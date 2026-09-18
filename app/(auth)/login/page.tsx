@@ -1,6 +1,6 @@
 "use client";
 
-import { signIn } from "next-auth/react";
+import { signIn, useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 
@@ -28,9 +28,24 @@ export default function LoginPage() {
         return;
       }
 
-      // Redirect to student dashboard
-      router.push("/student/dashboard");
-      router.refresh();
+      // Wait a moment for session to be established, then check role
+      setTimeout(async () => {
+        try {
+          const sessionRes = await fetch("/api/auth/session");
+          const session = await sessionRes.json();
+          
+          if (session?.user?.role === "ADMIN") {
+            router.push("/admin/dashboard");
+          } else {
+            router.push("/dashboard");
+          }
+          router.refresh();
+        } catch (err) {
+          // Fallback - just go to dashboard
+          router.push("/dashboard");
+          router.refresh();
+        }
+      }, 100);
     } catch (err) {
       setError("Something went wrong. Try again.");
     } finally {
