@@ -4,7 +4,15 @@ export async function GET() {
   try {
     const prisma = new PrismaClient();
 
-    // Run migrations
+    // Create enum first
+    await prisma.$executeRawUnsafe(`
+      DO $$ BEGIN
+        CREATE TYPE "Role" AS ENUM ('USER', 'ADMIN', 'SUPER_ADMIN');
+      EXCEPTION WHEN duplicate_object THEN NULL;
+      END $$;
+    `);
+
+    // Create User table
     await prisma.$executeRawUnsafe(`
       CREATE TABLE IF NOT EXISTS "User" (
         "id" TEXT NOT NULL PRIMARY KEY,
@@ -13,7 +21,7 @@ export async function GET() {
         "name" TEXT,
         "password" TEXT,
         "image" TEXT,
-        "role" TEXT NOT NULL DEFAULT 'USER',
+        "role" "Role" NOT NULL DEFAULT 'USER',
         "active" BOOLEAN NOT NULL DEFAULT true,
         "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
         "updatedAt" TIMESTAMP(3) NOT NULL
@@ -22,15 +30,8 @@ export async function GET() {
 
     await prisma.$disconnect();
 
-    return Response.json({ success: true, message: "Database tables created" });
+    return Response.json({ success: true, message: "Database and tables created" });
   } catch (error) {
-    const errorMsg = String(error);
-    
-    // Tables might already exist
-    if (errorMsg.includes("already exists")) {
-      return Response.json({ success: true, message: "Tables already exist" });
-    }
-
-    return Response.json({ error: errorMsg }, { status: 500 });
+    return Response.json({ error: String(error) }, { status: 500 });
   }
 }
