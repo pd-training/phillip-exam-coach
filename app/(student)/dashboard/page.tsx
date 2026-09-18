@@ -58,124 +58,212 @@ export default function StudentDashboard() {
   }, []);
 
   return (
-    <div style={{ maxWidth: "1200px", margin: "0 auto", padding: "20px" }}>
-      {/* Header with logout */}
-      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "30px" }}>
-        <div>
-          <h1 style={{ margin: "0 0 8px 0" }}>📚 Student Dashboard</h1>
-          <p style={{ color: "#666", margin: "0" }}>Welcome, {session?.user?.name || "Student"}!</p>
+    <div style={{ backgroundColor: "#f8f9fa", minHeight: "100vh" }}>
+      {/* Navigation Bar */}
+      <nav style={{
+        backgroundColor: "white",
+        borderBottom: "1px solid #e5e7eb",
+        padding: "16px 24px",
+        display: "flex",
+        justifyContent: "space-between",
+        alignItems: "center",
+      }}>
+        <div style={{ display: "flex", gap: "32px" }}>
+          <a href="/dashboard" style={{ textDecoration: "none", color: "#3b82f6", fontWeight: "600", fontSize: "14px" }}>
+            Dashboard
+          </a>
+          <a href="#" style={{ textDecoration: "none", color: "#666", fontWeight: "500", fontSize: "14px" }}>
+            Practice
+          </a>
+          <a href="#" style={{ textDecoration: "none", color: "#666", fontWeight: "500", fontSize: "14px" }}>
+            Browse papers
+          </a>
+          <a href="#" style={{ textDecoration: "none", color: "#666", fontWeight: "500", fontSize: "14px" }}>
+            Help
+          </a>
         </div>
-        <button
-          onClick={handleLogout}
-          style={{
-            padding: "10px 20px",
-            backgroundColor: "#ef4444",
-            color: "white",
-            border: "none",
-            borderRadius: "8px",
-            fontSize: "14px",
-            fontWeight: "600",
-            cursor: "pointer",
-            transition: "all 0.2s",
-          }}
-          onMouseEnter={(e) => {
-            e.currentTarget.style.backgroundColor = "#dc2626";
-          }}
-          onMouseLeave={(e) => {
-            e.currentTarget.style.backgroundColor = "#ef4444";
-          }}
-        >
-          🚪 Logout
-        </button>
-      </div>
+        <div style={{ display: "flex", gap: "24px", alignItems: "center" }}>
+          <span style={{ color: "#666", fontSize: "14px" }}>Account</span>
+          <span style={{ fontWeight: "600", fontSize: "14px" }}>{session?.user?.name || "Student"}</span>
+          <button
+            onClick={handleLogout}
+            style={{
+              backgroundColor: "transparent",
+              color: "#3b82f6",
+              border: "none",
+              cursor: "pointer",
+              fontSize: "14px",
+              fontWeight: "500",
+            }}
+          >
+            Log out
+          </button>
+        </div>
+      </nav>
 
-      {/* Available Exams Section */}
-      <section style={{ marginTop: "30px" }}>
-        <h2 style={{ marginBottom: "20px" }}>📋 Available Exams</h2>
-        
-        {loading ? (
-          <p style={{ color: "#666" }}>Loading exams...</p>
-        ) : papers.length === 0 ? (
+      {/* Main Content */}
+      <div style={{ maxWidth: "1100px", margin: "0 auto", padding: "32px 24px" }}>
+        {/* Welcome Section */}
+        <div style={{ marginBottom: "40px" }}>
+          <h1 style={{ fontSize: "32px", fontWeight: "600", margin: "0 0 8px 0", color: "#1f2937" }}>
+            Welcome, {session?.user?.name || "Student"}
+          </h1>
+          <p style={{ color: "#666", margin: "0", fontSize: "14px" }}>Your assigned CMFAS papers</p>
+        </div>
+
+        {/* Stats Cards */}
+        <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: "24px", marginBottom: "40px" }}>
           <div style={{
-            backgroundColor: "#f3f4f6",
-            padding: "40px",
-            borderRadius: "12px",
-            textAlign: "center",
-            color: "#666",
+            backgroundColor: "white",
+            padding: "24px",
+            borderRadius: "8px",
+            border: "1px solid #e5e7eb",
           }}>
-            <p style={{ margin: "0" }}>No exams available yet. Check back soon!</p>
+            <div style={{ fontSize: "32px", fontWeight: "bold", color: "#3b82f6", marginBottom: "8px" }}>0</div>
+            <p style={{ margin: "0", color: "#666", fontSize: "14px" }}>Full Exam Attempts Completed</p>
           </div>
-        ) : (
-          <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(300px, 1fr))", gap: "20px" }}>
-            {papers.map((paper) => (
-              <div
-                key={paper.id}
-                style={{
-                  backgroundColor: "white",
-                  padding: "24px",
-                  borderRadius: "12px",
-                  border: "1px solid #e5e7eb",
-                  boxShadow: "0 2px 8px rgba(0,0,0,0.08)",
-                  display: "flex",
-                  flexDirection: "column",
-                }}
-              >
-                <h3 style={{ margin: "0 0 12px 0", fontSize: "18px", fontWeight: "600" }}>
-                  {paper.title}
-                </h3>
-                
-                <div style={{ 
-                  margin: "0 0 20px 0", 
-                  fontSize: "14px", 
-                  color: "#666",
-                  flex: 1
-                }}>
-                  <p style={{ margin: "0 0 8px 0" }}>
-                    ⏱️ Duration: <strong>{paper.durationMinutes} minutes</strong>
-                  </p>
-                  <p style={{ margin: "0" }}>
-                    ❓ Questions: <strong>{paper.totalQuestions}</strong>
-                  </p>
-                </div>
+          <div style={{
+            backgroundColor: "white",
+            padding: "24px",
+            borderRadius: "8px",
+            border: "1px solid #e5e7eb",
+          }}>
+            <div style={{ fontSize: "32px", fontWeight: "bold", color: "#999", marginBottom: "8px" }}>—</div>
+            <p style={{ margin: "0", color: "#666", fontSize: "14px" }}>Average score</p>
+          </div>
+          <div style={{
+            backgroundColor: "white",
+            padding: "24px",
+            borderRadius: "8px",
+            border: "1px solid #e5e7eb",
+          }}>
+            <div style={{ fontSize: "32px", fontWeight: "bold", color: "#999", marginBottom: "8px" }}>—</div>
+            <p style={{ margin: "0", color: "#666", fontSize: "14px" }}>Pass rate</p>
+          </div>
+        </div>
 
-                <a href={`/exam/${paper.id}`} style={{ textDecoration: "none" }}>
-                  <button style={{
-                    width: "100%",
-                    padding: "12px",
-                    backgroundColor: "#3b82f6",
-                    color: "white",
-                    border: "none",
+        {/* AI Recommended Chapters */}
+        <div style={{
+          backgroundColor: "white",
+          padding: "24px",
+          borderRadius: "8px",
+          border: "1px solid #e5e7eb",
+          marginBottom: "40px",
+        }}>
+          <div style={{ display: "flex", alignItems: "center", marginBottom: "16px" }}>
+            <span style={{ fontSize: "20px", marginRight: "8px" }}>✨</span>
+            <h2 style={{ margin: "0", fontSize: "18px", fontWeight: "600" }}>AI Recommended Chapters to Practice</h2>
+          </div>
+          <p style={{ color: "#666", fontSize: "13px", margin: "0 0 20px 0" }}>
+            Based on your results across every paper and practice session
+          </p>
+          
+          {loading ? (
+            <p style={{ color: "#666" }}>Loading...</p>
+          ) : (
+            <div>
+              {papers.length === 0 ? (
+                <p style={{ color: "#666", fontSize: "14px", margin: "0" }}>
+                  Take your first exam to get AI recommendations
+                </p>
+              ) : (
+                <div style={{ display: "grid", gap: "12px" }}>
+                  {[
+                    { num: 1, chapter: "RES5 - Chapter 15", score: "0%" },
+                    { num: 2, chapter: "RES5 - Chapter 21", score: "0%" },
+                    { num: 3, chapter: "RES5 - Chapter 11", score: "0%" },
+                  ].map((item) => (
+                    <div key={item.num} style={{
+                      display: "flex",
+                      alignItems: "center",
+                      padding: "16px",
+                      backgroundColor: "#f9f9f9",
+                      borderRadius: "6px",
+                      justifyContent: "space-between",
+                    }}>
+                      <div style={{ display: "flex", alignItems: "center", gap: "12px" }}>
+                        <div style={{
+                          width: "32px",
+                          height: "32px",
+                          borderRadius: "50%",
+                          backgroundColor: "#e5e7eb",
+                          display: "flex",
+                          alignItems: "center",
+                          justifyContent: "center",
+                          fontWeight: "600",
+                          color: "#666",
+                        }}>
+                          {item.num}
+                        </div>
+                        <div>
+                          <p style={{ margin: "0", fontWeight: "500", fontSize: "14px" }}>{item.chapter}</p>
+                          <p style={{ margin: "4px 0 0 0", color: "#ef4444", fontSize: "12px", fontWeight: "600" }}>0% correct</p>
+                        </div>
+                      </div>
+                      <span style={{ color: "#999", fontSize: "20px" }}>→</span>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
+          )}
+        </div>
+
+        {/* Your Papers */}
+        <div>
+          <h2 style={{ fontSize: "16px", fontWeight: "600", margin: "0 0 20px 0" }}>Your papers</h2>
+          {loading ? (
+            <p style={{ color: "#666" }}>Loading papers...</p>
+          ) : papers.length === 0 ? (
+            <div style={{
+              backgroundColor: "white",
+              padding: "40px",
+              borderRadius: "8px",
+              textAlign: "center",
+              color: "#666",
+            }}>
+              <p style={{ margin: "0" }}>No exam papers available yet.</p>
+            </div>
+          ) : (
+            <div style={{ display: "grid", gap: "16px" }}>
+              {papers.map((paper) => (
+                <a
+                  key={paper.id}
+                  href={`/exam/${paper.id}`}
+                  style={{
+                    textDecoration: "none",
+                    backgroundColor: "white",
+                    padding: "20px",
                     borderRadius: "8px",
-                    fontSize: "14px",
-                    fontWeight: "600",
+                    border: "1px solid #e5e7eb",
+                    display: "flex",
+                    justifyContent: "space-between",
+                    alignItems: "center",
                     cursor: "pointer",
                     transition: "all 0.2s",
                   }}
                   onMouseEnter={(e) => {
-                    e.currentTarget.style.backgroundColor = "#2563eb";
+                    e.currentTarget.style.boxShadow = "0 4px 12px rgba(0,0,0,0.1)";
                   }}
                   onMouseLeave={(e) => {
-                    e.currentTarget.style.backgroundColor = "#3b82f6";
-                  }}>
-                    Start Exam →
-                  </button>
+                    e.currentTarget.style.boxShadow = "none";
+                  }}
+                >
+                  <div>
+                    <h3 style={{ margin: "0", fontSize: "15px", fontWeight: "600", color: "#3b82f6" }}>
+                      {paper.title}
+                    </h3>
+                    <p style={{ margin: "4px 0 0 0", color: "#666", fontSize: "13px" }}>
+                      {paper.totalQuestions} questions — {paper.durationMinutes} min
+                    </p>
+                  </div>
+                  <span style={{ color: "#999", fontSize: "18px" }}>→</span>
                 </a>
-              </div>
-            ))}
-          </div>
-        )}
-      </section>
-
-      {/* Info Section */}
-      <section style={{ marginTop: "40px", padding: "20px", backgroundColor: "#f0fdf4", borderLeft: "4px solid #10b981", borderRadius: "8px" }}>
-        <h3 style={{ margin: "0 0 10px 0", color: "#065f46" }}>💡 Tips</h3>
-        <ul style={{ margin: "0", paddingLeft: "20px", color: "#065f46" }}>
-          <li>Manage your time wisely during the exam</li>
-          <li>You can navigate between questions using the quick navigation panel</li>
-          <li>Your answers are automatically saved as you progress</li>
-          <li>You need 70% to pass</li>
-        </ul>
-      </section>
+              ))}
+            </div>
+          )}
+        </div>
+      </div>
     </div>
   );
 }
