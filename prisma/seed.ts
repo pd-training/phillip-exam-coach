@@ -128,15 +128,6 @@ async function main() {
       },
     });
 
-    // Assign paper to student
-    await prisma.assignment.create({
-      data: {
-        paperId: paper.id,
-        userId: student.id,
-        status: "APPROVED" as any,
-      },
-    });
-
     console.log("✅ Database seeded successfully!");
   } catch (error) {
     console.error("❌ Seed error:", error);
