@@ -114,10 +114,6 @@ async function main() {
         email: "admin@phillip.com",
         password: adminHash,
         role: "ADMIN" as any,
-        active: true,
-        approvedAt: new Date(),
-        pdpaConsent: true,
-        pdpaConsentAt: new Date(),
       },
     });
 
@@ -129,10 +125,6 @@ async function main() {
         email: "student@phillip.com",
         password: studentHash,
         role: "STUDENT" as any,
-        active: true,
-        approvedAt: new Date(),
-        pdpaConsent: true,
-        pdpaConsentAt: new Date(),
       },
     });
 
