@@ -53,7 +53,7 @@ async function main() {
       const topic = await prisma.topic.create({
         data: {
           moduleId: module.id,
-          code: i,
+          code: i as any,
           name: `Topic ${i}`,
         },
       });
