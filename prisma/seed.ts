@@ -1,4 +1,4 @@
-import { PrismaClient, Role, AssignmentStatus, Difficulty, AnswerOption } from "@prisma/client";
+import { PrismaClient } from "@prisma/client";
 import bcrypt from "bcryptjs";
 
 const prisma = new PrismaClient();
@@ -73,7 +73,8 @@ async function main() {
     // Create sample questions (110 for Part I)
     for (let i = 0; i < 110; i++) {
       const topicIndex = Math.floor(i / 5) % topics.length;
-      const answerOptions = [AnswerOption.A, AnswerOption.B, AnswerOption.C, AnswerOption.D];
+      const answerOptions = ["A", "B", "C", "D"];
+      const difficulties = ["EASY", "MEDIUM", "HARD"];
       
       await prisma.question.create({
         data: {
@@ -85,9 +86,9 @@ async function main() {
           optionB: "This is option B",
           optionC: "This is option C",
           optionD: "This is option D",
-          correctAnswer: answerOptions[i % 4],
+          correctAnswer: answerOptions[i % 4] as any,
           explanation: `This is the explanation for Part I Question ${i + 1}. The correct answer is option ${answerOptions[i % 4]}.`,
-          difficulty: [Difficulty.EASY, Difficulty.MEDIUM, Difficulty.HARD][i % 3],
+          difficulty: difficulties[i % 3] as any,
           orderInPaper: i + 1,
         },
       });
@@ -96,7 +97,8 @@ async function main() {
     // Create sample questions (40 for Part II)
     for (let i = 0; i < 40; i++) {
       const topicIndex = Math.floor(i / 2) % topics.length;
-      const answerOptions = [AnswerOption.A, AnswerOption.B, AnswerOption.C, AnswerOption.D];
+      const answerOptions = ["A", "B", "C", "D"];
+      const difficulties = ["EASY", "MEDIUM", "HARD"];
       
       await prisma.question.create({
         data: {
@@ -108,9 +110,9 @@ async function main() {
           optionB: "This is option B",
           optionC: "This is option C",
           optionD: "This is option D",
-          correctAnswer: answerOptions[i % 4],
+          correctAnswer: answerOptions[i % 4] as any,
           explanation: `This is the explanation for Part II Question ${i + 1}. The correct answer is option ${answerOptions[i % 4]}.`,
-          difficulty: [Difficulty.EASY, Difficulty.MEDIUM, Difficulty.HARD][i % 3],
+          difficulty: difficulties[i % 3] as any,
           orderInPaper: 111 + i,
         },
       });
@@ -123,7 +125,7 @@ async function main() {
         name: "Admin User",
         email: "admin@phillip.com",
         password: adminHash,
-        role: Role.ADMIN,
+        role: "ADMIN" as any,
         active: true,
         approvedAt: new Date(),
         pdpaConsent: true,
@@ -138,7 +140,7 @@ async function main() {
         name: "Student User",
         email: "student@phillip.com",
         password: studentHash,
-        role: Role.STUDENT,
+        role: "STUDENT" as any,
         active: true,
         approvedAt: new Date(),
         pdpaConsent: true,
@@ -151,7 +153,7 @@ async function main() {
       data: {
         paperId: paper.id,
         userId: student.id,
-        status: AssignmentStatus.APPROVED,
+        status: "APPROVED" as any,
       },
     });
 
