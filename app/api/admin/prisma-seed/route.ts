@@ -27,8 +27,8 @@ export async function GET() {
         name: "Admin", 
         email: "admin@phillip.com", 
         password: adminHash, 
-        role: "ADMIN" as any
-      }
+        role: "ADMIN"
+      } as any
     });
 
     // Create student user
@@ -38,8 +38,8 @@ export async function GET() {
         name: "Student", 
         email: "student@phillip.com", 
         password: studentHash, 
-        role: "STUDENT" as any
-      }
+        role: "STUDENT"
+      } as any
     });
 
     await prisma.$disconnect();
