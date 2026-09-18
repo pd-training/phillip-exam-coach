@@ -22,12 +22,17 @@ export default function UserManagement() {
   const [role, setRole] = useState("STUDENT");
   const [password, setPassword] = useState("");
   const [submitting, setSubmitting] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
   if (status === "loading") {
-    return <div style={{ padding: "20px" }}>Loading...</div>;
+    return <div style={{ padding: "20px" }}>Loading session...</div>;
   }
 
   if (status === "unauthenticated") {
+    redirect("/login");
+  }
+
+  if (!session?.user) {
     redirect("/login");
   }
 
@@ -45,8 +50,15 @@ export default function UserManagement() {
       if (res.ok) {
         const data = await res.json();
         setUsers(data.users || []);
+        setError(null);
+      } else {
+        const errorData = await res.json();
+        setError(`API Error: ${errorData.error || res.statusText}`);
+        console.error("API Error:", errorData);
       }
     } catch (error) {
+      const msg = error instanceof Error ? error.message : String(error);
+      setError(`Failed to fetch users: ${msg}`);
       console.error("Failed to fetch users:", error);
     } finally {
       setLoading(false);
@@ -262,6 +274,21 @@ export default function UserManagement() {
               {submitting ? "Creating..." : "Create User"}
             </button>
           </form>
+        </div>
+      )}
+
+      {/* Error Display */}
+      {error && (
+        <div style={{
+          backgroundColor: "#fee2e2",
+          border: "1px solid #fecaca",
+          padding: "12px 16px",
+          borderRadius: "8px",
+          marginBottom: "20px",
+          color: "#991b1b",
+          fontSize: "14px",
+        }}>
+          <strong>Error:</strong> {error}
         </div>
       )}
 
