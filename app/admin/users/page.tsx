@@ -23,20 +23,33 @@ export default function UserManagement() {
   const [password, setPassword] = useState("");
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [pageError, setPageError] = useState<string | null>(null);
+
+  // Log auth status for debugging
+  useEffect(() => {
+    console.log("Auth Status:", status);
+    console.log("Session:", session);
+  }, [status, session]);
 
   if (status === "loading") {
-    return <div style={{ padding: "20px" }}>Loading session...</div>;
+    return <div style={{ padding: "20px" }}>🔄 Loading session...</div>;
   }
 
   if (status === "unauthenticated") {
+    console.log("Not authenticated, redirecting to /login");
     redirect("/login");
   }
 
   if (!session?.user) {
+    console.log("No session.user, redirecting to /login");
     redirect("/login");
   }
 
-  if ((session?.user as any)?.role !== "ADMIN") {
+  const userRole = (session?.user as any)?.role;
+  console.log("User role:", userRole);
+
+  if (userRole !== "ADMIN") {
+    console.log("Not admin, redirecting to /dashboard");
     redirect("/dashboard");
   }
 
