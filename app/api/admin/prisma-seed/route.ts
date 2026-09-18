@@ -118,7 +118,7 @@ export async function GET() {
 
     // Create admin user
     const adminHash = await bcrypt.hash("Admin@123", 10);
-    const admin = await prisma.user.create({
+    await prisma.user.create({
       data: {
         name: "Admin User",
         email: "admin@phillip.com",
