@@ -1,5 +1,7 @@
 import NextAuth from "next-auth/next";
 import CredentialsProvider from "next-auth/providers/credentials";
+import crypto from "crypto";
+import { prisma } from "@/lib/prisma";
 
 const handler = NextAuth({
   providers: [
@@ -13,7 +15,26 @@ const handler = NextAuth({
         if (!credentials?.email || !credentials?.password) {
           return null;
         }
-        return { id: "1", email: credentials.email, name: "User" };
+
+        const user = await prisma.user.findUnique({
+          where: { email: credentials.email },
+        });
+
+        if (!user) return null;
+
+        const hash = crypto
+          .createHash("sha256")
+          .update(credentials.password)
+          .digest("hex");
+
+        if (hash !== user.password) return null;
+
+        return {
+          id: user.id,
+          email: user.email,
+          name: user.name,
+          role: user.role,
+        };
       },
     }),
   ],
