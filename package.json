@@ -3,9 +3,11 @@
   "version": "1.0.0",
   "description": "CMFAS exam preparation platform",
   "scripts": {
-    "dev": "next dev",
-    "build": "next build",
-    "start": "next start"
+  "dev": "next dev",
+  "build": "prisma generate && next build",
+  "start": "next start",
+  "postinstall": "prisma generate"
+}
   },
   "dependencies": {
     "react": "^18.2.0",
