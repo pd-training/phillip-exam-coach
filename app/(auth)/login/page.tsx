@@ -1,8 +1,8 @@
 "use client";
 
-import { useState } from "react";
 import { signIn } from "next-auth/react";
 import { useRouter } from "next/navigation";
+import { useState } from "react";
 
 export default function LoginPage() {
   const router = useRouter();
@@ -23,11 +23,21 @@ export default function LoginPage() {
         redirect: false,
       });
 
-      if (result?.error) {
+      if (!result?.ok) {
         setError("Invalid email or password");
-      } else if (result?.ok) {
-        router.push("/dashboard");
+        return;
       }
+
+      // Redirect based on role (admin vs student)
+      const response = await fetch("/api/whoami");
+      const userData = await response.json();
+      
+      if (userData.roles?.includes("ADMIN")) {
+        router.push("/admin/dashboard");
+      } else {
+        router.push("/student/dashboard");
+      }
+      router.refresh();
     } catch (err) {
       setError("Something went wrong. Try again.");
     } finally {
@@ -37,34 +47,36 @@ export default function LoginPage() {
 
   return (
     <div style={{ maxWidth: "400px", margin: "100px auto", padding: "20px" }}>
-      <h1>Login</h1>
+      <h1>Phillip Exam Coach - Login</h1>
       
       {error && (
-        <div style={{ color: "red", marginBottom: "10px", padding: "10px", backgroundColor: "#ffe0e0", borderRadius: "4px" }}>
-          {error}
+        <div style={{ color: "red", marginBottom: "15px", padding: "10px", backgroundColor: "#ffe0e0", borderRadius: "4px" }}>
+          ❌ {error}
         </div>
       )}
 
       <form onSubmit={handleSubmit}>
         <div style={{ marginBottom: "15px" }}>
-          <label>Email:</label>
+          <label htmlFor="email">Email:</label>
           <input
+            id="email"
             type="email"
             value={email}
             onChange={(e) => setEmail(e.target.value)}
             required
-            style={{ width: "100%", padding: "8px", marginTop: "5px" }}
+            style={{ width: "100%", padding: "8px", marginTop: "5px", boxSizing: "border-box" }}
           />
         </div>
 
         <div style={{ marginBottom: "15px" }}>
-          <label>Password:</label>
+          <label htmlFor="password">Password:</label>
           <input
+            id="password"
             type="password"
             value={password}
             onChange={(e) => setPassword(e.target.value)}
             required
-            style={{ width: "100%", padding: "8px", marginTop: "5px" }}
+            style={{ width: "100%", padding: "8px", marginTop: "5px", boxSizing: "border-box" }}
           />
         </div>
 
@@ -79,15 +91,18 @@ export default function LoginPage() {
             border: "none",
             borderRadius: "4px",
             cursor: loading ? "not-allowed" : "pointer",
+            fontWeight: "bold",
           }}
         >
           {loading ? "Signing in..." : "Sign In"}
         </button>
       </form>
 
-      <p style={{ marginTop: "20px", textAlign: "center" }}>
-        Test credentials: admin@phillip.com / Admin@123
-      </p>
+      <div style={{ marginTop: "20px", padding: "10px", backgroundColor: "#f0f0f0", borderRadius: "4px" }}>
+        <p style={{ margin: "0 0 10px 0", fontWeight: "bold" }}>Test Accounts:</p>
+        <p style={{ margin: "0" }}>Admin: <code>admin@phillip.com</code> / <code>Admin@123</code></p>
+        <p style={{ margin: "0" }}>Student: <code>student@phillip.com</code> / <code>Student@123</code></p>
+      </div>
     </div>
   );
 }
