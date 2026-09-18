@@ -1,7 +1,7 @@
 "use client";
 
 import { useSession, signOut } from "next-auth/react";
-import { redirect } from "next/navigation";
+import { useRouter } from "next/navigation";
 import { useState, useEffect } from "react";
 
 interface User {
@@ -13,6 +13,7 @@ interface User {
 }
 
 export default function UserManagement() {
+  const router = useRouter();
   const { data: session, status } = useSession();
   const [users, setUsers] = useState<User[]>([]);
   const [loading, setLoading] = useState(true);
@@ -31,32 +32,42 @@ export default function UserManagement() {
     console.log("Session:", session);
   }, [status, session]);
 
+  // Handle auth redirects
+  useEffect(() => {
+    if (status === "loading") return;
+
+    if (status === "unauthenticated") {
+      console.log("Not authenticated, redirecting to /login");
+      router.push("/login");
+      return;
+    }
+
+    if (!session?.user) {
+      console.log("No session.user, redirecting to /login");
+      router.push("/login");
+      return;
+    }
+
+    const userRole = (session?.user as any)?.role;
+    console.log("User role:", userRole);
+
+    if (userRole !== "ADMIN") {
+      console.log("Not admin, redirecting to /dashboard");
+      router.push("/dashboard");
+      return;
+    }
+  }, [status, session, router]);
+
   if (status === "loading") {
     return <div style={{ padding: "20px" }}>🔄 Loading session...</div>;
   }
 
-  if (status === "unauthenticated") {
-    console.log("Not authenticated, redirecting to /login");
-    redirect("/login");
+  // Don't render until we know they're an admin
+  if (status === "unauthenticated" || !session?.user || (session?.user as any)?.role !== "ADMIN") {
+    return null;
   }
 
-  if (!session?.user) {
-    console.log("No session.user, redirecting to /login");
-    redirect("/login");
-  }
-
-  const userRole = (session?.user as any)?.role;
-  console.log("User role:", userRole);
-
-  if (userRole !== "ADMIN") {
-    console.log("Not admin, redirecting to /dashboard");
-    redirect("/dashboard");
-  }
-
-  useEffect(() => {
-    fetchUsers();
-  }, []);
-
+  // Define fetchUsers before useEffect
   const fetchUsers = async () => {
     try {
       const res = await fetch("/api/users");
@@ -77,6 +88,12 @@ export default function UserManagement() {
       setLoading(false);
     }
   };
+
+  // Load users on mount
+  useEffect(() => {
+    fetchUsers();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   const handleLogout = async () => {
     const baseUrl = typeof window !== "undefined" ? window.location.origin : "";
