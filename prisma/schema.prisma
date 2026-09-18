@@ -1,0 +1,201 @@
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+model User {
+  id            String    @id @default(cuid())
+  email         String    @unique
+  emailVerified DateTime?
+  name          String?
+  password      String?
+  image         String?
+  role          Role      @default(USER)
+  active        Boolean   @default(true)
+  
+  accounts      Account[]
+  sessions      Session[]
+  attempts      Attempt[]
+  preferences   UserPreference?
+
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+
+  @@index([email])
+  @@index([role])
+}
+
+model Account {
+  id                 String  @id @default(cuid())
+  userId             String
+  type               String
+  provider           String
+  providerAccountId  String
+  refresh_token      String?  @db.Text
+  access_token       String?  @db.Text
+  expires_at         Int?
+  token_type         String?
+  scope              String?
+  id_token           String?  @db.Text
+  session_state      String?
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([provider, providerAccountId])
+  @@index([userId])
+}
+
+model Session {
+  id           String   @id @default(cuid())
+  sessionToken String   @unique
+  userId       String
+  expires      DateTime
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+}
+
+model UserPreference {
+  id                   String  @id @default(cuid())
+  userId               String  @unique
+  emailNotifications   Boolean @default(true)
+  theme                String  @default("light")
+  
+  user                 User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+}
+
+model Module {
+  id        String   @id @default(cuid())
+  code      String   @unique
+  name      String
+  
+  papers    Paper[]
+  topics    Topic[]
+  
+  createdAt DateTime @default(now())
+
+  @@index([code])
+}
+
+model Paper {
+  id               String   @id @default(cuid())
+  moduleId         String
+  title            String
+  durationMinutes  Int
+  totalQuestions   Int
+  active           Boolean  @default(true)
+  
+  module           Module   @relation(fields: [moduleId], references: [id], onDelete: Cascade)
+  sections         PaperSection[]
+  questions        Question[]
+  attempts         Attempt[]
+  
+  createdAt        DateTime @default(now())
+  updatedAt        DateTime @updatedAt
+
+  @@index([moduleId])
+  @@index([active])
+}
+
+model PaperSection {
+  id                String   @id @default(cuid())
+  paperId           String
+  name              String
+  order             Int
+  questionCount     Int
+  passThresholdPct  Int      @default(75)
+  
+  paper             Paper    @relation(fields: [paperId], references: [id], onDelete: Cascade)
+  questions         Question[]
+  
+  @@unique([paperId, order])
+  @@index([paperId])
+}
+
+model Topic {
+  id        String   @id @default(cuid())
+  moduleId  String
+  code      String
+  name      String
+  
+  module    Module   @relation(fields: [moduleId], references: [id], onDelete: Cascade)
+  questions Question[]
+  
+  @@unique([moduleId, code])
+  @@index([moduleId])
+}
+
+model Question {
+  id            String   @id @default(cuid())
+  paperId       String
+  sectionId     String
+  topicId       String?
+  questionText  String   @db.Text
+  optionA       String   @db.Text
+  optionB       String   @db.Text
+  optionC       String   @db.Text
+  optionD       String   @db.Text
+  correctAnswer String   // A, B, C, D
+  explanation   String   @db.Text
+  difficulty    String   @default("MEDIUM") // EASY, MEDIUM, HARD
+  active        Boolean  @default(true)
+  
+  paper         Paper    @relation(fields: [paperId], references: [id], onDelete: Cascade)
+  section       PaperSection @relation(fields: [sectionId], references: [id], onDelete: Cascade)
+  topic         Topic?   @relation(fields: [topicId], references: [id], onDelete: SetNull)
+  answers       AttemptAnswer[]
+  
+  createdAt     DateTime @default(now())
+
+  @@index([paperId])
+  @@index([sectionId])
+  @@index([topicId])
+  @@index([active])
+}
+
+model Attempt {
+  id               String   @id @default(cuid())
+  userId           String
+  paperId          String
+  startedAt        DateTime @default(now())
+  submittedAt      DateTime?
+  score            Float?
+  totalQuestions   Int
+  correctAnswers   Int?
+  timeSpent        Int?     // seconds
+  
+  user             User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  paper            Paper    @relation(fields: [paperId], references: [id], onDelete: Cascade)
+  answers          AttemptAnswer[]
+
+  @@index([userId])
+  @@index([paperId])
+  @@index([submittedAt])
+}
+
+model AttemptAnswer {
+  id         String   @id @default(cuid())
+  attemptId  String
+  questionId String
+  answer     String?  // A, B, C, D, or null if unanswered
+  isCorrect  Boolean?
+  
+  attempt    Attempt  @relation(fields: [attemptId], references: [id], onDelete: Cascade)
+  question   Question @relation(fields: [questionId], references: [id], onDelete: Cascade)
+
+  @@unique([attemptId, questionId])
+  @@index([attemptId])
+  @@index([questionId])
+}
+
+enum Role {
+  USER
+  ADMIN
+  SUPER_ADMIN
+}
