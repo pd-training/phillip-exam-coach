@@ -5,17 +5,8 @@ const prisma = new PrismaClient();
 
 async function main() {
   try {
-    // Clear existing data (optional - comment out if you want to keep old data)
-    await prisma.attemptAnswer.deleteMany();
-    await prisma.attemptSectionScore.deleteMany();
-    await prisma.attempt.deleteMany();
-    await prisma.assignment.deleteMany();
-    await prisma.question.deleteMany();
-    await prisma.paperSection.deleteMany();
-    await prisma.paper.deleteMany();
-    await prisma.topic.deleteMany();
-    await prisma.module.deleteMany();
-    await prisma.user.deleteMany();
+    // Note: Database tables are created via migrations, not seed
+    // Skip deleteMany() to avoid type generation issues at build time
 
     // Create module
     const module = await prisma.module.create({
