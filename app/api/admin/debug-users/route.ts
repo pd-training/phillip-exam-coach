@@ -6,9 +6,8 @@ export async function GET() {
     const { PrismaClient } = require("@prisma/client");
     const prisma = new PrismaClient({ datasources: { db: { url: dbUrl } } });
 
-    const users = await (prisma as any).user.findMany({
-      select: { id: true, email: true, name: true, role: true }
-    });
+    // Use raw SQL to get users
+    const users = await prisma.$queryRaw`SELECT id, email, name, role FROM "User"`;
 
     await prisma.$disconnect();
 

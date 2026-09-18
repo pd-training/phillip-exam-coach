@@ -22,9 +22,9 @@ export const authOptions = {
         }
 
         try {
-          const user = await prisma.user.findUnique({
-            where: { email: credentials.email },
-          });
+          // Use raw SQL to avoid Prisma enum validation issues
+          const users = await prisma.$queryRaw`SELECT id, email, name, password, role FROM "User" WHERE email = ${credentials.email}`;
+          const user = users?.[0];
 
           if (!user) return null;
 
