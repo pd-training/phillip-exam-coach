@@ -13,7 +13,6 @@ async function main() {
       data: {
         code: "RES5",
         name: "RES 5 - Rules, Ethics and Skills for Financial Advisory Services",
-        description: "CMFAS RES5 Module",
       },
     });
 
