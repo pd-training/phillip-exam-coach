@@ -1,201 +1,333 @@
-datasource db {
-  provider = "postgresql"
-  url      = "postgresql://postgres:MyPassword2026!@phillip-exam-coach-db.c7cmo2c6ecz8.ap-southeast-1.rds.amazonaws.com:5432/phillip_exam_coach"
-}
+// CMFAS LMS — Prisma schema
+// Designed so new modules (M5, M5A, M9, M9A, HI, PGI, CFP, etc.) are added
+// as DATA (rows in Module/Paper), never as new tables or code branches.
 
 generator client {
   provider = "prisma-client-js"
 }
 
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// ─────────────────────────────────────────────────────────────────
+// Enums
+// ─────────────────────────────────────────────────────────────────
+
+enum Role {
+  STUDENT
+  ADMIN
+}
+
+enum AssignmentStatus {
+  PENDING
+  APPROVED
+  REJECTED
+}
+
+enum AttemptStatus {
+  IN_PROGRESS
+  SUBMITTED
+  AUTO_SUBMITTED
+  ABANDONED
+}
+
+enum PracticeMode {
+  FULL
+  QUICK
+  CHAPTER
+  RECOMMENDED
+}
+
+enum Difficulty {
+  EASY
+  MEDIUM
+  HARD
+}
+
+enum AnswerOption {
+  A
+  B
+  C
+  D
+}
+
+// ─────────────────────────────────────────────────────────────────
+// Identity
+// ─────────────────────────────────────────────────────────────────
+
 model User {
-  id            String    @id @default(cuid())
-  email         String    @unique
-  emailVerified DateTime?
-  name          String?
-  password      String?
-  image         String?
-  role          Role      @default(USER)
-  active        Boolean   @default(true)
-  
-  accounts      Account[]
-  sessions      Session[]
+  id            String   @id @default(cuid())
+  name          String
+  firstName     String?
+  lastName      String?
+  phone         String?
+  selfRegistered Boolean @default(false)
+  email         String   @unique
+  passwordHash  String
+  roles         Role[]   @default([STUDENT])
+  active        Boolean  @default(true)
+  approvedAt    DateTime?
+  pdpaConsent   Boolean  @default(false)
+  pdpaConsentAt DateTime?
+  remarks       String?
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
   attempts      Attempt[]
-  preferences   UserPreference?
+  assignments   Assignment[]
+  auditLogs     AuditLog[]
+  practiceSessions PracticeSession[]
+  passwordResetTokens PasswordResetToken[]
 
-  createdAt     DateTime  @default(now())
-  updatedAt     DateTime  @updatedAt
-
-  @@index([email])
-  @@index([role])
+  @@index([active])
 }
 
-model Account {
-  id                 String  @id @default(cuid())
-  userId             String
-  type               String
-  provider           String
-  providerAccountId  String
-  refresh_token      String?  @db.Text
-  access_token       String?  @db.Text
-  expires_at         Int?
-  token_type         String?
-  scope              String?
-  id_token           String?  @db.Text
-  session_state      String?
-
-  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
-
-  @@unique([provider, providerAccountId])
-  @@index([userId])
-}
-
-model Session {
-  id           String   @id @default(cuid())
-  sessionToken String   @unique
-  userId       String
-  expires      DateTime
-  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-
-  @@index([userId])
-}
-
-model UserPreference {
-  id                   String  @id @default(cuid())
-  userId               String  @unique
-  emailNotifications   Boolean @default(true)
-  theme                String  @default("light")
-  
-  user                 User    @relation(fields: [userId], references: [id], onDelete: Cascade)
-
-  @@index([userId])
-}
+// ─────────────────────────────────────────────────────────────────
+// Module / Paper structure
+// ─────────────────────────────────────────────────────────────────
 
 model Module {
-  id        String   @id @default(cuid())
-  code      String   @unique
-  name      String
-  
-  papers    Paper[]
-  topics    Topic[]
-  
-  createdAt DateTime @default(now())
+  id          String   @id @default(cuid())
+  code        String   @unique
+  name        String
+  description String?
+  createdAt   DateTime @default(now())
 
-  @@index([code])
+  papers      Paper[]
 }
 
 model Paper {
-  id               String   @id @default(cuid())
-  moduleId         String
-  title            String
-  durationMinutes  Int
-  totalQuestions   Int
-  active           Boolean  @default(true)
-  
-  module           Module   @relation(fields: [moduleId], references: [id], onDelete: Cascade)
-  sections         PaperSection[]
-  questions        Question[]
-  attempts         Attempt[]
-  
-  createdAt        DateTime @default(now())
-  updatedAt        DateTime @updatedAt
+  id              String   @id @default(cuid())
+  moduleId        String
+  module          Module   @relation(fields: [moduleId], references: [id])
+  title           String
+  durationMinutes Int
+  totalQuestions  Int
+  active          Boolean  @default(true)
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
 
-  @@index([moduleId])
-  @@index([active])
+  sections        PaperSection[]
+  questions       Question[]
+  attempts        Attempt[]
+  assignments     Assignment[]
+  practiceSessions PracticeSession[]
 }
 
 model PaperSection {
   id                String   @id @default(cuid())
   paperId           String
+  paper             Paper    @relation(fields: [paperId], references: [id])
   name              String
   order             Int
   questionCount     Int
-  passThresholdPct  Int      @default(75)
-  
-  paper             Paper    @relation(fields: [paperId], references: [id], onDelete: Cascade)
+  passThresholdPct  Decimal  @db.Decimal(5, 2)
+
   questions         Question[]
-  
+  sectionScores     AttemptSectionScore[]
+
   @@unique([paperId, order])
-  @@index([paperId])
 }
 
 model Topic {
-  id        String   @id @default(cuid())
-  moduleId  String
-  code      String
-  name      String
-  
-  module    Module   @relation(fields: [moduleId], references: [id], onDelete: Cascade)
+  id       String  @id @default(cuid())
+  moduleId String
+  code     Int?
+  name     String
+
   questions Question[]
-  
+  practiceSessions PracticeSession[]
+
   @@unique([moduleId, code])
-  @@index([moduleId])
 }
 
+// ─────────────────────────────────────────────────────────────────
+// Question bank
+// ─────────────────────────────────────────────────────────────────
+
 model Question {
-  id            String   @id @default(cuid())
+  id            String       @id @default(cuid())
   paperId       String
+  paper         Paper        @relation(fields: [paperId], references: [id])
   sectionId     String
+  section       PaperSection @relation(fields: [sectionId], references: [id])
   topicId       String?
-  questionText  String   @db.Text
-  optionA       String   @db.Text
-  optionB       String   @db.Text
-  optionC       String   @db.Text
-  optionD       String   @db.Text
-  correctAnswer String
-  explanation   String   @db.Text
-  difficulty    String   @default("MEDIUM")
-  active        Boolean  @default(true)
-  
-  paper         Paper    @relation(fields: [paperId], references: [id], onDelete: Cascade)
-  section       PaperSection @relation(fields: [sectionId], references: [id], onDelete: Cascade)
-  topic         Topic?   @relation(fields: [topicId], references: [id], onDelete: SetNull)
-  answers       AttemptAnswer[]
-  
-  createdAt     DateTime @default(now())
+  topic         Topic?       @relation(fields: [topicId], references: [id])
+
+  questionText  String
+  optionA       String
+  optionB       String
+  optionC       String
+  optionD       String
+  correctAnswer AnswerOption
+  explanation   String
+  difficulty    Difficulty   @default(MEDIUM)
+  orderInPaper  Int?
+
+  isDuplicateOf String?
+  active        Boolean      @default(true)
+  createdAt     DateTime     @default(now())
+  updatedAt     DateTime     @updatedAt
+
+  attemptAnswers AttemptAnswer[]
+  practiceAnswers PracticeAnswer[]
 
   @@index([paperId])
   @@index([sectionId])
   @@index([topicId])
-  @@index([active])
 }
 
+// ─────────────────────────────────────────────────────────────────
+// Assignments (admin assigns papers to students)
+// ─────────────────────────────────────────────────────────────────
+
+model Assignment {
+  id           String    @id @default(cuid())
+  paperId      String
+  paper        Paper     @relation(fields: [paperId], references: [id])
+  userId       String
+  user         User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  status       AssignmentStatus @default(APPROVED)
+  assignedDate DateTime  @default(now())
+  dueDate      DateTime?
+
+  @@unique([paperId, userId])
+  @@index([userId])
+  @@index([status])
+}
+
+// ─────────────────────────────────────────────────────────────────
+// Attempts
+// ─────────────────────────────────────────────────────────────────
+
 model Attempt {
-  id               String   @id @default(cuid())
-  userId           String
-  paperId          String
-  startedAt        DateTime @default(now())
-  submittedAt      DateTime?
-  score            Float?
-  totalQuestions   Int
-  correctAnswers   Int?
-  timeSpent        Int?
-  
-  user             User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-  paper            Paper    @relation(fields: [paperId], references: [id], onDelete: Cascade)
-  answers          AttemptAnswer[]
+  id              String        @id @default(cuid())
+  userId          String
+  user            User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+  paperId         String
+  paper           Paper         @relation(fields: [paperId], references: [id])
+
+  status          AttemptStatus @default(IN_PROGRESS)
+  startTime       DateTime      @default(now())
+  submitTime      DateTime?
+  serverDeadline  DateTime
+
+  pausedRemainingSeconds Int?
+
+  questionIds     Json?
+
+  overallScore    Decimal?      @db.Decimal(5, 2)
+  passed          Boolean?
+
+  createdAt       DateTime      @default(now())
+  updatedAt       DateTime      @updatedAt
+
+  answers         AttemptAnswer[]
+  sectionScores   AttemptSectionScore[]
 
   @@index([userId])
   @@index([paperId])
-  @@index([submittedAt])
+  @@index([userId, paperId, status])
+}
+
+model AttemptSectionScore {
+  id         String       @id @default(cuid())
+  attemptId  String
+  attempt    Attempt      @relation(fields: [attemptId], references: [id], onDelete: Cascade)
+  sectionId  String
+  section    PaperSection @relation(fields: [sectionId], references: [id])
+
+  correctCount Int
+  totalCount   Int
+  scorePct     Decimal    @db.Decimal(5, 2)
+  passed       Boolean
+
+  @@unique([attemptId, sectionId])
 }
 
 model AttemptAnswer {
-  id         String   @id @default(cuid())
-  attemptId  String
-  questionId String
-  answer     String?
-  isCorrect  Boolean?
-  
-  attempt    Attempt  @relation(fields: [attemptId], references: [id], onDelete: Cascade)
-  question   Question @relation(fields: [questionId], references: [id], onDelete: Cascade)
+  id             String        @id @default(cuid())
+  attemptId      String
+  attempt        Attempt       @relation(fields: [attemptId], references: [id], onDelete: Cascade)
+  questionId     String
+  question       Question      @relation(fields: [questionId], references: [id])
+
+  selectedAnswer AnswerOption?
+  correct        Boolean       @default(false)
+  flagged        Boolean       @default(false)
+  answeredAt     DateTime?     @updatedAt
 
   @@unique([attemptId, questionId])
   @@index([attemptId])
-  @@index([questionId])
 }
 
-enum Role {
-  USER
-  ADMIN
-  SUPER_ADMIN
+// ─────────────────────────────────────────────────────────────────
+// Audit (admin actions, security-relevant events)
+// ─────────────────────────────────────────────────────────────────
+
+model AuditLog {
+  id        String   @id @default(cuid())
+  userId    String?
+  user      User?    @relation(fields: [userId], references: [id], onDelete: SetNull)
+  action    String
+  metadata  Json?
+  createdAt DateTime @default(now())
+
+  @@index([userId])
+  @@index([action])
+}
+
+// ─────────────────────────────────────────────────────────────────
+// Practice – separate from Attempt
+// ─────────────────────────────────────────────────────────────────
+
+model PracticeSession {
+  id          String       @id @default(cuid())
+  userId      String
+  user        User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+  paperId     String
+  paper       Paper        @relation(fields: [paperId], references: [id])
+  mode        PracticeMode
+  topicId     String?
+  topic       Topic?       @relation(fields: [topicId], references: [id])
+  questionIds Json
+  startedAt   DateTime     @default(now())
+  completedAt DateTime?
+  serverDeadline DateTime?
+
+  answers     PracticeAnswer[]
+
+  @@index([userId])
+}
+
+model PracticeAnswer {
+  id             String          @id @default(cuid())
+  sessionId      String
+  session        PracticeSession @relation(fields: [sessionId], references: [id], onDelete: Cascade)
+  questionId     String
+  question       Question        @relation(fields: [questionId], references: [id])
+  selectedAnswer AnswerOption?
+  correct        Boolean         @default(false)
+  answeredAt     DateTime?       @updatedAt
+
+  @@unique([sessionId, questionId])
+}
+
+// ─────────────────────────────────────────────────────────────────
+// Password reset
+// ─────────────────────────────────────────────────────────────────
+
+model PasswordResetToken {
+  id        String    @id @default(cuid())
+  userId    String
+  user      User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  token     String    @unique
+  expiresAt DateTime
+  usedAt    DateTime?
+  createdAt DateTime  @default(now())
+
+  @@index([userId])
+  @@index([token])
 }
