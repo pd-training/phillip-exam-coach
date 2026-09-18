@@ -79,7 +79,6 @@ async function main() {
           correctAnswer: answerOptions[i % 4] as any,
           explanation: `This is the explanation for Part I Question ${i + 1}. The correct answer is option ${answerOptions[i % 4]}.`,
           difficulty: difficulties[i % 3] as any,
-          orderInPaper: (i + 1) as any,
         },
       });
     }
@@ -103,7 +102,6 @@ async function main() {
           correctAnswer: answerOptions[i % 4] as any,
           explanation: `This is the explanation for Part II Question ${i + 1}. The correct answer is option ${answerOptions[i % 4]}.`,
           difficulty: difficulties[i % 3] as any,
-          orderInPaper: (111 + i) as any,
         },
       });
     }
