@@ -17,6 +17,9 @@ export async function GET() {
     const bcrypt = require("bcryptjs");
     const prisma = new PrismaClient({ datasources: { db: { url: dbUrl } } });
 
+    // Clear existing users
+    await prisma.user.deleteMany({});
+
     // Create admin user
     const adminHash = await bcrypt.hash("Admin@123", 10);
     await prisma.user.create({
