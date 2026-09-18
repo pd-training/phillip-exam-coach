@@ -8,7 +8,7 @@ const prisma = new PrismaClient();
 
 export async function GET() {
   try {
-    // Clear existing data (optional - comment out if you want to keep old data)
+    // Clear existing data
     await prisma.attemptAnswer.deleteMany();
     await prisma.attemptSectionScore.deleteMany();
     await prisma.attempt.deleteMany();
@@ -39,7 +39,7 @@ export async function GET() {
       },
     });
 
-    // Create sections (Part I & Part II)
+    // Create sections
     const partI = await prisma.paperSection.create({
       data: {
         paperId: paper.id,
@@ -60,7 +60,7 @@ export async function GET() {
       },
     });
 
-    // Create topics (27 topics for RES5)
+    // Create topics
     const topics = [];
     for (let i = 1; i <= 27; i++) {
       const topic = await prisma.topic.create({
@@ -73,10 +73,11 @@ export async function GET() {
       topics.push(topic);
     }
 
-    // Create sample questions (110 for Part I)
+    // Create questions for Part I
     for (let i = 0; i < 110; i++) {
       const topicIndex = Math.floor(i / 5) % topics.length;
       const answerOptions = ["A", "B", "C", "D"];
+      const difficulties = ["EASY", "MEDIUM", "HARD"];
       
       await prisma.question.create({
         data: {
@@ -88,18 +89,19 @@ export async function GET() {
           optionB: "This is option B",
           optionC: "This is option C",
           optionD: "This is option D",
-          correctAnswer: answerOptions[i % 4],
+          correctAnswer: answerOptions[i % 4] as any,
           explanation: `This is the explanation for Part I Question ${i + 1}. The correct answer is option ${answerOptions[i % 4]}.`,
-          difficulty: ["EASY", "MEDIUM", "HARD"][i % 3],
+          difficulty: difficulties[i % 3] as any,
           orderInPaper: i + 1,
         },
       });
     }
 
-    // Create sample questions (40 for Part II)
+    // Create questions for Part II
     for (let i = 0; i < 40; i++) {
       const topicIndex = Math.floor(i / 2) % topics.length;
-      const answerOptions = [AnswerOption.A, AnswerOption.B, AnswerOption.C, AnswerOption.D];
+      const answerOptions = ["A", "B", "C", "D"];
+      const difficulties = ["EASY", "MEDIUM", "HARD"];
       
       await prisma.question.create({
         data: {
@@ -111,78 +113,4 @@ export async function GET() {
           optionB: "This is option B",
           optionC: "This is option C",
           optionD: "This is option D",
-          correctAnswer: answerOptions[i % 4],
-          explanation: `This is the explanation for Part II Question ${i + 1}. The correct answer is option ${answerOptions[i % 4]}.`,
-          difficulty: [Difficulty.EASY, Difficulty.MEDIUM, Difficulty.HARD][i % 3],
-          orderInPaper: 111 + i,
-        },
-      });
-    }
-
-    // Create admin user
-    const adminHash = await bcrypt.hash("Admin@123", 10);
-    await prisma.user.create({
-      data: {
-        name: "Admin User",
-        email: "admin@phillip.com",
-        passwordHash: adminHash,
-        roles: ["ADMIN"],,
-        active: true,
-        approvedAt: new Date(),
-        pdpaConsent: true,
-        pdpaConsentAt: new Date(),
-      },
-    });
-
-    // Create student user
-    const studentHash = await bcrypt.hash("Student@123", 10);
-    const student = await prisma.user.create({
-      data: {
-        name: "Student User",
-        email: "student@phillip.com",
-        passwordHash: studentHash,
-        roles: ["STUDENT"],
-        active: true,
-        approvedAt: new Date(),
-        pdpaConsent: true,
-        pdpaConsentAt: new Date(),
-      },
-    });
-
-    // Assign paper to student
-    await prisma.assignment.create({
-      data: {
-        paperId: paper.id,
-        userId: student.id,
-        status: "APPROVED",
-      },
-    });
-
-    return Response.json({
-      success: true,
-      message: "Database seeded successfully!",
-      data: {
-        usersCreated: 2,
-        modulesCreated: 1,
-        papersCreated: 1,
-        topicsCreated: 27,
-        questionsCreated: 150,
-        assignmentsCreated: 1,
-      },
-      testAccounts: {
-        admin: "admin@phillip.com / Admin@123",
-        student: "student@phillip.com / Student@123",
-      },
-    });
-  } catch (error) {
-    console.error("Seed error:", error);
-    return Response.json(
-      {
-        success: false,
-        error: String(error),
-        message: "Seeding failed",
-      },
-      { status: 500 }
-    );
-  }
-}
+          correctAnswer: answerOptions[i % 4] as any,
