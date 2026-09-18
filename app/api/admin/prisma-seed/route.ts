@@ -1,7 +1,7 @@
 export const dynamic = "force-dynamic";
 export const revalidate = 0;
 
-import { PrismaClient, Role, AssignmentStatus, Difficulty, AnswerOption } from "@prisma/client";
+import { PrismaClient } from "@prisma/client";
 import bcrypt from "bcryptjs";
 
 const prisma = new PrismaClient();
@@ -76,7 +76,7 @@ export async function GET() {
     // Create sample questions (110 for Part I)
     for (let i = 0; i < 110; i++) {
       const topicIndex = Math.floor(i / 5) % topics.length;
-      const answerOptions = [AnswerOption.A, AnswerOption.B, AnswerOption.C, AnswerOption.D];
+      const answerOptions = ["A", "B", "C", "D"];
       
       await prisma.question.create({
         data: {
@@ -90,7 +90,7 @@ export async function GET() {
           optionD: "This is option D",
           correctAnswer: answerOptions[i % 4],
           explanation: `This is the explanation for Part I Question ${i + 1}. The correct answer is option ${answerOptions[i % 4]}.`,
-          difficulty: [Difficulty.EASY, Difficulty.MEDIUM, Difficulty.HARD][i % 3],
+          difficulty: ["EASY", "MEDIUM", "HARD"][i % 3],
           orderInPaper: i + 1,
         },
       });
@@ -126,7 +126,7 @@ export async function GET() {
         name: "Admin User",
         email: "admin@phillip.com",
         passwordHash: adminHash,
-        roles: [Role.ADMIN],
+        roles: ["ADMIN"],,
         active: true,
         approvedAt: new Date(),
         pdpaConsent: true,
@@ -141,7 +141,7 @@ export async function GET() {
         name: "Student User",
         email: "student@phillip.com",
         passwordHash: studentHash,
-        roles: [Role.STUDENT],
+        roles: ["STUDENT"],
         active: true,
         approvedAt: new Date(),
         pdpaConsent: true,
@@ -154,7 +154,7 @@ export async function GET() {
       data: {
         paperId: paper.id,
         userId: student.id,
-        status: AssignmentStatus.APPROVED,
+        status: "APPROVED",
       },
     });
 
