@@ -27,7 +27,7 @@ export const authOptions = {
 
           if (!user || !user.active) return null;
 
-          const passwordValid = await bcrypt.compare(credentials.password, user.passwordHash);
+          const passwordValid = await bcrypt.compare(credentials.password, user.password);
           if (!passwordValid) return null;
 
           return {

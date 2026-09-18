@@ -122,7 +122,7 @@ async function main() {
       data: {
         name: "Admin User",
         email: "admin@phillip.com",
-        passwordHash: adminHash,
+        password: adminHash,
         roles: [Role.ADMIN],
         active: true,
         approvedAt: new Date(),
@@ -137,7 +137,7 @@ async function main() {
       data: {
         name: "Student User",
         email: "student@phillip.com",
-        passwordHash: studentHash,
+        password: studentHash,
         roles: [Role.STUDENT],
         active: true,
         approvedAt: new Date(),
