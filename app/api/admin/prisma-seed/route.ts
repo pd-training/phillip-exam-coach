@@ -3,13 +3,13 @@ export const revalidate = 0;
 
 export async function GET() {
   try {
-    const dbUrl = process.env.DATABASE_URL;
+    // Use env var if available, otherwise fallback to hardcoded connection string
+    const dbUrl = process.env.DATABASE_URL || "postgresql://postgres:MyPassword2026!@phillip-exam-coach-db.c7cmo2c6ecz8.ap-southeast-1.rds.amazonaws.com:5432/phillip_exam_coach";
     
     if (!dbUrl) {
       return Response.json({ 
         success: false, 
-        message: "DATABASE_URL not set in environment variables. Add it to Amplify settings.",
-        envCheck: { hasDbUrl: !!process.env.DATABASE_URL, nodeEnv: process.env.NODE_ENV }
+        message: "DATABASE_URL not configured",
       }, { status: 500 });
     }
 
