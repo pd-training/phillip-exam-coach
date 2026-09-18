@@ -1,7 +1,7 @@
 "use client";
 
 import { useSession, signOut } from "next-auth/react";
-import { redirect } from "next/navigation";
+import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 
 interface Paper {
@@ -13,25 +13,38 @@ interface Paper {
 }
 
 export default function StudentDashboard() {
+  const router = useRouter();
   const { data: session, status } = useSession();
   const [papers, setPapers] = useState<Paper[]>([]);
   const [loading, setLoading] = useState(true);
+
+  // Handle auth redirects
+  useEffect(() => {
+    if (status === "loading") return;
+
+    if (status === "unauthenticated") {
+      router.push("/login");
+      return;
+    }
+
+    if (!session?.user) {
+      router.push("/login");
+      return;
+    }
+
+    if ((session?.user as any)?.role === "ADMIN") {
+      router.push("/admin/dashboard");
+      return;
+    }
+  }, [status, session, router]);
 
   if (status === "loading") {
     return <div style={{ padding: "20px" }}>Loading...</div>;
   }
 
-  if (status === "unauthenticated") {
-    redirect("/login");
-  }
-
-  if (!session?.user) {
-    redirect("/login");
-  }
-
-  // Redirect admin users to admin dashboard
-  if ((session.user as any).role === "ADMIN") {
-    redirect("/admin/dashboard");
+  // Don't render until we know they're authenticated and not admin
+  if (status === "unauthenticated" || !session?.user || (session?.user as any)?.role === "ADMIN") {
+    return null;
   }
 
   const handleLogout = async () => {

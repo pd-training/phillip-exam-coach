@@ -1,26 +1,42 @@
 "use client";
 
+"use client";
+
 import { useSession, signOut } from "next-auth/react";
-import { redirect } from "next/navigation";
+import { useRouter } from "next/navigation";
+import { useEffect } from "react";
 
 export default function AdminDashboard() {
+  const router = useRouter();
   const { data: session, status } = useSession();
+
+  // Handle auth redirects
+  useEffect(() => {
+    if (status === "loading") return;
+
+    if (status === "unauthenticated") {
+      router.push("/login");
+      return;
+    }
+
+    if (!session?.user) {
+      router.push("/login");
+      return;
+    }
+
+    if ((session?.user as any)?.role !== "ADMIN") {
+      router.push("/dashboard");
+      return;
+    }
+  }, [status, session, router]);
 
   if (status === "loading") {
     return <div style={{ padding: "20px" }}>Loading...</div>;
   }
 
-  if (status === "unauthenticated") {
-    redirect("/login");
-  }
-
-  if (!session?.user) {
-    redirect("/login");
-  }
-
-  // Only admins can access this page
-  if ((session.user as any).role !== "ADMIN") {
-    redirect("/dashboard");
+  // Don't render until we know they're an admin
+  if (status === "unauthenticated" || !session?.user || (session?.user as any)?.role !== "ADMIN") {
+    return null;
   }
 
   const handleLogout = async () => {

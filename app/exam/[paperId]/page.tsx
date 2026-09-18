@@ -1,7 +1,7 @@
 "use client";
 
 import { useSession } from "next-auth/react";
-import { redirect, useParams } from "next/navigation";
+import { useRouter, useParams } from "next/navigation";
 import { useState, useEffect } from "react";
 
 interface Question {
@@ -23,6 +23,7 @@ interface Paper {
 }
 
 export default function ExamPage() {
+  const router = useRouter();
   const { data: session, status } = useSession();
   const params = useParams();
   const paperId = params.paperId as string;
@@ -35,12 +36,22 @@ export default function ExamPage() {
   const [submitted, setSubmitted] = useState(false);
   const [score, setScore] = useState(0);
 
+  // Handle auth redirects
+  useEffect(() => {
+    if (status === "loading") return;
+
+    if (status === "unauthenticated") {
+      router.push("/login");
+      return;
+    }
+  }, [status, router]);
+
   if (status === "loading") {
     return <div style={{ padding: "20px" }}>Loading...</div>;
   }
 
   if (status === "unauthenticated") {
-    redirect("/login");
+    return null;
   }
 
   useEffect(() => {

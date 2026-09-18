@@ -1,7 +1,7 @@
 "use client";
 
 import { useSession, signOut } from "next-auth/react";
-import { redirect } from "next/navigation";
+import { useRouter } from "next/navigation";
 import { useState, useEffect } from "react";
 
 interface Paper {
@@ -13,6 +13,7 @@ interface Paper {
 }
 
 export default function PaperManagement() {
+  const router = useRouter();
   const { data: session, status } = useSession();
   const [papers, setPapers] = useState<Paper[]>([]);
   const [loading, setLoading] = useState(true);
@@ -22,22 +23,33 @@ export default function PaperManagement() {
   const [questions, setQuestions] = useState("150");
   const [submitting, setSubmitting] = useState(false);
 
+  // Handle auth redirects
+  useEffect(() => {
+    if (status === "loading") return;
+
+    if (status === "unauthenticated") {
+      console.log("Not authenticated, redirecting to /login");
+      router.push("/login");
+      return;
+    }
+
+    if (!session?.user || (session?.user as any)?.role !== "ADMIN") {
+      console.log("Not admin, redirecting to /dashboard");
+      router.push("/dashboard");
+      return;
+    }
+  }, [status, session, router]);
+
   if (status === "loading") {
     return <div style={{ padding: "20px" }}>Loading...</div>;
   }
 
-  if (status === "unauthenticated") {
-    redirect("/login");
+  // Don't render until we know they're an admin
+  if (status === "unauthenticated" || !session?.user || (session?.user as any)?.role !== "ADMIN") {
+    return null;
   }
 
-  if ((session?.user as any)?.role !== "ADMIN") {
-    redirect("/dashboard");
-  }
-
-  useEffect(() => {
-    fetchPapers();
-  }, []);
-
+  // Define fetchPapers before useEffect that uses it
   const fetchPapers = async () => {
     try {
       const res = await fetch("/api/papers");
@@ -51,6 +63,11 @@ export default function PaperManagement() {
       setLoading(false);
     }
   };
+
+  useEffect(() => {
+    fetchPapers();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   const handleLogout = async () => {
     const baseUrl = typeof window !== "undefined" ? window.location.origin : "";
