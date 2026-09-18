@@ -1,19 +1,20 @@
 "use client";
 
-import { signIn } from "next-auth/react";
 import { useState } from "react";
-import Link from "next/link";
+import { signIn } from "next-auth/react";
+import { useRouter } from "next/navigation";
 
 export default function LoginPage() {
+  const router = useRouter();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
 
-  const handleSignIn = async (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setLoading(true);
     setError("");
+    setLoading(true);
 
     try {
       const result = await signIn("credentials", {
@@ -23,73 +24,70 @@ export default function LoginPage() {
       });
 
       if (result?.error) {
-        setError(result.error);
+        setError("Invalid email or password");
       } else if (result?.ok) {
-        window.location.href = "/dashboard";
+        router.push("/dashboard");
       }
     } catch (err) {
-      setError("An error occurred. Please try again.");
+      setError("Something went wrong. Try again.");
     } finally {
       setLoading(false);
     }
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-slate-50">
-      <div className="bg-white p-8 rounded-lg shadow-lg max-w-md w-full">
-        <h1 className="text-3xl font-bold mb-2 text-center text-slate-900">
-          Phillip Exam Coach
-        </h1>
-        <p className="text-center text-slate-600 mb-8">Sign in to your account</p>
+    <div style={{ maxWidth: "400px", margin: "100px auto", padding: "20px" }}>
+      <h1>Login</h1>
+      
+      {error && (
+        <div style={{ color: "red", marginBottom: "10px", padding: "10px", backgroundColor: "#ffe0e0", borderRadius: "4px" }}>
+          {error}
+        </div>
+      )}
 
-        {error && <div className="bg-red-50 text-red-600 p-4 rounded mb-6">{error}</div>}
+      <form onSubmit={handleSubmit}>
+        <div style={{ marginBottom: "15px" }}>
+          <label>Email:</label>
+          <input
+            type="email"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            required
+            style={{ width: "100%", padding: "8px", marginTop: "5px" }}
+          />
+        </div>
 
-        <form onSubmit={handleSignIn} className="space-y-4">
-          <div>
-            <label className="block text-sm font-medium mb-2">Email</label>
-            <input
-              type="email"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              className="w-full px-4 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-700"
-              required
-            />
-          </div>
-          <div>
-            <label className="block text-sm font-medium mb-2">Password</label>
-            <input
-              type="password"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              className="w-full px-4 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-700"
-              required
-            />
-          </div>
-          <button
-            type="submit"
-            disabled={loading}
-            className="w-full bg-blue-700 hover:bg-blue-800 text-white font-bold py-2 rounded-lg transition disabled:opacity-50"
-          >
-            {loading ? "Signing in..." : "Sign In"}
-          </button>
-        </form>
-
-        <div className="my-6 border-t border-slate-300" />
+        <div style={{ marginBottom: "15px" }}>
+          <label>Password:</label>
+          <input
+            type="password"
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+            required
+            style={{ width: "100%", padding: "8px", marginTop: "5px" }}
+          />
+        </div>
 
         <button
-          onClick={() => signIn("github")}
-          className="w-full flex items-center justify-center gap-2 bg-slate-900 hover:bg-slate-800 text-white font-bold py-2 rounded-lg transition"
+          type="submit"
+          disabled={loading}
+          style={{
+            width: "100%",
+            padding: "10px",
+            backgroundColor: loading ? "#ccc" : "#0070f3",
+            color: "white",
+            border: "none",
+            borderRadius: "4px",
+            cursor: loading ? "not-allowed" : "pointer",
+          }}
         >
-          <span>Sign in with GitHub</span>
+          {loading ? "Signing in..." : "Sign In"}
         </button>
+      </form>
 
-        <p className="text-center text-slate-600 mt-8">
-          Don't have an account?{" "}
-          <Link href="/signup" className="text-blue-700 font-bold hover:underline">
-            Sign up
-          </Link>
-        </p>
-      </div>
+      <p style={{ marginTop: "20px", textAlign: "center" }}>
+        Test credentials: admin@phillip.com / Admin@123
+      </p>
     </div>
   );
 }
