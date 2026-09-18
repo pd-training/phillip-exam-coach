@@ -13,7 +13,7 @@ const handler = NextAuth({
         email: { label: "Email", type: "email" },
         password: { label: "Password", type: "password" },
       },
-      async authorize(credentials: any) {
+      async authorize(credentials) {
         if (!credentials?.email || !credentials?.password) {
           return null;
         }
@@ -23,18 +23,14 @@ const handler = NextAuth({
             where: { email: credentials.email },
           });
 
-          if (!user) {
-            return null;
-          }
+          if (!user) return null;
 
           const hash = crypto
             .createHash("sha256")
             .update(credentials.password)
             .digest("hex");
 
-          if (hash !== user.password) {
-            return null;
-          }
+          if (hash !== user.password) return null;
 
           return {
             id: user.id,
