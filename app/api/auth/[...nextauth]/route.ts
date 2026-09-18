@@ -8,9 +8,14 @@ const prisma = new PrismaClient();
 const handler = NextAuth({
   providers: [
     CredentialsProvider({
+      name: "Credentials",
+      credentials: {
+        email: { label: "Email", type: "email" },
+        password: { label: "Password", type: "password" },
+      },
       async authorize(credentials: any) {
         if (!credentials?.email || !credentials?.password) {
-          throw new Error("Missing credentials");
+          return null;
         }
 
         try {
@@ -19,7 +24,7 @@ const handler = NextAuth({
           });
 
           if (!user) {
-            throw new Error("User not found");
+            return null;
           }
 
           const hash = crypto
@@ -28,7 +33,7 @@ const handler = NextAuth({
             .digest("hex");
 
           if (hash !== user.password) {
-            throw new Error("Invalid password");
+            return null;
           }
 
           return {
@@ -39,14 +44,13 @@ const handler = NextAuth({
           };
         } catch (error) {
           console.error("Auth error:", error);
-          throw error;
+          return null;
         }
       },
     }),
   ],
   pages: {
     signIn: "/login",
-    error: "/login",
   },
   session: {
     strategy: "jwt",
