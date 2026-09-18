@@ -15,12 +15,12 @@ export async function GET() {
 
     const adminHash = await bcrypt.hash("Admin@123", 10);
     await prisma.user.create({
-      data: { name: "Admin", email: "admin@phillip.com", password: adminHash, roles: ["ADMIN"], active: true, approvedAt: new Date() }
+      data: { name: "Admin", email: "admin@phillip.com", password: adminHash, role: "ADMIN" as any, active: true, approvedAt: new Date() }
     });
 
     const studentHash = await bcrypt.hash("Student@123", 10);
     await prisma.user.create({
-      data: { name: "Student", email: "student@phillip.com", password: studentHash, roles: ["STUDENT"], active: true, approvedAt: new Date() }
+      data: { name: "Student", email: "student@phillip.com", password: studentHash, role: "STUDENT" as any, active: true, approvedAt: new Date() }
     });
 
     return Response.json({ success: true, message: "Seeded!", testAccounts: { admin: "admin@phillip.com / Admin@123", student: "student@phillip.com / Student@123" } });
