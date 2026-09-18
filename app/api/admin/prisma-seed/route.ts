@@ -1,3 +1,7 @@
+export const dynamic = "force-dynamic";
+
+import { PrismaClient, Role, AssignmentStatus, Difficulty, AnswerOption } from "@prisma/client";
+// ... rest of file
 import { PrismaClient, Role, AssignmentStatus, Difficulty, AnswerOption } from "@prisma/client";
 import bcrypt from "bcryptjs";
 
