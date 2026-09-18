@@ -1,13 +1,12 @@
 import { getServerSession } from "next-auth/next";
-import { authOptions } from "@/lib/auth-config";
 
 export async function getCurrentUser() {
-  const session = await getServerSession(authOptions);
+  const session = await getServerSession();
   return session?.user;
 }
 
 export async function getCurrentUserWithRole() {
-  const session = await getServerSession(authOptions);
+  const session = await getServerSession();
   return {
     user: session?.user,
     role: (session?.user as any)?.role,
