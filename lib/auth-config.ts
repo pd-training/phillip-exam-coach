@@ -53,6 +53,11 @@ export const authOptions = {
   },
   secret: process.env.NEXTAUTH_SECRET || "bd05705d95de1e8234e6932620671e22",
   callbacks: {
+    async redirect({ url, baseUrl }: any) {
+      // After login, redirect to dashboard
+      if (url.startsWith(baseUrl)) return `${baseUrl}/dashboard`;
+      return baseUrl;
+    },
     async jwt({ token, user }: any) {
       if (user) {
         token.id = user.id;
