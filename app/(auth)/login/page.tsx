@@ -1,6 +1,6 @@
 "use client";
 
-import { signIn, useSession } from "next-auth/react";
+import { signIn } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 
@@ -25,27 +25,13 @@ export default function LoginPage() {
 
       if (!result?.ok) {
         setError("Invalid email or password");
+        setLoading(false);
         return;
       }
 
-      // Wait a moment for session to be established, then check role
-      setTimeout(async () => {
-        try {
-          const sessionRes = await fetch("/api/auth/session");
-          const session = await sessionRes.json();
-          
-          if (session?.user?.role === "ADMIN") {
-            router.push("/admin/dashboard");
-          } else {
-            router.push("/dashboard");
-          }
-          router.refresh();
-        } catch (err) {
-          // Fallback - just go to dashboard
-          router.push("/dashboard");
-          router.refresh();
-        }
-      }, 100);
+      // Redirect to dashboard - role-based routing happens there
+      router.push("/dashboard");
+      router.refresh();
     } catch (err) {
       setError("Something went wrong. Try again.");
     } finally {

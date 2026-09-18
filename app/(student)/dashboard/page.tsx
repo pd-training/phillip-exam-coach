@@ -46,6 +46,11 @@ export default function StudentDashboard() {
     redirect("/login");
   }
 
+  // Redirect admin users to admin dashboard
+  if ((session.user as any).role === "ADMIN") {
+    redirect("/admin/dashboard");
+  }
+
   useEffect(() => {
     const fetchData = async () => {
       try {

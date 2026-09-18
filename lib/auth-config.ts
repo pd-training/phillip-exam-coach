@@ -53,12 +53,6 @@ export const authOptions = {
   },
   secret: process.env.NEXTAUTH_SECRET || "bd05705d95de1e8234e6932620671e22",
   callbacks: {
-    async redirect({ url, baseUrl, user }: any) {
-      // Admin goes to admin dashboard, student to student dashboard
-      if (user?.role === "ADMIN") return `${baseUrl}/admin/dashboard`;
-      if (user?.role === "STUDENT") return `${baseUrl}/dashboard`;
-      return baseUrl;
-    },
     async jwt({ token, user }: any) {
       if (user) {
         token.id = user.id;
