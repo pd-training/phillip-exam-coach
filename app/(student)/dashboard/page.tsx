@@ -9,29 +9,12 @@ interface Paper {
   title: string;
   durationMinutes: number;
   totalQuestions: number;
-}
-
-interface Assignment {
-  id: string;
-  paperId: string;
-  paper: Paper;
-  status: string;
-}
-
-interface Attempt {
-  id: string;
-  paperId: string;
-  paper: Paper;
-  status: string;
-  overallScore: number | null;
-  passed: boolean | null;
-  startTime: string;
+  createdAt: string;
 }
 
 export default function StudentDashboard() {
   const { data: session, status } = useSession();
-  const [assignments, setAssignments] = useState<Assignment[]>([]);
-  const [attempts, setAttempts] = useState<Attempt[]>([]);
+  const [papers, setPapers] = useState<Paper[]>([]);
   const [loading, setLoading] = useState(true);
 
   if (status === "loading") {
@@ -54,12 +37,13 @@ export default function StudentDashboard() {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        // For now, just show empty state
-        // Real implementation would fetch from API
-        setAssignments([]);
-        setAttempts([]);
+        const res = await fetch("/api/papers");
+        if (res.ok) {
+          const data = await res.json();
+          setPapers(data.papers || []);
+        }
       } catch (error) {
-        console.error("Error fetching data:", error);
+        console.error("Error fetching papers:", error);
       } finally {
         setLoading(false);
       }
@@ -70,69 +54,97 @@ export default function StudentDashboard() {
 
   return (
     <div style={{ maxWidth: "1200px", margin: "0 auto", padding: "20px" }}>
-      <h1>📚 Student Dashboard</h1>
-      <p>Welcome, {session?.user?.name || "Student"}!</p>
+      <div style={{ marginBottom: "30px" }}>
+        <h1 style={{ margin: "0 0 8px 0" }}>📚 Student Dashboard</h1>
+        <p style={{ color: "#666", margin: "0" }}>Welcome, {session?.user?.name || "Student"}!</p>
+      </div>
 
-      {/* Assigned Papers */}
+      {/* Available Exams Section */}
       <section style={{ marginTop: "30px" }}>
-        <h2>📋 Assigned Papers</h2>
+        <h2 style={{ marginBottom: "20px" }}>📋 Available Exams</h2>
+        
         {loading ? (
-          <p>Loading...</p>
-        ) : assignments.length === 0 ? (
-          <p>No papers assigned yet. Ask your admin to assign an exam.</p>
+          <p style={{ color: "#666" }}>Loading exams...</p>
+        ) : papers.length === 0 ? (
+          <div style={{
+            backgroundColor: "#f3f4f6",
+            padding: "40px",
+            borderRadius: "12px",
+            textAlign: "center",
+            color: "#666",
+          }}>
+            <p style={{ margin: "0" }}>No exams available yet. Check back soon!</p>
+          </div>
         ) : (
-          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "20px" }}>
-            {assignments.map((assignment) => (
+          <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(300px, 1fr))", gap: "20px" }}>
+            {papers.map((paper) => (
               <div
-                key={assignment.id}
+                key={paper.id}
                 style={{
-                  padding: "15px",
-                  border: "1px solid #ddd",
-                  borderRadius: "8px",
-                  backgroundColor: "#f9f9f9",
+                  backgroundColor: "white",
+                  padding: "24px",
+                  borderRadius: "12px",
+                  border: "1px solid #e5e7eb",
+                  boxShadow: "0 2px 8px rgba(0,0,0,0.08)",
+                  display: "flex",
+                  flexDirection: "column",
                 }}
               >
-                <h3>{assignment.paper.title}</h3>
-                <p>Duration: {assignment.paper.durationMinutes} minutes</p>
-                <p>Questions: {assignment.paper.totalQuestions}</p>
-                <button style={{ padding: "10px 20px", backgroundColor: "#0070f3", color: "white", border: "none", borderRadius: "4px", cursor: "pointer" }}>
-                  Start Exam
-                </button>
+                <h3 style={{ margin: "0 0 12px 0", fontSize: "18px", fontWeight: "600" }}>
+                  {paper.title}
+                </h3>
+                
+                <div style={{ 
+                  margin: "0 0 20px 0", 
+                  fontSize: "14px", 
+                  color: "#666",
+                  flex: 1
+                }}>
+                  <p style={{ margin: "0 0 8px 0" }}>
+                    ⏱️ Duration: <strong>{paper.durationMinutes} minutes</strong>
+                  </p>
+                  <p style={{ margin: "0" }}>
+                    ❓ Questions: <strong>{paper.totalQuestions}</strong>
+                  </p>
+                </div>
+
+                <a href={`/exam/${paper.id}`} style={{ textDecoration: "none" }}>
+                  <button style={{
+                    width: "100%",
+                    padding: "12px",
+                    backgroundColor: "#3b82f6",
+                    color: "white",
+                    border: "none",
+                    borderRadius: "8px",
+                    fontSize: "14px",
+                    fontWeight: "600",
+                    cursor: "pointer",
+                    transition: "all 0.2s",
+                  }}
+                  onMouseEnter={(e) => {
+                    e.currentTarget.style.backgroundColor = "#2563eb";
+                  }}
+                  onMouseLeave={(e) => {
+                    e.currentTarget.style.backgroundColor = "#3b82f6";
+                  }}>
+                    Start Exam →
+                  </button>
+                </a>
               </div>
             ))}
           </div>
         )}
       </section>
 
-      {/* Recent Attempts */}
-      <section style={{ marginTop: "30px" }}>
-        <h2>📊 Recent Attempts</h2>
-        {attempts.length === 0 ? (
-          <p>No attempts yet.</p>
-        ) : (
-          <table style={{ width: "100%", borderCollapse: "collapse", marginTop: "10px" }}>
-            <thead>
-              <tr style={{ backgroundColor: "#f0f0f0" }}>
-                <th style={{ padding: "10px", textAlign: "left", borderBottom: "1px solid #ddd" }}>Exam</th>
-                <th style={{ padding: "10px", textAlign: "left", borderBottom: "1px solid #ddd" }}>Score</th>
-                <th style={{ padding: "10px", textAlign: "left", borderBottom: "1px solid #ddd" }}>Status</th>
-              </tr>
-            </thead>
-            <tbody>
-              {attempts.map((attempt) => (
-                <tr key={attempt.id} style={{ borderBottom: "1px solid #ddd" }}>
-                  <td style={{ padding: "10px" }}>{attempt.paper.title}</td>
-                  <td style={{ padding: "10px" }}>{attempt.overallScore ? `${attempt.overallScore.toFixed(1)}%` : "N/A"}</td>
-                  <td style={{ padding: "10px" }}>
-                    <span style={{ color: attempt.passed ? "green" : "red" }}>
-                      {attempt.passed ? "✅ Passed" : "❌ Failed"}
-                    </span>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        )}
+      {/* Info Section */}
+      <section style={{ marginTop: "40px", padding: "20px", backgroundColor: "#f0fdf4", borderLeft: "4px solid #10b981", borderRadius: "8px" }}>
+        <h3 style={{ margin: "0 0 10px 0", color: "#065f46" }}>💡 Tips</h3>
+        <ul style={{ margin: "0", paddingLeft: "20px", color: "#065f46" }}>
+          <li>Manage your time wisely during the exam</li>
+          <li>You can navigate between questions using the quick navigation panel</li>
+          <li>Your answers are automatically saved as you progress</li>
+          <li>You need 70% to pass</li>
+        </ul>
       </section>
     </div>
   );

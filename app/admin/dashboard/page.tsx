@@ -36,32 +36,35 @@ export default function AdminDashboard() {
 
         <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "20px" }}>
           {[
-            { title: "👥 User Management", desc: "Add/edit users and advisors", icon: "👥" },
-            { title: "📝 Paper Management", desc: "Create and manage exam papers", icon: "📝" },
-            { title: "❓ Question Bank", desc: "Manage exam questions", icon: "❓" },
-            { title: "📊 Reports", desc: "View exam statistics", icon: "📊" },
+            { title: "👥 User Management", desc: "Add/edit users and advisors", icon: "👥", href: "/admin/users" },
+            { title: "📝 Paper Management", desc: "Create and manage exam papers", icon: "📝", href: "/admin/papers" },
+            { title: "❓ Question Bank", desc: "Manage exam questions", icon: "❓", href: "/admin/questions" },
+            { title: "📊 Reports", desc: "View exam statistics", icon: "📊", href: "/admin/reports" },
           ].map((item, idx) => (
-            <div
-              key={idx}
-              style={{
-                padding: "20px",
-                border: "1px solid #ddd",
-                borderRadius: "8px",
-                backgroundColor: "#f9f9f9",
-                cursor: "pointer",
-                transition: "all 0.3s",
-              }}
-              onMouseEnter={(e) => {
-                (e.currentTarget as HTMLElement).style.boxShadow = "0 4px 12px rgba(0,0,0,0.1)";
-              }}
-              onMouseLeave={(e) => {
-                (e.currentTarget as HTMLElement).style.boxShadow = "none";
-              }}
-            >
-              <div style={{ fontSize: "32px", marginBottom: "10px" }}>{item.icon}</div>
-              <h3 style={{ marginBottom: "5px" }}>{item.title}</h3>
-              <p style={{ color: "#666", fontSize: "14px" }}>{item.desc}</p>
-            </div>
+            <a key={idx} href={item.href} style={{ textDecoration: "none" }}>
+              <div
+                style={{
+                  padding: "20px",
+                  border: "1px solid #ddd",
+                  borderRadius: "8px",
+                  backgroundColor: "#f9f9f9",
+                  cursor: "pointer",
+                  transition: "all 0.3s",
+                }}
+                onMouseEnter={(e) => {
+                  (e.currentTarget as HTMLElement).style.boxShadow = "0 4px 12px rgba(0,0,0,0.1)";
+                  (e.currentTarget as HTMLElement).style.transform = "translateY(-2px)";
+                }}
+                onMouseLeave={(e) => {
+                  (e.currentTarget as HTMLElement).style.boxShadow = "none";
+                  (e.currentTarget as HTMLElement).style.transform = "translateY(0)";
+                }}
+              >
+                <div style={{ fontSize: "32px", marginBottom: "10px" }}>{item.icon}</div>
+                <h3 style={{ marginBottom: "5px" }}>{item.title}</h3>
+                <p style={{ color: "#666", fontSize: "14px" }}>{item.desc}</p>
+              </div>
+            </a>
           ))}
         </div>
       </section>
