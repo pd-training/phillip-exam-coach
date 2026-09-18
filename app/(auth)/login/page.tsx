@@ -40,62 +40,163 @@ export default function LoginPage() {
   };
 
   return (
-    <div style={{ maxWidth: "400px", margin: "100px auto", padding: "20px" }}>
-      <h1>Phillip Exam Coach - Login</h1>
-      
-      {error && (
-        <div style={{ color: "red", marginBottom: "15px", padding: "10px", backgroundColor: "#ffe0e0", borderRadius: "4px" }}>
-          ❌ {error}
-        </div>
-      )}
-
-      <form onSubmit={handleSubmit}>
-        <div style={{ marginBottom: "15px" }}>
-          <label htmlFor="email">Email:</label>
-          <input
-            id="email"
-            type="email"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-            required
-            style={{ width: "100%", padding: "8px", marginTop: "5px", boxSizing: "border-box" }}
-          />
+    <div style={{ minHeight: "100vh", display: "flex", alignItems: "center", justifyContent: "center", backgroundColor: "#f8f9fa" }}>
+      <div style={{ width: "100%", maxWidth: "400px", padding: "40px" }}>
+        {/* Header */}
+        <div style={{ textAlign: "center", marginBottom: "40px" }}>
+          <div style={{ fontSize: "48px", marginBottom: "12px" }}>📚</div>
+          <h1 style={{ fontSize: "28px", fontWeight: "bold", color: "#1a1a1a", margin: "0 0 8px 0" }}>
+            Phillip Exam Coach
+          </h1>
+          <p style={{ color: "#666", fontSize: "14px", margin: "0" }}>Sign in to your account</p>
         </div>
 
-        <div style={{ marginBottom: "15px" }}>
-          <label htmlFor="password">Password:</label>
-          <input
-            id="password"
-            type="password"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            required
-            style={{ width: "100%", padding: "8px", marginTop: "5px", boxSizing: "border-box" }}
-          />
-        </div>
+        {/* Error Message */}
+        {error && (
+          <div style={{
+            marginBottom: "20px",
+            padding: "12px 16px",
+            backgroundColor: "#fee2e2",
+            border: "1px solid #fca5a5",
+            borderRadius: "8px",
+            color: "#991b1b",
+            fontSize: "14px",
+            display: "flex",
+            alignItems: "center",
+            gap: "8px"
+          }}>
+            ⚠️ {error}
+          </div>
+        )}
 
-        <button
-          type="submit"
-          disabled={loading}
-          style={{
-            width: "100%",
-            padding: "10px",
-            backgroundColor: loading ? "#ccc" : "#0070f3",
-            color: "white",
-            border: "none",
-            borderRadius: "4px",
-            cursor: loading ? "not-allowed" : "pointer",
-            fontWeight: "bold",
-          }}
-        >
-          {loading ? "Signing in..." : "Sign In"}
-        </button>
-      </form>
+        {/* Login Form */}
+        <form onSubmit={handleSubmit} style={{
+          backgroundColor: "white",
+          padding: "32px",
+          borderRadius: "12px",
+          boxShadow: "0 2px 8px rgba(0, 0, 0, 0.08)",
+          border: "1px solid #e5e7eb"
+        }}>
+          {/* Email Input */}
+          <div style={{ marginBottom: "20px" }}>
+            <label htmlFor="email" style={{
+              display: "block",
+              fontSize: "14px",
+              fontWeight: "500",
+              color: "#1f2937",
+              marginBottom: "6px"
+            }}>
+              Email Address
+            </label>
+            <input
+              id="email"
+              type="email"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              placeholder="admin@phillip.com"
+              required
+              style={{
+                width: "100%",
+                padding: "10px 12px",
+                fontSize: "14px",
+                border: "1px solid #d1d5db",
+                borderRadius: "8px",
+                boxSizing: "border-box",
+                fontFamily: "inherit",
+                transition: "all 0.2s",
+                outline: "none"
+              }}
+              onFocus={(e) => {
+                e.currentTarget.style.borderColor = "#3b82f6";
+                e.currentTarget.style.boxShadow = "0 0 0 3px rgba(59, 130, 246, 0.1)";
+              }}
+              onBlur={(e) => {
+                e.currentTarget.style.borderColor = "#d1d5db";
+                e.currentTarget.style.boxShadow = "none";
+              }}
+            />
+          </div>
 
-      <div style={{ marginTop: "20px", padding: "10px", backgroundColor: "#f0f0f0", borderRadius: "4px" }}>
-        <p style={{ margin: "0 0 10px 0", fontWeight: "bold" }}>Test Accounts:</p>
-        <p style={{ margin: "0" }}>Admin: <code>admin@phillip.com</code> / <code>Admin@123</code></p>
-        <p style={{ margin: "0" }}>Student: <code>student@phillip.com</code> / <code>Student@123</code></p>
+          {/* Password Input */}
+          <div style={{ marginBottom: "24px" }}>
+            <label htmlFor="password" style={{
+              display: "block",
+              fontSize: "14px",
+              fontWeight: "500",
+              color: "#1f2937",
+              marginBottom: "6px"
+            }}>
+              Password
+            </label>
+            <input
+              id="password"
+              type="password"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              placeholder="••••••••"
+              required
+              style={{
+                width: "100%",
+                padding: "10px 12px",
+                fontSize: "14px",
+                border: "1px solid #d1d5db",
+                borderRadius: "8px",
+                boxSizing: "border-box",
+                fontFamily: "inherit",
+                transition: "all 0.2s",
+                outline: "none"
+              }}
+              onFocus={(e) => {
+                e.currentTarget.style.borderColor = "#3b82f6";
+                e.currentTarget.style.boxShadow = "0 0 0 3px rgba(59, 130, 246, 0.1)";
+              }}
+              onBlur={(e) => {
+                e.currentTarget.style.borderColor = "#d1d5db";
+                e.currentTarget.style.boxShadow = "none";
+              }}
+            />
+          </div>
+
+          {/* Sign In Button */}
+          <button
+            type="submit"
+            disabled={loading}
+            style={{
+              width: "100%",
+              padding: "12px",
+              backgroundColor: loading ? "#9ca3af" : "#1f2937",
+              color: "white",
+              border: "none",
+              borderRadius: "8px",
+              fontSize: "16px",
+              fontWeight: "600",
+              cursor: loading ? "not-allowed" : "pointer",
+              transition: "all 0.2s"
+            }}
+            onMouseEnter={(e) => {
+              if (!loading) {
+                e.currentTarget.style.backgroundColor = "#111827";
+              }
+            }}
+            onMouseLeave={(e) => {
+              if (!loading) {
+                e.currentTarget.style.backgroundColor = "#1f2937";
+              }
+            }}
+          >
+            {loading ? "Signing in..." : "Sign In"}
+          </button>
+        </form>
+
+        {/* Info Text */}
+        <p style={{
+          textAlign: "center",
+          marginTop: "20px",
+          color: "#666",
+          fontSize: "13px"
+        }}>
+          Contact your administrator if you need account access
+        </p>
       </div>
     </div>
   );
