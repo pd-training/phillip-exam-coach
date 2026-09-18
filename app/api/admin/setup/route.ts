@@ -1,8 +1,6 @@
 import { prisma } from "@/lib/prisma";
 
 export async function GET() {
-
-export async function GET() {
   try {
     // Check if admin exists
     const existing = await prisma.user.findUnique({
