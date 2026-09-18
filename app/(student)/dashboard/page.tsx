@@ -39,11 +39,11 @@ export default function StudentDashboard() {
   }
 
   if (status === "unauthenticated") {
-    redirect("/auth/login");
+    redirect("/login");
   }
 
   if (!session?.user) {
-    redirect("/auth/login");
+    redirect("/login");
   }
 
   useEffect(() => {

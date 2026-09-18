@@ -8,7 +8,7 @@ export default function ErrorPage() {
       <p style={{ fontSize: "12px", color: "#666" }}>
         Make sure the admin user exists in the database.
       </p>
-      <a href="/auth/login" style={{ color: "blue", textDecoration: "underline" }}>
+      <a href="/login" style={{ color: "blue", textDecoration: "underline" }}>
         Try again
       </a>
     </div>

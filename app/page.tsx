@@ -16,7 +16,7 @@ export default function LandingPage() {
             <a href="#features" className="text-slate-600 hover:text-slate-900">Features</a>
             <a href="#how-it-works" className="text-slate-600 hover:text-slate-900">How It Works</a>
             <a href="#faq" className="text-slate-600 hover:text-slate-900">FAQ</a>
-            <Link href="/auth/login">
+            <Link href="/login">
               <button className="px-4 py-2 text-slate-600 border border-slate-300 rounded-lg hover:bg-slate-50">Login</button>
             </Link>
           </div>
@@ -42,7 +42,7 @@ export default function LandingPage() {
                   Get Your AI Coach
                 </button>
               </Link>
-              <Link href="/auth/login">
+              <Link href="/login">
                 <button className="px-6 py-3 rounded-lg font-bold border border-slate-300 hover:bg-slate-50">
                   Login
                 </button>
