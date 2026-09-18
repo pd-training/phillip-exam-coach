@@ -1,6 +1,6 @@
 "use client";
 
-import { useSession } from "next-auth/react";
+import { useSession, signOut } from "next-auth/react";
 import { redirect } from "next/navigation";
 
 export default function AdminDashboard() {
@@ -23,10 +23,41 @@ export default function AdminDashboard() {
     redirect("/dashboard");
   }
 
+  const handleLogout = async () => {
+    await signOut({ redirect: true, callbackUrl: "/login" });
+  };
+
   return (
     <div style={{ maxWidth: "1200px", margin: "0 auto", padding: "20px" }}>
-      <h1>👨‍💼 Admin Dashboard</h1>
-      <p>Welcome, {session?.user?.name || "Admin"}!</p>
+      {/* Header with logout */}
+      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "30px" }}>
+        <div>
+          <h1 style={{ margin: "0 0 8px 0" }}>👨‍💼 Admin Dashboard</h1>
+          <p style={{ color: "#666", margin: "0" }}>Welcome, {session?.user?.name || "Admin"}!</p>
+        </div>
+        <button
+          onClick={handleLogout}
+          style={{
+            padding: "10px 20px",
+            backgroundColor: "#ef4444",
+            color: "white",
+            border: "none",
+            borderRadius: "8px",
+            fontSize: "14px",
+            fontWeight: "600",
+            cursor: "pointer",
+            transition: "all 0.2s",
+          }}
+          onMouseEnter={(e) => {
+            e.currentTarget.style.backgroundColor = "#dc2626";
+          }}
+          onMouseLeave={(e) => {
+            e.currentTarget.style.backgroundColor = "#ef4444";
+          }}
+        >
+          🚪 Logout
+        </button>
+      </div>
 
       <section style={{ marginTop: "30px" }}>
         <h2>📊 Admin Controls</h2>

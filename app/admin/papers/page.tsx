@@ -1,6 +1,6 @@
 "use client";
 
-import { useSession } from "next-auth/react";
+import { useSession, signOut } from "next-auth/react";
 import { redirect } from "next/navigation";
 import { useState, useEffect } from "react";
 
@@ -52,6 +52,10 @@ export default function PaperManagement() {
     }
   };
 
+  const handleLogout = async () => {
+    await signOut({ redirect: true, callbackUrl: "/login" });
+  };
+
   const handleCreatePaper = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!title.trim()) return;
@@ -89,6 +93,41 @@ export default function PaperManagement() {
           <h1 style={{ margin: "0 0 8px 0" }}>📝 Paper Management</h1>
           <p style={{ color: "#666", margin: "0" }}>Create and manage exam papers</p>
         </div>
+        <div style={{ display: "flex", gap: "12px" }}>
+          <a href="/admin/dashboard">
+            <button style={{
+              padding: "10px 20px",
+              backgroundColor: "#6b7280",
+              color: "white",
+              border: "none",
+              borderRadius: "8px",
+              fontSize: "14px",
+              fontWeight: "600",
+              cursor: "pointer",
+            }}>
+              ← Back
+            </button>
+          </a>
+          <button
+            onClick={handleLogout}
+            style={{
+              padding: "10px 20px",
+              backgroundColor: "#ef4444",
+              color: "white",
+              border: "none",
+              borderRadius: "8px",
+              fontSize: "14px",
+              fontWeight: "600",
+              cursor: "pointer",
+            }}
+          >
+            🚪 Logout
+          </button>
+        </div>
+      </div>
+
+      {/* New Paper Button */}
+      <div style={{ marginBottom: "30px" }}>
         <button
           onClick={() => setShowForm(!showForm)}
           style={{
