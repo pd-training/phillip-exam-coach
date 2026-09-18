@@ -18,28 +18,28 @@ export async function GET() {
     const prisma = new PrismaClient({ datasources: { db: { url: dbUrl } } });
 
     // Clear existing users
-    await prisma.user.deleteMany({});
+    await (prisma as any).user.deleteMany({});
 
-    // Create admin user
+    // Create admin user - bypass enum validation
     const adminHash = await bcrypt.hash("Admin@123", 10);
-    await prisma.user.create({
+    await (prisma as any).user.create({
       data: { 
         name: "Admin", 
         email: "admin@phillip.com", 
         password: adminHash, 
         role: "ADMIN"
-      } as any
+      }
     });
 
-    // Create student user
+    // Create student user - bypass enum validation
     const studentHash = await bcrypt.hash("Student@123", 10);
-    await prisma.user.create({
+    await (prisma as any).user.create({
       data: { 
         name: "Student", 
         email: "student@phillip.com", 
         password: studentHash, 
         role: "STUDENT"
-      } as any
+      }
     });
 
     await prisma.$disconnect();
