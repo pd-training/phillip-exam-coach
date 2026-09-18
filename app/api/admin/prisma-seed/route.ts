@@ -20,7 +20,7 @@ export async function GET() {
 
     // Create module
     const module = await prisma.module.create({
-      data: { code: "RES5", name: "RES 5", description: "CMFAS RES5 Module" }
+      data: { code: "RES5", name: "RES 5" }
     });
 
     // Create paper
