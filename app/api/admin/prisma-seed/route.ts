@@ -18,29 +18,21 @@ export async function GET() {
     const prisma = new PrismaClient({ datasources: { db: { url: dbUrl } } });
 
     // Clear existing users
-    await (prisma as any).user.deleteMany({});
+    await prisma.user.deleteMany({});
 
-    // Create admin user - bypass enum validation
+    // Create admin user
     const adminHash = await bcrypt.hash("Admin@123", 10);
-    await (prisma as any).user.create({
-      data: { 
-        name: "Admin", 
-        email: "admin@phillip.com", 
-        password: adminHash, 
-        role: "ADMIN"
-      }
-    });
+    await prisma.$queryRaw`
+      INSERT INTO "User" (id, name, email, password, role, "createdAt", "updatedAt")
+      VALUES (gen_random_uuid(), 'Admin', 'admin@phillip.com', ${adminHash}, 'ADMIN', NOW(), NOW())
+    `;
 
-    // Create student user - bypass enum validation
+    // Create student user
     const studentHash = await bcrypt.hash("Student@123", 10);
-    await (prisma as any).user.create({
-      data: { 
-        name: "Student", 
-        email: "student@phillip.com", 
-        password: studentHash, 
-        role: "STUDENT"
-      }
-    });
+    await prisma.$queryRaw`
+      INSERT INTO "User" (id, name, email, password, role, "createdAt", "updatedAt")
+      VALUES (gen_random_uuid(), 'Student', 'student@phillip.com', ${studentHash}, 'STUDENT', NOW(), NOW())
+    `;
 
     await prisma.$disconnect();
 
