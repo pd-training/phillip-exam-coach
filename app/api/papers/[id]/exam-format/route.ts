@@ -1,124 +1,78 @@
-export const dynamic = "force-dynamic";
-
-const dbUrl = process.env.DATABASE_URL || "postgresql://postgres:MyPassword2026!@phillip-exam-coach-db.c7cmo2c6ecz8.ap-southeast-1.rds.amazonaws.com:5432/phillip_exam_coach";
-
-interface ExamPart {
-  partName: string;
-  chapterStart: number;
-  chapterEnd: number;
-  questionCount: number;
-  passingScore: number;
-}
+import { NextRequest, NextResponse } from 'next/server';
+import { prisma } from '@/lib/prisma';
 
 export async function GET(
-  req: Request,
+  request: NextRequest,
   { params }: { params: { id: string } }
 ) {
   try {
-    const { PrismaClient } = require("@prisma/client");
-    const prisma = new PrismaClient({ datasources: { db: { url: dbUrl } } });
+    const paperId = params.id;
 
-    const paper = await prisma.$queryRaw`
-      SELECT id, "totalTime"
-      FROM "Paper"
-      WHERE id = ${params.id}::uuid
-    `;
+    const paper = await prisma.paper.findUnique({
+      where: { id: paperId as any },
+      select: { totalTime: true },
+    });
 
-    if (!paper || paper.length === 0) {
-      await prisma.$disconnect();
-      return Response.json(
-        { success: false, error: "Paper not found" },
-        { status: 404 }
-      );
+    if (!paper) {
+      return NextResponse.json({ error: 'Paper not found' }, { status: 404 });
     }
 
-    const parts = await prisma.$queryRaw`
-      SELECT id, "partName", "chapterStart", "chapterEnd", "questionCount", "passingScore", "orderIndex"
-      FROM "ExamPart"
-      WHERE "paperId" = ${params.id}::uuid
-      ORDER BY "orderIndex" ASC
-    `;
-
-    await prisma.$disconnect();
-
-    return Response.json({
-      success: true,
-      examFormat: {
-        totalTime: paper[0].totalTime,
-        parts: parts || []
-      }
+    const parts = await prisma.examPart.findMany({
+      where: { paperId: paperId as any },
+      orderBy: { orderIndex: 'asc' },
     });
-  } catch (error) {
-    console.error("Error fetching exam format:", error);
-    return Response.json(
-      { success: false, error: String(error) },
+
+    return NextResponse.json({
+      examFormat: {
+        totalTime: paper.totalTime,
+        parts,
+      },
+    });
+  } catch (error: any) {
+    console.error('Get exam format error:', error);
+    return NextResponse.json(
+      { error: error.message || 'Failed to fetch exam format' },
       { status: 500 }
     );
   }
 }
 
 export async function POST(
-  req: Request,
+  request: NextRequest,
   { params }: { params: { id: string } }
 ) {
   try {
-    const { totalTime, parts } = await req.json();
+    const body = await request.json();
+    const { totalTime, parts } = body;
+    const paperId = params.id;
 
-    if (!parts || parts.length === 0) {
-      return Response.json(
-        { success: false, error: "At least one part is required" },
-        { status: 400 }
-      );
-    }
-
-    const { PrismaClient } = require("@prisma/client");
-    const prisma = new PrismaClient({ datasources: { db: { url: dbUrl } } });
-
-    // Update Paper totalTime
-    await prisma.$queryRaw`
-      UPDATE "Paper"
-      SET "totalTime" = ${totalTime}, "updatedAt" = NOW()
-      WHERE id = ${params.id}::uuid
-    `;
+    // Update paper totalTime
+    await prisma.paper.update({
+      where: { id: paperId as any },
+      data: { totalTime },
+    });
 
     // Delete existing parts
-    await prisma.$queryRaw`
-      DELETE FROM "ExamPart"
-      WHERE "paperId" = ${params.id}::uuid
-    `;
-
-    // Insert new parts
-    for (let i = 0; i < parts.length; i++) {
-      const part = parts[i];
-      await prisma.$queryRaw`
-        INSERT INTO "ExamPart" (
-          "paperId", "partName", "chapterStart", "chapterEnd", 
-          "questionCount", "passingScore", "orderIndex", "createdAt", "updatedAt"
-        )
-        VALUES (
-          ${params.id}::uuid,
-          ${part.partName},
-          ${part.chapterStart},
-          ${part.chapterEnd},
-          ${part.questionCount},
-          ${part.passingScore},
-          ${i + 1},
-          NOW(),
-          NOW()
-        )
-      `;
-    }
-
-    await prisma.$disconnect();
-
-    return Response.json({
-      success: true,
-      message: "Exam format saved successfully"
+    await prisma.examPart.deleteMany({
+      where: { paperId: paperId as any },
     });
-  } catch (error) {
-    console.error("Error saving exam format:", error);
-    return Response.json(
-      { success: false, error: String(error) },
+
+    // Create new parts
+    const created = await prisma.examPart.createMany({
+      data: parts.map((p: any) => ({
+        paperId: paperId as any,
+        ...p,
+      })),
+    });
+
+    return NextResponse.json({
+      success: true,
+      partsCreated: created.count,
+    });
+  } catch (error: any) {
+    console.error('Save exam format error:', error);
+    return NextResponse.json(
+      { error: error.message || 'Failed to save exam format' },
       { status: 500 }
     );
   }

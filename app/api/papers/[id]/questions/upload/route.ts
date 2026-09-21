@@ -1,124 +1,116 @@
-export const dynamic = "force-dynamic";
-
-const dbUrl = process.env.DATABASE_URL || "postgresql://postgres:MyPassword2026!@phillip-exam-coach-db.c7cmo2c6ecz8.ap-southeast-1.rds.amazonaws.com:5432/phillip_exam_coach";
+import { NextRequest, NextResponse } from 'next/server';
+import { prisma } from '@/lib/prisma';
 
 export async function POST(
-  req: Request,
+  request: NextRequest,
   { params }: { params: { id: string } }
 ) {
   try {
-    const formData = await req.formData();
-    const file = formData.get("file") as File;
+    const formData = await request.formData();
+    const file = formData.get('file') as File;
 
     if (!file) {
-      return Response.json(
-        { success: false, error: "No file provided" },
-        { status: 400 }
-      );
+      return NextResponse.json({ error: 'No file provided' }, { status: 400 });
     }
 
+    const paperId = params.id;
+
+    // Verify paper exists
+    const paper = await prisma.paper.findUnique({
+      where: { id: paperId as any },
+    });
+
+    if (!paper) {
+      return NextResponse.json({ error: 'Paper not found' }, { status: 404 });
+    }
+
+    // Read CSV file
     const text = await file.text();
-    const lines = text.split("\n").filter(line => line.trim());
-
-    if (lines.length < 2) {
-      return Response.json(
-        { success: false, error: "CSV must have header and at least one row" },
-        { status: 400 }
-      );
-    }
-
-    // Parse CSV
-    const headers = lines[0].split(",").map(h => h.trim().toLowerCase());
+    const lines = text.split('\n');
     const questions = [];
-    const errors = [];
 
+    // Skip header row
     for (let i = 1; i < lines.length; i++) {
-      const values = lines[i].split(",").map(v => v.trim());
-      
-      if (values.length < 3) continue; // Skip incomplete rows
+      const line = lines[i].trim();
+      if (!line) continue;
 
-      const chapter = parseInt(values[0]);
-      const questionText = values[1];
-      const correctAnswer = values[2];
-      const explanation = values[3] || "";
+      // Parse CSV (handle quoted fields)
+      const parts = [];
+      let current = '';
+      let inQuotes = false;
 
-      // Validate
-      if (isNaN(chapter)) {
-        errors.push(`Row ${i + 1}: Invalid chapter number`);
-        continue;
+      for (let j = 0; j < line.length; j++) {
+        const char = line[j];
+        if (char === '"') {
+          inQuotes = !inQuotes;
+        } else if (char === ',' && !inQuotes) {
+          parts.push(current.trim().replace(/^"(.*)"$/, '$1'));
+          current = '';
+        } else {
+          current += char;
+        }
       }
+      parts.push(current.trim().replace(/^"(.*)"$/, '$1'));
 
-      if (!questionText) {
-        errors.push(`Row ${i + 1}: Question text is required`);
-        continue;
-      }
+      if (parts.length < 3) continue;
 
-      if (!["A", "B", "C", "D"].includes(correctAnswer.toUpperCase())) {
-        errors.push(`Row ${i + 1}: Answer must be A, B, C, or D`);
-        continue;
-      }
+      const [chapter, question, answer, explanation] = parts;
+
+      if (!chapter || !question || !answer) continue;
 
       questions.push({
-        chapter,
-        questionText,
-        correctAnswer: correctAnswer.toUpperCase(),
-        explanation
+        paperId: paperId as any,
+        chapterNumber: parseInt(chapter) || 1,
+        questionText: question,
+        correctAnswer: answer.toUpperCase().charAt(0),
+        explanation: explanation || '',
       });
     }
 
     if (questions.length === 0) {
-      return Response.json(
-        { success: false, error: "No valid questions to import", errors },
+      return NextResponse.json(
+        { error: 'No valid questions found in CSV' },
         { status: 400 }
       );
     }
 
-    // Insert into database
-    const { PrismaClient } = require("@prisma/client");
-    const prisma = new PrismaClient({ datasources: { db: { url: dbUrl } } });
+    // Delete existing questions for this paper
+    await prisma.question.deleteMany({
+      where: { paperId: paperId as any },
+    });
 
-    // First, delete existing questions for this paper
-    await prisma.$queryRaw`
-      DELETE FROM "Question"
-      WHERE "paperId" = ${params.id}::uuid
-    `;
+    // Bulk insert new questions
+    const created = await prisma.question.createMany({
+      data: questions,
+    });
 
-    // Insert new questions
-    for (const q of questions) {
-      await prisma.$queryRaw`
-        INSERT INTO "Question" (
-          "paperId", "chapterNumber", "questionText", "correctAnswer", "explanation", "createdAt", "updatedAt"
-        )
-        VALUES (
-          ${params.id}::uuid,
-          ${q.chapter},
-          ${q.questionText},
-          ${q.correctAnswer},
-          ${q.explanation},
-          NOW(),
-          NOW()
-        )
-      `;
+    // Update paper's total questions count
+    await prisma.paper.update({
+      where: { id: paperId as any },
+      data: { totalQuestions: created.count },
+    });
+
+    return NextResponse.json({
+      success: true,
+      count: created.count,
+      message: `${created.count} questions imported successfully`,
+    });
+  } catch (error: any) {
+    console.error('Upload error:', error);
+
+    // Better error messages
+    if (error.message?.includes('relation "Question" does not exist')) {
+      return NextResponse.json(
+        {
+          error: 'Database tables not initialized. Please wait for deployment to complete and try again.',
+          details: 'The Question table is being created during deployment.',
+        },
+        { status: 503 }
+      );
     }
 
-    // Update Paper totalQuestions
-    await prisma.$queryRaw`
-      UPDATE "Paper"
-      SET "totalQuestions" = ${questions.length}, "updatedAt" = NOW()
-      WHERE id = ${params.id}::uuid
-    `;
-
-    await prisma.$disconnect();
-
-    return Response.json({
-      success: true,
-      count: questions.length,
-      errors: errors.length > 0 ? errors : undefined
-    });
-  } catch (error) {
-    console.error("Error uploading questions:", error);
-    return Response.json(
-      { success: false, error: String(error) },
+    return NextResponse.json(
+      { error: error.message || 'Upload failed' },
       { status: 500 }
     );
   }

@@ -514,7 +514,7 @@ export default function PapersManagement() {
               <h3 style={{ margin: "0" }}>Question Bank</h3>
               <button
                 onClick={() => {
-                  setSelectedPaperId(papers[0]?.id || "");
+                  setSelectedPaperId("");
                   setActiveModal("uploadQuestions");
                 }}
                 disabled={papers.length === 0}
@@ -644,6 +644,31 @@ export default function PapersManagement() {
 
           <div style={{ marginBottom: "16px" }}>
             <label style={{ display: "block", fontSize: "14px", fontWeight: "500", marginBottom: "6px" }}>
+              Select Paper *
+            </label>
+            <select
+              value={selectedPaperId}
+              onChange={(e) => setSelectedPaperId(e.target.value)}
+              style={{
+                width: "100%",
+                padding: "10px",
+                border: "1px solid #d1d5db",
+                borderRadius: "6px",
+                fontSize: "13px",
+                boxSizing: "border-box",
+              }}
+            >
+              <option value="">-- Choose a paper --</option>
+              {papers.map((p) => (
+                <option key={p.id} value={p.id}>
+                  {p.title} ({p.durationMinutes} min)
+                </option>
+              ))}
+            </select>
+          </div>
+
+          <div style={{ marginBottom: "16px" }}>
+            <label style={{ display: "block", fontSize: "14px", fontWeight: "500", marginBottom: "6px" }}>
               CSV File *
             </label>
             <input
@@ -661,7 +686,7 @@ export default function PapersManagement() {
           </div>
 
           {uploadProgress && (
-            <div style={{ padding: "12px", backgroundColor: "#f0f9ff", borderRadius: "6px", marginBottom: "16px", fontSize: "13px", color: "#0369a1" }}>
+            <div style={{ padding: "12px", backgroundColor: uploadProgress.startsWith("✅") ? "#dcfce7" : "#fee2e2", borderRadius: "6px", marginBottom: "16px", fontSize: "13px", color: uploadProgress.startsWith("✅") ? "#166534" : "#991b1b" }}>
               {uploadProgress}
             </div>
           )}
@@ -669,7 +694,7 @@ export default function PapersManagement() {
           <div style={{ display: "flex", gap: "12px", justifyContent: "flex-end" }}>
             <button
               type="button"
-              onClick={() => { setActiveModal(null); setUploadFile(null); setUploadProgress(""); }}
+              onClick={() => { setActiveModal(null); setUploadFile(null); setUploadProgress(""); setSelectedPaperId(""); }}
               style={{
                 padding: "10px 20px",
                 backgroundColor: "#e5e7eb",
@@ -685,16 +710,16 @@ export default function PapersManagement() {
             </button>
             <button
               onClick={handleUploadQuestions}
-              disabled={!uploadFile || submitting}
+              disabled={!uploadFile || !selectedPaperId || submitting}
               style={{
                 padding: "10px 24px",
-                backgroundColor: !uploadFile || submitting ? "#9ca3af" : "#3b82f6",
+                backgroundColor: !uploadFile || !selectedPaperId || submitting ? "#9ca3af" : "#3b82f6",
                 color: "white",
                 border: "none",
                 borderRadius: "6px",
                 fontSize: "14px",
                 fontWeight: "600",
-                cursor: !uploadFile || submitting ? "not-allowed" : "pointer",
+                cursor: !uploadFile || !selectedPaperId || submitting ? "not-allowed" : "pointer",
               }}
             >
               {submitting ? "Uploading..." : "Upload"}

@@ -1,83 +1,60 @@
-export const dynamic = "force-dynamic";
-
-const dbUrl = process.env.DATABASE_URL || "postgresql://postgres:MyPassword2026!@phillip-exam-coach-db.c7cmo2c6ecz8.ap-southeast-1.rds.amazonaws.com:5432/phillip_exam_coach";
+import { NextRequest, NextResponse } from 'next/server';
+import { prisma } from '@/lib/prisma';
 
 export async function PATCH(
-  req: Request,
+  request: NextRequest,
   { params }: { params: { id: string; qid: string } }
 ) {
   try {
-    const { questionText, correctAnswer, explanation, chapterNumber } = await req.json();
+    const body = await request.json();
+    const { questionText, correctAnswer, chapterNumber, explanation } = body;
 
-    const { PrismaClient } = require("@prisma/client");
-    const prisma = new PrismaClient({ datasources: { db: { url: dbUrl } } });
-
-    const result = await prisma.$queryRaw`
-      UPDATE "Question"
-      SET "questionText" = ${questionText}, 
-          "correctAnswer" = ${correctAnswer},
-          "explanation" = ${explanation},
-          "chapterNumber" = ${chapterNumber},
-          "updatedAt" = NOW()
-      WHERE id = ${params.qid}::uuid
-      AND "paperId" = ${params.id}::uuid
-      RETURNING *
-    `;
-
-    await prisma.$disconnect();
-
-    if (!result || result.length === 0) {
-      return Response.json(
-        { success: false, error: "Question not found" },
-        { status: 404 }
-      );
-    }
-
-    return Response.json({
-      success: true,
-      question: result[0]
+    const updated = await prisma.question.update({
+      where: { id: params.qid as any },
+      data: {
+        questionText,
+        correctAnswer: correctAnswer?.toUpperCase().charAt(0),
+        chapterNumber,
+        explanation,
+      },
     });
-  } catch (error) {
-    console.error("Error updating question:", error);
-    return Response.json(
-      { success: false, error: String(error) },
+
+    return NextResponse.json({ question: updated });
+  } catch (error: any) {
+    console.error('Update error:', error);
+    return NextResponse.json(
+      { error: error.message || 'Failed to update question' },
       { status: 500 }
     );
   }
 }
 
 export async function DELETE(
-  req: Request,
+  request: NextRequest,
   { params }: { params: { id: string; qid: string } }
 ) {
   try {
-    const { PrismaClient } = require("@prisma/client");
-    const prisma = new PrismaClient({ datasources: { db: { url: dbUrl } } });
+    const paperId = params.id;
 
-    await prisma.$queryRaw`
-      DELETE FROM "Question"
-      WHERE id = ${params.qid}::uuid
-      AND "paperId" = ${params.id}::uuid
-    `;
+    await prisma.question.delete({
+      where: { id: params.qid as any },
+    });
 
-    // Update Paper totalQuestions
-    const count = await prisma.$queryRaw`
-      SELECT COUNT(*) as count FROM "Question" WHERE "paperId" = ${params.id}::uuid
-    `;
+    // Update paper's total questions count
+    const count = await prisma.question.count({
+      where: { paperId: paperId as any },
+    });
 
-    await prisma.$queryRaw`
-      UPDATE "Paper"
-      SET "totalQuestions" = ${count[0].count}, "updatedAt" = NOW()
-      WHERE id = ${params.id}::uuid
-    `;
+    await prisma.paper.update({
+      where: { id: paperId as any },
+      data: { totalQuestions: count },
+    });
 
-    await prisma.$disconnect();
-
-    return Response.json({ success: true });
-  } catch (error) {
-    console.error("Error deleting question:", error);
-    return Response.json(
-      { success: false, error: String(error) },
+    return NextResponse.json({ success: true });
+  } catch (error: any) {
+    console.error('Delete error:', error);
+    return NextResponse.json(
+      { error: error.message || 'Failed to delete question' },
       { status: 500 }
     );
   }
