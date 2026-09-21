@@ -10,7 +10,7 @@ export async function GET(request: Request) {
         id,
         title,
         "durationMinutes" as totalTime
-      FROM paper
+      FROM "Paper"
       ORDER BY title ASC
     ` as any[];
 

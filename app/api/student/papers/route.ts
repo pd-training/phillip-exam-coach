@@ -26,7 +26,7 @@ export async function GET(request: NextRequest) {
         p.title as paper_name,
         sp.status
       FROM "StudentPaper" sp
-      JOIN paper p ON p.id = sp."paperId"
+      JOIN "Paper" p ON p.id = sp."paperId"
       WHERE sp."userId" = ${userId}
       AND sp.status = 'active'
       ORDER BY p.title ASC

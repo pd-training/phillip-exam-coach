@@ -22,9 +22,9 @@ export async function GET(request: Request) {
         u.name as student_name,
         u.email as student_email,
         p.title as paper_name
-      FROM paperrequest pr
-      JOIN "user" u ON pr."userId" = u.id
-      JOIN paper p ON pr."paperId" = p.id
+      FROM "PaperRequest" pr
+      JOIN "User" u ON pr."userId" = u.id
+      JOIN "Paper" p ON pr."paperId" = p.id
       WHERE pr.status = 'pending'
       ORDER BY pr."requestedAt" ASC
     ` as any[];

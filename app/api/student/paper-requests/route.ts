@@ -22,8 +22,8 @@ export async function GET(request: Request) {
         pr.status,
         pr."requestedAt",
         p.title as paper_name
-      FROM paperrequest pr
-      JOIN paper p ON pr."paperId" = p.id
+      FROM "PaperRequest" pr
+      JOIN "Paper" p ON pr."paperId" = p.id
       WHERE pr."userId" = ${userId}
       ORDER BY pr."requestedAt" DESC
     ` as any[];
