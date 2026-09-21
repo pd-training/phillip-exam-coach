@@ -11,17 +11,23 @@ export async function PATCH(
     const body = await request.json();
     const { questionText, correctAnswer, chapterNumber, explanation } = body;
 
-    const updated = await prisma.question.update({
-      where: { id: params.qid as any },
-      data: {
-        questionText,
-        correctAnswer: correctAnswer?.toUpperCase().charAt(0),
-        chapterNumber,
-        explanation,
-      },
-    });
+    await prisma.$queryRaw`
+      UPDATE "Question"
+      SET "questionText" = ${questionText},
+          "correctAnswer" = ${correctAnswer?.toUpperCase().charAt(0)},
+          "chapterNumber" = ${chapterNumber},
+          explanation = ${explanation},
+          "updatedAt" = NOW()
+      WHERE id = ${params.qid}::uuid
+    `;
 
-    return NextResponse.json({ question: updated });
+    const result = await prisma.$queryRaw`
+      SELECT id, "paperId", "chapterNumber", "questionText", "correctAnswer", explanation
+      FROM "Question"
+      WHERE id = ${params.qid}::uuid
+    ` as any[];
+
+    return NextResponse.json({ question: result?.[0] });
   } catch (error: any) {
     console.error('Update error:', error);
     return NextResponse.json(
@@ -38,19 +44,24 @@ export async function DELETE(
   try {
     const paperId = params.id;
 
-    await prisma.question.delete({
-      where: { id: params.qid as any },
-    });
+    await prisma.$queryRaw`
+      DELETE FROM "Question"
+      WHERE id = ${params.qid}::uuid
+    `;
 
     // Update paper's total questions count
-    const count = await prisma.question.count({
-      where: { paperId: paperId as any },
-    });
+    const countResult = await prisma.$queryRaw`
+      SELECT COUNT(*) as count FROM "Question"
+      WHERE "paperId" = ${paperId}::uuid
+    ` as any[];
 
-    await prisma.paper.update({
-      where: { id: paperId as any },
-      data: { totalQuestions: count },
-    });
+    const count = countResult?.[0]?.count || 0;
+
+    await prisma.$queryRaw`
+      UPDATE "Paper"
+      SET "totalQuestions" = ${count}
+      WHERE id = ${paperId}::uuid
+    `;
 
     return NextResponse.json({ success: true });
   } catch (error: any) {

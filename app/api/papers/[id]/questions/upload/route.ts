@@ -18,11 +18,11 @@ export async function POST(
     const paperId = params.id;
 
     // Verify paper exists
-    const paper = await prisma.paper.findUnique({
-      where: { id: paperId as any },
-    });
+    const paperResult = await prisma.$queryRaw`
+      SELECT id FROM "Paper" WHERE id = ${paperId}::uuid
+    ` as any[];
 
-    if (!paper) {
+    if (!paperResult || paperResult.length === 0) {
       return NextResponse.json({ error: 'Paper not found' }, { status: 404 });
     }
 
@@ -61,7 +61,7 @@ export async function POST(
       if (!chapter || !question || !answer) continue;
 
       questions.push({
-        paperId: paperId as any,
+        paperId: paperId,
         chapterNumber: parseInt(chapter) || 1,
         questionText: question,
         correctAnswer: answer.toUpperCase().charAt(0),
@@ -77,30 +77,39 @@ export async function POST(
     }
 
     // Delete existing questions for this paper
-    await prisma.question.deleteMany({
-      where: { paperId: paperId as any },
-    });
+    await prisma.$queryRaw`
+      DELETE FROM "Question" WHERE "paperId" = ${paperId}::uuid
+    `;
 
     // Bulk insert new questions
-    const created = await prisma.question.createMany({
-      data: questions,
-    });
+    let insertedCount = 0;
+    for (const q of questions) {
+      try {
+        await prisma.$queryRaw`
+          INSERT INTO "Question" (id, "paperId", "chapterNumber", "questionText", "correctAnswer", explanation, "createdAt", "updatedAt")
+          VALUES (gen_random_uuid(), ${q.paperId}::uuid, ${q.chapterNumber}, ${q.questionText}, ${q.correctAnswer}, ${q.explanation}, NOW(), NOW())
+        `;
+        insertedCount++;
+      } catch (e) {
+        console.error('Insert error:', e);
+      }
+    }
 
     // Update paper's total questions count
-    await prisma.paper.update({
-      where: { id: paperId as any },
-      data: { totalQuestions: created.count },
-    });
+    await prisma.$queryRaw`
+      UPDATE "Paper"
+      SET "totalQuestions" = ${insertedCount}
+      WHERE id = ${paperId}::uuid
+    `;
 
     return NextResponse.json({
       success: true,
-      count: created.count,
-      message: `${created.count} questions imported successfully`,
+      count: insertedCount,
+      message: `${insertedCount} questions imported successfully`,
     });
   } catch (error: any) {
     console.error('Upload error:', error);
 
-    // Better error messages
     if (error.message?.includes('relation "Question" does not exist')) {
       return NextResponse.json(
         {

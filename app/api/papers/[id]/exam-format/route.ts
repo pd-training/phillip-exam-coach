@@ -3,6 +3,8 @@ import prisma from '@/lib/prisma';
 
 export const dynamic = 'force-dynamic';
 
+const dbUrl = process.env.DATABASE_URL || "postgresql://postgres:MyPassword2026!@phillip-exam-coach-db.c7cmo2c6ecz8.ap-southeast-1.rds.amazonaws.com:5432/phillip_exam_coach";
+
 export async function GET(
   request: NextRequest,
   { params }: { params: { id: string } }
@@ -10,24 +12,29 @@ export async function GET(
   try {
     const paperId = params.id;
 
-    const paper = await prisma.paper.findUnique({
-      where: { id: paperId as any },
-      select: { totalTime: true },
-    });
+    // Use raw SQL to fetch paper
+    const paperResult = await prisma.$queryRaw`
+      SELECT "totalTime" FROM "Paper" WHERE id = ${paperId}::uuid
+    ` as any[];
 
-    if (!paper) {
+    if (!paperResult || paperResult.length === 0) {
       return NextResponse.json({ error: 'Paper not found' }, { status: 404 });
     }
 
-    const parts = await prisma.examPart.findMany({
-      where: { paperId: paperId as any },
-      orderBy: { orderIndex: 'asc' },
-    });
+    const paper = paperResult[0];
+
+    // Fetch exam parts
+    const parts = await prisma.$queryRaw`
+      SELECT id, "partName", "chapterStart", "chapterEnd", "questionCount", "passingScore", "orderIndex"
+      FROM "ExamPart"
+      WHERE "paperId" = ${paperId}::uuid
+      ORDER BY "orderIndex" ASC
+    `;
 
     return NextResponse.json({
       examFormat: {
-        totalTime: paper.totalTime,
-        parts,
+        totalTime: paper.totalTime || 120,
+        parts: parts || [],
       },
     });
   } catch (error: any) {
@@ -49,27 +56,29 @@ export async function POST(
     const paperId = params.id;
 
     // Update paper totalTime
-    await prisma.paper.update({
-      where: { id: paperId as any },
-      data: { totalTime },
-    });
+    await prisma.$queryRaw`
+      UPDATE "Paper"
+      SET "totalTime" = ${totalTime}
+      WHERE id = ${paperId}::uuid
+    `;
 
     // Delete existing parts
-    await prisma.examPart.deleteMany({
-      where: { paperId: paperId as any },
-    });
+    await prisma.$queryRaw`
+      DELETE FROM "ExamPart"
+      WHERE "paperId" = ${paperId}::uuid
+    `;
 
     // Create new parts
-    const created = await prisma.examPart.createMany({
-      data: parts.map((p: any) => ({
-        paperId: paperId as any,
-        ...p,
-      })),
-    });
+    for (const part of parts) {
+      await prisma.$queryRaw`
+        INSERT INTO "ExamPart" (id, "paperId", "partName", "chapterStart", "chapterEnd", "questionCount", "passingScore", "orderIndex", "createdAt", "updatedAt")
+        VALUES (gen_random_uuid(), ${paperId}::uuid, ${part.partName}, ${part.chapterStart}, ${part.chapterEnd}, ${part.questionCount}, ${part.passingScore}, ${part.orderIndex}, NOW(), NOW())
+      `;
+    }
 
     return NextResponse.json({
       success: true,
-      partsCreated: created.count,
+      partsCreated: parts.length,
     });
   } catch (error: any) {
     console.error('Save exam format error:', error);
