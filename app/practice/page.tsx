@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useCallback } from 'react';
 import StudentNav from '@/components/StudentNav';
 import { useSession } from 'next-auth/react';
 import { useRouter } from 'next/navigation';
@@ -94,7 +94,7 @@ export default function PracticePage() {
     return 'available';
   };
 
-  const handleRequestPaper = async (paperId: string, paperName: string) => {
+  const handleRequestPaper = useCallback(async (paperId: string, paperName: string) => {
     try {
       setSubmitting(paperId);
 
@@ -148,7 +148,7 @@ export default function PracticePage() {
     } finally {
       setSubmitting(null);
     }
-  };
+  }, []);
 
   const formatTime = (seconds: number) => {
     if (!seconds) return '-';
