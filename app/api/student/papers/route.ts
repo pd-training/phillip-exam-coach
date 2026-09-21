@@ -1,13 +1,13 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getServerSession } from 'next-auth/next';
 import prisma from '@/lib/prisma';
-import authConfig from '@/lib/auth-config';
+import { authOptions } from '@/lib/auth-config';
 
 export const dynamic = 'force-dynamic';
 
 export async function GET(request: NextRequest) {
   try {
-    const session = await getServerSession(authConfig);
+    const session = await getServerSession(authOptions);
 
     if (!session?.user) {
       return NextResponse.json(
