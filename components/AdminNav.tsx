@@ -15,7 +15,8 @@ export default function AdminNav() {
   ];
 
   const handleLogout = async () => {
-    await signOut({ redirect: true, callbackUrl: '/login' });
+    const loginUrl = `${typeof window !== 'undefined' ? window.location.origin : ''}/login`;
+    await signOut({ redirect: true, callbackUrl: loginUrl });
   };
 
   return (
