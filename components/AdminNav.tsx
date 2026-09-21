@@ -12,6 +12,7 @@ export default function AdminNav() {
     { label: 'Dashboard', href: '/admin/dashboard' },
     { label: 'Papers', href: '/admin/papers' },
     { label: 'Users', href: '/admin/users' },
+    { label: 'Assign Papers', href: '/admin/assign-papers' },
   ];
 
   const handleLogout = async () => {
