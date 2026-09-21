@@ -70,8 +70,18 @@ export default function PaperManagement() {
   }, []);
 
   const handleLogout = async () => {
-    const baseUrl = typeof window !== "undefined" ? window.location.origin : "";
-    await signOut({ redirect: true, callbackUrl: `${baseUrl}/login` });
+    try {
+      const baseUrl = typeof window !== "undefined" ? window.location.origin : "";
+      console.log("Logging out with baseUrl:", baseUrl);
+      const callbackUrl = `${baseUrl}/login`;
+      console.log("Callback URL:", callbackUrl);
+      await signOut({ redirect: true, callbackUrl });
+    } catch (error) {
+      console.error("Logout error:", error);
+      if (typeof window !== "undefined") {
+        window.location.href = `${window.location.origin}/login`;
+      }
+    }
   };
 
   const handleCreatePaper = async (e: React.FormEvent) => {
