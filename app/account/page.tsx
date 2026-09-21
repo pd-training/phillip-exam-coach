@@ -1,5 +1,6 @@
 "use client";
 
+import StudentNav from "@/components/StudentNav";
 import { useSession, signOut } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
@@ -56,19 +57,6 @@ export default function AccountPage() {
   if (status === "unauthenticated" || !session?.user) {
     return null;
   }
-
-  const handleLogout = async () => {
-    try {
-      await signOut({ redirect: false });
-      const baseUrl = typeof window !== "undefined" ? window.location.origin : "";
-      window.location.href = `${baseUrl}/login`;
-    } catch (error) {
-      console.error("Logout error:", error);
-      if (typeof window !== "undefined") {
-        window.location.href = `${window.location.origin}/login`;
-      }
-    }
-  };
 
   const handleProfileUpdate = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -151,47 +139,7 @@ export default function AccountPage() {
 
   return (
     <div style={{ backgroundColor: "#f8f9fa", minHeight: "100vh" }}>
-      {/* Navigation Bar */}
-      <nav style={{
-        backgroundColor: "white",
-        borderBottom: "1px solid #e5e7eb",
-        padding: "16px 24px",
-        display: "flex",
-        justifyContent: "space-between",
-        alignItems: "center",
-      }}>
-        <div style={{ display: "flex", gap: "32px" }}>
-          <a href="/dashboard" style={{ textDecoration: "none", color: "#666", fontWeight: "500", fontSize: "14px" }}>
-            Dashboard
-          </a>
-          <a href="#" style={{ textDecoration: "none", color: "#666", fontWeight: "500", fontSize: "14px" }}>
-            Practice
-          </a>
-          <a href="#" style={{ textDecoration: "none", color: "#666", fontWeight: "500", fontSize: "14px" }}>
-            Browse papers
-          </a>
-          <a href="#" style={{ textDecoration: "none", color: "#666", fontWeight: "500", fontSize: "14px" }}>
-            Help
-          </a>
-        </div>
-        <div style={{ display: "flex", gap: "24px", alignItems: "center" }}>
-          <span style={{ color: "#666", fontSize: "14px" }}>Account</span>
-          <span style={{ fontWeight: "600", fontSize: "14px" }}>{session?.user?.name || "User"}</span>
-          <button
-            onClick={handleLogout}
-            style={{
-              backgroundColor: "transparent",
-              color: "#3b82f6",
-              border: "none",
-              cursor: "pointer",
-              fontSize: "14px",
-              fontWeight: "500",
-            }}
-          >
-            Log out
-          </button>
-        </div>
-      </nav>
+      <StudentNav />
 
       {/* Main Content */}
       <div style={{ maxWidth: "800px", margin: "0 auto", padding: "32px 24px" }}>

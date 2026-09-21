@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import StudentNav from '@/components/StudentNav';
 import { useSession } from 'next-auth/react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
@@ -152,20 +152,14 @@ export default function PracticePage() {
 
   return (
     <div className="min-h-screen bg-gray-50">
-      {/* Header */}
+      <StudentNav />
+
+      {/* Page Header */}
       <div className="bg-white border-b border-gray-200">
         <div className="max-w-6xl mx-auto px-6 py-6">
-          <div className="flex items-center justify-between mb-6">
-            <div>
-              <h1 className="text-3xl font-bold text-gray-900">Practice</h1>
-              <p className="text-gray-600 mt-1">Prepare for your CMFAS exams</p>
-            </div>
-            <Link
-              href="/dashboard"
-              className="px-4 py-2 bg-gray-200 text-gray-800 rounded-lg hover:bg-gray-300 font-medium"
-            >
-              ← Dashboard
-            </Link>
+          <div className="mb-6">
+            <h1 className="text-3xl font-bold text-gray-900">Practice</h1>
+            <p className="text-gray-600 mt-1">Prepare for your CMFAS exams</p>
           </div>
 
           {/* Tabs */}

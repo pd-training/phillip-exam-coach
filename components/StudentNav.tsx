@@ -4,15 +4,16 @@ import { usePathname } from 'next/navigation';
 import { signOut } from 'next-auth/react';
 import { useSession } from 'next-auth/react';
 
-export default function AdminNav() {
+export default function StudentNav() {
   const pathname = usePathname();
   const { data: session } = useSession();
 
   const navItems = [
-    { label: 'Dashboard', href: '/admin/dashboard' },
-    { label: 'Papers', href: '/admin/papers' },
-    { label: 'Users', href: '/admin/users' },
-    { label: 'Account', href: '/admin/account' },
+    { label: 'Dashboard', href: '/dashboard' },
+    { label: 'Practice', href: '/practice' },
+    { label: 'Browse Papers', href: '/practice' },
+    { label: 'Help', href: '/help' },
+    { label: 'Account', href: '/account' },
   ];
 
   const handleLogout = async () => {
@@ -29,7 +30,7 @@ export default function AdminNav() {
               key={item.href}
               href={item.href}
               className={`text-sm font-medium transition ${
-                pathname === item.href
+                pathname === item.href || (item.label === 'Browse Papers' && pathname === '/practice')
                   ? 'text-blue-600'
                   : 'text-gray-600 hover:text-gray-900'
               }`}
@@ -42,7 +43,7 @@ export default function AdminNav() {
         {/* Right side - Name & Logout */}
         <div className="flex items-center gap-6">
           <span className="text-sm font-medium text-gray-900">
-            {session?.user?.name || 'Admin'}
+            {session?.user?.name || 'Student'}
           </span>
           <button
             onClick={handleLogout}
