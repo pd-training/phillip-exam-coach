@@ -32,7 +32,7 @@ export default function StudentDashboard() {
       router.push("/admin/dashboard");
       return;
     }
-  }, [status, session?.user?.id, (session?.user as any)?.role]);
+  }, [status, session?.user?.email, (session?.user as any)?.role]);
 
   if (status === "loading") {
     return <div style={{ padding: "20px" }}>Loading...</div>;
