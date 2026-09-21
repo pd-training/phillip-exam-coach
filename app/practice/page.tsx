@@ -116,7 +116,27 @@ export default function PracticePage() {
       });
 
       // Refresh data after 1 second
-      setTimeout(fetchData, 1000);
+      setTimeout(async () => {
+        try {
+          const [papersRes, requestsRes, allPapersRes] = await Promise.all([
+            fetch('/api/student/papers'),
+            fetch('/api/student/paper-requests'),
+            fetch('/api/papers/available'),
+          ]);
+
+          if (papersRes.ok && requestsRes.ok && allPapersRes.ok) {
+            const papersData = await papersRes.json();
+            const requestsData = await requestsRes.json();
+            const allPapersData = await allPapersRes.json();
+
+            setPapers(papersData.papers || []);
+            setRequests(requestsData.requests || []);
+            setAllPapers(allPapersData.papers || []);
+          }
+        } catch (err) {
+          console.error('Error refreshing data:', err);
+        }
+      }, 1000);
     } catch (err: any) {
       setSubmitMessages({
         ...submitMessages,
