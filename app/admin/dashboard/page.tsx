@@ -55,36 +55,53 @@ export default function AdminDashboard() {
   };
 
   return (
-    <div style={{ maxWidth: "1200px", margin: "0 auto", padding: "20px" }}>
-      {/* Header with logout */}
-      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "30px" }}>
-        <div>
-          <h1 style={{ margin: "0 0 8px 0" }}>👨‍💼 Admin Dashboard</h1>
-          <p style={{ color: "#666", margin: "0" }}>Welcome, {session?.user?.name || "Admin"}!</p>
+    <div style={{ backgroundColor: "#f8f9fa", minHeight: "100vh" }}>
+      {/* Navigation Bar */}
+      <nav style={{
+        backgroundColor: "white",
+        borderBottom: "1px solid #e5e7eb",
+        padding: "16px 24px",
+        display: "flex",
+        justifyContent: "space-between",
+        alignItems: "center",
+      }}>
+        <div style={{ display: "flex", gap: "32px" }}>
+          <a href="/admin/dashboard" style={{ textDecoration: "none", color: "#3b82f6", fontWeight: "600", fontSize: "14px" }}>
+            Dashboard
+          </a>
+          <a href="/admin/papers" style={{ textDecoration: "none", color: "#666", fontWeight: "500", fontSize: "14px" }}>
+            Papers
+          </a>
+          <a href="/admin/users" style={{ textDecoration: "none", color: "#666", fontWeight: "500", fontSize: "14px" }}>
+            Users
+          </a>
+          <a href="/admin/questions" style={{ textDecoration: "none", color: "#666", fontWeight: "500", fontSize: "14px" }}>
+            Questions
+          </a>
         </div>
-        <button
-          onClick={handleLogout}
-          style={{
-            padding: "10px 20px",
-            backgroundColor: "#ef4444",
-            color: "white",
-            border: "none",
-            borderRadius: "8px",
-            fontSize: "14px",
-            fontWeight: "600",
-            cursor: "pointer",
-            transition: "all 0.2s",
-          }}
-          onMouseEnter={(e) => {
-            e.currentTarget.style.backgroundColor = "#dc2626";
-          }}
-          onMouseLeave={(e) => {
-            e.currentTarget.style.backgroundColor = "#ef4444";
-          }}
-        >
-          🚪 Logout
-        </button>
-      </div>
+        <div style={{ display: "flex", gap: "24px", alignItems: "center" }}>
+          <a href="/account" style={{ color: "#666", fontSize: "14px", textDecoration: "none", cursor: "pointer" }}>
+            Account
+          </a>
+          <span style={{ fontWeight: "600", fontSize: "14px" }}>{session?.user?.name || "Admin"}</span>
+          <button
+            onClick={handleLogout}
+            style={{
+              backgroundColor: "transparent",
+              color: "#3b82f6",
+              border: "none",
+              cursor: "pointer",
+              fontSize: "14px",
+              fontWeight: "500",
+            }}
+          >
+            Log out
+          </button>
+        </div>
+      </nav>
+
+      {/* Main Content */}
+      <div style={{ maxWidth: "1200px", margin: "0 auto", padding: "32px 24px" }}>
 
       <section style={{ marginTop: "30px" }}>
         <h2>📊 Admin Controls</h2>

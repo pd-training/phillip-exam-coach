@@ -106,7 +106,9 @@ export default function StudentDashboard() {
           </a>
         </div>
         <div style={{ display: "flex", gap: "24px", alignItems: "center" }}>
-          <span style={{ color: "#666", fontSize: "14px" }}>Account</span>
+          <a href="/account" style={{ color: "#666", fontSize: "14px", textDecoration: "none", cursor: "pointer" }}>
+            Account
+          </a>
           <span style={{ fontWeight: "600", fontSize: "14px" }}>{session?.user?.name || "Student"}</span>
           <button
             onClick={handleLogout}
