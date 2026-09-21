@@ -2,6 +2,7 @@ import { getServerSession } from "next-auth/next";
 import { authOptions } from "@/lib/auth-config";
 import { PrismaClient } from "@prisma/client";
 
+// Fetch user exam attempts
 const prisma = new PrismaClient({
   datasources: {
     db: {
