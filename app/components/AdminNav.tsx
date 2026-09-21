@@ -18,7 +18,6 @@ export function AdminNav({ title, subtitle }: AdminNavProps) {
     { label: "Dashboard", href: "/admin/dashboard" },
     { label: "Papers", href: "/admin/papers" },
     { label: "Users", href: "/admin/users" },
-    { label: "Questions", href: "/admin/questions" },
     { label: "Assign Papers", href: "/admin/assign-papers" },
   ];
 
