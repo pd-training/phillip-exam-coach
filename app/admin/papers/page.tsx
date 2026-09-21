@@ -159,20 +159,25 @@ export default function PapersManagement() {
   const togglePaperAvailability = async (paperId: string, currentStatus: boolean) => {
     setTogglingId(paperId);
     try {
+      console.log(`Toggling paper ${paperId} from ${currentStatus} to ${!currentStatus}`);
       const res = await fetch(`/api/papers/${paperId}`, {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ isAvailable: !currentStatus }),
       });
 
+      console.log(`Response status: ${res.status}`);
+      
       if (res.ok) {
         const data = await res.json();
+        console.log("Toggle success:", data);
         setPapers(papers.map(p => p.id === paperId ? { ...p, isAvailable: !currentStatus } : p));
       } else {
-        console.error("Failed to toggle:", res.statusText);
+        const errorData = await res.json();
+        console.error("Toggle failed:", res.status, errorData);
       }
     } catch (error) {
-      console.error("Failed to toggle availability:", error);
+      console.error("Toggle error:", error);
     } finally {
       setTogglingId(null);
     }
