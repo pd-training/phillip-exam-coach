@@ -46,7 +46,7 @@ export default function PracticePage() {
     if (status === 'unauthenticated') {
       router.push('/login');
     }
-  }, [status]);
+  }, [status, router]);
 
   useEffect(() => {
     if (status !== 'authenticated') return;
@@ -97,7 +97,6 @@ export default function PracticePage() {
   const handleRequestPaper = async (paperId: string, paperName: string) => {
     try {
       setSubmitting(paperId);
-      setSubmitMessages({ ...submitMessages, [paperId]: '' });
 
       const res = await fetch('/api/student/paper-requests', {
         method: 'POST',
@@ -107,13 +106,17 @@ export default function PracticePage() {
 
       if (!res.ok) {
         const errData = await res.json();
-        throw new Error(errData.error || 'Failed to submit request');
+        setSubmitMessages((prev) => ({
+          ...prev,
+          [paperId]: errData.error || 'Failed to submit request',
+        }));
+        return;
       }
 
-      setSubmitMessages({
-        ...submitMessages,
+      setSubmitMessages((prev) => ({
+        ...prev,
         [paperId]: 'Request submitted!',
-      });
+      }));
 
       // Refresh data after 1 second
       setTimeout(async () => {
@@ -138,10 +141,10 @@ export default function PracticePage() {
         }
       }, 1000);
     } catch (err: any) {
-      setSubmitMessages({
-        ...submitMessages,
+      setSubmitMessages((prev) => ({
+        ...prev,
         [paperId]: err.message || 'Failed to submit request',
-      });
+      }));
     } finally {
       setSubmitting(null);
     }
