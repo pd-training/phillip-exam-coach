@@ -18,9 +18,9 @@ export async function GET(request: Request) {
     ` as any[];
     const totalUsers = Number(totalUsersResult[0]?.count) || 0;
 
-    // Active users
+    // Active users - students with papers assigned
     const activeUsersResult = await prisma.$queryRaw`
-      SELECT COUNT(DISTINCT userid) as count FROM examattempt
+      SELECT COUNT(DISTINCT "userId") as count FROM "StudentPaper"
     ` as any[];
     const activeUsers = Number(activeUsersResult[0]?.count) || 0;
 
