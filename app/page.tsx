@@ -20,7 +20,7 @@ export default function LandingPage() {
               <button className="px-4 py-2 text-slate-600 border border-slate-300 rounded-lg hover:bg-slate-50">Login</button>
             </Link>
           </div>
-          <Link href="#start">
+          <Link href="/signup">
             <button className="px-4 py-2 rounded-lg font-bold bg-blue-700 hover:bg-blue-800 text-white">Get Started</button>
           </Link>
         </nav>
@@ -36,8 +36,8 @@ export default function LandingPage() {
             <p className="text-xl text-slate-600 mb-8">
               Designed for every CMFAS exam candidate. Practice smarter, not harder.
             </p>
-            <div className="flex gap-4">
-              <Link href="#start">
+          <div className="flex gap-4">
+              <Link href="/signup">
                 <button className="px-6 py-3 rounded-lg font-bold bg-blue-700 hover:bg-blue-800 text-white">
                   Get Your AI Coach
                 </button>
@@ -134,6 +134,23 @@ export default function LandingPage() {
               </div>
             ))}
           </div>
+        </div>
+      </section>
+
+      {/* CTA Section */}
+      <section className="py-20 bg-gradient-to-r from-blue-700 to-indigo-700">
+        <div className="max-w-7xl mx-auto px-4 text-center">
+          <h2 className="text-4xl font-bold text-white mb-4">
+            Ready to ace your CMFAS exam?
+          </h2>
+          <p className="text-xl text-blue-100 mb-8">
+            Join hundreds of PhillipCapital advisors preparing with Phillip Exam Coach
+          </p>
+          <Link href="/signup">
+            <button className="px-8 py-4 rounded-lg font-bold bg-white text-blue-700 hover:bg-slate-50 text-lg">
+              Create Free Account
+            </button>
+          </Link>
         </div>
       </section>
 
