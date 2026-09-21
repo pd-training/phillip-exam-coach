@@ -217,6 +217,16 @@ export default function UserDetailPage() {
       </div>
 
       <div style={{ maxWidth: "900px", margin: "0 auto", padding: "40px 20px" }}>
+        {loading ? (
+          <div style={{ padding: "40px", textAlign: "center", color: "#666" }}>
+            Loading user details...
+          </div>
+        ) : !user ? (
+          <div style={{ padding: "40px", textAlign: "center", color: "#ef4444" }}>
+            User not found
+          </div>
+        ) : (
+          <>
         {/* User Header */}
         <div style={{ marginBottom: "40px" }}>
           <h1 style={{ fontSize: "28px", fontWeight: "bold", color: "#1f2937", margin: "0 0 12px 0" }}>
@@ -534,6 +544,8 @@ export default function UserDetailPage() {
           <p style={{ color: "#6b7280", fontSize: "14px", margin: "0" }}>Coming soon</p>
         </div>
       </div>
+          </>
+        )}
     </div>
   );
 }
