@@ -46,43 +46,43 @@ export default function PracticePage() {
     if (status === 'unauthenticated') {
       router.push('/login');
     }
-  }, [status, router]);
-
-  useEffect(() => {
-    if (status === 'authenticated') {
-      fetchData();
-    }
   }, [status]);
 
-  const fetchData = async () => {
-    try {
-      setLoading(true);
-      setError('');
+  useEffect(() => {
+    if (status !== 'authenticated') return;
 
-      const [papersRes, requestsRes, allPapersRes] = await Promise.all([
-        fetch('/api/student/papers'),
-        fetch('/api/student/paper-requests'),
-        fetch('/api/papers/available'),
-      ]);
+    const fetchData = async () => {
+      try {
+        setLoading(true);
+        setError('');
 
-      if (!papersRes.ok || !requestsRes.ok || !allPapersRes.ok) {
-        throw new Error('Failed to fetch data');
+        const [papersRes, requestsRes, allPapersRes] = await Promise.all([
+          fetch('/api/student/papers'),
+          fetch('/api/student/paper-requests'),
+          fetch('/api/papers/available'),
+        ]);
+
+        if (!papersRes.ok || !requestsRes.ok || !allPapersRes.ok) {
+          throw new Error('Failed to fetch data');
+        }
+
+        const papersData = await papersRes.json();
+        const requestsData = await requestsRes.json();
+        const allPapersData = await allPapersRes.json();
+
+        setPapers(papersData.papers || []);
+        setRequests(requestsData.requests || []);
+        setAllPapers(allPapersData.papers || []);
+      } catch (err: any) {
+        setError(err.message || 'Failed to load papers');
+        console.error('Practice error:', err);
+      } finally {
+        setLoading(false);
       }
+    };
 
-      const papersData = await papersRes.json();
-      const requestsData = await requestsRes.json();
-      const allPapersData = await allPapersRes.json();
-
-      setPapers(papersData.papers || []);
-      setRequests(requestsData.requests || []);
-      setAllPapers(allPapersData.papers || []);
-    } catch (err: any) {
-      setError(err.message || 'Failed to load papers');
-      console.error('Practice error:', err);
-    } finally {
-      setLoading(false);
-    }
-  };
+    fetchData();
+  }, [status]);
 
   const getStatusForPaper = (paperId: string) => {
     const ownsPaper = papers.some((p) => p.paperId === paperId);

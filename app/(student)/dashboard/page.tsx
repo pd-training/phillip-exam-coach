@@ -23,12 +23,7 @@ export default function StudentDashboard() {
   useEffect(() => {
     if (status === "loading") return;
 
-    if (status === "unauthenticated") {
-      router.push("/login");
-      return;
-    }
-
-    if (!session?.user) {
+    if (status === "unauthenticated" || !session?.user) {
       router.push("/login");
       return;
     }
@@ -37,7 +32,7 @@ export default function StudentDashboard() {
       router.push("/admin/dashboard");
       return;
     }
-  }, [status, session, router]);
+  }, [status, session?.user?.id, (session?.user as any)?.role]);
 
   if (status === "loading") {
     return <div style={{ padding: "20px" }}>Loading...</div>;
