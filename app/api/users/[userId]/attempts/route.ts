@@ -28,7 +28,7 @@ export async function GET(request: Request, { params }: { params: { userId: stri
         ea.createdat
       FROM examattempt ea
       LEFT JOIN "Paper" p ON ea.paperid = p.id
-      WHERE ea.userid = ${params.userId}
+      WHERE ea.userid = ${params.userId}::uuid
       ORDER BY ea.createdat DESC
       LIMIT 50
     ` as any[];

@@ -19,7 +19,7 @@ export async function GET(request: Request, { params }: { params: { userId: stri
         pr.status
       FROM "PaperRequest" pr
       JOIN "Paper" p ON pr."paperId" = p.id
-      WHERE pr."userId" = ${params.userId}
+      WHERE pr."userId" = ${params.userId}::uuid
       ORDER BY p.title ASC
     ` as any[];
 
