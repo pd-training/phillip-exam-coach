@@ -7,12 +7,12 @@ import Link from "next/link";
 
 interface User {
   id: string;
-  name: string;
+  name: string | null;
   email: string;
   role: string;
   active: boolean;
-  pdpaConsent: boolean;
-  createdAt: string;
+  createdAt: Date;
+  [key: string]: any;
 }
 
 interface Paper {
@@ -381,7 +381,7 @@ export default function UserDetailPage() {
             </div>
 
             <div style={{ marginBottom: "12px", fontSize: "14px", color: "#6b7280" }}>
-              PDPA consent: {user.pdpaConsent ? "Recorded" : "Not recorded"}
+              PDPA consent: {(user as any).pdpaConsent ? "Recorded" : "Not recorded"}
             </div>
 
             <button
