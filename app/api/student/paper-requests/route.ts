@@ -14,14 +14,13 @@ export async function GET(request: Request) {
 
     const userId = (session.user as any).id;
 
-    // Get all pending and approved requests for this student
+    // Get all requests for this student
     const requests = await prisma.$queryRaw`
       SELECT 
         pr."id",
         pr."paperId",
         pr."status",
         pr."requestedAt",
-        pr."respondedAt",
         p."name" as paper_name
       FROM "PaperRequest" pr
       JOIN "Paper" p ON pr."paperId" = p."id"

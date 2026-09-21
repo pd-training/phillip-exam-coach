@@ -4,16 +4,14 @@ export const dynamic = 'force-dynamic';
 
 export async function GET(request: Request) {
   try {
-    // Get all active papers
+    // Get all papers
     const papers = await prisma.$queryRaw`
       SELECT 
-        id,
-        name,
-        description,
-        "totalQuestions",
+        "id",
+        "name",
+        "description",
         "totalTime"
       FROM "Paper"
-      WHERE "isActive" = true
       ORDER BY "name" ASC
     ` as any[];
 
