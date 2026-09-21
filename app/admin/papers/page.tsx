@@ -274,9 +274,14 @@ export default function PapersManagement() {
       if (res.ok) {
         alert("Exam format saved successfully!");
         setActiveModal(null);
+        setParts([]);
+      } else {
+        const errorData = await res.json();
+        alert(`Error: ${errorData.error || 'Failed to save exam format'}`);
       }
-    } catch (error) {
+    } catch (error: any) {
       console.error("Save failed:", error);
+      alert(`Error: ${error.message || 'Failed to save exam format'}`);
     } finally {
       setSubmitting(false);
     }
