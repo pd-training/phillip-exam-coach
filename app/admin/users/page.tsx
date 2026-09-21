@@ -122,58 +122,58 @@ export default function UserManagement() {
   if (status === "loading" || !session?.user) return null;
 
   return (
-    <div style={{ minHeight: "100vh", backgroundColor: "#f9fafb" }}>
-      {/* Header */}
-      <div style={{
+    <div style={{ backgroundColor: "#f8f9fa", minHeight: "100vh" }}>
+      {/* Navigation Bar */}
+      <nav style={{
         backgroundColor: "white",
         borderBottom: "1px solid #e5e7eb",
-        padding: "20px",
+        padding: "16px 24px",
         display: "flex",
         justifyContent: "space-between",
         alignItems: "center",
       }}>
-        <div style={{
-          display: "flex",
-          gap: "12px",
-          alignItems: "center",
-        }}>
-          <Link href="/admin/dashboard">
-            <a style={{
-              color: "#666",
-              fontSize: "14px",
-              textDecoration: "none",
-              cursor: "pointer",
-            }}>
-              Dashboard
-            </a>
-          </Link>
-          <span style={{ color: "#d1d5db" }}>•</span>
-          <span style={{ color: "#1f2937", fontSize: "14px", fontWeight: "500" }}>Users</span>
-        </div>
-        <button
-          onClick={handleLogout}
-          style={{
-            padding: "8px 16px",
-            backgroundColor: "#ef4444",
-            color: "white",
-            border: "none",
-            borderRadius: "6px",
-            fontSize: "14px",
-            fontWeight: "500",
-            cursor: "pointer",
-          }}
-        >
-          🚪 Logout
-        </button>
-      </div>
-
-      <div style={{ maxWidth: "1400px", margin: "0 auto", padding: "40px 20px" }}>
-        {/* Title */}
-        <div style={{ marginBottom: "40px" }}>
-          <h1 style={{ fontSize: "32px", fontWeight: "bold", color: "#1f2937", margin: "0 0 8px 0" }}>
+        <div style={{ display: "flex", gap: "32px" }}>
+          <a href="/admin/dashboard" style={{ textDecoration: "none", color: "#666", fontWeight: "500", fontSize: "14px" }}>
+            Dashboard
+          </a>
+          <a href="/admin/papers" style={{ textDecoration: "none", color: "#666", fontWeight: "500", fontSize: "14px" }}>
+            Papers
+          </a>
+          <a href="/admin/users" style={{ textDecoration: "none", color: "#3b82f6", fontWeight: "600", fontSize: "14px" }}>
             Users
+          </a>
+          <a href="/admin/questions" style={{ textDecoration: "none", color: "#666", fontWeight: "500", fontSize: "14px" }}>
+            Questions
+          </a>
+        </div>
+        <div style={{ display: "flex", gap: "24px", alignItems: "center" }}>
+          <a href="/account" style={{ color: "#666", fontSize: "14px", textDecoration: "none", cursor: "pointer" }}>
+            Account
+          </a>
+          <span style={{ fontWeight: "600", fontSize: "14px" }}>{session?.user?.name || "Admin"}</span>
+          <button
+            onClick={handleLogout}
+            style={{
+              backgroundColor: "transparent",
+              color: "#3b82f6",
+              border: "none",
+              cursor: "pointer",
+              fontSize: "14px",
+              fontWeight: "500",
+            }}
+          >
+            Log out
+          </button>
+        </div>
+      </nav>
+
+      <div style={{ maxWidth: "1400px", margin: "0 auto", padding: "30px 20px" }}>
+        {/* Page Title */}
+        <div style={{ marginBottom: "30px" }}>
+          <h1 style={{ fontSize: "28px", fontWeight: "bold", color: "#1f2937", margin: "0 0 8px 0" }}>
+            👥 Users
           </h1>
-          <p style={{ color: "#6b7280", margin: "0" }}>Manage advisors and students</p>
+          <p style={{ color: "#6b7280", margin: "0", fontSize: "14px" }}>Manage advisors and students</p>
         </div>
 
         {/* Success Message */}
