@@ -1,103 +1,100 @@
 "use client";
 
+import { useState, useEffect } from "react";
 import { useSession, signOut } from "next-auth/react";
 import { useRouter } from "next/navigation";
-import { useState, useEffect } from "react";
 
+// Types
 interface Paper {
   id: string;
   title: string;
   durationMinutes: number;
   totalQuestions: number;
   isAvailable: boolean;
+  totalTime: number;
   createdAt: string;
 }
 
 interface Question {
   id: string;
   paperId: string;
-  module: string;
-  questionPool: number;
-  requiredCount: number;
-  drawType: "random" | "fixed";
+  chapterNumber: number;
+  questionText: string;
+  correctAnswer: string;
+  explanation: string;
+  createdAt: string;
 }
 
-interface Chapter {
+interface ExamPart {
   id: string;
-  paperId: string;
-  name: string;
-  description?: string;
+  partName: string;
+  chapterStart: number;
+  chapterEnd: number;
+  questionCount: number;
+  passingScore: number;
   orderIndex: number;
 }
 
-interface ExamFormat {
-  paperId: string;
-  passingScore: number;
-  timeWarning: number; // minutes
-  showAnswerReview: boolean;
-  allowRetakes: boolean;
-  retakeLimit?: number;
-}
-
-type ActiveTab = "availability" | "questions" | "settings";
-type ActiveModal = null | "createPaper" | "editPaper" | "editQuestion" | "manageChapters" | "examFormat";
+type ActiveTab = "availability" | "questions" | "format";
+type ActiveModal = null | "uploadQuestions" | "viewQuestions" | "editQuestion" | "configureFormat";
 
 export default function PapersManagement() {
   const router = useRouter();
   const { data: session, status } = useSession();
-  const [papers, setPapers] = useState<Paper[]>([]);
-  const [questions, setQuestions] = useState<Question[]>([]);
-  const [chapters, setChapters] = useState<Chapter[]>([]);
-  const [examFormats, setExamFormats] = useState<Record<string, ExamFormat>>({});
-  const [loading, setLoading] = useState(true);
-  const [togglingId, setTogglingId] = useState<string | null>(null);
-  
+
+  // Page state
   const [activeTab, setActiveTab] = useState<ActiveTab>("availability");
   const [activeModal, setActiveModal] = useState<ActiveModal>(null);
-  const [selectedPaperId, setSelectedPaperId] = useState<string>("");
-  const [selectedQuestion, setSelectedQuestion] = useState<Question | null>(null);
-
-  // Form states
-  const [paperTitle, setPaperTitle] = useState("");
-  const [paperDuration, setPaperDuration] = useState("180");
-  const [paperTotalQuestions, setPaperTotalQuestions] = useState("150");
+  const [selectedPaperId, setSelectedPaperId] = useState("");
+  const [loading, setLoading] = useState(true);
   const [submitting, setSubmitting] = useState(false);
+  const [togglingId, setTogglingId] = useState<string | null>(null);
 
-  // Question form states
-  const [qModule, setQModule] = useState("");
-  const [qPool, setQPool] = useState("100");
-  const [qRequired, setQRequired] = useState("50");
-  const [qDrawType, setQDrawType] = useState<"random" | "fixed">("random");
+  // Data
+  const [papers, setPapers] = useState<Paper[]>([]);
+  const [questions, setQuestions] = useState<Question[]>([]);
+  const [examParts, setExamParts] = useState<ExamPart[]>([]);
 
-  // Chapter form states
-  const [chapterName, setChapterName] = useState("");
-  const [chapterDesc, setChapterDesc] = useState("");
+  // Upload form
+  const [uploadFile, setUploadFile] = useState<File | null>(null);
+  const [uploadProgress, setUploadProgress] = useState("");
 
-  // Exam format states
-  const [passingScore, setPassingScore] = useState("60");
-  const [timeWarning, setTimeWarning] = useState("5");
-  const [showAnswerReview, setShowAnswerReview] = useState(true);
-  const [allowRetakes, setAllowRetakes] = useState(true);
-  const [retakeLimit, setRetakeLimit] = useState("3");
+  // Question edit form
+  const [selectedQuestion, setSelectedQuestion] = useState<Question | null>(null);
+  const [editQuestionText, setEditQuestionText] = useState("");
+  const [editAnswer, setEditAnswer] = useState("A");
+  const [editChapter, setEditChapter] = useState("1");
+  const [editExplanation, setEditExplanation] = useState("");
 
+  // Exam format form
+  const [totalTime, setTotalTime] = useState("120");
+  const [parts, setParts] = useState<Omit<ExamPart, "id" | "createdAt" | "updatedAt">[]>([]);
+  const [newPart, setNewPart] = useState({
+    partName: "",
+    chapterStart: 1,
+    chapterEnd: 13,
+    questionCount: 110,
+    passingScore: 75,
+  });
+
+  // Auth check
   useEffect(() => {
     if (status === "loading") return;
+
     if (status === "unauthenticated") {
       router.push("/login");
       return;
     }
+
     if (!session?.user || (session?.user as any)?.role !== "ADMIN") {
       router.push("/dashboard");
       return;
     }
+
+    fetchPapers();
   }, [status, session, router]);
 
-  useEffect(() => {
-    if (status === "authenticated") {
-      fetchPapers();
-    }
-  }, [status]);
-
+  // Fetch papers
   const fetchPapers = async () => {
     try {
       const res = await fetch("/api/papers");
@@ -112,6 +109,192 @@ export default function PapersManagement() {
     }
   };
 
+  // Fetch questions for selected paper
+  const fetchQuestions = async (paperId: string) => {
+    try {
+      const res = await fetch(`/api/papers/${paperId}/questions`);
+      if (res.ok) {
+        const data = await res.json();
+        setQuestions(data.questions || []);
+      }
+    } catch (error) {
+      console.error("Failed to fetch questions:", error);
+    }
+  };
+
+  // Fetch exam format for selected paper
+  const fetchExamFormat = async (paperId: string) => {
+    try {
+      const res = await fetch(`/api/papers/${paperId}/exam-format`);
+      if (res.ok) {
+        const data = await res.json();
+        setTotalTime(String(data.examFormat?.totalTime || 120));
+        setParts(data.examFormat?.parts || []);
+      }
+    } catch (error) {
+      console.error("Failed to fetch exam format:", error);
+    }
+  };
+
+  // Toggle paper availability
+  const togglePaperAvailability = async (paperId: string, currentStatus: boolean) => {
+    setTogglingId(paperId);
+    try {
+      const res = await fetch(`/api/papers/${paperId}`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ isAvailable: !currentStatus }),
+      });
+
+      if (res.ok) {
+        await fetchPapers();
+      } else {
+        console.error("Toggle failed");
+      }
+    } catch (error) {
+      console.error("Toggle error:", error);
+    } finally {
+      setTogglingId(null);
+    }
+  };
+
+  // Upload questions
+  const handleUploadQuestions = async () => {
+    if (!uploadFile || !selectedPaperId) return;
+
+    setSubmitting(true);
+    setUploadProgress("Uploading...");
+
+    try {
+      const formData = new FormData();
+      formData.append("file", uploadFile);
+
+      const res = await fetch(`/api/papers/${selectedPaperId}/questions/upload`, {
+        method: "POST",
+        body: formData,
+      });
+
+      const data = await res.json();
+
+      if (res.ok) {
+        setUploadProgress(`✅ ${data.count} questions imported successfully!`);
+        await fetchPapers();
+        await fetchQuestions(selectedPaperId);
+        setTimeout(() => {
+          setActiveModal(null);
+          setUploadFile(null);
+          setUploadProgress("");
+        }, 2000);
+      } else {
+        setUploadProgress(`❌ Error: ${data.error}`);
+      }
+    } catch (error) {
+      setUploadProgress(`❌ Upload failed: ${String(error)}`);
+    } finally {
+      setSubmitting(false);
+    }
+  };
+
+  // Update question
+  const handleUpdateQuestion = async () => {
+    if (!selectedQuestion || !selectedPaperId) return;
+
+    setSubmitting(true);
+    try {
+      const res = await fetch(`/api/papers/${selectedPaperId}/questions/${selectedQuestion.id}`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          questionText: editQuestionText,
+          correctAnswer: editAnswer,
+          chapterNumber: parseInt(editChapter),
+          explanation: editExplanation,
+        }),
+      });
+
+      if (res.ok) {
+        await fetchQuestions(selectedPaperId);
+        setActiveModal(null);
+        setSelectedQuestion(null);
+      }
+    } catch (error) {
+      console.error("Update failed:", error);
+    } finally {
+      setSubmitting(false);
+    }
+  };
+
+  // Delete question
+  const handleDeleteQuestion = async (questionId: string) => {
+    if (!selectedPaperId || !confirm("Delete this question?")) return;
+
+    try {
+      const res = await fetch(`/api/papers/${selectedPaperId}/questions/${questionId}`, {
+        method: "DELETE",
+      });
+
+      if (res.ok) {
+        await fetchQuestions(selectedPaperId);
+      }
+    } catch (error) {
+      console.error("Delete failed:", error);
+    }
+  };
+
+  // Save exam format
+  const handleSaveExamFormat = async () => {
+    if (!selectedPaperId || parts.length === 0) {
+      alert("Please configure at least one part");
+      return;
+    }
+
+    setSubmitting(true);
+    try {
+      const res = await fetch(`/api/papers/${selectedPaperId}/exam-format`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          totalTime: parseInt(totalTime),
+          parts: parts.map((p, i) => ({
+            partName: p.partName,
+            chapterStart: p.chapterStart,
+            chapterEnd: p.chapterEnd,
+            questionCount: p.questionCount,
+            passingScore: p.passingScore,
+            orderIndex: i + 1,
+          })),
+        }),
+      });
+
+      if (res.ok) {
+        alert("Exam format saved successfully!");
+        setActiveModal(null);
+      }
+    } catch (error) {
+      console.error("Save failed:", error);
+    } finally {
+      setSubmitting(false);
+    }
+  };
+
+  // Add part
+  const addPart = () => {
+    setParts([...parts, { ...newPart, orderIndex: parts.length + 1 }]);
+    setNewPart({
+      partName: "",
+      chapterStart: 1,
+      chapterEnd: 13,
+      questionCount: 110,
+      passingScore: 75,
+    });
+  };
+
+  // Remove part
+  const removePart = (index: number) => {
+    setParts(parts.filter((_, i) => i !== index));
+  };
+
+  // Logout
   const handleLogout = async () => {
     try {
       await signOut({ redirect: false });
@@ -119,73 +302,6 @@ export default function PapersManagement() {
     } catch (error) {
       console.error("Logout error:", error);
       window.location.href = `${window.location.origin}/login`;
-    }
-  };
-
-  const openCreatePaper = () => {
-    setPaperTitle("");
-    setPaperDuration("180");
-    setPaperTotalQuestions("150");
-    setActiveModal("createPaper");
-  };
-
-  const handleCreatePaper = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!paperTitle.trim()) return;
-
-    setSubmitting(true);
-    try {
-      const res = await fetch("/api/papers", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          title: paperTitle,
-          durationMinutes: parseInt(paperDuration),
-          totalQuestions: parseInt(paperTotalQuestions),
-        }),
-      });
-
-      if (res.ok) {
-        await fetchPapers();
-        setActiveModal(null);
-      }
-    } catch (error) {
-      console.error("Failed to create paper:", error);
-    } finally {
-      setSubmitting(false);
-    }
-  };
-
-  const togglePaperAvailability = async (paperId: string, currentStatus: boolean) => {
-    setTogglingId(paperId);
-    try {
-      console.log(`Toggling paper ${paperId} from ${currentStatus} to ${!currentStatus}`);
-      const res = await fetch(`/api/papers/${paperId}`, {
-        method: "PATCH",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ isAvailable: !currentStatus }),
-      });
-
-      console.log(`Response status: ${res.status}`);
-      const responseText = await res.text();
-      console.log(`Response body: ${responseText}`);
-      
-      if (res.ok) {
-        try {
-          const data = JSON.parse(responseText);
-          console.log("Toggle success:", data);
-        } catch (e) {
-          console.log("Could not parse JSON, but status is ok");
-        }
-        // Refetch papers to ensure UI is in sync with database
-        await fetchPapers();
-      } else {
-        console.error("Toggle failed with status:", res.status, "body:", responseText);
-      }
-    } catch (error) {
-      console.error("Toggle error:", error);
-    } finally {
-      setTogglingId(null);
     }
   };
 
@@ -227,17 +343,7 @@ export default function PapersManagement() {
             Account
           </a>
           <span style={{ fontWeight: "600", fontSize: "14px" }}>{session?.user?.name || "Admin"}</span>
-          <button
-            onClick={handleLogout}
-            style={{
-              backgroundColor: "transparent",
-              color: "#3b82f6",
-              border: "none",
-              cursor: "pointer",
-              fontSize: "14px",
-              fontWeight: "500",
-            }}
-          >
+          <button onClick={handleLogout} style={{ backgroundColor: "transparent", color: "#3b82f6", border: "none", cursor: "pointer", fontSize: "14px", fontWeight: "500" }}>
             Log out
           </button>
         </div>
@@ -248,102 +354,76 @@ export default function PapersManagement() {
         {/* Page Header */}
         <div style={{ marginBottom: "30px" }}>
           <h1 style={{ margin: "0 0 8px 0", fontSize: "28px" }}>📚 Papers & Questions</h1>
-          <p style={{ color: "#666", margin: "0", fontSize: "14px" }}>Manage exam papers, questions, chapters & settings</p>
+          <p style={{ color: "#666", margin: "0", fontSize: "14px" }}>Manage exam papers, questions, and exam format</p>
         </div>
 
-      {/* Tab Navigation */}
-      <div style={{ display: "flex", gap: "12px", marginBottom: "24px", borderBottom: "2px solid #e5e7eb", paddingBottom: "0" }}>
-        {(["availability", "questions", "settings"] as const).map((tab) => (
-          <button
-            key={tab}
-            onClick={() => setActiveTab(tab)}
-            style={{
-              padding: "12px 20px",
-              backgroundColor: activeTab === tab ? "#3b82f6" : "transparent",
-              color: activeTab === tab ? "white" : "#6b7280",
-              border: "none",
-              borderBottom: activeTab === tab ? "3px solid #3b82f6" : "none",
-              borderRadius: "0",
-              fontSize: "14px",
-              fontWeight: "600",
-              cursor: "pointer",
-              textTransform: "capitalize",
-            }}
-          >
-            {tab === "availability" && "📋 Paper Availability"}
-            {tab === "questions" && "❓ Question Bank"}
-            {tab === "settings" && "⚙️ Exam Format"}
-          </button>
-        ))}
-      </div>
-
-      {/* Tab Content */}
-      {activeTab === "availability" && (
-        <div>
-          {/* New Paper Button */}
-          <div style={{ marginBottom: "24px" }}>
+        {/* Tabs */}
+        <div style={{ display: "flex", gap: "8px", marginBottom: "30px", borderBottom: "2px solid #e5e7eb" }}>
+          {(["availability", "questions", "format"] as const).map((tab) => (
             <button
-              onClick={openCreatePaper}
+              key={tab}
+              onClick={() => setActiveTab(tab)}
               style={{
-                padding: "12px 24px",
-                backgroundColor: "#1f2937",
-                color: "white",
+                padding: "12px 20px",
+                backgroundColor: activeTab === tab ? "#3b82f6" : "transparent",
+                color: activeTab === tab ? "white" : "#666",
                 border: "none",
-                borderRadius: "8px",
-                fontSize: "14px",
-                fontWeight: "600",
                 cursor: "pointer",
+                fontSize: "14px",
+                fontWeight: activeTab === tab ? "600" : "500",
+                borderRadius: "4px 4px 0 0",
               }}
             >
-              + Create New Paper
+              {tab === "availability" && "📋 Paper Availability"}
+              {tab === "questions" && "❓ Question Bank"}
+              {tab === "format" && "⚙️ Exam Format"}
             </button>
-          </div>
+          ))}
+        </div>
 
-          {/* Paper Availability */}
-          <div style={{
-            backgroundColor: "white",
-            padding: "24px",
-            borderRadius: "12px",
-            border: "1px solid #e5e7eb",
-          }}>
-            <h3 style={{ marginTop: "0", marginBottom: "8px" }}>Paper Availability</h3>
-            <p style={{ color: "#666", fontSize: "13px", marginBottom: "20px" }}>
-              Turning a paper off hides it everywhere for students — Browse Papers, Dashboard, and Practice — including for students already assigned to it. Existing exam attempts and history aren't affected, only the ability to start something new or continue practicing it.
+        {/* TAB 1: Paper Availability */}
+        {activeTab === "availability" && (
+          <div style={{ backgroundColor: "white", padding: "24px", borderRadius: "12px", border: "1px solid #e5e7eb" }}>
+            <h3 style={{ marginTop: "0", marginBottom: "20px" }}>Paper Availability</h3>
+            <p style={{ color: "#666", marginBottom: "20px", fontSize: "14px" }}>
+              Toggle papers on/off to control student access. Existing exam attempts are not affected.
             </p>
 
-            {loading ? (
-              <p style={{ color: "#666" }}>Loading papers...</p>
-            ) : papers.length === 0 ? (
-              <p style={{ color: "#999", fontStyle: "italic" }}>No papers created yet. Click "Create New Paper" to get started.</p>
+            {papers.length === 0 ? (
+              <p style={{ color: "#999" }}>No papers created yet.</p>
             ) : (
-              <div style={{ display: "grid", gap: "12px" }}>
+              <div style={{ display: "grid", gap: "16px" }}>
                 {papers.map((paper) => (
                   <div
                     key={paper.id}
                     style={{
-                      display: "grid",
-                      gridTemplateColumns: "1fr auto",
-                      alignItems: "center",
                       padding: "16px",
-                      borderBottom: "1px solid #f3f4f6",
+                      backgroundColor: "#f9fafb",
+                      borderRadius: "8px",
+                      border: "1px solid #e5e7eb",
+                      display: "flex",
+                      justifyContent: "space-between",
+                      alignItems: "center",
                     }}
                   >
                     <div>
-                      <p style={{ margin: "0", fontWeight: "600", fontSize: "14px" }}>{paper.title}</p>
-                      <p style={{ margin: "4px 0 0 0", color: "#666", fontSize: "12px" }}>
+                      <h4 style={{ margin: "0 0 4px 0", fontSize: "15px" }}>{paper.title}</h4>
+                      <p style={{ color: "#666", margin: "0", fontSize: "13px" }}>
                         {paper.durationMinutes} min • {paper.totalQuestions} questions
                       </p>
                     </div>
                     <div style={{ display: "flex", gap: "12px", alignItems: "center" }}>
-                      <span style={{
-                        padding: "4px 12px",
-                        borderRadius: "20px",
-                        fontSize: "12px",
-                        fontWeight: "600",
-                        backgroundColor: paper.isAvailable ? "#d1fae5" : "#fee2e2",
-                        color: paper.isAvailable ? "#065f46" : "#991b1b",
-                      }}>
-                        {paper.isAvailable ? "Available" : "Unavailable"}
+                      <span
+                        style={{
+                          padding: "6px 12px",
+                          backgroundColor: paper.isAvailable ? "#d1fae5" : "#fee2e2",
+                          color: paper.isAvailable ? "#065f46" : "#991b1b",
+                          borderRadius: "6px",
+                          fontSize: "12px",
+                          fontWeight: "600",
+                        }}
+                      >
+                        {paper.isAvailable ? "✓ Available" : "✕ Unavailable"}
                       </span>
                       <button
                         onClick={() => togglePaperAvailability(paper.id, paper.isAvailable)}
@@ -368,123 +448,109 @@ export default function PapersManagement() {
               </div>
             )}
           </div>
-        </div>
-      )}
+        )}
 
-      {activeTab === "questions" && (
-        <div>
-          {/* Question Bank */}
-          <div style={{
-            backgroundColor: "white",
-            padding: "24px",
-            borderRadius: "12px",
-            border: "1px solid #e5e7eb",
-          }}>
+        {/* TAB 2: Question Bank */}
+        {activeTab === "questions" && (
+          <div style={{ backgroundColor: "white", padding: "24px", borderRadius: "12px", border: "1px solid #e5e7eb" }}>
             <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "20px" }}>
               <h3 style={{ margin: "0" }}>Question Bank</h3>
               <button
                 onClick={() => {
-                  setSelectedQuestion(null);
-                  setActiveModal("editQuestion");
+                  setSelectedPaperId(papers[0]?.id || "");
+                  setActiveModal("uploadQuestions");
                 }}
+                disabled={papers.length === 0}
                 style={{
-                  padding: "10px 16px",
+                  padding: "8px 16px",
                   backgroundColor: "#3b82f6",
                   color: "white",
                   border: "none",
                   borderRadius: "6px",
                   fontSize: "13px",
                   fontWeight: "600",
-                  cursor: "pointer",
+                  cursor: papers.length === 0 ? "not-allowed" : "pointer",
+                  opacity: papers.length === 0 ? 0.5 : 1,
                 }}
               >
-                + Add Question Pool
+                ⬆️ Upload Questions
               </button>
             </div>
 
-            <div style={{ overflowX: "auto" }}>
-              <table style={{ width: "100%", borderCollapse: "collapse", fontSize: "13px" }}>
-                <thead>
-                  <tr style={{ borderBottom: "2px solid #e5e7eb" }}>
-                    <th style={{ padding: "12px", textAlign: "left", fontWeight: "600", color: "#4b5563" }}>Paper</th>
-                    <th style={{ padding: "12px", textAlign: "left", fontWeight: "600", color: "#4b5563" }}>Module</th>
-                    <th style={{ padding: "12px", textAlign: "left", fontWeight: "600", color: "#4b5563" }}>Question Pool</th>
-                    <th style={{ padding: "12px", textAlign: "left", fontWeight: "600", color: "#4b5563" }}>Draw Type</th>
-                    <th style={{ padding: "12px", textAlign: "left", fontWeight: "600", color: "#4b5563" }}>Actions</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {papers.length === 0 ? (
-                    <tr>
-                      <td colSpan={5} style={{ padding: "20px", textAlign: "center", color: "#999" }}>
-                        Create papers first to add questions
-                      </td>
+            {papers.length === 0 ? (
+              <p style={{ color: "#999" }}>Create papers first to upload questions.</p>
+            ) : (
+              <div style={{ overflowX: "auto" }}>
+                <table style={{ width: "100%", borderCollapse: "collapse", fontSize: "13px" }}>
+                  <thead>
+                    <tr style={{ borderBottom: "2px solid #e5e7eb" }}>
+                      <th style={{ padding: "12px", textAlign: "left", fontWeight: "600", color: "#4b5563" }}>Paper</th>
+                      <th style={{ padding: "12px", textAlign: "left", fontWeight: "600", color: "#4b5563" }}>Total Questions</th>
+                      <th style={{ padding: "12px", textAlign: "left", fontWeight: "600", color: "#4b5563" }}>Actions</th>
                     </tr>
-                  ) : (
-                    papers.map((paper) => (
+                  </thead>
+                  <tbody>
+                    {papers.map((paper) => (
                       <tr key={paper.id} style={{ borderBottom: "1px solid #f3f4f6" }}>
                         <td style={{ padding: "12px" }}>
                           <strong>{paper.title}</strong>
                         </td>
-                        <td style={{ padding: "12px" }}>—</td>
-                        <td style={{ padding: "12px" }}>{paper.totalQuestions} • Random draw active</td>
-                        <td style={{ padding: "12px" }}>Random</td>
+                        <td style={{ padding: "12px" }}>{paper.totalQuestions}</td>
                         <td style={{ padding: "12px" }}>
-                          <button style={{
-                            color: "#3b82f6",
-                            backgroundColor: "transparent",
-                            border: "none",
-                            cursor: "pointer",
-                            fontSize: "13px",
-                            fontWeight: "600",
-                            textDecoration: "underline",
-                          }}>
-                            View / edit
+                          <button
+                            onClick={() => {
+                              setSelectedPaperId(paper.id);
+                              setActiveModal("viewQuestions");
+                              fetchQuestions(paper.id);
+                            }}
+                            style={{
+                              color: "#3b82f6",
+                              backgroundColor: "transparent",
+                              border: "none",
+                              cursor: "pointer",
+                              fontSize: "13px",
+                              fontWeight: "600",
+                              textDecoration: "underline",
+                            }}
+                          >
+                            📋 View / Edit
                           </button>
                         </td>
                       </tr>
-                    ))
-                  )}
-                </tbody>
-              </table>
-            </div>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            )}
           </div>
-        </div>
-      )}
+        )}
 
-      {activeTab === "settings" && (
-        <div>
-          {/* Exam Format Settings */}
-          <div style={{
-            backgroundColor: "white",
-            padding: "24px",
-            borderRadius: "12px",
-            border: "1px solid #e5e7eb",
-          }}>
-            <h3 style={{ marginTop: "0", marginBottom: "20px" }}>Exam Format Settings</h3>
+        {/* TAB 3: Exam Format */}
+        {activeTab === "format" && (
+          <div style={{ backgroundColor: "white", padding: "24px", borderRadius: "12px", border: "1px solid #e5e7eb" }}>
+            <h3 style={{ marginTop: "0", marginBottom: "20px" }}>Exam Format Configuration</h3>
 
             {papers.length === 0 ? (
-              <p style={{ color: "#999", fontStyle: "italic" }}>Create papers first to configure exam settings.</p>
+              <p style={{ color: "#999" }}>Create papers first to configure exam format.</p>
             ) : (
               <div style={{ display: "grid", gap: "24px" }}>
                 {papers.map((paper) => (
-                  <div key={paper.id} style={{
-                    padding: "20px",
-                    backgroundColor: "#f9fafb",
-                    borderRadius: "8px",
-                    border: "1px solid #e5e7eb",
-                  }}>
+                  <div
+                    key={paper.id}
+                    style={{
+                      padding: "20px",
+                      backgroundColor: "#f9fafb",
+                      borderRadius: "8px",
+                      border: "1px solid #e5e7eb",
+                    }}
+                  >
                     <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "16px" }}>
-                      <h4 style={{ margin: "0", fontSize: "15px", fontWeight: "600" }}>{paper.title}</h4>
+                      <h4 style={{ margin: "0" }}>{paper.title}</h4>
                       <button
                         onClick={() => {
                           setSelectedPaperId(paper.id);
-                          setPassingScore("60");
-                          setTimeWarning("5");
-                          setShowAnswerReview(true);
-                          setAllowRetakes(true);
-                          setRetakeLimit("3");
-                          setActiveModal("examFormat");
+                          setActiveModal("configureFormat");
+                          fetchExamFormat(paper.id);
                         }}
                         style={{
                           padding: "8px 16px",
@@ -500,282 +566,421 @@ export default function PapersManagement() {
                         ⚙️ Configure
                       </button>
                     </div>
-
-                    <div style={{
-                      display: "grid",
-                      gridTemplateColumns: "repeat(2, 1fr)",
-                      gap: "16px",
-                      fontSize: "13px",
-                    }}>
-                      <div>
-                        <p style={{ margin: "0 0 4px 0", color: "#666", fontSize: "12px", fontWeight: "500" }}>Passing Score</p>
-                        <p style={{ margin: "0", fontWeight: "600" }}>60%</p>
-                      </div>
-                      <div>
-                        <p style={{ margin: "0 0 4px 0", color: "#666", fontSize: "12px", fontWeight: "500" }}>Time Warning</p>
-                        <p style={{ margin: "0", fontWeight: "600" }}>5 minutes before end</p>
-                      </div>
-                      <div>
-                        <p style={{ margin: "0 0 4px 0", color: "#666", fontSize: "12px", fontWeight: "500" }}>Answer Review</p>
-                        <p style={{ margin: "0", fontWeight: "600" }}>✓ Enabled</p>
-                      </div>
-                      <div>
-                        <p style={{ margin: "0 0 4px 0", color: "#666", fontSize: "12px", fontWeight: "500" }}>Retakes</p>
-                        <p style={{ margin: "0", fontWeight: "600" }}>✓ Allowed (3 max)</p>
-                      </div>
-                    </div>
+                    <p style={{ margin: "0", fontSize: "13px", color: "#666" }}>
+                      Total Time: {paper.totalTime} minutes
+                    </p>
                   </div>
                 ))}
               </div>
             )}
           </div>
-        </div>
+        )}
+      </div>
+
+      {/* MODAL: Upload Questions */}
+      {activeModal === "uploadQuestions" && (
+        <Modal onClose={() => { setActiveModal(null); setUploadFile(null); setUploadProgress(""); }}>
+          <h2 style={{ marginTop: "0" }}>Upload Questions</h2>
+          <p style={{ color: "#666", fontSize: "13px", marginBottom: "16px" }}>
+            CSV format: Chapter, Question, Answer (A-D), Explanation
+          </p>
+
+          <div style={{ marginBottom: "16px" }}>
+            <label style={{ display: "block", fontSize: "14px", fontWeight: "500", marginBottom: "6px" }}>
+              CSV File *
+            </label>
+            <input
+              type="file"
+              accept=".csv"
+              onChange={(e) => setUploadFile(e.target.files?.[0] || null)}
+              style={{
+                width: "100%",
+                padding: "10px",
+                border: "1px solid #d1d5db",
+                borderRadius: "6px",
+                fontSize: "13px",
+              }}
+            />
+          </div>
+
+          {uploadProgress && (
+            <div style={{ padding: "12px", backgroundColor: "#f0f9ff", borderRadius: "6px", marginBottom: "16px", fontSize: "13px", color: "#0369a1" }}>
+              {uploadProgress}
+            </div>
+          )}
+
+          <div style={{ display: "flex", gap: "12px", justifyContent: "flex-end" }}>
+            <button
+              type="button"
+              onClick={() => { setActiveModal(null); setUploadFile(null); setUploadProgress(""); }}
+              style={{
+                padding: "10px 20px",
+                backgroundColor: "#e5e7eb",
+                color: "#1f2937",
+                border: "none",
+                borderRadius: "6px",
+                fontSize: "14px",
+                fontWeight: "600",
+                cursor: "pointer",
+              }}
+            >
+              Cancel
+            </button>
+            <button
+              onClick={handleUploadQuestions}
+              disabled={!uploadFile || submitting}
+              style={{
+                padding: "10px 24px",
+                backgroundColor: !uploadFile || submitting ? "#9ca3af" : "#3b82f6",
+                color: "white",
+                border: "none",
+                borderRadius: "6px",
+                fontSize: "14px",
+                fontWeight: "600",
+                cursor: !uploadFile || submitting ? "not-allowed" : "pointer",
+              }}
+            >
+              {submitting ? "Uploading..." : "Upload"}
+            </button>
+          </div>
+        </Modal>
       )}
 
-      {/* Modals */}
-      {activeModal === "createPaper" && (
-        <Modal onClose={() => setActiveModal(null)}>
-          <h2 style={{ marginTop: "0" }}>Create New Exam Paper</h2>
-          <form onSubmit={handleCreatePaper}>
-            <div style={{ marginBottom: "16px" }}>
-              <label style={{ display: "block", fontSize: "14px", fontWeight: "500", marginBottom: "6px" }}>
-                Paper Title *
-              </label>
+      {/* MODAL: View Questions */}
+      {activeModal === "viewQuestions" && (
+        <Modal onClose={() => { setActiveModal(null); setQuestions([]); }}>
+          <h2 style={{ marginTop: "0" }}>Questions ({questions.length})</h2>
+
+          {questions.length === 0 ? (
+            <p style={{ color: "#999" }}>No questions uploaded yet. Use the "Upload Questions" button to get started.</p>
+          ) : (
+            <div style={{ maxHeight: "500px", overflowY: "auto", marginBottom: "16px" }}>
+              <table style={{ width: "100%", borderCollapse: "collapse", fontSize: "12px" }}>
+                <thead>
+                  <tr style={{ borderBottom: "1px solid #e5e7eb", position: "sticky", top: "0", backgroundColor: "#f9fafb" }}>
+                    <th style={{ padding: "8px", textAlign: "left", fontWeight: "600" }}>Ch</th>
+                    <th style={{ padding: "8px", textAlign: "left", fontWeight: "600" }}>Question</th>
+                    <th style={{ padding: "8px", textAlign: "left", fontWeight: "600" }}>Ans</th>
+                    <th style={{ padding: "8px", textAlign: "left", fontWeight: "600" }}>Actions</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {questions.map((q) => (
+                    <tr key={q.id} style={{ borderBottom: "1px solid #f3f4f6" }}>
+                      <td style={{ padding: "8px", fontWeight: "600" }}>{q.chapterNumber}</td>
+                      <td style={{ padding: "8px" }}>{q.questionText.substring(0, 40)}...</td>
+                      <td style={{ padding: "8px", fontWeight: "600" }}>{q.correctAnswer}</td>
+                      <td style={{ padding: "8px" }}>
+                        <button
+                          onClick={() => {
+                            setSelectedQuestion(q);
+                            setEditQuestionText(q.questionText);
+                            setEditAnswer(q.correctAnswer);
+                            setEditChapter(String(q.chapterNumber));
+                            setEditExplanation(q.explanation);
+                            setActiveModal("editQuestion");
+                          }}
+                          style={{ color: "#3b82f6", backgroundColor: "transparent", border: "none", cursor: "pointer", fontSize: "11px", textDecoration: "underline" }}
+                        >
+                          Edit
+                        </button>
+                        {" | "}
+                        <button
+                          onClick={() => handleDeleteQuestion(q.id)}
+                          style={{ color: "#ef4444", backgroundColor: "transparent", border: "none", cursor: "pointer", fontSize: "11px", textDecoration: "underline" }}
+                        >
+                          Delete
+                        </button>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          )}
+
+          <div style={{ display: "flex", gap: "12px", justifyContent: "flex-end" }}>
+            <button
+              onClick={() => { setActiveModal(null); setQuestions([]); }}
+              style={{
+                padding: "10px 20px",
+                backgroundColor: "#e5e7eb",
+                color: "#1f2937",
+                border: "none",
+                borderRadius: "6px",
+                fontSize: "14px",
+                fontWeight: "600",
+                cursor: "pointer",
+              }}
+            >
+              Close
+            </button>
+          </div>
+        </Modal>
+      )}
+
+      {/* MODAL: Edit Question */}
+      {activeModal === "editQuestion" && selectedQuestion && (
+        <Modal onClose={() => { setActiveModal("viewQuestions"); setSelectedQuestion(null); }}>
+          <h2 style={{ marginTop: "0" }}>Edit Question</h2>
+
+          <div style={{ marginBottom: "16px" }}>
+            <label style={{ display: "block", fontSize: "14px", fontWeight: "500", marginBottom: "6px" }}>Chapter *</label>
+            <input
+              type="number"
+              value={editChapter}
+              onChange={(e) => setEditChapter(e.target.value)}
+              min="1"
+              max="27"
+              style={{ width: "100%", padding: "10px", border: "1px solid #d1d5db", borderRadius: "6px", fontSize: "14px", boxSizing: "border-box" }}
+            />
+          </div>
+
+          <div style={{ marginBottom: "16px" }}>
+            <label style={{ display: "block", fontSize: "14px", fontWeight: "500", marginBottom: "6px" }}>Question *</label>
+            <textarea
+              value={editQuestionText}
+              onChange={(e) => setEditQuestionText(e.target.value)}
+              style={{ width: "100%", padding: "10px", border: "1px solid #d1d5db", borderRadius: "6px", fontSize: "14px", minHeight: "80px", boxSizing: "border-box", fontFamily: "inherit" }}
+            />
+          </div>
+
+          <div style={{ marginBottom: "16px" }}>
+            <label style={{ display: "block", fontSize: "14px", fontWeight: "500", marginBottom: "6px" }}>Correct Answer *</label>
+            <select
+              value={editAnswer}
+              onChange={(e) => setEditAnswer(e.target.value)}
+              style={{ width: "100%", padding: "10px", border: "1px solid #d1d5db", borderRadius: "6px", fontSize: "14px", boxSizing: "border-box" }}
+            >
+              <option>A</option>
+              <option>B</option>
+              <option>C</option>
+              <option>D</option>
+            </select>
+          </div>
+
+          <div style={{ marginBottom: "16px" }}>
+            <label style={{ display: "block", fontSize: "14px", fontWeight: "500", marginBottom: "6px" }}>Explanation</label>
+            <textarea
+              value={editExplanation}
+              onChange={(e) => setEditExplanation(e.target.value)}
+              style={{ width: "100%", padding: "10px", border: "1px solid #d1d5db", borderRadius: "6px", fontSize: "14px", minHeight: "60px", boxSizing: "border-box", fontFamily: "inherit" }}
+            />
+          </div>
+
+          <div style={{ display: "flex", gap: "12px", justifyContent: "flex-end" }}>
+            <button
+              onClick={() => { setActiveModal("viewQuestions"); setSelectedQuestion(null); }}
+              style={{
+                padding: "10px 20px",
+                backgroundColor: "#e5e7eb",
+                color: "#1f2937",
+                border: "none",
+                borderRadius: "6px",
+                fontSize: "14px",
+                fontWeight: "600",
+                cursor: "pointer",
+              }}
+            >
+              Cancel
+            </button>
+            <button
+              onClick={handleUpdateQuestion}
+              disabled={submitting}
+              style={{
+                padding: "10px 24px",
+                backgroundColor: submitting ? "#9ca3af" : "#3b82f6",
+                color: "white",
+                border: "none",
+                borderRadius: "6px",
+                fontSize: "14px",
+                fontWeight: "600",
+                cursor: submitting ? "not-allowed" : "pointer",
+              }}
+            >
+              {submitting ? "Saving..." : "Save"}
+            </button>
+          </div>
+        </Modal>
+      )}
+
+      {/* MODAL: Configure Exam Format */}
+      {activeModal === "configureFormat" && (
+        <Modal onClose={() => { setActiveModal(null); setParts([]); }}>
+          <h2 style={{ marginTop: "0" }}>Configure Exam Format</h2>
+
+          <div style={{ marginBottom: "24px" }}>
+            <label style={{ display: "block", fontSize: "14px", fontWeight: "500", marginBottom: "6px" }}>
+              Total Time (minutes) *
+            </label>
+            <input
+              type="number"
+              value={totalTime}
+              onChange={(e) => setTotalTime(e.target.value)}
+              min="30"
+              style={{ width: "100%", padding: "10px", border: "1px solid #d1d5db", borderRadius: "6px", fontSize: "14px", boxSizing: "border-box" }}
+            />
+          </div>
+
+          <h4 style={{ margin: "0 0 16px 0", fontSize: "14px" }}>Exam Parts</h4>
+
+          {parts.length > 0 && (
+            <div style={{ marginBottom: "20px", display: "grid", gap: "12px" }}>
+              {parts.map((part, idx) => (
+                <div
+                  key={idx}
+                  style={{
+                    padding: "12px",
+                    backgroundColor: "#f9fafb",
+                    borderRadius: "6px",
+                    border: "1px solid #e5e7eb",
+                    display: "flex",
+                    justifyContent: "space-between",
+                    alignItems: "center",
+                  }}
+                >
+                  <div style={{ fontSize: "13px" }}>
+                    <strong>{part.partName}</strong> | Chapters {part.chapterStart}-{part.chapterEnd} | {part.questionCount} Q | {part.passingScore}%
+                  </div>
+                  <button
+                    onClick={() => removePart(idx)}
+                    style={{
+                      padding: "4px 8px",
+                      backgroundColor: "#fee2e2",
+                      color: "#991b1b",
+                      border: "none",
+                      borderRadius: "4px",
+                      fontSize: "12px",
+                      fontWeight: "600",
+                      cursor: "pointer",
+                    }}
+                  >
+                    Remove
+                  </button>
+                </div>
+              ))}
+            </div>
+          )}
+
+          <div style={{
+            padding: "16px",
+            backgroundColor: "#f0f9ff",
+            borderRadius: "6px",
+            border: "1px solid #bfdbfe",
+            marginBottom: "16px",
+            display: "grid",
+            gap: "12px",
+          }}>
+            <div>
+              <label style={{ fontSize: "13px", fontWeight: "500", display: "block", marginBottom: "4px" }}>Part Name</label>
               <input
                 type="text"
-                value={paperTitle}
-                onChange={(e) => setPaperTitle(e.target.value)}
-                placeholder="e.g., RES5 Mock Exam"
-                style={{
-                  width: "100%",
-                  padding: "10px 12px",
-                  fontSize: "14px",
-                  border: "1px solid #d1d5db",
-                  borderRadius: "8px",
-                  boxSizing: "border-box",
-                }}
-                required
+                value={newPart.partName}
+                onChange={(e) => setNewPart({ ...newPart, partName: e.target.value })}
+                placeholder="e.g., Part I, Part II"
+                style={{ width: "100%", padding: "8px", border: "1px solid #d1d5db", borderRadius: "4px", fontSize: "13px", boxSizing: "border-box" }}
               />
             </div>
 
-            <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "16px", marginBottom: "16px" }}>
+            <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "8px" }}>
               <div>
-                <label style={{ display: "block", fontSize: "14px", fontWeight: "500", marginBottom: "6px" }}>
-                  Duration (minutes) *
-                </label>
+                <label style={{ fontSize: "13px", fontWeight: "500", display: "block", marginBottom: "4px" }}>Chapter Start</label>
                 <input
                   type="number"
-                  value={paperDuration}
-                  onChange={(e) => setPaperDuration(e.target.value)}
-                  min="30"
-                  style={{
-                    width: "100%",
-                    padding: "10px 12px",
-                    fontSize: "14px",
-                    border: "1px solid #d1d5db",
-                    borderRadius: "8px",
-                    boxSizing: "border-box",
-                  }}
-                  required
-                />
-              </div>
-
-              <div>
-                <label style={{ display: "block", fontSize: "14px", fontWeight: "500", marginBottom: "6px" }}>
-                  Total Questions *
-                </label>
-                <input
-                  type="number"
-                  value={paperTotalQuestions}
-                  onChange={(e) => setPaperTotalQuestions(e.target.value)}
+                  value={newPart.chapterStart}
+                  onChange={(e) => setNewPart({ ...newPart, chapterStart: parseInt(e.target.value) })}
                   min="1"
-                  style={{
-                    width: "100%",
-                    padding: "10px 12px",
-                    fontSize: "14px",
-                    border: "1px solid #d1d5db",
-                    borderRadius: "8px",
-                    boxSizing: "border-box",
-                  }}
-                  required
+                  style={{ width: "100%", padding: "8px", border: "1px solid #d1d5db", borderRadius: "4px", fontSize: "13px", boxSizing: "border-box" }}
+                />
+              </div>
+              <div>
+                <label style={{ fontSize: "13px", fontWeight: "500", display: "block", marginBottom: "4px" }}>Chapter End</label>
+                <input
+                  type="number"
+                  value={newPart.chapterEnd}
+                  onChange={(e) => setNewPart({ ...newPart, chapterEnd: parseInt(e.target.value) })}
+                  min="1"
+                  style={{ width: "100%", padding: "8px", border: "1px solid #d1d5db", borderRadius: "4px", fontSize: "13px", boxSizing: "border-box" }}
                 />
               </div>
             </div>
 
-            <div style={{ display: "flex", gap: "12px", justifyContent: "flex-end" }}>
-              <button
-                type="button"
-                onClick={() => setActiveModal(null)}
-                style={{
-                  padding: "10px 20px",
-                  backgroundColor: "#e5e7eb",
-                  color: "#1f2937",
-                  border: "none",
-                  borderRadius: "8px",
-                  fontSize: "14px",
-                  fontWeight: "600",
-                  cursor: "pointer",
-                }}
-              >
-                Cancel
-              </button>
-              <button
-                type="submit"
-                disabled={submitting}
-                style={{
-                  padding: "10px 24px",
-                  backgroundColor: submitting ? "#9ca3af" : "#3b82f6",
-                  color: "white",
-                  border: "none",
-                  borderRadius: "8px",
-                  fontSize: "14px",
-                  fontWeight: "600",
-                  cursor: submitting ? "not-allowed" : "pointer",
-                }}
-              >
-                {submitting ? "Creating..." : "Create Paper"}
-              </button>
-            </div>
-          </form>
-        </Modal>
-      )}
-
-      {activeModal === "examFormat" && (
-        <Modal onClose={() => setActiveModal(null)}>
-          <h2 style={{ marginTop: "0" }}>Exam Format Settings</h2>
-          <form onSubmit={(e) => {
-            e.preventDefault();
-            setActiveModal(null);
-          }}>
-            <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "16px", marginBottom: "16px" }}>
+            <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "8px" }}>
               <div>
-                <label style={{ display: "block", fontSize: "14px", fontWeight: "500", marginBottom: "6px" }}>
-                  Passing Score (%) *
-                </label>
+                <label style={{ fontSize: "13px", fontWeight: "500", display: "block", marginBottom: "4px" }}>Questions to Draw</label>
                 <input
                   type="number"
-                  value={passingScore}
-                  onChange={(e) => setPassingScore(e.target.value)}
+                  value={newPart.questionCount}
+                  onChange={(e) => setNewPart({ ...newPart, questionCount: parseInt(e.target.value) })}
+                  min="1"
+                  style={{ width: "100%", padding: "8px", border: "1px solid #d1d5db", borderRadius: "4px", fontSize: "13px", boxSizing: "border-box" }}
+                />
+              </div>
+              <div>
+                <label style={{ fontSize: "13px", fontWeight: "500", display: "block", marginBottom: "4px" }}>Passing Score (%)</label>
+                <input
+                  type="number"
+                  value={newPart.passingScore}
+                  onChange={(e) => setNewPart({ ...newPart, passingScore: parseInt(e.target.value) })}
                   min="0"
                   max="100"
-                  style={{
-                    width: "100%",
-                    padding: "10px 12px",
-                    fontSize: "14px",
-                    border: "1px solid #d1d5db",
-                    borderRadius: "8px",
-                    boxSizing: "border-box",
-                  }}
-                  required
-                />
-              </div>
-
-              <div>
-                <label style={{ display: "block", fontSize: "14px", fontWeight: "500", marginBottom: "6px" }}>
-                  Time Warning (minutes) *
-                </label>
-                <input
-                  type="number"
-                  value={timeWarning}
-                  onChange={(e) => setTimeWarning(e.target.value)}
-                  min="1"
-                  style={{
-                    width: "100%",
-                    padding: "10px 12px",
-                    fontSize: "14px",
-                    border: "1px solid #d1d5db",
-                    borderRadius: "8px",
-                    boxSizing: "border-box",
-                  }}
-                  required
+                  style={{ width: "100%", padding: "8px", border: "1px solid #d1d5db", borderRadius: "4px", fontSize: "13px", boxSizing: "border-box" }}
                 />
               </div>
             </div>
 
-            <div style={{ marginBottom: "16px" }}>
-              <label style={{ display: "flex", alignItems: "center", fontSize: "14px", cursor: "pointer" }}>
-                <input
-                  type="checkbox"
-                  checked={showAnswerReview}
-                  onChange={(e) => setShowAnswerReview(e.target.checked)}
-                  style={{ marginRight: "8px" }}
-                />
-                Show Answer Review After Exam
-              </label>
-            </div>
+            <button
+              onClick={addPart}
+              style={{
+                padding: "8px 16px",
+                backgroundColor: "#3b82f6",
+                color: "white",
+                border: "none",
+                borderRadius: "4px",
+                fontSize: "13px",
+                fontWeight: "600",
+                cursor: "pointer",
+              }}
+            >
+              + Add Part
+            </button>
+          </div>
 
-            <div style={{ marginBottom: "16px" }}>
-              <label style={{ display: "flex", alignItems: "center", fontSize: "14px", cursor: "pointer" }}>
-                <input
-                  type="checkbox"
-                  checked={allowRetakes}
-                  onChange={(e) => setAllowRetakes(e.target.checked)}
-                  style={{ marginRight: "8px" }}
-                />
-                Allow Retakes
-              </label>
-            </div>
-
-            {allowRetakes && (
-              <div style={{ marginBottom: "16px" }}>
-                <label style={{ display: "block", fontSize: "14px", fontWeight: "500", marginBottom: "6px" }}>
-                  Retake Limit
-                </label>
-                <input
-                  type="number"
-                  value={retakeLimit}
-                  onChange={(e) => setRetakeLimit(e.target.value)}
-                  min="1"
-                  style={{
-                    width: "100%",
-                    padding: "10px 12px",
-                    fontSize: "14px",
-                    border: "1px solid #d1d5db",
-                    borderRadius: "8px",
-                    boxSizing: "border-box",
-                  }}
-                  required
-                />
-              </div>
-            )}
-
-            <div style={{ display: "flex", gap: "12px", justifyContent: "flex-end" }}>
-              <button
-                type="button"
-                onClick={() => setActiveModal(null)}
-                style={{
-                  padding: "10px 20px",
-                  backgroundColor: "#e5e7eb",
-                  color: "#1f2937",
-                  border: "none",
-                  borderRadius: "8px",
-                  fontSize: "14px",
-                  fontWeight: "600",
-                  cursor: "pointer",
-                }}
-              >
-                Cancel
-              </button>
-              <button
-                type="submit"
-                style={{
-                  padding: "10px 24px",
-                  backgroundColor: "#3b82f6",
-                  color: "white",
-                  border: "none",
-                  borderRadius: "8px",
-                  fontSize: "14px",
-                  fontWeight: "600",
-                  cursor: "pointer",
-                }}
-              >
-                Save Settings
-              </button>
-            </div>
-          </form>
+          <div style={{ display: "flex", gap: "12px", justifyContent: "flex-end" }}>
+            <button
+              onClick={() => { setActiveModal(null); setParts([]); }}
+              style={{
+                padding: "10px 20px",
+                backgroundColor: "#e5e7eb",
+                color: "#1f2937",
+                border: "none",
+                borderRadius: "6px",
+                fontSize: "14px",
+                fontWeight: "600",
+                cursor: "pointer",
+              }}
+            >
+              Cancel
+            </button>
+            <button
+              onClick={handleSaveExamFormat}
+              disabled={submitting || parts.length === 0}
+              style={{
+                padding: "10px 24px",
+                backgroundColor: submitting || parts.length === 0 ? "#9ca3af" : "#3b82f6",
+                color: "white",
+                border: "none",
+                borderRadius: "6px",
+                fontSize: "14px",
+                fontWeight: "600",
+                cursor: submitting || parts.length === 0 ? "not-allowed" : "pointer",
+              }}
+            >
+              {submitting ? "Saving..." : "Save Format"}
+            </button>
+          </div>
         </Modal>
       )}
-      </div>
     </div>
   );
 }
@@ -799,7 +1004,7 @@ function Modal({ onClose, children }: { onClose: () => void; children: React.Rea
         backgroundColor: "white",
         padding: "32px",
         borderRadius: "12px",
-        maxWidth: "500px",
+        maxWidth: "600px",
         width: "90%",
         maxHeight: "90vh",
         overflowY: "auto",
