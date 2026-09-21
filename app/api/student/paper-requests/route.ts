@@ -24,7 +24,7 @@ export async function GET(request: Request) {
         p.title as paper_name
       FROM "PaperRequest" pr
       JOIN "Paper" p ON pr."paperId" = p.id
-      WHERE pr."userId" = ${userId}::uuid
+      WHERE pr."userId" = ${userId}
       ORDER BY pr."requestedAt" DESC
     ` as any[];
 
@@ -56,7 +56,7 @@ export async function POST(request: Request) {
     // Check if student already has this paper (via approved request)
     const existingApprovedRequest = await prisma.$queryRaw`
       SELECT "id" FROM "PaperRequest"
-      WHERE "userId" = ${userId}::uuid AND "paperId" = ${paperId}::uuid
+      WHERE "userId" = ${userId} AND "paperId" = ${paperId}::uuid
       AND "status" = 'approved'
     ` as any[];
 
@@ -70,7 +70,7 @@ export async function POST(request: Request) {
     // Check if request already exists (pending or approved)
     const existingRequest = await prisma.$queryRaw`
       SELECT "id", "status" FROM "PaperRequest"
-      WHERE "userId" = ${userId}::uuid AND "paperId" = ${paperId}::uuid
+      WHERE "userId" = ${userId} AND "paperId" = ${paperId}::uuid
       AND "status" IN ('pending', 'approved')
     ` as any[];
 
@@ -88,7 +88,7 @@ export async function POST(request: Request) {
     // Create new paper request
     const result = await prisma.$queryRaw`
       INSERT INTO "PaperRequest" ("userId", "paperId", "status", "requestedAt")
-      VALUES (${userId}::uuid, ${paperId}::uuid, 'pending', NOW())
+      VALUES (${userId}, ${paperId}::uuid, 'pending', NOW())
       RETURNING "id", "paperId", "status", "requestedAt"
     ` as any[];
 

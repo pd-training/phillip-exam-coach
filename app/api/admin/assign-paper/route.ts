@@ -21,7 +21,7 @@ export async function POST(request: NextRequest) {
     // Check if already assigned (approved request exists)
     const existing = await prisma.$queryRaw`
       SELECT id FROM "PaperRequest"
-      WHERE "userId" = ${userId}::uuid AND "paperId" = ${paperId}::uuid
+      WHERE "userId" = ${userId} AND "paperId" = ${paperId}::uuid
       AND status = 'approved'
     ` as any[];
 
@@ -35,7 +35,7 @@ export async function POST(request: NextRequest) {
     // Assign paper by creating an approved request
     await prisma.$queryRaw`
       INSERT INTO "PaperRequest" ("userId", "paperId", status, "requestedAt", "reviewedAt")
-      VALUES (${userId}::uuid, ${paperId}::uuid, 'approved', NOW(), NOW())
+      VALUES (${userId}, ${paperId}::uuid, 'approved', NOW(), NOW())
     `;
 
     return NextResponse.json({ success: true });

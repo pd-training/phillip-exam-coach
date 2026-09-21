@@ -27,7 +27,7 @@ export async function GET(request: NextRequest) {
         pr.status
       FROM "PaperRequest" pr
       JOIN "Paper" p ON p.id = pr."paperId"
-      WHERE pr."userId" = ${userId}::uuid
+      WHERE pr."userId" = ${userId}
       AND pr.status = 'approved'
       ORDER BY p.title ASC
     ` as any[];
