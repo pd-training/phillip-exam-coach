@@ -13,7 +13,7 @@ export async function GET(
     const paper = await prisma.$queryRaw`
       SELECT id, title, "durationMinutes", "totalQuestions", "isAvailable"
       FROM "Paper"
-      WHERE id = ${params.id}
+      WHERE id = ${params.id}::uuid
     `;
 
     if (!paper || paper.length === 0) {
@@ -59,9 +59,12 @@ export async function PATCH(
     const { PrismaClient } = require("@prisma/client");
     const prisma = new PrismaClient({ datasources: { db: { url: dbUrl } } });
 
+    // Convert id to UUID using native postgres
+    const paperId = params.id;
+
     // Check if paper exists
     const paper = await prisma.$queryRaw`
-      SELECT id FROM "Paper" WHERE id = ${params.id}
+      SELECT id FROM "Paper" WHERE id = ${paperId}::uuid
     `;
 
     if (!paper || paper.length === 0) {
@@ -76,7 +79,7 @@ export async function PATCH(
     const result = await prisma.$queryRaw`
       UPDATE "Paper"
       SET "isAvailable" = ${isAvailable}, "updatedAt" = NOW()
-      WHERE id = ${params.id}
+      WHERE id = ${paperId}::uuid
       RETURNING id, title, "isAvailable"
     `;
 
