@@ -167,14 +167,20 @@ export default function PapersManagement() {
       });
 
       console.log(`Response status: ${res.status}`);
+      const responseText = await res.text();
+      console.log(`Response body: ${responseText}`);
       
       if (res.ok) {
-        const data = await res.json();
-        console.log("Toggle success:", data);
-        setPapers(papers.map(p => p.id === paperId ? { ...p, isAvailable: !currentStatus } : p));
+        try {
+          const data = JSON.parse(responseText);
+          console.log("Toggle success:", data);
+        } catch (e) {
+          console.log("Could not parse JSON, but status is ok");
+        }
+        // Refetch papers to ensure UI is in sync with database
+        await fetchPapers();
       } else {
-        const errorData = await res.json();
-        console.error("Toggle failed:", res.status, errorData);
+        console.error("Toggle failed with status:", res.status, "body:", responseText);
       }
     } catch (error) {
       console.error("Toggle error:", error);
