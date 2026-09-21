@@ -24,7 +24,6 @@ export async function GET(request: NextRequest) {
         sp."id",
         sp."paperId",
         p."title" as paper_name,
-        p."description" as paper_description,
         sp."status"
       FROM "StudentPaper" sp
       JOIN "Paper" p ON p."id" = sp."paperId"

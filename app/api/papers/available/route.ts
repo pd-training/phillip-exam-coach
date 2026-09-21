@@ -9,7 +9,6 @@ export async function GET(request: Request) {
       SELECT 
         "id",
         "title",
-        "description",
         "totalTime"
       FROM "Paper"
       ORDER BY "title" ASC

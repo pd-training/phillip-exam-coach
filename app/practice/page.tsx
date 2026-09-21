@@ -10,15 +10,12 @@ interface StudentPaper {
   id: string;
   paperId: string;
   paper_name: string;
-  paper_description: string;
   status: string;
 }
 
 interface Paper {
   id: string;
-  name: string;
-  description: string;
-  totalQuestions: number;
+  title: string;
   totalTime: number;
 }
 
@@ -224,7 +221,7 @@ export default function PracticePage() {
                       {paper.paper_name}
                     </h3>
                     <p className="text-sm text-gray-600 mt-2 line-clamp-2">
-                      {paper.paper_description || 'Click to start practicing'}
+                      Ready to practice
                     </p>
                     <div className="mt-4 flex items-center text-blue-600 font-medium">
                       Start practicing →
@@ -256,15 +253,12 @@ export default function PracticePage() {
                     >
                       <div className="flex-1">
                         <h3 className="text-lg font-semibold text-gray-900">
-                          {paper.name}
+                          {paper.title}
                         </h3>
                         <p className="text-sm text-gray-600 mt-1">
-                          {paper.description}
+                          Available for practice
                         </p>
                         <div className="flex gap-4 mt-3 text-sm text-gray-500">
-                          {paper.totalQuestions && (
-                            <span>📝 {paper.totalQuestions} questions</span>
-                          )}
                           {paper.totalTime && (
                             <span>⏱️ {formatTime(paper.totalTime)}</span>
                           )}
