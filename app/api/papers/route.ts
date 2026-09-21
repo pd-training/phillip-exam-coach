@@ -8,7 +8,7 @@ export async function GET() {
     const prisma = new PrismaClient({ datasources: { db: { url: dbUrl } } });
 
     const papers = await prisma.$queryRaw`
-      SELECT id, title, "durationMinutes", "totalQuestions", "createdAt"
+      SELECT id, title, "durationMinutes", "totalQuestions", "isAvailable", "createdAt"
       FROM "Paper"
       ORDER BY "createdAt" DESC
     `;
@@ -46,7 +46,7 @@ export async function POST(req: Request) {
     const result = await prisma.$queryRaw`
       INSERT INTO "Paper" (id, title, "durationMinutes", "totalQuestions", "createdAt", "updatedAt")
       VALUES (gen_random_uuid(), ${title}, ${durationMinutes || 180}, ${totalQuestions || 150}, NOW(), NOW())
-      RETURNING id, title, "durationMinutes", "totalQuestions", "createdAt"
+      RETURNING id, title, "durationMinutes", "totalQuestions", "isAvailable", "createdAt"
     `;
 
     await prisma.$disconnect();

@@ -11,7 +11,7 @@ export async function GET(
     const prisma = new PrismaClient({ datasources: { db: { url: dbUrl } } });
 
     const paper = await prisma.$queryRaw`
-      SELECT id, title, "durationMinutes", "totalQuestions"
+      SELECT id, title, "durationMinutes", "totalQuestions", "isAvailable"
       FROM "Paper"
       WHERE id = ${params.id}
     `;
@@ -42,6 +42,52 @@ export async function GET(
     });
   } catch (error) {
     console.error("Error fetching paper:", error);
+    return Response.json(
+      { success: false, error: String(error) },
+      { status: 500 }
+    );
+  }
+}
+
+export async function PATCH(
+  req: Request,
+  { params }: { params: { id: string } }
+) {
+  try {
+    const { isAvailable } = await req.json();
+
+    const { PrismaClient } = require("@prisma/client");
+    const prisma = new PrismaClient({ datasources: { db: { url: dbUrl } } });
+
+    // Check if paper exists
+    const paper = await prisma.$queryRaw`
+      SELECT id FROM "Paper" WHERE id = ${params.id}
+    `;
+
+    if (!paper || paper.length === 0) {
+      await prisma.$disconnect();
+      return Response.json(
+        { success: false, error: "Paper not found" },
+        { status: 404 }
+      );
+    }
+
+    // Update availability
+    const result = await prisma.$queryRaw`
+      UPDATE "Paper"
+      SET "isAvailable" = ${isAvailable}, "updatedAt" = NOW()
+      WHERE id = ${params.id}
+      RETURNING id, title, "isAvailable"
+    `;
+
+    await prisma.$disconnect();
+
+    return Response.json({
+      success: true,
+      paper: result?.[0] || null,
+    });
+  } catch (error) {
+    console.error("Error updating paper:", error);
     return Response.json(
       { success: false, error: String(error) },
       { status: 500 }
