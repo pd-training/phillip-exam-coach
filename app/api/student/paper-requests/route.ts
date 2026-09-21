@@ -53,14 +53,26 @@ export async function POST(request: Request) {
       return Response.json({ error: "paperId required" }, { status: 400 });
     }
 
-    // Check if student already has this paper (via approved request)
-    const existingApprovedRequest = await prisma.$queryRaw`
-      SELECT "id" FROM "PaperRequest"
-      WHERE "userId" = ${userId} AND "paperId" = ${paperId}::uuid
-      AND "status" = 'approved'
-    ` as any[];
+    // Validate paperId is a valid UUID
+    const uuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+    if (!uuidRegex.test(paperId)) {
+      return Response.json({ error: "Invalid paperId format" }, { status: 400 });
+    }
 
-    if (existingApprovedRequest.length > 0) {
+    // Check if student already has this paper (via approved request)
+    let existingApprovedRequest;
+    try {
+      existingApprovedRequest = await prisma.$queryRaw`
+        SELECT "id" FROM "PaperRequest"
+        WHERE "userId" = ${userId} AND "paperId" = ${paperId}::uuid
+        AND "status" = 'approved'
+      ` as any[];
+    } catch (e) {
+      console.error("Error checking approved request:", e);
+      existingApprovedRequest = [];
+    }
+
+    if (existingApprovedRequest && existingApprovedRequest.length > 0) {
       return Response.json(
         { error: "You already have access to this paper" },
         { status: 400 }
@@ -68,13 +80,19 @@ export async function POST(request: Request) {
     }
 
     // Check if request already exists (pending or approved)
-    const existingRequest = await prisma.$queryRaw`
-      SELECT "id", "status" FROM "PaperRequest"
-      WHERE "userId" = ${userId} AND "paperId" = ${paperId}::uuid
-      AND "status" IN ('pending', 'approved')
-    ` as any[];
+    let existingRequest;
+    try {
+      existingRequest = await prisma.$queryRaw`
+        SELECT "id", "status" FROM "PaperRequest"
+        WHERE "userId" = ${userId} AND "paperId" = ${paperId}::uuid
+        AND "status" IN ('pending', 'approved')
+      ` as any[];
+    } catch (e) {
+      console.error("Error checking existing request:", e);
+      existingRequest = [];
+    }
 
-    if (existingRequest.length > 0) {
+    if (existingRequest && existingRequest.length > 0) {
       return Response.json(
         {
           error: `Request already ${
@@ -98,7 +116,7 @@ export async function POST(request: Request) {
       message: "Request submitted. Admin will review shortly.",
     });
   } catch (error: any) {
-    console.error("Create paper request error:", error);
+    console.error("Create paper request error:", error.message || error);
     return Response.json(
       { error: error.message || "Failed to create request" },
       { status: 500 }
