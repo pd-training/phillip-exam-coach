@@ -21,7 +21,7 @@ export async function GET(request: Request) {
         pr."status",
         u."name" as student_name,
         u."email" as student_email,
-        p."name" as paper_name
+        p."title" as paper_name
       FROM "PaperRequest" pr
       JOIN "User" u ON pr."userId" = u."id"
       JOIN "Paper" p ON pr."paperId" = p."id"

@@ -16,9 +16,8 @@ interface Attempt {
   id: string;
   userId: string;
   paperId: string;
-  overallScore: number;
+  score: number;
   submittedAt: string;
-  timeSpent: number;
   student_name: string;
   paper_name: string;
 }
@@ -225,7 +224,7 @@ export default function AdminDashboard() {
                   </thead>
                   <tbody>
                     {attempts.map((attempt) => {
-                      const isPassed = attempt.overallScore >= 50;
+                      const isPassed = attempt.score >= 50;
                       return (
                         <tr key={attempt.id} className="border-b border-gray-200 hover:bg-gray-50">
                           <td className="px-6 py-4 text-sm text-gray-900">
@@ -240,7 +239,7 @@ export default function AdminDashboard() {
                             {attempt.paper_name}
                           </td>
                           <td className="px-6 py-4 text-sm font-medium text-gray-900">
-                            {attempt.overallScore}%
+                            {attempt.score}%
                           </td>
                           <td className="px-6 py-4 text-sm">
                             <span
@@ -254,7 +253,7 @@ export default function AdminDashboard() {
                             </span>
                           </td>
                           <td className="px-6 py-4 text-sm text-gray-600">
-                            {formatTime(attempt.timeSpent)}
+                            -
                           </td>
                           <td className="px-6 py-4 text-sm text-gray-600">
                             {formatDate(attempt.submittedAt)}

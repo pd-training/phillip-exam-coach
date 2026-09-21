@@ -23,14 +23,14 @@ export async function GET(request: NextRequest) {
       SELECT
         sp."id",
         sp."paperId",
-        p."name" as paper_name,
+        p."title" as paper_name,
         p."description" as paper_description,
         sp."status"
       FROM "StudentPaper" sp
       JOIN "Paper" p ON p."id" = sp."paperId"
       WHERE sp."userId" = ${userId}
       AND sp."status" = 'active'
-      ORDER BY p."name" ASC
+      ORDER BY p."title" ASC
     ` as any[];
 
     return NextResponse.json({

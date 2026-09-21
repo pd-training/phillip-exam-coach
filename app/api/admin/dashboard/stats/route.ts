@@ -33,8 +33,8 @@ export async function GET(request: Request) {
 
     // Average score
     const avgScoreResult = await prisma.$queryRaw`
-      SELECT AVG("overallScore") as avg FROM "ExamAttempt"
-      WHERE "overallScore" IS NOT NULL
+      SELECT AVG("score") as avg FROM "ExamAttempt"
+      WHERE "score" IS NOT NULL
     ` as any[];
     const avgScore = avgScoreResult[0]?.avg ? parseFloat(avgScoreResult[0].avg).toFixed(1) : "0";
 
@@ -42,9 +42,9 @@ export async function GET(request: Request) {
     const passRateResult = await prisma.$queryRaw`
       SELECT 
         COUNT(*) as total,
-        SUM(CASE WHEN "overallScore" >= 50 THEN 1 ELSE 0 END) as passed
+        SUM(CASE WHEN "score" >= 50 THEN 1 ELSE 0 END) as passed
       FROM "ExamAttempt"
-      WHERE "overallScore" IS NOT NULL
+      WHERE "score" IS NOT NULL
     ` as any[];
     
     const total = Number(passRateResult[0]?.total) || 0;

@@ -17,11 +17,10 @@ export async function GET(request: Request) {
         ea."id",
         ea."userId",
         ea."paperId",
-        ea."overallScore",
+        ea."score",
         ea."submittedAt",
-        ea."timeSpent",
         u."name" as student_name,
-        p."name" as paper_name
+        p."title" as paper_name
       FROM "ExamAttempt" ea
       JOIN "User" u ON ea."userId" = u."id"
       JOIN "Paper" p ON ea."paperId" = p."id"
