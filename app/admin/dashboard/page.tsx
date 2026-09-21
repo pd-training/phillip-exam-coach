@@ -41,11 +41,9 @@ export default function AdminDashboard() {
 
   const handleLogout = async () => {
     try {
+      await signOut({ redirect: false });
       const baseUrl = typeof window !== "undefined" ? window.location.origin : "";
-      console.log("Logging out with baseUrl:", baseUrl);
-      const callbackUrl = `${baseUrl}/login`;
-      console.log("Callback URL:", callbackUrl);
-      await signOut({ redirect: true, callbackUrl });
+      window.location.href = `${baseUrl}/login`;
     } catch (error) {
       console.error("Logout error:", error);
       if (typeof window !== "undefined") {

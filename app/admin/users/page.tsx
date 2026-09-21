@@ -97,14 +97,13 @@ export default function UserManagement() {
 
   const handleLogout = async () => {
     try {
+      await signOut({ redirect: false });
+      // After sign out completes, redirect to login
       const baseUrl = typeof window !== "undefined" ? window.location.origin : "";
-      console.log("Logging out with baseUrl:", baseUrl);
-      const callbackUrl = `${baseUrl}/login`;
-      console.log("Callback URL:", callbackUrl);
-      await signOut({ redirect: true, callbackUrl });
+      window.location.href = `${baseUrl}/login`;
     } catch (error) {
       console.error("Logout error:", error);
-      // Fallback: manually redirect
+      // Force redirect even if signOut fails
       if (typeof window !== "undefined") {
         window.location.href = `${window.location.origin}/login`;
       }
