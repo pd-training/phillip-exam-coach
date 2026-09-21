@@ -3,12 +3,14 @@
 import { useSession, signOut } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import { useState, useEffect } from "react";
+import Link from "next/link";
 
 interface User {
   id: string;
   email: string;
   name: string;
   role: string;
+  active: boolean;
   createdAt: string;
 }
 
@@ -16,238 +18,417 @@ export default function UserManagement() {
   const router = useRouter();
   const { data: session, status } = useSession();
   const [users, setUsers] = useState<User[]>([]);
+  const [filteredUsers, setFilteredUsers] = useState<User[]>([]);
   const [loading, setLoading] = useState(true);
-  const [showForm, setShowForm] = useState(false);
-  const [name, setName] = useState("");
-  const [email, setEmail] = useState("");
-  const [role, setRole] = useState("STUDENT");
-  const [password, setPassword] = useState("");
+  const [searchTerm, setSearchTerm] = useState("");
+  const [formData, setFormData] = useState({
+    firstName: "",
+    lastName: "",
+    phone: "",
+    email: "",
+    password: "",
+    roles: { student: true, admin: false },
+  });
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [pageError, setPageError] = useState<string | null>(null);
+  const [success, setSuccess] = useState<string | null>(null);
 
-  // Log auth status for debugging
-  useEffect(() => {
-    console.log("Auth Status:", status);
-    console.log("Session:", session);
-  }, [status, session]);
-
-  // Handle auth redirects
+  // Auth check
   useEffect(() => {
     if (status === "loading") return;
-
-    if (status === "unauthenticated") {
-      console.log("Not authenticated, redirecting to /login");
+    if (status === "unauthenticated" || !session?.user || (session?.user as any)?.role !== "ADMIN") {
       router.push("/login");
-      return;
-    }
-
-    if (!session?.user) {
-      console.log("No session.user, redirecting to /login");
-      router.push("/login");
-      return;
-    }
-
-    const userRole = (session?.user as any)?.role;
-    console.log("User role:", userRole);
-
-    if (userRole !== "ADMIN") {
-      console.log("Not admin, redirecting to /dashboard");
-      router.push("/dashboard");
       return;
     }
   }, [status, session, router]);
 
-  if (status === "loading") {
-    return <div style={{ padding: "20px" }}>🔄 Loading session...</div>;
-  }
-
-  // Don't render until we know they're an admin
-  if (status === "unauthenticated" || !session?.user || (session?.user as any)?.role !== "ADMIN") {
-    return null;
-  }
-
-  // Define fetchUsers before useEffect
+  // Fetch users
   const fetchUsers = async () => {
     try {
       const res = await fetch("/api/users");
       if (res.ok) {
         const data = await res.json();
         setUsers(data.users || []);
-        setError(null);
-      } else {
-        const errorData = await res.json();
-        setError(`API Error: ${errorData.error || res.statusText}`);
-        console.error("API Error:", errorData);
+        setFilteredUsers(data.users || []);
       }
     } catch (error) {
-      const msg = error instanceof Error ? error.message : String(error);
-      setError(`Failed to fetch users: ${msg}`);
       console.error("Failed to fetch users:", error);
     } finally {
       setLoading(false);
     }
   };
 
-  // Load users on mount
   useEffect(() => {
     fetchUsers();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
+  // Search filter
+  useEffect(() => {
+    const filtered = users.filter((user) =>
+      user.name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      user.email.toLowerCase().includes(searchTerm.toLowerCase())
+    );
+    setFilteredUsers(filtered);
+  }, [searchTerm, users]);
+
   const handleLogout = async () => {
-    try {
-      await signOut({ redirect: false });
-      // After sign out completes, redirect to login
-      const baseUrl = typeof window !== "undefined" ? window.location.origin : "";
-      window.location.href = `${baseUrl}/login`;
-    } catch (error) {
-      console.error("Logout error:", error);
-      // Force redirect even if signOut fails
-      if (typeof window !== "undefined") {
-        window.location.href = `${window.location.origin}/login`;
-      }
-    }
+    await signOut({ redirect: false });
+    window.location.href = `${window.location.origin}/login`;
   };
 
   const handleCreateUser = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!name.trim() || !email.trim() || !password.trim()) return;
-
     setSubmitting(true);
+    setError(null);
+
     try {
+      const fullName = `${formData.firstName} ${formData.lastName}`.trim();
+      const selectedRole = formData.roles.admin ? "ADMIN" : "STUDENT";
+
       const res = await fetch("/api/users", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ name, email, password, role }),
+        body: JSON.stringify({
+          name: fullName,
+          email: formData.email,
+          password: formData.password,
+          role: selectedRole,
+        }),
       });
 
       if (res.ok) {
-        setName("");
-        setEmail("");
-        setPassword("");
-        setRole("STUDENT");
-        setShowForm(false);
+        setSuccess("User created successfully!");
+        setFormData({
+          firstName: "",
+          lastName: "",
+          phone: "",
+          email: "",
+          password: "",
+          roles: { student: true, admin: false },
+        });
         await fetchUsers();
+        setTimeout(() => setSuccess(null), 3000);
       } else {
-        const error = await res.json();
-        alert("Error: " + error.error);
+        const errorData = await res.json();
+        setError(errorData.error || "Failed to create user");
       }
     } catch (error) {
-      console.error("Failed to create user:", error);
-      alert("Failed to create user");
+      setError("An error occurred while creating the user");
     } finally {
       setSubmitting(false);
     }
   };
 
+  if (status === "loading" || !session?.user) return null;
+
   return (
-    <div style={{ maxWidth: "1200px", margin: "0 auto", padding: "20px" }}>
-      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "30px" }}>
-        <div>
-          <h1 style={{ margin: "0 0 8px 0" }}>👥 User Management</h1>
-          <p style={{ color: "#666", margin: "0" }}>Add and manage advisors and students</p>
-        </div>
-        <div style={{ display: "flex", gap: "12px" }}>
-          <a href="/admin/dashboard">
-            <button style={{
-              padding: "10px 20px",
-              backgroundColor: "#6b7280",
-              color: "white",
-              border: "none",
-              borderRadius: "8px",
+    <div style={{ minHeight: "100vh", backgroundColor: "#f9fafb" }}>
+      {/* Header */}
+      <div style={{
+        backgroundColor: "white",
+        borderBottom: "1px solid #e5e7eb",
+        padding: "20px",
+        display: "flex",
+        justifyContent: "space-between",
+        alignItems: "center",
+      }}>
+        <div style={{
+          display: "flex",
+          gap: "12px",
+          alignItems: "center",
+        }}>
+          <Link href="/admin/dashboard">
+            <a style={{
+              color: "#666",
               fontSize: "14px",
-              fontWeight: "600",
+              textDecoration: "none",
               cursor: "pointer",
             }}>
-              ← Back
-            </button>
-          </a>
-          <button
-            onClick={handleLogout}
-            style={{
-              padding: "10px 20px",
-              backgroundColor: "#ef4444",
-              color: "white",
-              border: "none",
-              borderRadius: "8px",
-              fontSize: "14px",
-              fontWeight: "600",
-              cursor: "pointer",
-            }}
-          >
-            🚪 Logout
-          </button>
+              Dashboard
+            </a>
+          </Link>
+          <span style={{ color: "#d1d5db" }}>•</span>
+          <span style={{ color: "#1f2937", fontSize: "14px", fontWeight: "500" }}>Users</span>
         </div>
-      </div>
-
-      {/* New User Button */}
-      <div style={{ marginBottom: "30px" }}>
         <button
-          onClick={() => setShowForm(!showForm)}
+          onClick={handleLogout}
           style={{
-            padding: "10px 20px",
-            backgroundColor: "#1f2937",
+            padding: "8px 16px",
+            backgroundColor: "#ef4444",
             color: "white",
             border: "none",
-            borderRadius: "8px",
+            borderRadius: "6px",
             fontSize: "14px",
-            fontWeight: "600",
+            fontWeight: "500",
             cursor: "pointer",
           }}
         >
-          {showForm ? "✕ Cancel" : "+ New User"}
+          🚪 Logout
         </button>
       </div>
 
-      {/* Create Form */}
-      {showForm && (
+      <div style={{ maxWidth: "1400px", margin: "0 auto", padding: "40px 20px" }}>
+        {/* Title */}
+        <div style={{ marginBottom: "40px" }}>
+          <h1 style={{ fontSize: "32px", fontWeight: "bold", color: "#1f2937", margin: "0 0 8px 0" }}>
+            Users
+          </h1>
+          <p style={{ color: "#6b7280", margin: "0" }}>Manage advisors and students</p>
+        </div>
+
+        {/* Success Message */}
+        {success && (
+          <div style={{
+            backgroundColor: "#d1fae5",
+            border: "1px solid #6ee7b7",
+            color: "#065f46",
+            padding: "12px 16px",
+            borderRadius: "8px",
+            marginBottom: "20px",
+            fontSize: "14px",
+            fontWeight: "500",
+          }}>
+            ✅ {success}
+          </div>
+        )}
+
+        {/* Search Bar */}
+        <div style={{ marginBottom: "30px" }}>
+          <input
+            type="text"
+            placeholder="Search by name or email..."
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+            style={{
+              width: "100%",
+              maxWidth: "500px",
+              padding: "12px 16px",
+              fontSize: "14px",
+              border: "1px solid #d1d5db",
+              borderRadius: "8px",
+              boxSizing: "border-box",
+            }}
+          />
+        </div>
+
+        {/* Users Table */}
         <div style={{
           backgroundColor: "white",
-          padding: "24px",
           borderRadius: "12px",
           border: "1px solid #e5e7eb",
-          marginBottom: "30px",
+          marginBottom: "40px",
+          overflow: "hidden",
         }}>
-          <h3 style={{ marginTop: "0", marginBottom: "20px" }}>Add New User</h3>
+          <div style={{ overflowX: "auto" }}>
+            <table style={{
+              width: "100%",
+              borderCollapse: "collapse",
+            }}>
+              <thead>
+                <tr style={{ backgroundColor: "#f9fafb", borderBottom: "1px solid #e5e7eb" }}>
+                  <th style={{ padding: "16px", textAlign: "left", fontSize: "12px", fontWeight: "600", color: "#6b7280", textTransform: "uppercase" }}>
+                    NAME
+                  </th>
+                  <th style={{ padding: "16px", textAlign: "left", fontSize: "12px", fontWeight: "600", color: "#6b7280", textTransform: "uppercase" }}>
+                    EMAIL
+                  </th>
+                  <th style={{ padding: "16px", textAlign: "left", fontSize: "12px", fontWeight: "600", color: "#6b7280", textTransform: "uppercase" }}>
+                    ROLES
+                  </th>
+                  <th style={{ padding: "16px", textAlign: "left", fontSize: "12px", fontWeight: "600", color: "#6b7280", textTransform: "uppercase" }}>
+                    STATUS
+                  </th>
+                  <th style={{ padding: "16px", textAlign: "left", fontSize: "12px", fontWeight: "600", color: "#6b7280", textTransform: "uppercase" }}>
+                    CREATED VIA
+                  </th>
+                </tr>
+              </thead>
+              <tbody>
+                {loading ? (
+                  <tr>
+                    <td colSpan={5} style={{ padding: "40px", textAlign: "center", color: "#666" }}>
+                      Loading...
+                    </td>
+                  </tr>
+                ) : filteredUsers.length === 0 ? (
+                  <tr>
+                    <td colSpan={5} style={{ padding: "40px", textAlign: "center", color: "#666" }}>
+                      No users found
+                    </td>
+                  </tr>
+                ) : (
+                  filteredUsers.map((user) => (
+                    <tr
+                      key={user.id}
+                      onClick={() => router.push(`/admin/users/${user.id}`)}
+                      style={{
+                        borderBottom: "1px solid #e5e7eb",
+                        cursor: "pointer",
+                        transition: "background-color 0.2s",
+                      }}
+                      onMouseEnter={(e) => {
+                        (e.currentTarget as HTMLTableRowElement).style.backgroundColor = "#f9fafb";
+                      }}
+                      onMouseLeave={(e) => {
+                        (e.currentTarget as HTMLTableRowElement).style.backgroundColor = "white";
+                      }}
+                    >
+                      <td style={{ padding: "16px", fontSize: "14px", fontWeight: "500", color: "#1f2937" }}>
+                        {user.name || "—"}
+                      </td>
+                      <td style={{ padding: "16px", fontSize: "14px", color: "#2563eb" }}>
+                        {user.email}
+                      </td>
+                      <td style={{ padding: "16px", fontSize: "14px" }}>
+                        <div style={{ display: "flex", gap: "8px", flexWrap: "wrap" }}>
+                          {user.role.split(",").map((role) => (
+                            <span
+                              key={role}
+                              style={{
+                                display: "inline-block",
+                                padding: "4px 12px",
+                                backgroundColor: role === "ADMIN" ? "#fee2e2" : "#dbeafe",
+                                color: role === "ADMIN" ? "#991b1b" : "#1e40af",
+                                borderRadius: "4px",
+                                fontSize: "12px",
+                                fontWeight: "600",
+                              }}
+                            >
+                              {role}
+                            </span>
+                          ))}
+                        </div>
+                      </td>
+                      <td style={{ padding: "16px", fontSize: "14px" }}>
+                        <span
+                          style={{
+                            display: "inline-block",
+                            padding: "4px 12px",
+                            backgroundColor: user.active ? "#d1fae5" : "#fecaca",
+                            color: user.active ? "#065f46" : "#991b1b",
+                            borderRadius: "4px",
+                            fontSize: "12px",
+                            fontWeight: "600",
+                          }}
+                        >
+                          {user.active ? "Active" : "Inactive"}
+                        </span>
+                      </td>
+                      <td style={{ padding: "16px", fontSize: "14px", color: "#6b7280" }}>
+                        Admin created
+                      </td>
+                    </tr>
+                  ))
+                )}
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        {/* Create User Form */}
+        <div style={{
+          backgroundColor: "white",
+          borderRadius: "12px",
+          border: "1px solid #e5e7eb",
+          padding: "32px",
+        }}>
+          <h2 style={{ fontSize: "18px", fontWeight: "600", color: "#1f2937", margin: "0 0 24px 0" }}>
+            Create user
+          </h2>
+
+          {error && (
+            <div style={{
+              backgroundColor: "#fee2e2",
+              border: "1px solid #fecaca",
+              color: "#991b1b",
+              padding: "12px 16px",
+              borderRadius: "8px",
+              marginBottom: "20px",
+              fontSize: "14px",
+            }}>
+              ❌ {error}
+            </div>
+          )}
+
           <form onSubmit={handleCreateUser}>
-            <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "16px", marginBottom: "20px" }}>
+            <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: "16px", marginBottom: "20px" }}>
               <div>
-                <label style={{ display: "block", fontSize: "14px", fontWeight: "500", marginBottom: "6px" }}>
-                  Full Name
+                <label style={{ display: "block", fontSize: "14px", fontWeight: "500", marginBottom: "8px", color: "#374151" }}>
+                  First name
                 </label>
                 <input
                   type="text"
-                  value={name}
-                  onChange={(e) => setName(e.target.value)}
-                  placeholder="John Doe"
+                  value={formData.firstName}
+                  onChange={(e) => setFormData({ ...formData, firstName: e.target.value })}
+                  placeholder="John"
                   style={{
                     width: "100%",
                     padding: "10px 12px",
                     fontSize: "14px",
                     border: "1px solid #d1d5db",
-                    borderRadius: "8px",
+                    borderRadius: "6px",
                     boxSizing: "border-box",
                   }}
-                  required
                 />
               </div>
 
               <div>
-                <label style={{ display: "block", fontSize: "14px", fontWeight: "500", marginBottom: "6px" }}>
+                <label style={{ display: "block", fontSize: "14px", fontWeight: "500", marginBottom: "8px", color: "#374151" }}>
+                  Last name
+                </label>
+                <input
+                  type="text"
+                  value={formData.lastName}
+                  onChange={(e) => setFormData({ ...formData, lastName: e.target.value })}
+                  placeholder="Doe"
+                  style={{
+                    width: "100%",
+                    padding: "10px 12px",
+                    fontSize: "14px",
+                    border: "1px solid #d1d5db",
+                    borderRadius: "6px",
+                    boxSizing: "border-box",
+                  }}
+                />
+              </div>
+
+              <div>
+                <label style={{ display: "block", fontSize: "14px", fontWeight: "500", marginBottom: "8px", color: "#374151" }}>
+                  Phone (+65...)
+                </label>
+                <input
+                  type="tel"
+                  value={formData.phone}
+                  onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
+                  placeholder="9123 4567"
+                  style={{
+                    width: "100%",
+                    padding: "10px 12px",
+                    fontSize: "14px",
+                    border: "1px solid #d1d5db",
+                    borderRadius: "6px",
+                    boxSizing: "border-box",
+                  }}
+                />
+              </div>
+            </div>
+
+            <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "16px", marginBottom: "20px" }}>
+              <div>
+                <label style={{ display: "block", fontSize: "14px", fontWeight: "500", marginBottom: "8px", color: "#374151" }}>
                   Email
                 </label>
                 <input
                   type="email"
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
+                  value={formData.email}
+                  onChange={(e) => setFormData({ ...formData, email: e.target.value })}
                   placeholder="john@phillip.com"
                   style={{
                     width: "100%",
                     padding: "10px 12px",
                     fontSize: "14px",
                     border: "1px solid #d1d5db",
-                    borderRadius: "8px",
+                    borderRadius: "6px",
                     boxSizing: "border-box",
                   }}
                   required
@@ -255,155 +436,77 @@ export default function UserManagement() {
               </div>
 
               <div>
-                <label style={{ display: "block", fontSize: "14px", fontWeight: "500", marginBottom: "6px" }}>
-                  Password
+                <label style={{ display: "block", fontSize: "14px", fontWeight: "500", marginBottom: "8px", color: "#374151" }}>
+                  Temporary password
                 </label>
                 <input
                   type="password"
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
+                  value={formData.password}
+                  onChange={(e) => setFormData({ ...formData, password: e.target.value })}
                   placeholder="••••••••"
                   style={{
                     width: "100%",
                     padding: "10px 12px",
                     fontSize: "14px",
                     border: "1px solid #d1d5db",
-                    borderRadius: "8px",
+                    borderRadius: "6px",
                     boxSizing: "border-box",
                   }}
                   required
                 />
               </div>
+            </div>
 
-              <div>
-                <label style={{ display: "block", fontSize: "14px", fontWeight: "500", marginBottom: "6px" }}>
-                  Role
-                </label>
-                <select
-                  value={role}
-                  onChange={(e) => setRole(e.target.value)}
-                  style={{
-                    width: "100%",
-                    padding: "10px 12px",
-                    fontSize: "14px",
-                    border: "1px solid #d1d5db",
-                    borderRadius: "8px",
-                    boxSizing: "border-box",
-                  }}
-                >
-                  <option value="STUDENT">Student</option>
-                  <option value="ADMIN">Admin</option>
-                </select>
-              </div>
+            <div style={{ display: "flex", gap: "20px", marginBottom: "24px" }}>
+              <label style={{ display: "flex", alignItems: "center", gap: "8px", cursor: "pointer" }}>
+                <input
+                  type="checkbox"
+                  checked={formData.roles.student}
+                  onChange={(e) =>
+                    setFormData({
+                      ...formData,
+                      roles: { ...formData.roles, student: e.target.checked },
+                    })
+                  }
+                  style={{ cursor: "pointer" }}
+                />
+                <span style={{ fontSize: "14px", color: "#374151" }}>Student</span>
+              </label>
+              <label style={{ display: "flex", alignItems: "center", gap: "8px", cursor: "pointer" }}>
+                <input
+                  type="checkbox"
+                  checked={formData.roles.admin}
+                  onChange={(e) =>
+                    setFormData({
+                      ...formData,
+                      roles: { ...formData.roles, admin: e.target.checked },
+                    })
+                  }
+                  style={{ cursor: "pointer" }}
+                />
+                <span style={{ fontSize: "14px", color: "#374151" }}>Admin</span>
+              </label>
             </div>
 
             <button
               type="submit"
               disabled={submitting}
               style={{
-                padding: "10px 24px",
-                backgroundColor: submitting ? "#9ca3af" : "#3b82f6",
+                width: "100%",
+                padding: "12px 16px",
+                backgroundColor: submitting ? "#9ca3af" : "#2563eb",
                 color: "white",
                 border: "none",
-                borderRadius: "8px",
-                fontSize: "14px",
+                borderRadius: "6px",
+                fontSize: "16px",
                 fontWeight: "600",
                 cursor: submitting ? "not-allowed" : "pointer",
               }}
             >
-              {submitting ? "Creating..." : "Create User"}
+              {submitting ? "Creating user..." : "Create user"}
             </button>
           </form>
         </div>
-      )}
-
-      {/* Error Display */}
-      {error && (
-        <div style={{
-          backgroundColor: "#fee2e2",
-          border: "1px solid #fecaca",
-          padding: "12px 16px",
-          borderRadius: "8px",
-          marginBottom: "20px",
-          color: "#991b1b",
-          fontSize: "14px",
-        }}>
-          <strong>Error:</strong> {error}
-        </div>
-      )}
-
-      {/* Users List */}
-      <div>
-        {loading ? (
-          <p style={{ color: "#666" }}>Loading users...</p>
-        ) : users.length === 0 ? (
-          <div style={{
-            backgroundColor: "#f3f4f6",
-            padding: "40px",
-            borderRadius: "12px",
-            textAlign: "center",
-            color: "#666",
-          }}>
-            <p style={{ margin: "0" }}>No users found.</p>
-          </div>
-        ) : (
-          <div style={{ overflowX: "auto" }}>
-            <table style={{
-              width: "100%",
-              borderCollapse: "collapse",
-              backgroundColor: "white",
-              borderRadius: "12px",
-              overflow: "hidden",
-            }}>
-              <thead>
-                <tr style={{ backgroundColor: "#f3f4f6", borderBottom: "1px solid #e5e7eb" }}>
-                  <th style={{ padding: "12px 16px", textAlign: "left", fontSize: "14px", fontWeight: "600" }}>Name</th>
-                  <th style={{ padding: "12px 16px", textAlign: "left", fontSize: "14px", fontWeight: "600" }}>Email</th>
-                  <th style={{ padding: "12px 16px", textAlign: "left", fontSize: "14px", fontWeight: "600" }}>Role</th>
-                  <th style={{ padding: "12px 16px", textAlign: "left", fontSize: "14px", fontWeight: "600" }}>Joined</th>
-                  <th style={{ padding: "12px 16px", textAlign: "right", fontSize: "14px", fontWeight: "600" }}>Actions</th>
-                </tr>
-              </thead>
-              <tbody>
-                {users.map((user) => (
-                  <tr key={user.id} style={{ borderBottom: "1px solid #e5e7eb" }}>
-                    <td style={{ padding: "12px 16px" }}>{user.name}</td>
-                    <td style={{ padding: "12px 16px", color: "#0070f3" }}>{user.email}</td>
-                    <td style={{ padding: "12px 16px" }}>
-                      <span style={{
-                        display: "inline-block",
-                        padding: "4px 12px",
-                        backgroundColor: user.role === "ADMIN" ? "#fecaca" : "#bfdbfe",
-                        color: user.role === "ADMIN" ? "#991b1b" : "#1e40af",
-                        borderRadius: "4px",
-                        fontSize: "12px",
-                        fontWeight: "600",
-                      }}>
-                        {user.role}
-                      </span>
-                    </td>
-                    <td style={{ padding: "12px 16px", color: "#666", fontSize: "13px" }}>
-                      {new Date(user.createdAt).toLocaleDateString()}
-                    </td>
-                    <td style={{ padding: "12px 16px", textAlign: "right" }}>
-                      <button style={{
-                        padding: "6px 12px",
-                        backgroundColor: "#ef4444",
-                        color: "white",
-                        border: "none",
-                        borderRadius: "4px",
-                        fontSize: "12px",
-                        cursor: "pointer",
-                      }}>
-                        Delete
-                      </button>
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-        )}
       </div>
     </div>
   );
