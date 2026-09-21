@@ -3,6 +3,7 @@
 import { usePathname } from 'next/navigation';
 import { signOut } from 'next-auth/react';
 import { useSession } from 'next-auth/react';
+import Link from 'next/link';
 
 export default function AdminNav() {
   const pathname = usePathname();
@@ -26,7 +27,7 @@ export default function AdminNav() {
         {/* Navigation Links */}
         <div className="flex gap-8">
           {navItems.map((item) => (
-            <a
+            <Link
               key={item.href}
               href={item.href}
               className={`text-sm font-medium transition ${
@@ -36,13 +37,13 @@ export default function AdminNav() {
               }`}
             >
               {item.label}
-            </a>
+            </Link>
           ))}
         </div>
 
         {/* Right side - Account, Name & Logout */}
         <div className="flex items-center gap-6">
-          <a
+          <Link
             href="/admin/account"
             className={`text-sm font-medium transition ${
               pathname === '/admin/account'
@@ -51,7 +52,7 @@ export default function AdminNav() {
             }`}
           >
             Account
-          </a>
+          </Link>
           <span className="text-sm font-medium text-gray-900">
             {session?.user?.name || 'Admin'}
           </span>
