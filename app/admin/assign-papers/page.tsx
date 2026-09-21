@@ -3,7 +3,7 @@
 import { useState, useEffect } from "react";
 import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
-import { AdminNav } from "@/app/components/AdminNav";
+import AdminNav from "@/components/AdminNav";
 
 interface User {
   id: string;
@@ -99,9 +99,11 @@ export default function AssignPapersPage() {
 
   return (
     <div style={{ backgroundColor: "#f8f9fa", minHeight: "100vh" }}>
-      <AdminNav title="📋 Assign Papers" subtitle="Grant students access to exam papers" />
+      <AdminNav />
 
       <div style={{ maxWidth: "1400px", margin: "0 auto", padding: "30px 20px" }}>
+        <h1 style={{ marginBottom: "8px", fontSize: "28px", fontWeight: "700" }}>📋 Assign Papers</h1>
+        <p style={{ color: "#666", marginBottom: "24px", fontSize: "14px" }}>Grant students access to exam papers</p>
         <div style={{ maxWidth: "500px" }}>
           <div style={{ marginBottom: "16px" }}>
             <label style={{ display: "block", marginBottom: "8px", fontWeight: "600" }}>
