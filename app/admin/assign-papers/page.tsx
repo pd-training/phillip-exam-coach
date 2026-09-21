@@ -31,7 +31,7 @@ export default function AssignPapersPage() {
     if (status === "unauthenticated") {
       router.push("/login");
     } else if ((session?.user as any)?.role !== "ADMIN") {
-      router.push("/dashboard");
+      router.push("/admin/dashboard");
     }
   }, [status, session, router]);
 
