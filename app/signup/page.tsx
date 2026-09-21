@@ -86,166 +86,347 @@ export default function SignupPage() {
   };
 
   return (
-    <div style={{ minHeight: "100vh", display: "flex", alignItems: "center", justifyContent: "center", backgroundColor: "#f8f9fa" }}>
-      <div style={{ width: "100%", maxWidth: "400px", padding: "40px" }}>
-        {/* Header */}
-        <div style={{ textAlign: "center", marginBottom: "40px" }}>
-          <div style={{ fontSize: "48px", marginBottom: "12px" }}>📚</div>
-          <h1 style={{ fontSize: "28px", fontWeight: "bold", color: "#1a1a1a", margin: "0 0 8px 0" }}>
-            Phillip Exam Coach
-          </h1>
-          <p style={{ color: "#666", margin: "0", fontSize: "14px" }}>Create your account</p>
-        </div>
-
-        {/* Error Message */}
-        {error && (
+    <div style={{
+      minHeight: "100vh",
+      display: "flex",
+      alignItems: "center",
+      justifyContent: "center",
+      background: "linear-gradient(135deg, #667eea 0%, #764ba2 100%)",
+      padding: "20px",
+    }}>
+      <div style={{
+        width: "100%",
+        maxWidth: "1200px",
+        backgroundColor: "white",
+        borderRadius: "16px",
+        overflow: "hidden",
+        boxShadow: "0 20px 60px rgba(0, 0, 0, 0.15)",
+      }}>
+        <div style={{
+          display: "grid",
+          gridTemplateColumns: "1fr 1fr",
+          minHeight: "600px",
+        }}>
+          {/* Left Panel - Illustration */}
           <div style={{
-            backgroundColor: "#fee2e2",
-            border: "1px solid #fecaca",
-            color: "#991b1b",
-            padding: "12px 16px",
-            borderRadius: "8px",
-            marginBottom: "20px",
-            fontSize: "14px",
+            background: "linear-gradient(135deg, #667eea 0%, #764ba2 100%)",
+            padding: "60px 40px",
+            display: "flex",
+            flexDirection: "column",
+            justifyContent: "center",
+            alignItems: "center",
+            color: "white",
           }}>
-            {error}
-          </div>
-        )}
+            <div style={{
+              textAlign: "center",
+            }}>
+              <div style={{
+                fontSize: "100px",
+                marginBottom: "24px",
+                lineHeight: "1",
+              }}>
+                🚀
+              </div>
+              <h2 style={{
+                fontSize: "32px",
+                fontWeight: "bold",
+                margin: "0 0 16px 0",
+              }}>
+                Start Your Journey
+              </h2>
+              <p style={{
+                fontSize: "16px",
+                lineHeight: "1.6",
+                margin: "0 0 40px 0",
+                opacity: "0.95",
+              }}>
+                Join thousands preparing with AI-powered exam coaching
+              </p>
 
-        {/* Form */}
-        <form onSubmit={handleSubmit} style={{ marginBottom: "20px" }}>
-          {/* Name Input */}
-          <div style={{ marginBottom: "16px" }}>
-            <label style={{ display: "block", marginBottom: "6px", fontSize: "14px", fontWeight: "600", color: "#1a1a1a" }}>
-              Full Name
-            </label>
-            <input
-              type="text"
-              name="name"
-              value={formData.name}
-              onChange={handleChange}
-              placeholder="John Doe"
-              style={{
-                width: "100%",
-                padding: "10px 12px",
-                border: "1px solid #d1d5db",
+              {/* Feature List */}
+              <div style={{
+                textAlign: "left",
+                display: "inline-block",
+              }}>
+                {[
+                  { icon: "🎯", text: "Ace Your CMFAS Exam" },
+                  { icon: "📈", text: "Track Your Progress" },
+                  { icon: "⚡", text: "Study Smarter" },
+                  { icon: "🏆", text: "Achieve Success" },
+                ].map((feature, idx) => (
+                  <div key={idx} style={{
+                    display: "flex",
+                    alignItems: "center",
+                    gap: "12px",
+                    marginBottom: "16px",
+                    fontSize: "15px",
+                  }}>
+                    <span style={{ fontSize: "20px" }}>{feature.icon}</span>
+                    <span>{feature.text}</span>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
+
+          {/* Right Panel - Form */}
+          <div style={{
+            padding: "60px 40px",
+            display: "flex",
+            flexDirection: "column",
+            justifyContent: "center",
+          }}>
+            {/* Error Message */}
+            {error && (
+              <div style={{
+                backgroundColor: "#fee2e2",
+                border: "1px solid #fecaca",
+                color: "#991b1b",
+                padding: "12px 16px",
                 borderRadius: "8px",
+                marginBottom: "20px",
                 fontSize: "14px",
-                fontFamily: "inherit",
-                boxSizing: "border-box",
-              }}
-            />
-          </div>
+                fontWeight: "500",
+              }}>
+                ❌ {error}
+              </div>
+            )}
 
-          {/* Email Input */}
-          <div style={{ marginBottom: "16px" }}>
-            <label style={{ display: "block", marginBottom: "6px", fontSize: "14px", fontWeight: "600", color: "#1a1a1a" }}>
-              Email Address
-            </label>
-            <input
-              type="email"
-              name="email"
-              value={formData.email}
-              onChange={handleChange}
-              placeholder="student@example.com"
-              style={{
-                width: "100%",
-                padding: "10px 12px",
-                border: "1px solid #d1d5db",
-                borderRadius: "8px",
+            {/* Form */}
+            <form onSubmit={handleSubmit}>
+              <h3 style={{
+                fontSize: "20px",
+                fontWeight: "600",
+                color: "#1f2937",
+                margin: "0 0 24px 0",
+              }}>
+                Create Account
+              </h3>
+
+              {/* Name Input */}
+              <div style={{ marginBottom: "20px" }}>
+                <label style={{
+                  display: "block",
+                  marginBottom: "8px",
+                  fontSize: "14px",
+                  fontWeight: "600",
+                  color: "#1f2937",
+                }}>
+                  Full Name
+                </label>
+                <input
+                  type="text"
+                  name="name"
+                  value={formData.name}
+                  onChange={handleChange}
+                  placeholder="John Doe"
+                  style={{
+                    width: "100%",
+                    padding: "11px 13px",
+                    border: "1px solid #d1d5db",
+                    borderRadius: "8px",
+                    fontSize: "14px",
+                    fontFamily: "inherit",
+                    boxSizing: "border-box",
+                    transition: "border-color 0.2s",
+                  }}
+                  onFocus={(e) => {
+                    e.currentTarget.style.borderColor = "#3b82f6";
+                    e.currentTarget.style.outline = "2px solid rgba(59, 130, 246, 0.1)";
+                  }}
+                  onBlur={(e) => {
+                    e.currentTarget.style.borderColor = "#d1d5db";
+                    e.currentTarget.style.outline = "none";
+                  }}
+                />
+              </div>
+
+              {/* Email Input */}
+              <div style={{ marginBottom: "20px" }}>
+                <label style={{
+                  display: "block",
+                  marginBottom: "8px",
+                  fontSize: "14px",
+                  fontWeight: "600",
+                  color: "#1f2937",
+                }}>
+                  Email Address
+                </label>
+                <input
+                  type="email"
+                  name="email"
+                  value={formData.email}
+                  onChange={handleChange}
+                  placeholder="you@example.com"
+                  style={{
+                    width: "100%",
+                    padding: "11px 13px",
+                    border: "1px solid #d1d5db",
+                    borderRadius: "8px",
+                    fontSize: "14px",
+                    fontFamily: "inherit",
+                    boxSizing: "border-box",
+                    transition: "border-color 0.2s",
+                  }}
+                  onFocus={(e) => {
+                    e.currentTarget.style.borderColor = "#3b82f6";
+                    e.currentTarget.style.outline = "2px solid rgba(59, 130, 246, 0.1)";
+                  }}
+                  onBlur={(e) => {
+                    e.currentTarget.style.borderColor = "#d1d5db";
+                    e.currentTarget.style.outline = "none";
+                  }}
+                />
+              </div>
+
+              {/* Password Input */}
+              <div style={{ marginBottom: "20px" }}>
+                <label style={{
+                  display: "block",
+                  marginBottom: "8px",
+                  fontSize: "14px",
+                  fontWeight: "600",
+                  color: "#1f2937",
+                }}>
+                  Password
+                </label>
+                <input
+                  type="password"
+                  name="password"
+                  value={formData.password}
+                  onChange={handleChange}
+                  placeholder="••••••••"
+                  style={{
+                    width: "100%",
+                    padding: "11px 13px",
+                    border: "1px solid #d1d5db",
+                    borderRadius: "8px",
+                    fontSize: "14px",
+                    fontFamily: "inherit",
+                    boxSizing: "border-box",
+                    transition: "border-color 0.2s",
+                  }}
+                  onFocus={(e) => {
+                    e.currentTarget.style.borderColor = "#3b82f6";
+                    e.currentTarget.style.outline = "2px solid rgba(59, 130, 246, 0.1)";
+                  }}
+                  onBlur={(e) => {
+                    e.currentTarget.style.borderColor = "#d1d5db";
+                    e.currentTarget.style.outline = "none";
+                  }}
+                />
+              </div>
+
+              {/* Confirm Password Input */}
+              <div style={{ marginBottom: "24px" }}>
+                <label style={{
+                  display: "block",
+                  marginBottom: "8px",
+                  fontSize: "14px",
+                  fontWeight: "600",
+                  color: "#1f2937",
+                }}>
+                  Confirm Password
+                </label>
+                <input
+                  type="password"
+                  name="confirmPassword"
+                  value={formData.confirmPassword}
+                  onChange={handleChange}
+                  placeholder="••••••••"
+                  style={{
+                    width: "100%",
+                    padding: "11px 13px",
+                    border: "1px solid #d1d5db",
+                    borderRadius: "8px",
+                    fontSize: "14px",
+                    fontFamily: "inherit",
+                    boxSizing: "border-box",
+                    transition: "border-color 0.2s",
+                  }}
+                  onFocus={(e) => {
+                    e.currentTarget.style.borderColor = "#3b82f6";
+                    e.currentTarget.style.outline = "2px solid rgba(59, 130, 246, 0.1)";
+                  }}
+                  onBlur={(e) => {
+                    e.currentTarget.style.borderColor = "#d1d5db";
+                    e.currentTarget.style.outline = "none";
+                  }}
+                />
+              </div>
+
+              {/* Submit Button */}
+              <button
+                type="submit"
+                disabled={loading}
+                style={{
+                  width: "100%",
+                  padding: "12px 16px",
+                  backgroundColor: loading ? "#9ca3af" : "#2563eb",
+                  color: "white",
+                  border: "none",
+                  borderRadius: "8px",
+                  fontSize: "16px",
+                  fontWeight: "600",
+                  cursor: loading ? "not-allowed" : "pointer",
+                  transition: "background-color 0.2s",
+                }}
+                onMouseEnter={(e) => {
+                  if (!loading) (e.currentTarget as HTMLButtonElement).style.backgroundColor = "#1d4ed8";
+                }}
+                onMouseLeave={(e) => {
+                  if (!loading) (e.currentTarget as HTMLButtonElement).style.backgroundColor = "#2563eb";
+                }}
+              >
+                {loading ? "Creating Account..." : "Create Account"}
+              </button>
+            </form>
+
+            {/* Login Link */}
+            <div style={{
+              textAlign: "center",
+              marginTop: "24px",
+              color: "#6b7280",
+              fontSize: "14px",
+            }}>
+              Already have an account?{" "}
+              <Link href="/login" style={{
+                color: "#2563eb",
+                textDecoration: "none",
+                fontWeight: "600",
+                cursor: "pointer",
+              }}>
+                Login here
+              </Link>
+            </div>
+
+            {/* Back to Home */}
+            <div style={{
+              textAlign: "center",
+              marginTop: "20px",
+            }}>
+              <div style={{
+                color: "#6b7280",
                 fontSize: "14px",
-                fontFamily: "inherit",
-                boxSizing: "border-box",
+                transition: "color 0.2s",
+                cursor: "pointer",
               }}
-            />
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.color = "#2563eb";
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.color = "#6b7280";
+                }}
+              >
+                <Link href="/" style={{
+                  color: "inherit",
+                  textDecoration: "none",
+                }}>
+                  ← Back to Home
+                </Link>
+              </div>
+            </div>
           </div>
-
-          {/* Password Input */}
-          <div style={{ marginBottom: "16px" }}>
-            <label style={{ display: "block", marginBottom: "6px", fontSize: "14px", fontWeight: "600", color: "#1a1a1a" }}>
-              Password
-            </label>
-            <input
-              type="password"
-              name="password"
-              value={formData.password}
-              onChange={handleChange}
-              placeholder="••••••••"
-              style={{
-                width: "100%",
-                padding: "10px 12px",
-                border: "1px solid #d1d5db",
-                borderRadius: "8px",
-                fontSize: "14px",
-                fontFamily: "inherit",
-                boxSizing: "border-box",
-              }}
-            />
-          </div>
-
-          {/* Confirm Password Input */}
-          <div style={{ marginBottom: "20px" }}>
-            <label style={{ display: "block", marginBottom: "6px", fontSize: "14px", fontWeight: "600", color: "#1a1a1a" }}>
-              Confirm Password
-            </label>
-            <input
-              type="password"
-              name="confirmPassword"
-              value={formData.confirmPassword}
-              onChange={handleChange}
-              placeholder="••••••••"
-              style={{
-                width: "100%",
-                padding: "10px 12px",
-                border: "1px solid #d1d5db",
-                borderRadius: "8px",
-                fontSize: "14px",
-                fontFamily: "inherit",
-                boxSizing: "border-box",
-              }}
-            />
-          </div>
-
-          {/* Submit Button */}
-          <button
-            type="submit"
-            disabled={loading}
-            style={{
-              width: "100%",
-              padding: "12px 16px",
-              backgroundColor: loading ? "#9ca3af" : "#2563eb",
-              color: "white",
-              border: "none",
-              borderRadius: "8px",
-              fontSize: "16px",
-              fontWeight: "600",
-              cursor: loading ? "not-allowed" : "pointer",
-              transition: "background-color 0.2s",
-            }}
-            onMouseEnter={(e) => {
-              if (!loading) (e.target as HTMLButtonElement).style.backgroundColor = "#1d4ed8";
-            }}
-            onMouseLeave={(e) => {
-              if (!loading) (e.target as HTMLButtonElement).style.backgroundColor = "#2563eb";
-            }}
-          >
-            {loading ? "Creating Account..." : "Create Account"}
-          </button>
-        </form>
-
-        {/* Login Link */}
-        <div style={{ textAlign: "center", color: "#666", fontSize: "14px" }}>
-          Already have an account?{" "}
-          <Link href="/login" style={{ color: "#2563eb", textDecoration: "none", fontWeight: "600" }}>
-            Login here
-          </Link>
-        </div>
-
-        {/* Back to Home */}
-        <div style={{ textAlign: "center", marginTop: "20px" }}>
-          <Link href="/" style={{ color: "#666", textDecoration: "none", fontSize: "14px" }}>
-            ← Back to Home
-          </Link>
         </div>
       </div>
     </div>

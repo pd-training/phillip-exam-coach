@@ -57,7 +57,7 @@ export default function LoginPage() {
                 margin: "0 0 40px 0",
                 opacity: "0.95",
               }}>
-                AI-powered exam prep tailored for PhillipCapital advisors
+                AI-powered exam prep tool
               </p>
 
               {/* Feature List */}
