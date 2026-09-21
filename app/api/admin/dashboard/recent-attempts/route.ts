@@ -23,7 +23,7 @@ export async function GET(request: Request) {
         p.title as paper_name
       FROM examattempt ea
       JOIN "User" u ON ea.userid = u.id
-      JOIN paper p ON ea.paperid = p.id
+      JOIN "Paper" p ON ea.paperid = p.id
       ORDER BY ea.submittedat DESC
       LIMIT 10
     ` as any[];
