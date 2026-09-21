@@ -49,6 +49,8 @@ export async function POST(request: Request) {
     const userId = (session.user as any).id;
     const { paperId } = await request.json();
 
+    console.log('Paper request - userId:', userId, 'paperId:', paperId);
+
     if (!paperId) {
       return Response.json({ error: "paperId required" }, { status: 400 });
     }
@@ -56,7 +58,13 @@ export async function POST(request: Request) {
     // Validate paperId is a valid UUID
     const uuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
     if (!uuidRegex.test(paperId)) {
+      console.error('Invalid paperId format:', paperId);
       return Response.json({ error: "Invalid paperId format" }, { status: 400 });
+    }
+
+    if (!uuidRegex.test(userId)) {
+      console.error('Invalid userId format:', userId);
+      return Response.json({ error: "Invalid userId format" }, { status: 400 });
     }
 
     // Check if student already has this paper (via approved request)
