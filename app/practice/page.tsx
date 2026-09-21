@@ -13,10 +13,12 @@ interface StudentPaper {
   status: string;
 }
 
-interface AvailablePaper {
+interface Paper {
   id: string;
   name: string;
   description: string;
+  totalQuestions: number;
+  totalTime: number;
 }
 
 interface PaperRequest {
@@ -25,23 +27,22 @@ interface PaperRequest {
   paper_name: string;
   status: string;
   requestedAt: string;
-  respondedAt?: string;
 }
+
+type Tab = 'your-papers' | 'browse';
 
 export default function PracticePage() {
   const { data: session, status } = useSession();
   const router = useRouter();
 
+  const [tab, setTab] = useState<Tab>('your-papers');
   const [papers, setPapers] = useState<StudentPaper[]>([]);
+  const [allPapers, setAllPapers] = useState<Paper[]>([]);
   const [requests, setRequests] = useState<PaperRequest[]>([]);
-  const [availablePapers, setAvailablePapers] = useState<AvailablePaper[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
-  const [showModal, setShowModal] = useState(false);
-  const [selectedPaperId, setSelectedPaperId] = useState('');
-  const [submitting, setSubmitting] = useState(false);
-  const [submitError, setSubmitError] = useState('');
-  const [submitSuccess, setSubmitSuccess] = useState('');
+  const [submitting, setSubmitting] = useState<string | null>(null);
+  const [submitMessages, setSubmitMessages] = useState<{ [key: string]: string }>({});
 
   useEffect(() => {
     if (status === 'unauthenticated') {
@@ -51,11 +52,11 @@ export default function PracticePage() {
 
   useEffect(() => {
     if (status === 'authenticated') {
-      fetchPapersAndRequests();
+      fetchData();
     }
   }, [status]);
 
-  const fetchPapersAndRequests = async () => {
+  const fetchData = async () => {
     try {
       setLoading(true);
       setError('');
@@ -63,7 +64,7 @@ export default function PracticePage() {
       const [papersRes, requestsRes, allPapersRes] = await Promise.all([
         fetch('/api/student/papers'),
         fetch('/api/student/paper-requests'),
-        fetch('/api/papers'),
+        fetch('/api/papers/available'),
       ]);
 
       if (!papersRes.ok || !requestsRes.ok || !allPapersRes.ok) {
@@ -76,7 +77,7 @@ export default function PracticePage() {
 
       setPapers(papersData.papers || []);
       setRequests(requestsData.requests || []);
-      setAvailablePapers(allPapersData.papers || []);
+      setAllPapers(allPapersData.papers || []);
     } catch (err: any) {
       setError(err.message || 'Failed to load papers');
       console.error('Practice error:', err);
@@ -85,21 +86,25 @@ export default function PracticePage() {
     }
   };
 
-  const handleRequestPaper = async () => {
-    if (!selectedPaperId) {
-      setSubmitError('Please select a paper');
-      return;
-    }
+  const getStatusForPaper = (paperId: string) => {
+    const ownsPaper = papers.some((p) => p.paperId === paperId);
+    if (ownsPaper) return 'owned';
 
+    const hasRequest = requests.find((r) => r.paperId === paperId);
+    if (hasRequest) return hasRequest.status; // 'pending', 'approved', 'rejected'
+
+    return 'available';
+  };
+
+  const handleRequestPaper = async (paperId: string, paperName: string) => {
     try {
-      setSubmitting(true);
-      setSubmitError('');
-      setSubmitSuccess('');
+      setSubmitting(paperId);
+      setSubmitMessages({ ...submitMessages, [paperId]: '' });
 
       const res = await fetch('/api/student/paper-requests', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ paperId: selectedPaperId }),
+        body: JSON.stringify({ paperId }),
       });
 
       if (!res.ok) {
@@ -107,29 +112,31 @@ export default function PracticePage() {
         throw new Error(errData.error || 'Failed to submit request');
       }
 
-      const data = await res.json();
-      setSubmitSuccess(data.message || 'Request submitted successfully');
-      setSelectedPaperId('');
+      setSubmitMessages({
+        ...submitMessages,
+        [paperId]: 'Request submitted!',
+      });
 
-      // Refresh requests
-      setTimeout(() => {
-        fetchPapersAndRequests();
-        setShowModal(false);
-      }, 1500);
+      // Refresh data after 1 second
+      setTimeout(fetchData, 1000);
     } catch (err: any) {
-      setSubmitError(err.message || 'Failed to submit request');
+      setSubmitMessages({
+        ...submitMessages,
+        [paperId]: err.message || 'Failed to submit request',
+      });
     } finally {
-      setSubmitting(false);
+      setSubmitting(null);
     }
   };
 
-  const getRequestablesPapers = () => {
-    const ownedPaperIds = new Set(papers.map((p) => p.paperId));
-    const requestedPaperIds = new Set(requests.map((r) => r.paperId));
-
-    return availablePapers.filter(
-      (p) => !ownedPaperIds.has(p.id) && !requestedPaperIds.has(p.id)
-    );
+  const formatTime = (seconds: number) => {
+    if (!seconds) return '-';
+    const hours = Math.floor(seconds / 60);
+    const minutes = seconds % 60;
+    if (hours > 0) {
+      return `${hours}h ${minutes}m`;
+    }
+    return `${minutes}m`;
   };
 
   if (status === 'loading' || loading) {
@@ -137,7 +144,7 @@ export default function PracticePage() {
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
         <div className="text-center">
           <div className="inline-block h-8 w-8 animate-spin rounded-full border-4 border-blue-500 border-t-transparent"></div>
-          <p className="mt-4 text-gray-600">Loading your papers...</p>
+          <p className="mt-4 text-gray-600">Loading...</p>
         </div>
       </div>
     );
@@ -147,203 +154,183 @@ export default function PracticePage() {
     <div className="min-h-screen bg-gray-50">
       {/* Header */}
       <div className="bg-white border-b border-gray-200">
-        <div className="max-w-4xl mx-auto px-6 py-6">
-          <div className="flex items-center justify-between">
+        <div className="max-w-6xl mx-auto px-6 py-6">
+          <div className="flex items-center justify-between mb-6">
             <div>
               <h1 className="text-3xl font-bold text-gray-900">Practice</h1>
-              <p className="text-gray-600 mt-1">Select a paper to begin practicing</p>
+              <p className="text-gray-600 mt-1">Prepare for your CMFAS exams</p>
             </div>
             <Link
               href="/dashboard"
-              className="px-4 py-2 bg-gray-200 text-gray-800 rounded-lg hover:bg-gray-300"
+              className="px-4 py-2 bg-gray-200 text-gray-800 rounded-lg hover:bg-gray-300 font-medium"
             >
               ← Dashboard
             </Link>
           </div>
+
+          {/* Tabs */}
+          <div className="flex gap-6 border-t border-gray-200 pt-0">
+            <button
+              onClick={() => setTab('your-papers')}
+              className={`px-1 py-4 font-medium transition border-b-2 ${
+                tab === 'your-papers'
+                  ? 'text-blue-600 border-blue-600'
+                  : 'text-gray-600 border-transparent hover:text-gray-900'
+              }`}
+            >
+              Your papers ({papers.length})
+            </button>
+            <button
+              onClick={() => setTab('browse')}
+              className={`px-1 py-4 font-medium transition border-b-2 ${
+                tab === 'browse'
+                  ? 'text-blue-600 border-blue-600'
+                  : 'text-gray-600 border-transparent hover:text-gray-900'
+              }`}
+            >
+              Browse papers ({allPapers.length})
+            </button>
+          </div>
         </div>
       </div>
 
-      <div className="max-w-4xl mx-auto px-6 py-8">
+      <div className="max-w-6xl mx-auto px-6 py-8">
         {error && (
           <div className="mb-6 p-4 bg-red-50 border border-red-200 rounded-lg text-red-800">
             {error}
           </div>
         )}
 
-        {/* Available Papers */}
-        <div className="mb-8">
-          <h2 className="text-xl font-semibold text-gray-900 mb-4">
-            Your papers ({papers.length})
-          </h2>
-
-          {papers.length === 0 ? (
-            <div className="bg-white rounded-lg border border-gray-200 p-8 text-center">
-              <p className="text-gray-600 mb-4">No papers assigned yet</p>
-              <p className="text-sm text-gray-500">
-                Ask your admin to assign papers or submit a request below.
-              </p>
-            </div>
-          ) : (
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              {papers.map((paper) => (
-                <Link
-                  key={paper.id}
-                  href={`/exam/${paper.paperId}`}
-                  className="bg-white rounded-lg border border-gray-200 p-6 hover:shadow-lg hover:border-blue-300 transition"
-                >
-                  <h3 className="text-lg font-semibold text-gray-900">
-                    {paper.paper_name}
-                  </h3>
-                  <p className="text-sm text-gray-600 mt-2">
-                    {paper.paper_description || 'Click to start practicing'}
-                  </p>
-                  <div className="mt-4 flex items-center text-blue-600">
-                    Start practicing →
-                  </div>
-                </Link>
-              ))}
-            </div>
-          )}
-        </div>
-
-        {/* Paper Requests Section */}
-        <div className="mb-8">
-          <div className="flex items-center justify-between mb-4">
-            <h2 className="text-xl font-semibold text-gray-900">
-              Paper requests {requests.length > 0 && <span className="text-sm text-orange-600">({requests.length})</span>}
-            </h2>
-            <button
-              onClick={() => setShowModal(true)}
-              className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 font-medium"
-            >
-              Request paper
-            </button>
-          </div>
-
-          {requests.length === 0 ? (
-            <div className="bg-white rounded-lg border border-gray-200 p-6 text-center">
-              <p className="text-gray-600">No pending requests</p>
-            </div>
-          ) : (
-            <div className="space-y-3">
-              {requests.map((req) => {
-                const isPending = req.status === 'pending';
-                const isApproved = req.status === 'approved';
-
-                return (
-                  <div
-                    key={req.id}
-                    className="bg-white rounded-lg border border-gray-200 p-4 flex items-center justify-between"
-                  >
-                    <div>
-                      <p className="font-medium text-gray-900">
-                        {req.paper_name}
-                      </p>
-                      <p className="text-sm text-gray-600">
-                        Requested {new Date(req.requestedAt).toLocaleDateString()}
-                      </p>
-                    </div>
-                    <div className="flex items-center gap-3">
-                      {isPending && (
-                        <span className="px-3 py-1 bg-yellow-100 text-yellow-800 rounded-full text-xs font-medium">
-                          Pending
-                        </span>
-                      )}
-                      {isApproved && (
-                        <span className="px-3 py-1 bg-green-100 text-green-800 rounded-full text-xs font-medium">
-                          Approved
-                        </span>
-                      )}
-                      {req.status === 'rejected' && (
-                        <span className="px-3 py-1 bg-red-100 text-red-800 rounded-full text-xs font-medium">
-                          Rejected
-                        </span>
-                      )}
-                    </div>
-                  </div>
-                );
-              })}
-            </div>
-          )}
-        </div>
-      </div>
-
-      {/* Request Paper Modal */}
-      {showModal && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-          <div className="bg-white rounded-lg shadow-lg max-w-md w-full mx-4">
-            <div className="px-6 py-4 border-b border-gray-200">
-              <h3 className="text-lg font-semibold text-gray-900">
-                Request a paper
-              </h3>
-            </div>
-
-            <div className="px-6 py-4">
-              {submitError && (
-                <div className="mb-4 p-3 bg-red-50 border border-red-200 rounded text-red-800 text-sm">
-                  {submitError}
-                </div>
-              )}
-
-              {submitSuccess && (
-                <div className="mb-4 p-3 bg-green-50 border border-green-200 rounded text-green-800 text-sm">
-                  {submitSuccess}
-                </div>
-              )}
-
-              <label className="block mb-4">
-                <span className="block text-sm font-medium text-gray-700 mb-2">
-                  Select paper
-                </span>
-                <select
-                  value={selectedPaperId}
-                  onChange={(e) => {
-                    setSelectedPaperId(e.target.value);
-                    setSubmitError('');
-                  }}
-                  disabled={submitting}
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent disabled:bg-gray-100"
-                >
-                  <option value="">-- Choose a paper --</option>
-                  {getRequestablesPapers().map((paper) => (
-                    <option key={paper.id} value={paper.id}>
-                      {paper.name}
-                    </option>
-                  ))}
-                </select>
-              </label>
-
-              {getRequestablesPapers().length === 0 && (
-                <p className="text-sm text-gray-600 mb-4 text-center">
-                  No more papers to request
+        {/* Your Papers Tab */}
+        {tab === 'your-papers' && (
+          <div>
+            {papers.length === 0 ? (
+              <div className="bg-white rounded-lg border border-gray-200 p-12 text-center">
+                <p className="text-gray-600 mb-4">No papers yet</p>
+                <p className="text-sm text-gray-500 mb-6">
+                  Browse available papers or wait for your admin to assign them
                 </p>
-              )}
-            </div>
-
-            <div className="px-6 py-4 border-t border-gray-200 flex gap-3">
-              <button
-                onClick={() => {
-                  setShowModal(false);
-                  setSubmitError('');
-                  setSubmitSuccess('');
-                  setSelectedPaperId('');
-                }}
-                disabled={submitting}
-                className="flex-1 px-4 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 font-medium disabled:opacity-50"
-              >
-                Cancel
-              </button>
-              <button
-                onClick={handleRequestPaper}
-                disabled={submitting || !selectedPaperId}
-                className="flex-1 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 font-medium disabled:bg-gray-300"
-              >
-                {submitting ? 'Submitting...' : 'Submit request'}
-              </button>
-            </div>
+                <button
+                  onClick={() => setTab('browse')}
+                  className="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 font-medium"
+                >
+                  Browse papers
+                </button>
+              </div>
+            ) : (
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                {papers.map((paper) => (
+                  <Link
+                    key={paper.id}
+                    href={`/exam/${paper.paperId}`}
+                    className="bg-white rounded-lg border border-gray-200 p-6 hover:shadow-lg hover:border-blue-300 transition"
+                  >
+                    <h3 className="text-lg font-semibold text-gray-900">
+                      {paper.paper_name}
+                    </h3>
+                    <p className="text-sm text-gray-600 mt-2 line-clamp-2">
+                      {paper.paper_description || 'Click to start practicing'}
+                    </p>
+                    <div className="mt-4 flex items-center text-blue-600 font-medium">
+                      Start practicing →
+                    </div>
+                  </Link>
+                ))}
+              </div>
+            )}
           </div>
-        </div>
-      )}
+        )}
+
+        {/* Browse Papers Tab */}
+        {tab === 'browse' && (
+          <div>
+            {allPapers.length === 0 ? (
+              <div className="bg-white rounded-lg border border-gray-200 p-12 text-center">
+                <p className="text-gray-600">No papers available</p>
+              </div>
+            ) : (
+              <div className="space-y-3">
+                {allPapers.map((paper) => {
+                  const status = getStatusForPaper(paper.id);
+                  const msg = submitMessages[paper.id];
+
+                  return (
+                    <div
+                      key={paper.id}
+                      className="bg-white rounded-lg border border-gray-200 p-6 flex items-center justify-between"
+                    >
+                      <div className="flex-1">
+                        <h3 className="text-lg font-semibold text-gray-900">
+                          {paper.name}
+                        </h3>
+                        <p className="text-sm text-gray-600 mt-1">
+                          {paper.description}
+                        </p>
+                        <div className="flex gap-4 mt-3 text-sm text-gray-500">
+                          {paper.totalQuestions && (
+                            <span>📝 {paper.totalQuestions} questions</span>
+                          )}
+                          {paper.totalTime && (
+                            <span>⏱️ {formatTime(paper.totalTime)}</span>
+                          )}
+                        </div>
+                      </div>
+
+                      <div className="ml-6 flex flex-col items-end gap-2">
+                        {status === 'owned' && (
+                          <Link
+                            href={`/exam/${paper.id}`}
+                            className="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 font-medium whitespace-nowrap"
+                          >
+                            Start →
+                          </Link>
+                        )}
+
+                        {status === 'available' && (
+                          <>
+                            <button
+                              onClick={() =>
+                                handleRequestPaper(paper.id, paper.name)
+                              }
+                              disabled={submitting === paper.id}
+                              className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 font-medium whitespace-nowrap disabled:bg-gray-300"
+                            >
+                              {submitting === paper.id ? 'Requesting...' : 'Request'}
+                            </button>
+                            {msg && (
+                              <p className="text-xs text-green-600 font-medium text-right">
+                                {msg}
+                              </p>
+                            )}
+                          </>
+                        )}
+
+                        {status === 'pending' && (
+                          <span className="px-3 py-2 bg-yellow-100 text-yellow-800 rounded-lg text-sm font-medium whitespace-nowrap">
+                            ⏳ Pending
+                          </span>
+                        )}
+
+                        {status === 'approved' && (
+                          <span className="px-3 py-2 bg-green-100 text-green-800 rounded-lg text-sm font-medium whitespace-nowrap">
+                            ✓ Approved
+                          </span>
+                        )}
+
+                        {status === 'rejected' && (
+                          <span className="px-3 py-2 bg-red-100 text-red-800 rounded-lg text-sm font-medium whitespace-nowrap">
+                            ✗ Rejected
+                          </span>
+                        )}
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            )}
+          </div>
+        )}
+      </div>
     </div>
   );
 }
