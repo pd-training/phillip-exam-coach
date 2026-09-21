@@ -48,8 +48,10 @@ model User {
   createdAt     DateTime  @default(now())
   updatedAt     DateTime  @updatedAt
 
-  accounts Account[]
-  sessions Session[]
+  accounts       Account[]
+  sessions       Session[]
+  studentPapers  StudentPaper[]
+  paperRequests  PaperRequest[]
 }
 
 // Papers & Questions
@@ -68,10 +70,12 @@ model Paper {
   createdAt        DateTime @default(now())
   updatedAt        DateTime @updatedAt
 
-  questions Question[]
-  examParts ExamPart[]
-  chapters  Chapter[]
-  attempts  ExamAttempt[]
+  questions      Question[]
+  examParts      ExamPart[]
+  chapters       Chapter[]
+  attempts       ExamAttempt[]
+  studentPapers  StudentPaper[]
+  paperRequests  PaperRequest[]
 
   @@index([isAvailable])
 }
@@ -136,6 +140,44 @@ model ExamAttempt {
   createdAt   DateTime @default(now())
 
   paper Paper @relation(fields: [paperId], references: [id], onDelete: Cascade)
+}
+
+// Student Paper Access
+model StudentPaper {
+  id         String   @id @default(cuid())
+  userId     String
+  paperId    String   @db.Uuid
+  status     String   @default("active") // active | requested | rejected
+  requestedAt DateTime?
+  approvedAt DateTime?
+  approvedBy String?
+  createdAt  DateTime @default(now())
+
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  paper  Paper  @relation(fields: [paperId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, paperId])
+  @@index([userId])
+  @@index([status])
+}
+
+// Paper Access Requests
+model PaperRequest {
+  id                String   @id @default(cuid())
+  userId            String
+  paperId           String   @db.Uuid
+  status            String   @default("pending") // pending | approved | rejected
+  rejectionReason   String?
+  requestedAt       DateTime @default(now())
+  reviewedAt        DateTime?
+  reviewedBy        String?
+  createdAt         DateTime @default(now())
+
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  paper  Paper  @relation(fields: [paperId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([status])
 }
 
 // Legacy models (placeholder)
