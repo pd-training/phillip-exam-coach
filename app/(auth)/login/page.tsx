@@ -220,11 +220,11 @@ export default function LoginPage() {
           textAlign: "center",
           marginTop: "20px",
         }}>
-          <Link href="/" style={{
+          <div style={{
             color: "#6b7280",
-            textDecoration: "none",
             fontSize: "14px",
             transition: "color 0.2s",
+            cursor: "pointer",
           }}
             onMouseEnter={(e) => {
               e.currentTarget.style.color = "#2563eb";
@@ -233,8 +233,13 @@ export default function LoginPage() {
               e.currentTarget.style.color = "#6b7280";
             }}
           >
-            ← Back to Home
-          </Link>
+            <Link href="/" style={{
+              color: "inherit",
+              textDecoration: "none",
+            }}>
+              ← Back to Home
+            </Link>
+          </div>
         </div>
       </div>
     </div>
