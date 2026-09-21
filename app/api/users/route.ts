@@ -30,7 +30,7 @@ export async function GET() {
 
 export async function POST(req: Request) {
   try {
-    const { name, email, password, role } = await req.json();
+    const { name, email, password, role, paperId } = await req.json();
 
     if (!name || !email || !password) {
       return Response.json(
@@ -65,11 +65,27 @@ export async function POST(req: Request) {
       RETURNING id, name, email, role, "createdAt"
     `;
 
+    const userId = result?.[0]?.id;
+
+    // If paperId provided, assign paper to student
+    if (paperId && userId) {
+      try {
+        await prisma.$queryRaw`
+          INSERT INTO "StudentPaper" (id, "userId", "paperId", status, "createdAt")
+          VALUES (gen_random_uuid(), ${userId}, ${paperId}, 'active', NOW())
+        `;
+      } catch (paperError) {
+        console.error("Error assigning paper:", paperError);
+        // Continue anyway - user is created
+      }
+    }
+
     await prisma.$disconnect();
 
     return Response.json({
       success: true,
       user: result?.[0] || null,
+      paperId: paperId || null,
     });
   } catch (error) {
     console.error("Error creating user:", error);

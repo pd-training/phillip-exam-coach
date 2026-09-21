@@ -1,8 +1,13 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
+
+interface Paper {
+  id: string;
+  title: string;
+}
 
 export default function SignupPage() {
   const router = useRouter();
@@ -12,8 +17,30 @@ export default function SignupPage() {
     password: "",
     confirmPassword: "",
   });
+  const [selectedPaper, setSelectedPaper] = useState("");
+  const [papers, setPapers] = useState<Paper[]>([]);
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
+
+  // Fetch papers on mount
+  useEffect(() => {
+    const fetchPapers = async () => {
+      try {
+        const res = await fetch("/api/papers");
+        if (res.ok) {
+          const data = await res.json();
+          setPapers(data.papers || []);
+          // Auto-select first paper
+          if (data.papers?.length > 0) {
+            setSelectedPaper(data.papers[0].id);
+          }
+        }
+      } catch (error) {
+        console.error("Failed to fetch papers:", error);
+      }
+    };
+    fetchPapers();
+  }, []);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
@@ -56,6 +83,12 @@ export default function SignupPage() {
       return;
     }
 
+    if (!selectedPaper) {
+      setError("Please select a paper");
+      setLoading(false);
+      return;
+    }
+
     try {
       const res = await fetch("/api/users", {
         method: "POST",
@@ -65,6 +98,7 @@ export default function SignupPage() {
           email: formData.email,
           password: formData.password,
           role: "STUDENT",
+          paperId: selectedPaper,
         }),
       });
 
@@ -353,6 +387,49 @@ export default function SignupPage() {
                     e.currentTarget.style.outline = "none";
                   }}
                 />
+              </div>
+
+              {/* Paper Selection */}
+              <div style={{ marginBottom: "24px" }}>
+                <label style={{
+                  display: "block",
+                  marginBottom: "8px",
+                  fontSize: "14px",
+                  fontWeight: "600",
+                  color: "#1f2937",
+                }}>
+                  Select Exam Paper
+                </label>
+                <select
+                  value={selectedPaper}
+                  onChange={(e) => setSelectedPaper(e.target.value)}
+                  style={{
+                    width: "100%",
+                    padding: "11px 13px",
+                    border: "1px solid #d1d5db",
+                    borderRadius: "8px",
+                    fontSize: "14px",
+                    fontFamily: "inherit",
+                    boxSizing: "border-box",
+                    transition: "border-color 0.2s",
+                    cursor: "pointer",
+                  }}
+                  onFocus={(e) => {
+                    e.currentTarget.style.borderColor = "#3b82f6";
+                    e.currentTarget.style.outline = "2px solid rgba(59, 130, 246, 0.1)";
+                  }}
+                  onBlur={(e) => {
+                    e.currentTarget.style.borderColor = "#d1d5db";
+                    e.currentTarget.style.outline = "none";
+                  }}
+                >
+                  <option value="">-- Select a paper --</option>
+                  {papers.map((paper) => (
+                    <option key={paper.id} value={paper.id}>
+                      {paper.title}
+                    </option>
+                  ))}
+                </select>
               </div>
 
               {/* Submit Button */}
