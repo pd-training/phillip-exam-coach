@@ -95,7 +95,7 @@ export default function UserDetailPage() {
 
   const handleLogout = async () => {
     await signOut({ redirect: false });
-    window.location.href = `${window.location.origin}/login`;
+    window.location.href = '/login';
   };
 
   const formatTime = (minutes: number | null) => {

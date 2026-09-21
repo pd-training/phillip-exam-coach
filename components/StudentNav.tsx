@@ -16,8 +16,8 @@ export default function StudentNav() {
   ];
 
   const handleLogout = async () => {
-    const loginUrl = `${typeof window !== 'undefined' ? window.location.origin : ''}/login`;
-    await signOut({ redirect: true, callbackUrl: loginUrl });
+    await signOut({ redirect: false });
+    window.location.href = '/login';
   };
 
   return (

@@ -27,10 +27,10 @@ export default function QuestionBank() {
   const handleLogout = async () => {
     try {
       await signOut({ redirect: false });
-      window.location.href = `${window.location.origin}/login`;
+      window.location.href = '/login';
     } catch (error) {
       console.error("Logout error:", error);
-      window.location.href = `${window.location.origin}/login`;
+      window.location.href = '/login';
     }
   };
 
