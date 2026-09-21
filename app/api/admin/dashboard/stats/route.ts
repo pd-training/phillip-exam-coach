@@ -20,20 +20,20 @@ export async function GET(request: Request) {
 
     // Active users
     const activeUsersResult = await prisma.$queryRaw`
-      SELECT COUNT(DISTINCT "userId") as count FROM "ExamAttempt"
+      SELECT COUNT(DISTINCT "userId") as count FROM examattempt
     ` as any[];
     const activeUsers = Number(activeUsersResult[0]?.count) || 0;
 
     // Attempts today
     const todayAttemptsResult = await prisma.$queryRaw`
-      SELECT COUNT(*) as count FROM "ExamAttempt"
+      SELECT COUNT(*) as count FROM examattempt
       WHERE DATE("submittedAt") = CURRENT_DATE
     ` as any[];
     const attemptsToday = Number(todayAttemptsResult[0]?.count) || 0;
 
     // Average score
     const avgScoreResult = await prisma.$queryRaw`
-      SELECT AVG("score") as avg FROM "ExamAttempt"
+      SELECT AVG("score") as avg FROM examattempt
       WHERE "score" IS NOT NULL
     ` as any[];
     const avgScore = avgScoreResult[0]?.avg ? parseFloat(avgScoreResult[0].avg).toFixed(1) : "0";
@@ -43,7 +43,7 @@ export async function GET(request: Request) {
       SELECT 
         COUNT(*) as total,
         SUM(CASE WHEN "score" >= 50 THEN 1 ELSE 0 END) as passed
-      FROM "ExamAttempt"
+      FROM examattempt
       WHERE "score" IS NOT NULL
     ` as any[];
     

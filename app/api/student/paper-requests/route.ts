@@ -17,13 +17,13 @@ export async function GET(request: Request) {
     // Get all requests for this student
     const requests = await prisma.$queryRaw`
       SELECT 
-        pr."id",
+        pr.id,
         pr."paperId",
-        pr."status",
+        pr.status,
         pr."requestedAt",
-        p."title" as paper_name
-      FROM "PaperRequest" pr
-      JOIN "Paper" p ON pr."paperId" = p."id"
+        p.title as paper_name
+      FROM paperrequest pr
+      JOIN paper p ON pr."paperId" = p.id
       WHERE pr."userId" = ${userId}
       ORDER BY pr."requestedAt" DESC
     ` as any[];

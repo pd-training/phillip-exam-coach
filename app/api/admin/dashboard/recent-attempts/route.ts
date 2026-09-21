@@ -14,16 +14,16 @@ export async function GET(request: Request) {
 
     const attempts = await prisma.$queryRaw`
       SELECT 
-        ea."id",
+        ea.id,
         ea."userId",
         ea."paperId",
-        ea."score",
+        ea.score,
         ea."submittedAt",
-        u."name" as student_name,
-        p."title" as paper_name
-      FROM "ExamAttempt" ea
-      JOIN "User" u ON ea."userId" = u."id"
-      JOIN "Paper" p ON ea."paperId" = p."id"
+        u.name as student_name,
+        p.title as paper_name
+      FROM examattempt ea
+      JOIN "user" u ON ea."userId" = u.id
+      JOIN paper p ON ea."paperId" = p.id
       ORDER BY ea."submittedAt" DESC
       LIMIT 10
     ` as any[];

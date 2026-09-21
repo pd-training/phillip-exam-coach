@@ -21,15 +21,15 @@ export async function GET(request: NextRequest) {
     // Get student's papers
     const studentPapers = await prisma.$queryRaw`
       SELECT
-        sp."id",
+        sp.id,
         sp."paperId",
-        p."title" as paper_name,
-        sp."status"
+        p.title as paper_name,
+        sp.status
       FROM "StudentPaper" sp
-      JOIN "Paper" p ON p."id" = sp."paperId"
+      JOIN paper p ON p.id = sp."paperId"
       WHERE sp."userId" = ${userId}
-      AND sp."status" = 'active'
-      ORDER BY p."title" ASC
+      AND sp.status = 'active'
+      ORDER BY p.title ASC
     ` as any[];
 
     return NextResponse.json({

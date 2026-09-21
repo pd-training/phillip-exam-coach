@@ -7,11 +7,11 @@ export async function GET(request: Request) {
     // Get all papers
     const papers = await prisma.$queryRaw`
       SELECT 
-        "id",
-        "title",
-        "totalTime"
-      FROM "Paper"
-      ORDER BY "title" ASC
+        id,
+        title,
+        "durationMinutes" as totalTime
+      FROM paper
+      ORDER BY title ASC
     ` as any[];
 
     return Response.json({ papers: papers || [] });
