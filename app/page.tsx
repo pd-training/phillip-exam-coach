@@ -140,15 +140,12 @@ export default function LandingPage() {
       {/* CTA Section */}
       <section className="py-20 bg-gradient-to-r from-blue-700 to-indigo-700">
         <div className="max-w-7xl mx-auto px-4 text-center">
-          <h2 className="text-4xl font-bold text-white mb-4">
+          <h2 className="text-4xl font-bold text-white mb-8">
             Ready to ace your CMFAS exam?
           </h2>
-          <p className="text-xl text-blue-100 mb-8">
-            Join hundreds of PhillipCapital advisors preparing with Phillip Exam Coach
-          </p>
           <Link href="/signup">
             <button className="px-8 py-4 rounded-lg font-bold bg-white text-blue-700 hover:bg-slate-50 text-lg">
-              Create Free Account
+              Get Your AI Coach
             </button>
           </Link>
         </div>
