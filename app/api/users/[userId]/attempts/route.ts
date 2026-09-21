@@ -27,19 +27,20 @@ export async function GET(request: Request, { params }: { params: { userId: stri
           },
         },
       },
-      orderBy: { createdAt: "desc" },
     });
 
-    const attempts = rawAttempts.map((a) => ({
-      id: a.id,
-      paperId: a.paperId,
-      paperTitle: a.paper.title,
-      status: a.status,
-      overallScore: a.overallScore,
-      passed: a.passed,
-      submittedAt: a.submittedAt,
-      createdAt: a.createdAt,
-    }));
+    const attempts = rawAttempts
+      .map((a) => ({
+        id: a.id,
+        paperId: a.paperId,
+        paperTitle: a.paper.title,
+        status: a.status,
+        overallScore: a.overallScore,
+        passed: a.passed,
+        submittedAt: a.submittedAt,
+        createdAt: a.createdAt,
+      }))
+      .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
 
     return Response.json({ attempts });
   } catch (error) {
