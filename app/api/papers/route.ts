@@ -1,19 +1,14 @@
 export const dynamic = "force-dynamic";
 
-const dbUrl = process.env.DATABASE_URL || "postgresql://postgres:MyPassword2026!@phillip-exam-coach-db.c7cmo2c6ecz8.ap-southeast-1.rds.amazonaws.com:5432/phillip_exam_coach";
+import prisma from "@/lib/prisma";
 
 export async function GET() {
   try {
-    const { PrismaClient } = require("@prisma/client");
-    const prisma = new PrismaClient({ datasources: { db: { url: dbUrl } } });
-
     const papers = await prisma.$queryRaw`
       SELECT id, title, "durationMinutes", "totalQuestions", "isAvailable", "createdAt"
       FROM "Paper"
       ORDER BY "createdAt" DESC
     `;
-
-    await prisma.$disconnect();
 
     return Response.json({
       success: true,
@@ -39,17 +34,12 @@ export async function POST(req: Request) {
       );
     }
 
-    const { PrismaClient } = require("@prisma/client");
-    const prisma = new PrismaClient({ datasources: { db: { url: dbUrl } } });
-
     // Use raw SQL to bypass Prisma enum validation
     const result = await prisma.$queryRaw`
       INSERT INTO "Paper" (id, title, "durationMinutes", "totalQuestions", "createdAt", "updatedAt")
       VALUES (gen_random_uuid(), ${title}, ${durationMinutes || 180}, ${totalQuestions || 150}, NOW(), NOW())
       RETURNING id, title, "durationMinutes", "totalQuestions", "isAvailable", "createdAt"
     `;
-
-    await prisma.$disconnect();
 
     return Response.json({
       success: true,

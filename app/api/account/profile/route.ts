@@ -1,9 +1,8 @@
 import { getServerSession } from "next-auth/next";
 import { authOptions } from "@/lib/auth-config";
-import { PrismaClient } from "@prisma/client";
+import prisma from "@/lib/prisma";
 
-const dbUrl = process.env.DATABASE_URL || "postgresql://postgres:MyPassword2026!@phillip-exam-coach-db.c7cmo2c6ecz8.ap-southeast-1.rds.amazonaws.com:5432/phillip_exam_coach";
-const prisma = new PrismaClient({ datasources: { db: { url: dbUrl } } });
+export const dynamic = 'force-dynamic';
 
 export async function PUT(req: Request) {
   try {
