@@ -12,7 +12,7 @@ export async function GET(
 
     // Get paper config
     const paperResult = await prisma.$queryRaw`
-      SELECT "totalTime", "passingScore" FROM "Paper" WHERE id = ${paperId}::uuid
+      SELECT "totalTime", "passingScore" FROM "Paper" WHERE id = ${paperId}
     ` as any[];
 
     if (!paperResult || paperResult.length === 0) {
@@ -32,7 +32,7 @@ export async function GET(
         ep."passingScore", 
         ep."orderIndex"
       FROM "ExamPart" ep
-      WHERE ep."paperId" = ${paperId}::uuid
+      WHERE ep."paperId" = ${paperId}
       ORDER BY ep."orderIndex" ASC
     ` as any[];
 
@@ -45,7 +45,7 @@ export async function GET(
         "correctAnswer", 
         explanation
       FROM "Question"
-      WHERE "paperId" = ${paperId}::uuid
+      WHERE "paperId" = ${paperId}
       ORDER BY "chapterNumber" ASC, id ASC
     ` as any[];
 
@@ -97,7 +97,7 @@ export async function POST(
     // Get all correct answers
     const questionsResult = await prisma.$queryRaw`
       SELECT id, "correctAnswer" FROM "Question"
-      WHERE "paperId" = ${paperId}::uuid
+      WHERE "paperId" = ${paperId}
     ` as any[];
 
     // Calculate score
@@ -122,7 +122,7 @@ export async function POST(
 
     // Get passing score requirement
     const paperResult = await prisma.$queryRaw`
-      SELECT "passingScore" FROM "Paper" WHERE id = ${paperId}::uuid
+      SELECT "passingScore" FROM "Paper" WHERE id = ${paperId}
     ` as any[];
 
     const passingScore = paperResult[0]?.passingScore || 75;
@@ -133,7 +133,7 @@ export async function POST(
       INSERT INTO examattempt (id, paperid, userid, startedat, submittedat, score, passed, createdat)
       VALUES (
         gen_random_uuid(),
-        ${paperId}::uuid,
+        ${paperId},
         ${userId},
         NOW(),
         NOW(),

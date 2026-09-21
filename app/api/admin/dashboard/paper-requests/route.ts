@@ -57,7 +57,7 @@ export async function PUT(request: Request) {
       // Get the request details
       const reqResult = await prisma.$queryRaw`
         SELECT "userId", "paperId" FROM "PaperRequest"
-        WHERE id = ${requestId}::uuid
+        WHERE id = ${requestId}
       ` as any[];
 
       if (reqResult.length === 0) {
@@ -68,7 +68,7 @@ export async function PUT(request: Request) {
       await prisma.$queryRaw`
         UPDATE "PaperRequest"
         SET status = 'approved', "reviewedAt" = NOW()
-        WHERE id = ${requestId}::uuid
+        WHERE id = ${requestId}
       `;
 
       return Response.json({ success: true, message: "Request approved" });
@@ -77,7 +77,7 @@ export async function PUT(request: Request) {
       await prisma.$queryRaw`
         UPDATE "PaperRequest"
         SET status = 'rejected', "respondedAt" = NOW()
-        WHERE id = ${requestId}::uuid
+        WHERE id = ${requestId}
       `;
 
       return Response.json({ success: true, message: "Request rejected" });
