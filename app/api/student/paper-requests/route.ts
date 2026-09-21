@@ -71,9 +71,10 @@ export async function POST(request: Request) {
     let existingApprovedRequest;
     try {
       existingApprovedRequest = await prisma.$queryRaw`
-        SELECT "id" FROM "PaperRequest"
-        WHERE "userId" = ${userId} AND "paperId" = ${paperId}::uuid
-        AND "status" = 'approved'
+        SELECT id FROM "PaperRequest"
+        WHERE "userId" = ${userId}
+        AND "paperId" = ${paperId}
+        AND status = 'approved'
       ` as any[];
     } catch (e) {
       console.error("Error checking approved request:", e);
@@ -91,9 +92,10 @@ export async function POST(request: Request) {
     let existingRequest;
     try {
       existingRequest = await prisma.$queryRaw`
-        SELECT "id", "status" FROM "PaperRequest"
-        WHERE "userId" = ${userId} AND "paperId" = ${paperId}::uuid
-        AND "status" IN ('pending', 'approved')
+        SELECT id, status FROM "PaperRequest"
+        WHERE "userId" = ${userId}
+        AND "paperId" = ${paperId}
+        AND status IN ('pending', 'approved')
       ` as any[];
     } catch (e) {
       console.error("Error checking existing request:", e);
@@ -113,9 +115,9 @@ export async function POST(request: Request) {
 
     // Create new paper request
     const result = await prisma.$queryRaw`
-      INSERT INTO "PaperRequest" ("userId", "paperId", "status", "requestedAt")
-      VALUES (${userId}, ${paperId}::uuid, 'pending', NOW())
-      RETURNING "id", "paperId", "status", "requestedAt"
+      INSERT INTO "PaperRequest" ("userId", "paperId", status, "requestedAt")
+      VALUES (${userId}, ${paperId}, 'pending', NOW())
+      RETURNING id, "paperId", status, "requestedAt"
     ` as any[];
 
     return Response.json({
