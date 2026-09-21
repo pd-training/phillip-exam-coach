@@ -50,6 +50,7 @@ export default function PapersManagement() {
   const [chapters, setChapters] = useState<Chapter[]>([]);
   const [examFormats, setExamFormats] = useState<Record<string, ExamFormat>>({});
   const [loading, setLoading] = useState(true);
+  const [togglingId, setTogglingId] = useState<string | null>(null);
   
   const [activeTab, setActiveTab] = useState<ActiveTab>("availability");
   const [activeModal, setActiveModal] = useState<ActiveModal>(null);
@@ -156,6 +157,7 @@ export default function PapersManagement() {
   };
 
   const togglePaperAvailability = async (paperId: string, currentStatus: boolean) => {
+    setTogglingId(paperId);
     try {
       const res = await fetch(`/api/papers/${paperId}`, {
         method: "PATCH",
@@ -164,10 +166,15 @@ export default function PapersManagement() {
       });
 
       if (res.ok) {
+        const data = await res.json();
         setPapers(papers.map(p => p.id === paperId ? { ...p, isAvailable: !currentStatus } : p));
+      } else {
+        console.error("Failed to toggle:", res.statusText);
       }
     } catch (error) {
       console.error("Failed to toggle availability:", error);
+    } finally {
+      setTogglingId(null);
     }
   };
 
@@ -329,18 +336,20 @@ export default function PapersManagement() {
                       </span>
                       <button
                         onClick={() => togglePaperAvailability(paper.id, paper.isAvailable)}
+                        disabled={togglingId === paper.id}
                         style={{
                           padding: "6px 16px",
-                          backgroundColor: paper.isAvailable ? "#fee2e2" : "#d1fae5",
-                          color: paper.isAvailable ? "#991b1b" : "#065f46",
-                          border: `1px solid ${paper.isAvailable ? "#fca5a5" : "#86efac"}`,
+                          backgroundColor: togglingId === paper.id ? "#d1d5db" : (paper.isAvailable ? "#fee2e2" : "#d1fae5"),
+                          color: togglingId === paper.id ? "#6b7280" : (paper.isAvailable ? "#991b1b" : "#065f46"),
+                          border: `1px solid ${togglingId === paper.id ? "#9ca3af" : (paper.isAvailable ? "#fca5a5" : "#86efac")}`,
                           borderRadius: "6px",
                           fontSize: "12px",
                           fontWeight: "600",
-                          cursor: "pointer",
+                          cursor: togglingId === paper.id ? "not-allowed" : "pointer",
+                          opacity: togglingId === paper.id ? 0.6 : 1,
                         }}
                       >
-                        {paper.isAvailable ? "Turn off" : "Turn on"}
+                        {togglingId === paper.id ? "Updating..." : (paper.isAvailable ? "Turn off" : "Turn on")}
                       </button>
                     </div>
                   </div>
