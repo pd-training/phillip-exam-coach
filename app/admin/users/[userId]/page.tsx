@@ -157,17 +157,15 @@ export default function UserDetailPage() {
         <button
           onClick={handleLogout}
           style={{
-            padding: "8px 16px",
-            backgroundColor: "#ef4444",
-            color: "white",
+            backgroundColor: "transparent",
+            color: "#2563eb",
             border: "none",
-            borderRadius: "6px",
+            cursor: "pointer",
             fontSize: "14px",
             fontWeight: "500",
-            cursor: "pointer",
           }}
         >
-          🚪 Logout
+          🚪 Log out
         </button>
       </div>
 
