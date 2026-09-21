@@ -36,7 +36,7 @@ interface ExamPart {
 }
 
 type ActiveTab = "availability" | "questions" | "format";
-type ActiveModal = null | "uploadQuestions" | "viewQuestions" | "editQuestion" | "configureFormat";
+type ActiveModal = null | "uploadQuestions" | "viewQuestions" | "editQuestion" | "configureFormat" | "createPaper";
 
 export default function PapersManagement() {
   const router = useRouter();
@@ -76,6 +76,11 @@ export default function PapersManagement() {
     questionCount: 110,
     passingScore: 75,
   });
+
+  // Create paper form
+  const [newPaperTitle, setNewPaperTitle] = useState("");
+  const [newPaperDuration, setNewPaperDuration] = useState("120");
+  const [newPaperQuestions, setNewPaperQuestions] = useState("50");
 
   // Auth check
   useEffect(() => {
@@ -294,6 +299,41 @@ export default function PapersManagement() {
     setParts(parts.filter((_, i) => i !== index));
   };
 
+  // Create paper
+  const handleCreatePaper = async () => {
+    if (!newPaperTitle.trim()) {
+      alert("Paper title is required");
+      return;
+    }
+
+    setSubmitting(true);
+    try {
+      const res = await fetch("/api/papers", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          title: newPaperTitle,
+          durationMinutes: parseInt(newPaperDuration),
+          totalQuestions: parseInt(newPaperQuestions),
+        }),
+      });
+
+      if (res.ok) {
+        await fetchPapers();
+        setActiveModal(null);
+        setNewPaperTitle("");
+        setNewPaperDuration("120");
+        setNewPaperQuestions("50");
+        alert("Paper created successfully!");
+      }
+    } catch (error) {
+      console.error("Create paper error:", error);
+      alert("Failed to create paper");
+    } finally {
+      setSubmitting(false);
+    }
+  };
+
   // Logout
   const handleLogout = async () => {
     try {
@@ -384,7 +424,24 @@ export default function PapersManagement() {
         {/* TAB 1: Paper Availability */}
         {activeTab === "availability" && (
           <div style={{ backgroundColor: "white", padding: "24px", borderRadius: "12px", border: "1px solid #e5e7eb" }}>
-            <h3 style={{ marginTop: "0", marginBottom: "20px" }}>Paper Availability</h3>
+            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "20px" }}>
+              <h3 style={{ margin: "0" }}>Paper Availability</h3>
+              <button
+                onClick={() => setActiveModal("createPaper")}
+                style={{
+                  padding: "8px 16px",
+                  backgroundColor: "#3b82f6",
+                  color: "white",
+                  border: "none",
+                  borderRadius: "6px",
+                  fontSize: "13px",
+                  fontWeight: "600",
+                  cursor: "pointer",
+                }}
+              >
+                ➕ Create New Paper
+              </button>
+            </div>
             <p style={{ color: "#666", marginBottom: "20px", fontSize: "14px" }}>
               Toggle papers on/off to control student access. Existing exam attempts are not affected.
             </p>
@@ -799,6 +856,86 @@ export default function PapersManagement() {
               }}
             >
               {submitting ? "Saving..." : "Save"}
+            </button>
+          </div>
+        </Modal>
+      )}
+
+      {/* MODAL: Create Paper */}
+      {activeModal === "createPaper" && (
+        <Modal onClose={() => { setActiveModal(null); setNewPaperTitle(""); setNewPaperDuration("120"); setNewPaperQuestions("50"); }}>
+          <h2 style={{ marginTop: "0" }}>Create New Paper</h2>
+
+          <div style={{ marginBottom: "16px" }}>
+            <label style={{ display: "block", fontSize: "14px", fontWeight: "500", marginBottom: "6px" }}>
+              Paper Title *
+            </label>
+            <input
+              type="text"
+              value={newPaperTitle}
+              onChange={(e) => setNewPaperTitle(e.target.value)}
+              placeholder="e.g., RES5, CM-LIP, HI, CM-SIP"
+              style={{ width: "100%", padding: "10px", border: "1px solid #d1d5db", borderRadius: "6px", fontSize: "14px", boxSizing: "border-box" }}
+            />
+          </div>
+
+          <div style={{ marginBottom: "16px" }}>
+            <label style={{ display: "block", fontSize: "14px", fontWeight: "500", marginBottom: "6px" }}>
+              Duration (minutes) *
+            </label>
+            <input
+              type="number"
+              value={newPaperDuration}
+              onChange={(e) => setNewPaperDuration(e.target.value)}
+              min="30"
+              style={{ width: "100%", padding: "10px", border: "1px solid #d1d5db", borderRadius: "6px", fontSize: "14px", boxSizing: "border-box" }}
+            />
+          </div>
+
+          <div style={{ marginBottom: "16px" }}>
+            <label style={{ display: "block", fontSize: "14px", fontWeight: "500", marginBottom: "6px" }}>
+              Total Questions (estimate) *
+            </label>
+            <input
+              type="number"
+              value={newPaperQuestions}
+              onChange={(e) => setNewPaperQuestions(e.target.value)}
+              min="1"
+              style={{ width: "100%", padding: "10px", border: "1px solid #d1d5db", borderRadius: "6px", fontSize: "14px", boxSizing: "border-box" }}
+            />
+          </div>
+
+          <div style={{ display: "flex", gap: "12px", justifyContent: "flex-end" }}>
+            <button
+              onClick={() => { setActiveModal(null); setNewPaperTitle(""); setNewPaperDuration("120"); setNewPaperQuestions("50"); }}
+              style={{
+                padding: "10px 20px",
+                backgroundColor: "#e5e7eb",
+                color: "#1f2937",
+                border: "none",
+                borderRadius: "6px",
+                fontSize: "14px",
+                fontWeight: "600",
+                cursor: "pointer",
+              }}
+            >
+              Cancel
+            </button>
+            <button
+              onClick={handleCreatePaper}
+              disabled={submitting || !newPaperTitle.trim()}
+              style={{
+                padding: "10px 24px",
+                backgroundColor: submitting || !newPaperTitle.trim() ? "#9ca3af" : "#3b82f6",
+                color: "white",
+                border: "none",
+                borderRadius: "6px",
+                fontSize: "14px",
+                fontWeight: "600",
+                cursor: submitting || !newPaperTitle.trim() ? "not-allowed" : "pointer",
+              }}
+            >
+              {submitting ? "Creating..." : "Create Paper"}
             </button>
           </div>
         </Modal>

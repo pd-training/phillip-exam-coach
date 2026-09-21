@@ -10,291 +10,24 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-enum Role {
-  STUDENT
-  ADMIN
-}
-
-enum AssignmentStatus {
-  PENDING
-  APPROVED
-  REJECTED
-}
-
-enum AttemptStatus {
-  IN_PROGRESS
-  SUBMITTED
-  AUTO_SUBMITTED
-  ABANDONED
-}
-
-enum Difficulty {
-  EASY
-  MEDIUM
-  HARD
-}
-
-enum AnswerOption {
-  A
-  B
-  C
-  D
-}
-
-model User {
-  id                   String    @id @default(cuid())
-  name                 String?
-  email                String    @unique
-  password             String?
-  role                 Role
-  active               Boolean   @default(false)
-  approvedAt           DateTime?
-  pdpaConsent          Boolean   @default(false)
-  pdpaConsentAt        DateTime?
-  createdAt            DateTime  @default(now())
-  updatedAt            DateTime  @updatedAt
-
-  assignments          Assignment[]
-  attempts             Attempt[]
-  sessions             Session[]
-  accounts             Account[]
-  passwordResetTokens  PasswordResetToken[]
-
-  @@index([email])
-}
-
-model Module {
-  id          String   @id @default(cuid())
-  code        String   @unique
-  name        String
-  description String?
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
-
-  topics      Topic[]
-  papers      Paper[]
-
-  @@index([code])
-}
-
-model Topic {
-  id        String   @id @default(cuid())
-  moduleId  String
-  code      Int
-  name      String
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-
-  module    Module   @relation(fields: [moduleId], references: [id], onDelete: Cascade)
-  questions Question[]
-
-  @@unique([moduleId, code])
-  @@index([moduleId])
-}
-
-model Paper {
-  id               String   @id @default(cuid())
-  moduleId         String
-  title            String
-  durationMinutes  Int
-  totalQuestions   Int
-  passThresholdPct Int      @default(75)
-  createdAt        DateTime @default(now())
-  updatedAt        DateTime @updatedAt
-
-  module           Module   @relation(fields: [moduleId], references: [id], onDelete: Cascade)
-  sections         PaperSection[]
-  questions        Question[]
-  assignments      Assignment[]
-  attempts         Attempt[]
-
-  @@index([moduleId])
-}
-
-model PaperSection {
-  id               String   @id @default(cuid())
-  paperId          String
-  name             String
-  order            Int
-  questionCount    Int
-  passThresholdPct Int      @default(75)
-  createdAt        DateTime @default(now())
-  updatedAt        DateTime @updatedAt
-
-  paper     Paper      @relation(fields: [paperId], references: [id], onDelete: Cascade)
-  questions Question[]
-  scores    AttemptSectionScore[]
-
-  @@index([paperId])
-}
-
-model Question {
-  id               String   @id @default(cuid())
-  paperId          String
-  sectionId        String
-  topicId          String
-  questionText     String
-  optionA          String
-  optionB          String
-  optionC          String
-  optionD          String
-  correctAnswer    AnswerOption
-  explanation      String?
-  difficulty       Difficulty @default(MEDIUM)
-  orderInPaper     Int
-  createdAt        DateTime @default(now())
-  updatedAt        DateTime @updatedAt
-
-  paper    Paper          @relation(fields: [paperId], references: [id], onDelete: Cascade)
-  section  PaperSection   @relation(fields: [sectionId], references: [id], onDelete: Cascade)
-  topic    Topic          @relation(fields: [topicId], references: [id])
-  answers  AttemptAnswer[]
-
-  @@index([paperId])
-  @@index([sectionId])
-  @@index([topicId])
-}
-
-model Assignment {
-  id        String            @id @default(cuid())
-  paperId   String
-  userId    String
-  status    AssignmentStatus  @default(PENDING)
-  createdAt DateTime          @default(now())
-  updatedAt DateTime          @updatedAt
-
-  paper Paper @relation(fields: [paperId], references: [id], onDelete: Cascade)
-  user  User  @relation(fields: [userId], references: [id], onDelete: Cascade)
-
-  @@unique([paperId, userId])
-  @@index([paperId])
-  @@index([userId])
-}
-
-model Attempt {
-  id                    String         @id @default(cuid())
-  paperId               String
-  userId                String
-  status                AttemptStatus  @default(IN_PROGRESS)
-  startTime             DateTime       @default(now())
-  submittedAt           DateTime?
-  overallScore          Float?
-  passed                Boolean?
-  serverDeadline        DateTime?
-  questionIds           String[]
-  pausedRemainingSeconds Int?
-  createdAt             DateTime       @default(now())
-  updatedAt             DateTime       @updatedAt
-
-  paper              Paper                  @relation(fields: [paperId], references: [id], onDelete: Cascade)
-  user               User                   @relation(fields: [userId], references: [id], onDelete: Cascade)
-  answers            AttemptAnswer[]
-  sectionScores      AttemptSectionScore[]
-  auditLog           AuditLog[]
-
-  @@index([paperId])
-  @@index([userId])
-  @@index([status])
-}
-
-model AttemptAnswer {
-  id         String   @id @default(cuid())
-  attemptId  String
-  questionId String
-  selectedOption AnswerOption?
-  isCorrect  Boolean?
-  createdAt  DateTime @default(now())
-  updatedAt  DateTime @updatedAt
-
-  attempt  Attempt  @relation(fields: [attemptId], references: [id], onDelete: Cascade)
-  question Question @relation(fields: [questionId], references: [id], onDelete: Cascade)
-
-  @@index([attemptId])
-  @@index([questionId])
-}
-
-model AttemptSectionScore {
-  id        String   @id @default(cuid())
-  attemptId String
-  sectionId String
-  score     Float
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-
-  attempt Attempt       @relation(fields: [attemptId], references: [id], onDelete: Cascade)
-  section PaperSection  @relation(fields: [sectionId], references: [id], onDelete: Cascade)
-
-  @@index([attemptId])
-  @@index([sectionId])
-}
-
-model AuditLog {
-  id        String   @id @default(cuid())
-  attemptId String
-  action    String
-  details   String?
-  createdAt DateTime @default(now())
-
-  attempt Attempt @relation(fields: [attemptId], references: [id], onDelete: Cascade)
-
-  @@index([attemptId])
-}
-
-model PracticeSession {
-  id        String   @id @default(cuid())
-  userId    String
-  topicId   String?
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-
-  answers PracticeAnswer[]
-
-  @@index([userId])
-}
-
-model PracticeAnswer {
-  id              String   @id @default(cuid())
-  sessionId       String
-  questionId      String?
-  selectedOption  AnswerOption?
-  createdAt       DateTime @default(now())
-
-  session PracticeSession @relation(fields: [sessionId], references: [id], onDelete: Cascade)
-
-  @@index([sessionId])
-}
-
-model PasswordResetToken {
-  id        String   @id @default(cuid())
-  userId    String
-  token     String   @unique
-  expiresAt DateTime
-  createdAt DateTime @default(now())
-
-  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
-
-  @@index([userId])
-  @@index([token])
-}
-
+// Auth models
 model Account {
   id                 String  @id @default(cuid())
   userId             String
   type               String
   provider           String
   providerAccountId  String
-  refresh_token      String?
-  access_token       String?
+  refresh_token      String?  @db.Text
+  access_token       String?  @db.Text
   expires_at         Int?
   token_type         String?
   scope              String?
-  id_token           String?
+  id_token           String?  @db.Text
   session_state      String?
 
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@unique([provider, providerAccountId])
-  @@index([userId])
 }
 
 model Session {
@@ -302,17 +35,112 @@ model Session {
   sessionToken String   @unique
   userId       String
   expires      DateTime
-  createdAt    DateTime @default(now())
-
-  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
-
-  @@index([userId])
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 }
 
-model VerificationToken {
-  identifier String
-  token      String   @unique
-  expires    DateTime
+model User {
+  id            String    @id @default(cuid())
+  name          String?
+  email         String?   @unique
+  emailVerified DateTime?
+  password      String?
+  role          String    @default("STUDENT") // ADMIN | STUDENT
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
 
-  @@unique([identifier, token])
+  accounts Account[]
+  sessions Session[]
+}
+
+// Papers & Questions
+model Paper {
+  id               String   @id @default(uuid()) @db.Uuid
+  title            String
+  durationMinutes  Int
+  totalQuestions   Int      @default(0)
+  isAvailable      Boolean  @default(false)
+  passingScore     Int      @default(75)
+  timeWarning      Int      @default(5)
+  showAnswerReview Boolean  @default(true)
+  allowRetakes     Boolean  @default(false)
+  retakeLimit      Int      @default(0)
+  totalTime        Int      @default(120)
+  createdAt        DateTime @default(now())
+  updatedAt        DateTime @updatedAt
+
+  questions Question[]
+  examParts ExamPart[]
+  chapters  Chapter[]
+  attempts  ExamAttempt[]
+
+  @@index([isAvailable])
+}
+
+model Chapter {
+  id      String @id @default(cuid())
+  paperId String @db.Uuid
+  number  Int
+  title   String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  paper Paper @relation(fields: [paperId], references: [id], onDelete: Cascade)
+
+  @@unique([paperId, number])
+  @@index([paperId])
+}
+
+model Question {
+  id               String   @id @default(uuid()) @db.Uuid
+  paperId          String   @db.Uuid
+  chapterNumber    Int
+  questionText     String   @db.Text
+  correctAnswer    String   @db.VarChar(1) // A, B, C, D
+  explanation      String   @db.Text
+  createdAt        DateTime @default(now())
+  updatedAt        DateTime @updatedAt
+
+  paper Paper @relation(fields: [paperId], references: [id], onDelete: Cascade)
+
+  @@index([paperId])
+  @@index([chapterNumber])
+}
+
+model ExamPart {
+  id             String   @id @default(uuid()) @db.Uuid
+  paperId        String   @db.Uuid
+  partName       String   @db.VarChar(50)
+  chapterStart   Int
+  chapterEnd     Int
+  questionCount  Int
+  passingScore   Int
+  orderIndex     Int
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+
+  paper Paper @relation(fields: [paperId], references: [id], onDelete: Cascade)
+
+  @@index([paperId])
+  @@index([orderIndex])
+}
+
+// Exam Attempts
+model ExamAttempt {
+  id          String   @id @default(cuid())
+  paperId     String   @db.Uuid
+  userId      String
+  startedAt   DateTime
+  submittedAt DateTime?
+  score       Int?
+  passed      Boolean?
+  createdAt   DateTime @default(now())
+
+  paper Paper @relation(fields: [paperId], references: [id], onDelete: Cascade)
+}
+
+// Legacy models (placeholder)
+model QuestionPool {
+  id        String   @id @default(cuid())
+  name      String
+  createdAt DateTime @default(now())
 }
