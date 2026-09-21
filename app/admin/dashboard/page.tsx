@@ -51,25 +51,50 @@ export default function AdminDashboard() {
       setLoading(true);
       setError('');
 
+      console.log('Fetching dashboard data...');
+
       const [statsRes, attemptsRes, requestsRes] = await Promise.all([
         fetch('/api/admin/dashboard/stats'),
         fetch('/api/admin/dashboard/recent-attempts'),
         fetch('/api/admin/dashboard/paper-requests'),
       ]);
 
-      if (!statsRes.ok || !attemptsRes.ok || !requestsRes.ok) {
-        throw new Error('Failed to fetch dashboard data');
+      console.log('Stats response:', statsRes.status, statsRes.statusText);
+      console.log('Attempts response:', attemptsRes.status, attemptsRes.statusText);
+      console.log('Requests response:', requestsRes.status, requestsRes.statusText);
+
+      const statsText = await statsRes.text();
+      const attemptsText = await attemptsRes.text();
+      const requestsText = await requestsRes.text();
+
+      console.log('Stats data:', statsText);
+      console.log('Attempts data:', attemptsText);
+      console.log('Requests data:', requestsText);
+
+      if (!statsRes.ok) {
+        throw new Error(`Stats API error: ${statsRes.status} ${statsText}`);
+      }
+      if (!attemptsRes.ok) {
+        throw new Error(`Attempts API error: ${attemptsRes.status} ${attemptsText}`);
+      }
+      if (!requestsRes.ok) {
+        throw new Error(`Requests API error: ${requestsRes.status} ${requestsText}`);
       }
 
-      const statsData = await statsRes.json();
-      const attemptsData = await attemptsRes.json();
-      const requestsData = await requestsRes.json();
+      const statsData = JSON.parse(statsText);
+      const attemptsData = JSON.parse(attemptsText);
+      const requestsData = JSON.parse(requestsText);
+
+      console.log('Parsed stats:', statsData);
+      console.log('Parsed attempts:', attemptsData);
+      console.log('Parsed requests:', requestsData);
 
       setStats(statsData.stats);
       setAttempts(attemptsData.attempts || []);
       setRequests(requestsData.requests || []);
     } catch (err: any) {
-      setError(err.message || 'Failed to load dashboard');
+      const errorMsg = err.message || 'Failed to load dashboard';
+      setError(errorMsg);
       console.error('Dashboard error:', err);
     } finally {
       setLoading(false);

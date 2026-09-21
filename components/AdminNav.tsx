@@ -12,7 +12,6 @@ export default function AdminNav() {
     { label: 'Dashboard', href: '/admin/dashboard' },
     { label: 'Papers', href: '/admin/papers' },
     { label: 'Users', href: '/admin/users' },
-    { label: 'Account', href: '/admin/account' },
   ];
 
   const handleLogout = async () => {
@@ -39,8 +38,18 @@ export default function AdminNav() {
           ))}
         </div>
 
-        {/* Right side - Name & Logout */}
+        {/* Right side - Account, Name & Logout */}
         <div className="flex items-center gap-6">
+          <a
+            href="/admin/account"
+            className={`text-sm font-medium transition ${
+              pathname === '/admin/account'
+                ? 'text-blue-600'
+                : 'text-gray-600 hover:text-gray-900'
+            }`}
+          >
+            Account
+          </a>
           <span className="text-sm font-medium text-gray-900">
             {session?.user?.name || 'Admin'}
           </span>

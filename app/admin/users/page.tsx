@@ -1,6 +1,7 @@
 "use client";
 
-import { useSession, signOut } from "next-auth/react";
+import AdminNav from "@/components/AdminNav";
+import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import { useState, useEffect } from "react";
 import Link from "next/link";
@@ -71,11 +72,6 @@ export default function UserManagement() {
     setFilteredUsers(filtered);
   }, [searchTerm, users]);
 
-  const handleLogout = async () => {
-    await signOut({ redirect: false });
-    window.location.href = `${window.location.origin}/login`;
-  };
-
   const handleCreateUser = async (e: React.FormEvent) => {
     e.preventDefault();
     setSubmitting(true);
@@ -123,49 +119,7 @@ export default function UserManagement() {
 
   return (
     <div style={{ backgroundColor: "#f8f9fa", minHeight: "100vh" }}>
-      {/* Navigation Bar */}
-      <nav style={{
-        backgroundColor: "white",
-        borderBottom: "1px solid #e5e7eb",
-        padding: "16px 24px",
-        display: "flex",
-        justifyContent: "space-between",
-        alignItems: "center",
-      }}>
-        <div style={{ display: "flex", gap: "32px" }}>
-          <a href="/admin/dashboard" style={{ textDecoration: "none", color: "#666", fontWeight: "500", fontSize: "14px" }}>
-            Dashboard
-          </a>
-          <a href="/admin/papers" style={{ textDecoration: "none", color: "#666", fontWeight: "500", fontSize: "14px" }}>
-            Papers
-          </a>
-          <a href="/admin/users" style={{ textDecoration: "none", color: "#3b82f6", fontWeight: "600", fontSize: "14px" }}>
-            Users
-          </a>
-          <a href="/admin/questions" style={{ textDecoration: "none", color: "#666", fontWeight: "500", fontSize: "14px" }}>
-            Questions
-          </a>
-        </div>
-        <div style={{ display: "flex", gap: "24px", alignItems: "center" }}>
-          <a href="/account" style={{ color: "#666", fontSize: "14px", textDecoration: "none", cursor: "pointer" }}>
-            Account
-          </a>
-          <span style={{ fontWeight: "600", fontSize: "14px" }}>{session?.user?.name || "Admin"}</span>
-          <button
-            onClick={handleLogout}
-            style={{
-              backgroundColor: "transparent",
-              color: "#3b82f6",
-              border: "none",
-              cursor: "pointer",
-              fontSize: "14px",
-              fontWeight: "500",
-            }}
-          >
-            Log out
-          </button>
-        </div>
-      </nav>
+      <AdminNav />
 
       <div style={{ maxWidth: "1400px", margin: "0 auto", padding: "30px 20px" }}>
         {/* Page Title */}
