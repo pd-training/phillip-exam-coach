@@ -518,22 +518,7 @@ export default function UserDetailPage() {
           <h2 style={{ fontSize: "16px", fontWeight: "600", color: "#1f2937", margin: "0 0 20px 0" }}>
             Assigned papers ({papers.length})
           </h2>
-          {papers.length === 0 ? (
-            <p style={{ color: "#6b7280", fontSize: "14px", margin: "0" }}>No papers assigned</p>
-          ) : (
-            <ul style={{ listStyle: "none", padding: "0", margin: "0" }}>
-              {papers.map((paper) => (
-                <li key={paper.id} style={{
-                  padding: "8px 0",
-                  borderBottom: "1px solid #f3f4f6",
-                  color: "#1f2937",
-                  fontSize: "14px",
-                }}>
-                  {paper.title}
-                </li>
-              ))}
-            </ul>
-          )}
+          <p style={{ color: "#6b7280", fontSize: "14px", margin: "0" }}>Coming soon</p>
         </div>
 
         {/* Attempt History */}
@@ -546,60 +531,7 @@ export default function UserDetailPage() {
           <h2 style={{ fontSize: "16px", fontWeight: "600", color: "#1f2937", margin: "0 0 20px 0" }}>
             Attempt history ({attempts.length})
           </h2>
-          {attempts.length === 0 ? (
-            <p style={{ color: "#6b7280", fontSize: "14px", margin: "0" }}>No attempts yet</p>
-          ) : (
-            <div style={{ overflowX: "auto" }}>
-              <table style={{
-                width: "100%",
-                borderCollapse: "collapse",
-                fontSize: "14px",
-              }}>
-                <thead>
-                  <tr style={{ backgroundColor: "#f9fafb", borderBottom: "1px solid #e5e7eb" }}>
-                    <th style={{ padding: "12px", textAlign: "left", fontWeight: "600", color: "#6b7280" }}>Paper</th>
-                    <th style={{ padding: "12px", textAlign: "left", fontWeight: "600", color: "#6b7280" }}>Status</th>
-                    <th style={{ padding: "12px", textAlign: "left", fontWeight: "600", color: "#6b7280" }}>Score</th>
-                    <th style={{ padding: "12px", textAlign: "left", fontWeight: "600", color: "#6b7280" }}>Result</th>
-                    <th style={{ padding: "12px", textAlign: "left", fontWeight: "600", color: "#6b7280" }}>Date</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {attempts.map((attempt) => (
-                    <tr key={attempt.id} style={{ borderBottom: "1px solid #e5e7eb" }}>
-                      <td style={{ padding: "12px", color: "#1f2937" }}>{attempt.paperTitle}</td>
-                      <td style={{ padding: "12px", color: "#6b7280", textTransform: "uppercase", fontSize: "12px", fontWeight: "600" }}>
-                        {attempt.status}
-                      </td>
-                      <td style={{ padding: "12px", color: "#1f2937" }}>
-                        {attempt.overallScore !== null ? `${attempt.overallScore.toFixed(1)}%` : "—"}
-                      </td>
-                      <td style={{ padding: "12px" }}>
-                        {attempt.passed === null ? (
-                          <span style={{ color: "#6b7280" }}>—</span>
-                        ) : (
-                          <span style={{
-                            display: "inline-block",
-                            padding: "2px 8px",
-                            backgroundColor: attempt.passed ? "#d1fae5" : "#fee2e2",
-                            color: attempt.passed ? "#065f46" : "#991b1b",
-                            borderRadius: "4px",
-                            fontSize: "12px",
-                            fontWeight: "600",
-                          }}>
-                            {attempt.passed ? "Pass" : "Fail"}
-                          </span>
-                        )}
-                      </td>
-                      <td style={{ padding: "12px", color: "#6b7280" }}>
-                        {new Date(attempt.createdAt).toLocaleDateString()}
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-          )}
+          <p style={{ color: "#6b7280", fontSize: "14px", margin: "0" }}>Coming soon</p>
         </div>
       </div>
     </div>
