@@ -16,10 +16,10 @@ export async function GET(request: Request, { params }: { params: { userId: stri
       SELECT 
         p.id,
         p.title,
-        sp.status
-      FROM "StudentPaper" sp
-      JOIN "Paper" p ON sp."paperId" = p.id
-      WHERE sp."userId" = ${params.userId}
+        pr.status
+      FROM "PaperRequest" pr
+      JOIN "Paper" p ON pr."paperId" = p.id
+      WHERE pr."userId" = ${params.userId}
       ORDER BY p.title ASC
     ` as any[];
 

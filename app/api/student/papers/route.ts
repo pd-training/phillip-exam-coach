@@ -18,17 +18,17 @@ export async function GET(request: NextRequest) {
 
     const userId = (session.user as any).id;
 
-    // Get student's papers
+    // Get student's papers (from approved paper requests)
     const studentPapers = await prisma.$queryRaw`
       SELECT
-        sp.id,
-        sp."paperId",
+        pr.id,
+        pr."paperId",
         p.title as paper_name,
-        sp.status
-      FROM "StudentPaper" sp
-      JOIN "Paper" p ON p.id = sp."paperId"
-      WHERE sp."userId" = ${userId}
-      AND sp.status = 'active'
+        pr.status
+      FROM "PaperRequest" pr
+      JOIN "Paper" p ON p.id = pr."paperId"
+      WHERE pr."userId" = ${userId}
+      AND pr.status = 'approved'
       ORDER BY p.title ASC
     ` as any[];
 

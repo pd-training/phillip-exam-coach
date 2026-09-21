@@ -64,27 +64,11 @@ export async function PUT(request: Request) {
         return Response.json({ error: "Request not found" }, { status: 404 });
       }
 
-      const { userId, paperId } = reqResult[0];
-
-      // Check if StudentPaper already exists
-      const existingResult = await prisma.$queryRaw`
-        SELECT "id" FROM "StudentPaper"
-        WHERE "userId" = ${userId} AND "paperId" = ${paperId}
-      ` as any[];
-
-      if (existingResult.length === 0) {
-        // Create StudentPaper record
-        await prisma.$queryRaw`
-          INSERT INTO "StudentPaper" ("userId", "paperId", "status", "createdAt")
-          VALUES (${userId}, ${paperId}, 'active', NOW())
-        `;
-      }
-
-      // Update request status
+      // Update request status to approved
       await prisma.$queryRaw`
         UPDATE "PaperRequest"
-        SET "status" = 'approved', "respondedAt" = NOW()
-        WHERE "id" = ${requestId}
+        SET status = 'approved', "reviewedAt" = NOW()
+        WHERE id = ${requestId}
       `;
 
       return Response.json({ success: true, message: "Request approved" });

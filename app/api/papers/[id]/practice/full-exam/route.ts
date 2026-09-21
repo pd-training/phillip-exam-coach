@@ -130,7 +130,7 @@ export async function POST(
 
     // Save exam attempt
     await prisma.$queryRaw`
-      INSERT INTO "ExamAttempt" (id, "paperId", "userId", "startedAt", "submittedAt", score, passed, "createdAt")
+      INSERT INTO examattempt (id, paperid, userid, startedat, submittedat, score, passed, createdat)
       VALUES (
         gen_random_uuid(),
         ${paperId}::uuid,

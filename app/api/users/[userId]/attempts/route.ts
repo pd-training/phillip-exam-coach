@@ -15,22 +15,21 @@ export async function GET(request: Request, { params }: { params: { userId: stri
     const attempts = await prisma.$queryRaw`
       SELECT 
         ea.id,
-        ea."paperId",
+        ea.paperid,
         p.title as "paperTitle",
-        ea.status,
-        ea."overallScore" as score,
+        ea.score,
         CASE 
-          WHEN ea."overallScore" >= COALESCE(p."passingScore", 50) THEN 'Pass'
-          WHEN ea."overallScore" IS NULL THEN NULL
+          WHEN ea.score >= COALESCE(p."passingScore", 50) THEN 'Pass'
+          WHEN ea.score IS NULL THEN NULL
           ELSE 'Fail'
         END as result,
-        FLOOR(EXTRACT(EPOCH FROM (ea."submittedAt" - ea."createdAt")) / 60)::INT as "timeTaken",
-        ea."submittedAt",
-        ea."createdAt"
-      FROM "ExamAttempt" ea
-      LEFT JOIN "Paper" p ON ea."paperId" = p.id
-      WHERE ea."userId" = ${params.userId}
-      ORDER BY ea."createdAt" DESC
+        FLOOR(EXTRACT(EPOCH FROM (ea.submittedat - ea.startedat)) / 60)::INT as "timeTaken",
+        ea.submittedat,
+        ea.createdat
+      FROM examattempt ea
+      LEFT JOIN "Paper" p ON ea.paperid = p.id
+      WHERE ea.userid = ${params.userId}
+      ORDER BY ea.createdat DESC
       LIMIT 50
     ` as any[];
 

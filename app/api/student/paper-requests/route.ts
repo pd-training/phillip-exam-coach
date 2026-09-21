@@ -53,13 +53,14 @@ export async function POST(request: Request) {
       return Response.json({ error: "paperId required" }, { status: 400 });
     }
 
-    // Check if student already has this paper (via StudentPaper)
-    const existingStudentPaper = await prisma.$queryRaw`
-      SELECT "id" FROM "StudentPaper"
+    // Check if student already has this paper (via approved request)
+    const existingApprovedRequest = await prisma.$queryRaw`
+      SELECT "id" FROM "PaperRequest"
       WHERE "userId" = ${userId} AND "paperId" = ${paperId}
+      AND "status" = 'approved'
     ` as any[];
 
-    if (existingStudentPaper.length > 0) {
+    if (existingApprovedRequest.length > 0) {
       return Response.json(
         { error: "You already have access to this paper" },
         { status: 400 }
