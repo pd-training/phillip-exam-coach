@@ -157,6 +157,7 @@ export default function AdminDashboard() {
           </button>
         </div>
       </section>
+      </div>
     </div>
   );
 }
