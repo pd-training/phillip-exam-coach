@@ -93,7 +93,7 @@ export default function StudentDashboard() {
           <a href="/dashboard" style={{ textDecoration: "none", color: "#3b82f6", fontWeight: "600", fontSize: "14px" }}>
             Dashboard
           </a>
-          <a href="#" style={{ textDecoration: "none", color: "#666", fontWeight: "500", fontSize: "14px" }}>
+          <a href="/practice" style={{ textDecoration: "none", color: "#666", fontWeight: "500", fontSize: "14px" }}>
             Practice
           </a>
           <a href="#" style={{ textDecoration: "none", color: "#666", fontWeight: "500", fontSize: "14px" }}>
