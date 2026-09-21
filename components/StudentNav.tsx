@@ -13,7 +13,6 @@ export default function StudentNav() {
     { label: 'Practice', href: '/practice' },
     { label: 'Browse Papers', href: '/practice' },
     { label: 'Help', href: '/help' },
-    { label: 'Account', href: '/account' },
   ];
 
   const handleLogout = async () => {
@@ -41,8 +40,18 @@ export default function StudentNav() {
           ))}
         </div>
 
-        {/* Right side - Name & Logout */}
+        {/* Right side - Account, Name & Logout */}
         <div className="flex items-center gap-6">
+          <a
+            href="/account"
+            className={`text-sm font-medium transition ${
+              pathname === '/account'
+                ? 'text-blue-600'
+                : 'text-gray-600 hover:text-gray-900'
+            }`}
+          >
+            Account
+          </a>
           <span className="text-sm font-medium text-gray-900">
             {session?.user?.name || 'Student'}
           </span>
