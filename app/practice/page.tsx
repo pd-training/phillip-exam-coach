@@ -1,5 +1,6 @@
 'use client';
 
+import { useEffect, useState } from 'react';
 import StudentNav from '@/components/StudentNav';
 import { useSession } from 'next-auth/react';
 import { useRouter } from 'next/navigation';
