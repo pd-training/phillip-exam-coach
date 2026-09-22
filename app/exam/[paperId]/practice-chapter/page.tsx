@@ -224,7 +224,9 @@ export default function PracticeChapterMode() {
           <div className="w-full h-2 bg-gray-200 rounded-full mb-8 overflow-hidden">
             <div
               className="h-full bg-blue-600 transition-all duration-300"
-      </div>
+              style={{ width: `${(progress / questions.length) * 100}%` }}
+            />
+          </div>
 
       {/* Question */}
       <div className="bg-blue-50 border border-blue-200 rounded-xl p-6 mb-8">

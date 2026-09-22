@@ -155,14 +155,12 @@ export default function QuickQuizMode() {
           {/* Progress bar */}
           <div className="w-full h-2 bg-gray-200 rounded-full mb-8 overflow-hidden">
             <div
-          style={{
-            height: "100%",
-            width: `${(progress / questions.length) * 100}%`,
-            backgroundColor: "#3b82f6",
-            transition: "width 0.3s",
-          }}
-        />
-      </div>
+              className="h-full bg-blue-600 transition-all duration-300"
+              style={{
+                width: `${(progress / questions.length) * 100}%`,
+              }}
+            />
+          </div>
 
       {/* Question */}
       <div
