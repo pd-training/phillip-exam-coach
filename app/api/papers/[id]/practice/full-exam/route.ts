@@ -140,11 +140,13 @@ export async function POST(
 
     // Save exam attempt using raw SQL (examattempt is lowercase)
     try {
+      console.log('Saving attempt - userId:', userId, 'paperId:', paperId, 'score:', score);
+      const attemptId = crypto.randomUUID();
       await prisma.$queryRaw`
         INSERT INTO examattempt (id, paperid, userid, startedat, submittedat, score, passed, createdat)
         VALUES (
-          gen_random_uuid(),
-          ${paperId},
+          ${attemptId},
+          ${paperId}::uuid,
           ${userId},
           NOW(),
           NOW(),
@@ -153,10 +155,9 @@ export async function POST(
           NOW()
         )
       `;
-      console.log('Exam attempt saved');
+      console.log('Exam attempt saved with ID:', attemptId);
     } catch (insertError: any) {
-      console.error('Error saving exam attempt:', insertError.message);
-      // Don't fail the response just because we couldn't save attempt
+      console.error('Error saving exam attempt:', insertError.message, insertError.code);
     }
 
     return NextResponse.json({
