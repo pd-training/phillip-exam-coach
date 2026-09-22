@@ -22,13 +22,13 @@ export async function PATCH(
     }
 
     const body = await request.json();
-    const { title, description } = body;
+    const { title, description, totalQuestions, durationMinutes, passingScore } = body;
 
     if (!title || !title.trim()) {
       return NextResponse.json({ error: "Paper title is required" }, { status: 400 });
     }
 
-    console.log('Updating paper:', paperId, 'with title:', title);
+    console.log('Updating paper:', paperId, 'with title:', title, 'totalQuestions:', totalQuestions, 'durationMinutes:', durationMinutes, 'passingScore:', passingScore);
 
     // Validate paper exists first
     const existingPaper = await (prisma as any).paper.findUnique({
@@ -44,6 +44,9 @@ export async function PATCH(
       data: {
         title: title.trim(),
         ...(description !== undefined && { description: description?.trim() || '' }),
+        ...(totalQuestions !== undefined && totalQuestions > 0 && { totalQuestions }),
+        ...(durationMinutes !== undefined && durationMinutes > 0 && { durationMinutes }),
+        ...(passingScore !== undefined && passingScore > 0 && passingScore <= 100 && { passingScore }),
       }
     });
 

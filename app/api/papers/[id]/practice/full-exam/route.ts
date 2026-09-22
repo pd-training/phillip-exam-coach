@@ -43,18 +43,22 @@ export async function GET(
     console.log('Found total questions in bank:', allQuestions.length, 'Paper configured for:', paper.totalQuestions);
 
     // Randomly select the configured number of questions
-    const numToSelect = Math.min(paper.totalQuestions || allQuestions.length, allQuestions.length);
+    // If totalQuestions is 0 or not set, use all questions; otherwise use the configured amount
+    const numToSelect = paper.totalQuestions > 0 
+      ? Math.min(paper.totalQuestions, allQuestions.length) 
+      : allQuestions.length;
     const selectedQuestions = allQuestions
       .sort(() => Math.random() - 0.5)
       .slice(0, numToSelect);
 
-    console.log('Selected questions for exam:', selectedQuestions.length);
+    console.log('Selected questions for exam:', selectedQuestions.length, 'from', numToSelect, 'configured');
 
     // Return in exam format
     return NextResponse.json({
       examConfig: {
         totalTime: paper.durationMinutes,
         passingScore: paper.passingScore,
+        totalQuestions: paper.totalQuestions > 0 ? paper.totalQuestions : undefined,
       },
       questions: selectedQuestions.map((q: any) => ({
         id: q.id,
