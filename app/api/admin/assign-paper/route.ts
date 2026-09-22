@@ -59,16 +59,27 @@ export async function POST(request: NextRequest) {
     }
 
     // Assign paper by creating an approved request
-    await prisma.$queryRaw`
-      INSERT INTO "PaperRequest" ("userId", "paperId", status, "requestedAt", "reviewedAt")
-      VALUES (${userId}, ${paperId}, 'approved', NOW(), NOW())
-    `;
+    console.log('About to INSERT into PaperRequest');
+    try {
+      await prisma.$queryRaw`
+        INSERT INTO "PaperRequest" ("userId", "paperId", status, "requestedAt", "reviewedAt")
+        VALUES (${userId}, ${paperId}, 'approved', NOW(), NOW())
+      `;
+      console.log('INSERT successful for userId:', userId, 'paperId:', paperId);
+    } catch (insertError: any) {
+      console.error('INSERT error:', insertError.message || insertError);
+      throw insertError;
+    }
 
     return NextResponse.json({ success: true, message: 'Paper assigned successfully' });
   } catch (error: any) {
-    console.error('Assign paper error:', error.message || error);
+    const errorMsg = error?.message || error?.toString() || 'Unknown error';
+    const errorCode = error?.code || 'UNKNOWN';
+    console.error('Assign paper error - Code:', errorCode, 'Message:', errorMsg);
+    console.error('Full error:', JSON.stringify(error, null, 2));
+    
     return NextResponse.json(
-      { error: error.message || 'Failed to assign paper' },
+      { error: errorMsg, code: errorCode },
       { status: 500 }
     );
   }
