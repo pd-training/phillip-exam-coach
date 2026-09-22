@@ -18,6 +18,7 @@ export async function GET(request: Request) {
         ea.userid,
         ea.paperid,
         ea.score,
+        ea.startedat,
         ea.submittedat,
         u.name as student_name,
         p.title as paper_name

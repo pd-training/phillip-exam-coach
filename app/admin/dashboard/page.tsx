@@ -14,10 +14,11 @@ interface DashboardStats {
 
 interface Attempt {
   id: string;
-  userId: string;
-  paperId: string;
+  userid: string;
+  paperid: string;
   score: number;
-  submittedAt: string;
+  startedat: string;
+  submittedat: string;
   student_name: string;
   paper_name: string;
 }
@@ -245,37 +246,57 @@ export default function AdminDashboard() {
                     <th className="px-6 py-3 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">Student</th>
                     <th className="px-6 py-3 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">Paper</th>
                     <th className="px-6 py-3 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">Score</th>
-                    <th className="px-6 py-3 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">Date</th>
+                    <th className="px-6 py-3 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">Submitted</th>
+                    <th className="px-6 py-3 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">Time Taken</th>
+                    <th className="px-6 py-3 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">Action</th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-gray-200">
                   {attempts.length === 0 ? (
                     <tr>
-                      <td colSpan={4} className="px-6 py-8 text-center text-gray-600">
+                      <td colSpan={6} className="px-6 py-8 text-center text-gray-600">
                         No recent attempts
                       </td>
                     </tr>
                   ) : (
-                    attempts.map((attempt) => (
-                      <tr key={attempt.id} className="hover:bg-gray-50 transition">
-                        <td className="px-6 py-4">
-                          <div className="font-medium text-gray-900">{attempt.student_name}</div>
-                        </td>
-                        <td className="px-6 py-4 text-gray-700">{attempt.paper_name}</td>
-                        <td className="px-6 py-4">
-                          <span className={`inline-flex items-center px-3 py-1 rounded-full text-sm font-medium ${
-                            parseInt(attempt.score) >= 50
-                              ? 'bg-green-100 text-green-800'
-                              : 'bg-red-100 text-red-800'
-                          }`}>
-                            {attempt.score}%
-                          </span>
-                        </td>
-                        <td className="px-6 py-4 text-gray-600 text-sm">
-                          {new Date(attempt.submittedAt).toLocaleDateString()}
-                        </td>
-                      </tr>
-                    ))
+                    attempts.map((attempt) => {
+                      const timeTaken = Math.round(
+                        (new Date(attempt.submittedat).getTime() - new Date(attempt.startedat).getTime()) / 60000
+                      );
+                      const submittedDate = new Date(attempt.submittedat);
+                      
+                      return (
+                        <tr key={attempt.id} className="hover:bg-gray-50 transition cursor-pointer">
+                          <td className="px-6 py-4">
+                            <div className="font-medium text-gray-900">{attempt.student_name}</div>
+                          </td>
+                          <td className="px-6 py-4 text-gray-700">{attempt.paper_name}</td>
+                          <td className="px-6 py-4">
+                            <span className={`inline-flex items-center px-3 py-1 rounded-full text-sm font-medium ${
+                              parseInt(String(attempt.score)) >= 50
+                                ? 'bg-green-100 text-green-800'
+                                : 'bg-red-100 text-red-800'
+                            }`}>
+                              {attempt.score}%
+                            </span>
+                          </td>
+                          <td className="px-6 py-4 text-gray-600 text-sm">
+                            <div>{submittedDate.toLocaleDateString()}</div>
+                            <div className="text-gray-500">{submittedDate.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</div>
+                          </td>
+                          <td className="px-6 py-4 text-gray-600 text-sm">
+                            {timeTaken} min
+                          </td>
+                          <td className="px-6 py-4 text-sm">
+                            <Link href={`/admin/attempts/${attempt.id}`}>
+                              <button className="px-3 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg text-xs font-medium transition">
+                                View Answers
+                              </button>
+                            </Link>
+                          </td>
+                        </tr>
+                      );
+                    })
                   )}
                 </tbody>
               </table>
