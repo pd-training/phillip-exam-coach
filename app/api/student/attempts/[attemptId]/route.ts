@@ -60,18 +60,18 @@ export async function GET(
     console.log("Fetching questions for paperId:", attempt.paperid);
     const questionsRes = await prisma.$queryRaw`
       SELECT 
-        id,
-        "questionText",
-        "correctAnswer",
-        "optionA",
-        "optionB",
-        "optionC",
-        "optionD",
-        "explanation",
-        "chapterNumber"
-      FROM "Question"
-      WHERE "paperId" = ${attempt.paperid}
-      ORDER BY id ASC
+        q.id,
+        q."questionText",
+        q."correctAnswer",
+        q."optionA",
+        q."optionB",
+        q."optionC",
+        q."optionD",
+        q."explanation",
+        q."chapterNumber"
+      FROM "Question" q
+      WHERE q."paperId" = ${attempt.paperid}
+      ORDER BY q.id ASC
     ` as any[];
 
     const questions = questionsRes || [];
