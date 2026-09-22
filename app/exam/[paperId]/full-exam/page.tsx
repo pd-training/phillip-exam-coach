@@ -190,6 +190,11 @@ export default function FullExamMode() {
               <p style={{ margin: "0 0 8px 0", fontWeight: "600" }}>
                 Q{idx + 1}: {answer.isCorrect ? "✓ Correct" : "✗ Incorrect"}
               </p>
+              {answer.questionText && (
+                <p style={{ margin: "0 0 12px 0", fontSize: "14px", lineHeight: "1.5", color: "#1f2937" }}>
+                  {answer.questionText}
+                </p>
+              )}
               <p style={{ margin: "0 0 8px 0", fontSize: "14px" }}>
                 Your answer: {answer.studentAnswer}
               </p>
