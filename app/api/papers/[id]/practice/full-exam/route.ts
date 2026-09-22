@@ -12,12 +12,12 @@ export async function GET(
 
     console.log('Fetching full exam - paperId:', paperId);
 
-    // Get paper config including totalQuestions
+    // Get paper config including exam format settings
     const paper = await (prisma as any).paper.findUnique({
       where: { id: paperId },
       select: {
         id: true,
-        totalTime: true,
+        durationMinutes: true,
         passingScore: true,
         totalQuestions: true,
       }
@@ -53,7 +53,7 @@ export async function GET(
     // Return in exam format
     return NextResponse.json({
       examConfig: {
-        totalTime: paper.totalTime,
+        totalTime: paper.durationMinutes,
         passingScore: paper.passingScore,
       },
       questions: selectedQuestions.map((q: any) => ({
