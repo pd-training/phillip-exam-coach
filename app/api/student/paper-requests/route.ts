@@ -51,6 +51,11 @@ export async function POST(request: Request) {
 
     console.log('Paper request - userId:', userId, 'paperId:', paperId);
 
+    if (!userId) {
+      console.error('No userId in session');
+      return Response.json({ error: "Session error: no userId" }, { status: 401 });
+    }
+
     if (!paperId) {
       return Response.json({ error: "paperId required" }, { status: 400 });
     }
@@ -64,48 +69,33 @@ export async function POST(request: Request) {
 
     // userId is a CUID, not a UUID - skip UUID validation for userId
 
-    // Check if student already has this paper (via approved request)
-    let existingApprovedRequest;
-    try {
-      existingApprovedRequest = await prisma.$queryRaw`
-        SELECT id FROM "PaperRequest"
-        WHERE "userId" = ${userId}
-        AND "paperId" = ${paperId}
-        AND status = 'approved'
-      ` as any[];
-    } catch (e) {
-      console.error("Error checking approved request:", e);
-      existingApprovedRequest = [];
-    }
-
-    if (existingApprovedRequest && existingApprovedRequest.length > 0) {
-      return Response.json(
-        { error: "You already have access to this paper" },
-        { status: 400 }
-      );
-    }
-
-    // Check if request already exists (pending or approved)
+    // Check if request already exists (any status)
     let existingRequest;
     try {
       existingRequest = await prisma.$queryRaw`
         SELECT id, status FROM "PaperRequest"
         WHERE "userId" = ${userId}
         AND "paperId" = ${paperId}
-        AND status IN ('pending', 'approved')
       ` as any[];
+      
+      console.log('Existing requests:', existingRequest?.length || 0);
     } catch (e) {
       console.error("Error checking existing request:", e);
       existingRequest = [];
     }
 
     if (existingRequest && existingRequest.length > 0) {
+      const req = existingRequest[0];
+      // Approved: user already has access
+      if (req.status === 'approved') {
+        return Response.json(
+          { error: "You already have access to this paper" },
+          { status: 400 }
+        );
+      }
+      // Pending or Rejected: already requested
       return Response.json(
-        {
-          error: `Request already ${
-            existingRequest[0].status === 'pending' ? 'pending' : 'approved'
-          } for this paper`,
-        },
+        { error: `Request already ${req.status} for this paper` },
         { status: 400 }
       );
     }
@@ -132,10 +122,19 @@ export async function POST(request: Request) {
   } catch (error: any) {
     const errorMsg = error?.message || error?.toString() || 'Unknown error';
     const errorCode = error?.code || 'UNKNOWN';
+    
+    // Handle specific DB errors
+    let userMessage = errorMsg;
+    if (errorCode === '23503') {
+      userMessage = 'Invalid student or paper ID';
+    } else if (errorCode === '23505') {
+      userMessage = 'Request already exists for this paper';
+    }
+    
     console.error('Create paper request error - Code:', errorCode, 'Message:', errorMsg);
     console.error('Full error:', JSON.stringify(error, null, 2));
     return Response.json(
-      { error: errorMsg, code: errorCode },
+      { error: userMessage, code: errorCode },
       { status: 500 }
     );
   }
