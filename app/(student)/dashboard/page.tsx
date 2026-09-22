@@ -13,10 +13,17 @@ interface Paper {
   createdAt: string;
 }
 
+interface AttemptStats {
+  completedCount: number;
+  averageScore: number;
+  passCount: number;
+}
+
 export default function StudentDashboard() {
   const router = useRouter();
   const { data: session, status } = useSession();
   const [papers, setPapers] = useState<Paper[]>([]);
+  const [stats, setStats] = useState<AttemptStats>({ completedCount: 0, averageScore: 0, passCount: 0 });
   const [loading, setLoading] = useState(true);
 
   // Handle auth redirects
@@ -46,13 +53,22 @@ export default function StudentDashboard() {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const res = await fetch("/api/papers");
-        if (res.ok) {
-          const data = await res.json();
+        const [papersRes, attemptsRes] = await Promise.all([
+          fetch("/api/papers"),
+          fetch("/api/student/attempts")
+        ]);
+
+        if (papersRes.ok) {
+          const data = await papersRes.json();
           setPapers(data.papers || []);
         }
+
+        if (attemptsRes.ok) {
+          const data = await attemptsRes.json();
+          setStats(data.stats || { completedCount: 0, averageScore: 0, passCount: 0 });
+        }
       } catch (error) {
-        console.error("Error fetching papers:", error);
+        console.error("Error fetching data:", error);
       } finally {
         setLoading(false);
       }
@@ -83,7 +99,7 @@ export default function StudentDashboard() {
             borderRadius: "8px",
             border: "1px solid #e5e7eb",
           }}>
-            <div style={{ fontSize: "32px", fontWeight: "bold", color: "#3b82f6", marginBottom: "8px" }}>0</div>
+            <div style={{ fontSize: "32px", fontWeight: "bold", color: "#3b82f6", marginBottom: "8px" }}>{stats.completedCount}</div>
             <p style={{ margin: "0", color: "#666", fontSize: "14px" }}>Full Exam Attempts Completed</p>
           </div>
           <div style={{
@@ -92,7 +108,7 @@ export default function StudentDashboard() {
             borderRadius: "8px",
             border: "1px solid #e5e7eb",
           }}>
-            <div style={{ fontSize: "32px", fontWeight: "bold", color: "#999", marginBottom: "8px" }}>—</div>
+            <div style={{ fontSize: "32px", fontWeight: "bold", color: stats.completedCount > 0 ? "#10b981" : "#999", marginBottom: "8px" }}>{stats.completedCount > 0 ? `${stats.averageScore}%` : "—"}</div>
             <p style={{ margin: "0", color: "#666", fontSize: "14px" }}>Average score</p>
           </div>
           <div style={{
@@ -101,8 +117,10 @@ export default function StudentDashboard() {
             borderRadius: "8px",
             border: "1px solid #e5e7eb",
           }}>
-            <div style={{ fontSize: "32px", fontWeight: "bold", color: "#999", marginBottom: "8px" }}>—</div>
-            <p style={{ margin: "0", color: "#666", fontSize: "14px" }}>Pass rate</p>
+            <div style={{ fontSize: "32px", fontWeight: "bold", color: stats.completedCount > 0 ? "#10b981" : "#999", marginBottom: "8px" }}>
+              {stats.completedCount > 0 ? `${Math.round((stats.passCount / stats.completedCount) * 100)}%` : "—"}
+            </div>
+            <p style={{ margin: "0", color: "#666", fontSize: "14px" }}>Pass rate ({stats.passCount} of {stats.completedCount})</p>
           </div>
         </div>
 
