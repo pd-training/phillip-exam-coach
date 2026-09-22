@@ -41,7 +41,7 @@ export async function GET(
         p."passingScore"
       FROM examattempt ea
       JOIN "User" u ON ea.userid = u.id
-      JOIN "Paper" p ON ea.paperid::uuid = p.id
+      JOIN "Paper" p ON ea.paperid = p.id
       WHERE ea.id = ${attemptId}
       AND ea.userid = ${userId}
     ` as any[];
@@ -58,10 +58,23 @@ export async function GET(
 
     // Get questions for this paper
     console.log("Fetching questions for paperId:", attempt.paperid);
-    const questions = await (prisma as any).question.findMany({
-      where: { paperId: attempt.paperid },
-      orderBy: { id: 'asc' },
-    });
+    const questionsRes = await prisma.$queryRaw`
+      SELECT 
+        id,
+        "questionText",
+        "correctAnswer",
+        "optionA",
+        "optionB",
+        "optionC",
+        "optionD",
+        "explanation",
+        "chapterNumber"
+      FROM "Question"
+      WHERE "paperId" = ${attempt.paperid}
+      ORDER BY id ASC
+    ` as any[];
+
+    const questions = questionsRes || [];
 
     console.log("Found questions:", questions.length);
 

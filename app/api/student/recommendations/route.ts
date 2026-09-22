@@ -25,7 +25,7 @@ export async function GET(request: Request) {
         ea.score,
         ea.submittedat
       FROM examattempt ea
-      LEFT JOIN "Paper" p ON ea.paperid::uuid = p.id
+      LEFT JOIN "Paper" p ON ea.paperid = p.id
       WHERE ea.userid = ${userId}
       ORDER BY ea.submittedat DESC
       LIMIT 20
