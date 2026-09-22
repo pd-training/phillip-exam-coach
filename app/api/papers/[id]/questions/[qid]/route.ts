@@ -11,25 +11,33 @@ export async function PATCH(
     const body = await request.json();
     const { questionText, correctAnswer, chapterNumber, explanation } = body;
 
-    await prisma.$queryRaw`
-      UPDATE "Question"
-      SET "questionText" = ${questionText},
-          "correctAnswer" = ${correctAnswer?.toUpperCase().charAt(0)},
-          "chapterNumber" = ${chapterNumber},
-          explanation = ${explanation},
-          "updatedAt" = NOW()
-      WHERE id = ${params.qid}::uuid
-    `;
+    console.log('Updating question:', params.qid);
 
-    const result = await prisma.$queryRaw`
-      SELECT id, "paperId", "chapterNumber", "questionText", "correctAnswer", explanation
-      FROM "Question"
-      WHERE id = ${params.qid}::uuid
-    ` as any[];
+    await (prisma as any).question.update({
+      where: { id: params.qid },
+      data: {
+        questionText,
+        correctAnswer: correctAnswer?.toUpperCase().charAt(0),
+        chapterNumber,
+        explanation,
+      }
+    });
 
-    return NextResponse.json({ question: result?.[0] });
+    const question = await (prisma as any).question.findUnique({
+      where: { id: params.qid },
+      select: {
+        id: true,
+        paperId: true,
+        chapterNumber: true,
+        questionText: true,
+        correctAnswer: true,
+        explanation: true,
+      }
+    });
+
+    return NextResponse.json({ question });
   } catch (error: any) {
-    console.error('Update error:', error);
+    console.error('Update error:', error.message);
     return NextResponse.json(
       { error: error.message || 'Failed to update question' },
       { status: 500 }
@@ -44,28 +52,26 @@ export async function DELETE(
   try {
     const paperId = params.id;
 
-    await prisma.$queryRaw`
-      DELETE FROM "Question"
-      WHERE id = ${params.qid}::uuid
-    `;
+    console.log('Deleting question:', params.qid);
+
+    // Delete the question
+    await (prisma as any).question.delete({
+      where: { id: params.qid }
+    });
 
     // Update paper's total questions count
-    const countResult = await prisma.$queryRaw`
-      SELECT COUNT(*) as count FROM "Question"
-      WHERE "paperId" = ${paperId}::uuid
-    ` as any[];
+    const count = await (prisma as any).question.count({
+      where: { paperId: paperId }
+    });
 
-    const count = countResult?.[0]?.count || 0;
-
-    await prisma.$queryRaw`
-      UPDATE "Paper"
-      SET "totalQuestions" = ${count}
-      WHERE id = ${paperId}::uuid
-    `;
+    await (prisma as any).paper.update({
+      where: { id: paperId },
+      data: { totalQuestions: count }
+    });
 
     return NextResponse.json({ success: true });
   } catch (error: any) {
-    console.error('Delete error:', error);
+    console.error('Delete error:', error.message);
     return NextResponse.json(
       { error: error.message || 'Failed to delete question' },
       { status: 500 }

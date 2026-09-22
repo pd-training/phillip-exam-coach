@@ -10,16 +10,26 @@ export async function GET(
   try {
     const paperId = params.id;
 
-    const questions = await prisma.$queryRaw`
-      SELECT id, "paperId", "chapterNumber", "questionText", "correctAnswer", explanation
-      FROM "Question"
-      WHERE "paperId" = ${paperId}::uuid
-      ORDER BY "chapterNumber" ASC, id ASC
-    `;
+    console.log('Fetching all questions for paper:', paperId);
+
+    const questions = await (prisma as any).question.findMany({
+      where: { paperId: paperId },
+      select: {
+        id: true,
+        paperId: true,
+        chapterNumber: true,
+        questionText: true,
+        correctAnswer: true,
+        explanation: true,
+      },
+      orderBy: [{ chapterNumber: 'asc' }, { id: 'asc' }]
+    });
+
+    console.log('Found questions:', questions.length);
 
     return NextResponse.json({
       questions,
-      count: (questions as any[]).length,
+      count: questions.length,
     });
   } catch (error: any) {
     console.error('Get questions error:', error);
