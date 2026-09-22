@@ -7,14 +7,14 @@ export async function GET() {
   try {
     console.log('Testing database connection...');
     
-    // Try a simple query
-    const result = await prisma.$queryRaw`SELECT 1 as test`;
+    // Try a simple query using ORM
+    const users = await (prisma as any).user.findMany({ take: 1 });
     
     console.log('Database connection successful');
     return NextResponse.json({
       success: true,
       message: 'Database connected',
-      result: result
+      usersFound: users.length
     });
   } catch (error: any) {
     console.error('Database connection error:', error.message);
