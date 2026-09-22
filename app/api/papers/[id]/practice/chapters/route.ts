@@ -10,36 +10,37 @@ export async function GET(
   try {
     const paperId = params.id;
 
-    // Get all unique chapters from questions
-    const chapters = await prisma.$queryRaw`
-      SELECT DISTINCT "chapterNumber"
-      FROM "Question"
-      WHERE "paperId" = ${paperId}::uuid
-      ORDER BY "chapterNumber" ASC
-    ` as any[];
+    console.log('Fetching chapters for paper:', paperId);
 
-    // Get question count per chapter
-    const chaptersWithCounts = await Promise.all(
-      chapters.map(async (ch: any) => {
-        const countResult = await prisma.$queryRaw`
-          SELECT COUNT(*) as count FROM "Question"
-          WHERE "paperId" = ${paperId}::uuid 
-          AND "chapterNumber" = ${ch.chapterNumber}
-        ` as any[];
+    // Get all questions grouped by chapter
+    const allQuestions = await (prisma as any).question.findMany({
+      where: { paperId: paperId },
+      select: {
+        chapterNumber: true,
+      },
+      orderBy: { chapterNumber: 'asc' }
+    });
 
-        return {
-          number: ch.chapterNumber,
-          questionCount: countResult[0]?.count || 0,
-          title: `Chapter ${ch.chapterNumber}`,
-        };
-      })
-    );
+    // Group by chapter and count
+    const chapterMap = new Map<number, number>();
+    for (const q of allQuestions) {
+      const count = (chapterMap.get(q.chapterNumber) || 0) + 1;
+      chapterMap.set(q.chapterNumber, count);
+    }
+
+    const chapters = Array.from(chapterMap.entries()).map(([number, count]) => ({
+      number,
+      questionCount: count,
+      title: `Chapter ${number}`,
+    }));
+
+    console.log('Found chapters:', chapters.length);
 
     return NextResponse.json({
-      chapters: chaptersWithCounts,
+      chapters: chapters,
     });
   } catch (error: any) {
-    console.error('Get chapters error:', error);
+    console.error('Get chapters error:', error.message);
     return NextResponse.json(
       { error: error.message || 'Failed to fetch chapters' },
       { status: 500 }
