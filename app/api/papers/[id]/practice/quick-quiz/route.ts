@@ -66,73 +66,55 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'Invalid JSON' }, { status: 400 });
     }
 
-    const answers = body?.answers || {};
-    console.log('Quick quiz submit - answers count:', Object.keys(answers).length);
+    const questionId = body?.questionId;
+    const answer = body?.answer;
 
-    if (Object.keys(answers).length === 0) {
+    console.log('Quick quiz answer - questionId:', questionId, 'answer:', answer);
+
+    if (!questionId || !answer) {
       return NextResponse.json(
-        { error: 'No answers provided' },
+        { error: 'questionId and answer required' },
         { status: 400 }
       );
     }
 
-    let correctCount = 0;
-    const feedback: any[] = [];
-
-    // Process each answer
-    for (const [questionId, studentAnswer] of Object.entries(answers)) {
-      try {
-        const question = await (prisma as any).question.findUnique({
-          where: { id: questionId as string },
-          select: { 
-            id: true,
-            correctAnswer: true, 
-            explanation: true, 
-            questionText: true 
-          }
-        });
-
-        if (!question) {
-          console.warn('Question not found:', questionId);
-          continue;
+    // Fetch the question
+    try {
+      const question = await (prisma as any).question.findUnique({
+        where: { id: questionId as string },
+        select: {
+          id: true,
+          correctAnswer: true,
+          explanation: true,
+          questionText: true,
         }
+      });
 
-        const isCorrect = question.correctAnswer === studentAnswer;
-        if (isCorrect) correctCount++;
-
-        feedback.push({
-          questionId,
-          studentAnswer,
-          correctAnswer: question.correctAnswer,
-          isCorrect,
-          explanation: question.explanation,
-        });
-      } catch (qError: any) {
-        console.error('Error processing question:', questionId, qError.message);
+      if (!question) {
+        return NextResponse.json(
+          { error: 'Question not found' },
+          { status: 404 }
+        );
       }
+
+      const isCorrect = question.correctAnswer === answer;
+
+      console.log('Question check - correct:', isCorrect);
+
+      return NextResponse.json({
+        questionId,
+        isCorrect,
+        correctAnswer: question.correctAnswer,
+        explanation: question.explanation,
+      });
+    } catch (qError: any) {
+      console.error('Error fetching question:', qError.message);
+      throw qError;
     }
-
-    if (feedback.length === 0) {
-      return NextResponse.json(
-        { error: 'No valid answers to process' },
-        { status: 400 }
-      );
-    }
-
-    const score = Math.round((correctCount / feedback.length) * 100);
-
-    console.log('Quick quiz result - score:', score, 'correct:', correctCount, '/', feedback.length);
-
-    return NextResponse.json({
-      score,
-      correctCount,
-      totalQuestions: feedback.length,
-      feedback,
-    });
   } catch (error: any) {
     console.error('Submit quick quiz error:', error.message || error);
     return NextResponse.json(
-      { error: error.message || 'Failed to submit quiz' },
+      { error: error.message || 'Failed to submit answer' },
       { status: 500 }
     );
   }
