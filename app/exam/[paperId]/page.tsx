@@ -49,6 +49,28 @@ export default function PracticePage() {
 
   const fetchPaper = async () => {
     try {
+      // First verify student has access to this paper
+      const accessRes = await fetch(`/api/student/papers`);
+      if (!accessRes.ok) {
+        console.error("Could not fetch student papers");
+        setLoading(false);
+        return;
+      }
+
+      const accessData = await accessRes.json();
+      const studentPapers = accessData.papers || [];
+      
+      // Check if student has access to this paper
+      const hasAccess = studentPapers.some((p: any) => p.id === paperId);
+      
+      if (!hasAccess) {
+        console.error("Student does not have access to this paper:", paperId);
+        setPaper(null);
+        setLoading(false);
+        return;
+      }
+
+      // Now fetch full paper details
       const [paperRes, recommendationsRes] = await Promise.all([
         fetch(`/api/papers/${paperId}`),
         fetch(`/api/student/recommendations`),
@@ -56,7 +78,11 @@ export default function PracticePage() {
 
       if (paperRes.ok) {
         const data = await paperRes.json();
-        setPaper(data.paper);
+        setPaper(data.paper || data);
+        console.log("Paper loaded:", data.paper?.title || data.title);
+      } else {
+        console.error("Failed to fetch paper:", paperRes.status);
+        setPaper(null);
       }
 
       if (recommendationsRes.ok) {
@@ -69,6 +95,7 @@ export default function PracticePage() {
       }
     } catch (error) {
       console.error("Failed to fetch data:", error);
+      setPaper(null);
     } finally {
       setLoading(false);
     }

@@ -135,13 +135,22 @@ export default function PapersManagement() {
   // Fetch questions for selected paper
   const fetchQuestions = async (paperId: string) => {
     try {
+      console.log("Fetching questions for paper:", paperId);
       const res = await fetch(`/api/papers/${paperId}/questions`);
+      console.log("Questions API response status:", res.status);
+      
       if (res.ok) {
         const data = await res.json();
+        console.log("Questions loaded:", data.questions?.length || 0);
         setQuestions(data.questions || []);
+      } else {
+        const errorData = await res.json().catch(() => ({ error: res.statusText }));
+        console.error("Failed to fetch questions:", res.status, errorData);
+        setQuestions([]);
       }
     } catch (error) {
       console.error("Failed to fetch questions:", error);
+      setQuestions([]);
     }
   };
 

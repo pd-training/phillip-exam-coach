@@ -55,21 +55,42 @@ export async function GET(
     // Get answer details from the examattempt table (if stored) or reconstruct from questions
     console.log("Fetching questions for paperid:", attempt.paperid);
     
-    const answersRes = await prisma.$queryRaw`
-      SELECT 
-        q.id,
-        q."questionText",
-        q."correctAnswer",
-        q."optionA",
-        q."optionB",
-        q."optionC",
-        q."optionD",
-        q."explanation",
-        q."chapterNumber"
-      FROM "Question" q
-      WHERE q."paperId" = ${attempt.paperid}
-      ORDER BY q."chapterNumber" ASC, q.id ASC
-    ` as any[];
+    let answersRes: any[] = [];
+    try {
+      answersRes = await prisma.$queryRaw`
+        SELECT 
+          q.id,
+          q."questionText",
+          q."correctAnswer",
+          q."optionA",
+          q."optionB",
+          q."optionC",
+          q."optionD",
+          q."explanation",
+          q."chapterNumber"
+        FROM "Question" q
+        WHERE q."paperId" = ${attempt.paperid}
+        ORDER BY q."chapterNumber" ASC, q.id ASC
+      ` as any[];
+    } catch (e: any) {
+      console.log("Warning: Could not fetch questions with all columns, retrying without options:", e.message);
+      try {
+        answersRes = await prisma.$queryRaw`
+          SELECT 
+            q.id,
+            q."questionText",
+            q."correctAnswer",
+            q."explanation",
+            q."chapterNumber"
+          FROM "Question" q
+          WHERE q."paperId" = ${attempt.paperid}
+          ORDER BY q."chapterNumber" ASC, q.id ASC
+        ` as any[];
+      } catch (retryError) {
+        console.log("Could not fetch questions at all:", retryError);
+        answersRes = [];
+      }
+    }
 
     console.log("Questions query returned:", answersRes?.length, "questions");
 

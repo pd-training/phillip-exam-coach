@@ -58,25 +58,39 @@ export async function GET(
 
     // Get questions for this paper
     console.log("Fetching questions for paperId:", attempt.paperid);
-    const questionsRes = await prisma.$queryRaw`
-      SELECT 
-        q.id,
-        q."questionText",
-        q."correctAnswer",
-        q."optionA",
-        q."optionB",
-        q."optionC",
-        q."optionD",
-        q."explanation",
-        q."chapterNumber"
-      FROM "Question" q
-      WHERE q."paperId" = ${attempt.paperid}
-      ORDER BY q.id ASC
-    ` as any[];
-
-    const questions = questionsRes || [];
-
-    console.log("Found questions:", questions.length);
+    let questions: any[] = [];
+    
+    try {
+      const questionsRes = await prisma.$queryRaw`
+        SELECT 
+          q.id,
+          q."questionText",
+          q."correctAnswer",
+          q."explanation",
+          q."chapterNumber"
+        FROM "Question" q
+        WHERE q."paperId"::text = ${attempt.paperid}::text
+        ORDER BY q.id ASC
+      ` as any[];
+      
+      questions = questionsRes || [];
+      console.log("Found questions:", questions.length);
+    } catch (questionsError) {
+      console.log("Warning: Could not fetch questions with current schema, continuing without options:", questionsError);
+      // Continue without options - try fetching just basic question data
+      try {
+        const basicQuestionsRes = await prisma.$queryRaw`
+          SELECT id, "questionText", "correctAnswer", "explanation"
+          FROM "Question"
+          WHERE "paperId"::text = ${attempt.paperid}::text
+          ORDER BY id ASC
+        ` as any[];
+        questions = basicQuestionsRes || [];
+      } catch (e) {
+        console.log("Could not fetch questions at all, continuing with empty list:", e);
+        questions = [];
+      }
+    }
 
     // Get student answers from StudentAnswer table if it exists
     let studentAnswers: any[] = [];
