@@ -12,7 +12,6 @@ export default function StudentNav() {
   const navItems = [
     { label: 'Dashboard', href: '/dashboard' },
     { label: 'Practice', href: '/practice' },
-    { label: 'Browse Papers', href: '/practice' },
     { label: 'Help', href: '/help' },
   ];
 
@@ -31,7 +30,7 @@ export default function StudentNav() {
               key={item.href}
               href={item.href}
               className={`text-sm font-medium transition ${
-                pathname === item.href || (item.label === 'Browse Papers' && pathname === '/practice')
+                pathname === item.href
                   ? 'text-blue-600'
                   : 'text-gray-600 hover:text-gray-900'
               }`}

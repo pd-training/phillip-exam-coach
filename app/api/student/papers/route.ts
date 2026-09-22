@@ -21,9 +21,12 @@ export async function GET(request: NextRequest) {
     // Get student's papers (from approved paper requests)
     const studentPapers = await prisma.$queryRaw`
       SELECT
-        pr.id,
-        pr."paperId",
-        p.title as paper_name,
+        p.id,
+        p.title,
+        p."durationMinutes",
+        p."totalQuestions",
+        p."isAvailable",
+        p."createdAt",
         pr.status
       FROM "PaperRequest" pr
       JOIN "Paper" p ON p.id = pr."paperId"

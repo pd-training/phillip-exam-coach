@@ -89,7 +89,7 @@ export default function StudentDashboard() {
     const fetchData = async () => {
       try {
         const [papersRes, attemptsRes, recommendationsRes] = await Promise.all([
-          fetch("/api/papers"),
+          fetch("/api/student/papers"),
           fetch("/api/student/attempts"),
           fetch("/api/student/recommendations"),
         ]);
@@ -155,13 +155,62 @@ export default function StudentDashboard() {
 
       {/* Main Content */}
       <div className="max-w-7xl mx-auto px-6 py-12">
-        {/* Stats Cards */}
-        <div className="grid md:grid-cols-3 gap-8 mb-12">
-        {/* Completed Attempts Section */}
-        <div>
-          <div className="mb-8">
-            <h2 className="text-2xl font-bold text-gray-900 mb-2">Recent Exam Attempts</h2>
-            <p className="text-gray-600">
+        {/* Compact Stats Row */}
+        <div className="grid md:grid-cols-2 gap-6 mb-12">
+          {/* Average Score */}
+          <div className="bg-white rounded-lg p-4 border border-gray-200">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-gray-600 text-sm font-medium">Average Score</p>
+                <p className="text-3xl font-bold text-gray-900 mt-1">
+                  {stats.completedCount > 0 ? `${Math.round(stats.averageScore)}%` : "—"}
+                </p>
+              </div>
+              <div className="w-10 h-10 bg-green-100 rounded flex items-center justify-center flex-shrink-0">
+                <svg
+                  className="w-5 h-5 text-green-600"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M13 10V3L4 14h7v7l9-11h-7z"
+                  />
+                </svg>
+              </div>
+            </div>
+          </div>
+
+          {/* Pass Rate */}
+          <div className="bg-white rounded-lg p-4 border border-gray-200">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-gray-600 text-sm font-medium">Pass Rate</p>
+                <p className="text-3xl font-bold text-gray-900 mt-1">
+                  {stats.completedCount > 0 ? `${passRate}%` : "—"}
+                </p>
+              </div>
+              <div className="w-10 h-10 bg-emerald-100 rounded flex items-center justify-center flex-shrink-0">
+                <svg
+                  className="w-5 h-5 text-emerald-600"
+                  fill="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path d="M10 15.172l9.192-9.193a1 1 0 111.415 1.415l-10.606 10.606a1 1 0 01-1.415 0l-5.656-5.657a1 1 0 111.415-1.415l4.243 4.242z" />
+                </svg>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Recent Exam Attempts Section */}
+        <div className="mb-12">
+          <div className="mb-6">
+            <h2 className="text-2xl font-bold text-gray-900 mb-1">Recent Exam Attempts</h2>
+            <p className="text-gray-600 text-sm">
               {attempts.length === 0
                 ? "No completed attempts yet"
                 : `${attempts.length} exam${attempts.length !== 1 ? "s" : ""} completed`}
@@ -169,7 +218,7 @@ export default function StudentDashboard() {
           </div>
 
           {attempts.length === 0 ? (
-            <div className="bg-white rounded-2xl p-12 border border-gray-200 text-center">
+            <div className="bg-white rounded-xl p-12 border border-gray-200 text-center">
               <div className="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
                 <svg
                   className="w-8 h-8 text-gray-400"
@@ -191,48 +240,42 @@ export default function StudentDashboard() {
               </p>
             </div>
           ) : (
-            <div className="space-y-3">
-              {attempts.map((attempt) => (
-                <Link key={attempt.id} href={`/exam/attempts/${attempt.id}`}>
-                  <div className="bg-white rounded-2xl p-6 border border-gray-200 hover:border-blue-300 hover:shadow-lg transition duration-300 cursor-pointer group">
-                    <div className="flex items-center justify-between">
-                      <div className="flex-1">
-                        <h3 className="font-semibold text-gray-900 group-hover:text-blue-600 transition mb-2">
-                          {attempt.paperTitle}
-                        </h3>
-                        <div className="flex items-center gap-6 text-sm text-gray-600">
-                          <span>
-                            {new Date(attempt.submittedat).toLocaleDateString('en-US', {
-                              year: 'numeric',
-                              month: 'short',
-                              day: 'numeric',
-                            })}{' '}
-                            at{' '}
-                            {new Date(attempt.submittedat).toLocaleTimeString('en-US', {
-                              hour: 'numeric',
-                              minute: '2-digit',
-                              hour12: true,
-                            })}
-                          </span>
-                          <span>Time taken: {attempt.timeTaken} minutes</span>
-                        </div>
-                      </div>
-                      <div className="flex items-center gap-4">
-                        <div className="text-right">
-                          <div className={`text-2xl font-bold ${
-                            attempt.result === 'Pass' ? 'text-green-600' : 'text-red-600'
-                          }`}>
-                            {attempt.score}%
-                          </div>
-                          <div className={`text-sm font-medium ${
-                            attempt.result === 'Pass' ? 'text-green-600' : 'text-red-600'
-                          }`}>
-                            {attempt.result}
+            <>
+              <div className="space-y-3">
+                {attempts.slice(0, 5).map((attempt) => (
+                  <Link key={attempt.id} href={`/exam/attempts/${attempt.id}`}>
+                    <div className="bg-white rounded-lg p-4 border border-gray-200 hover:border-blue-300 hover:shadow-md transition duration-300 cursor-pointer group">
+                      <div className="flex items-center justify-between">
+                        <div className="flex-1 min-w-0">
+                          <h3 className="font-semibold text-gray-900 group-hover:text-blue-600 transition mb-1">
+                            {attempt.paperTitle}
+                          </h3>
+                          <div className="flex items-center gap-4 text-xs text-gray-600">
+                            <span>
+                              {new Date(attempt.submittedat).toLocaleDateString('en-US', {
+                                year: 'numeric',
+                                month: 'short',
+                                day: 'numeric',
+                              })}
+                            </span>
+                            <span>{attempt.timeTaken} min</span>
                           </div>
                         </div>
-                        <div className="w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center group-hover:bg-blue-200 transition">
+                        <div className="flex items-center gap-3 flex-shrink-0">
+                          <div className="text-right">
+                            <div className={`font-bold ${
+                              attempt.result === 'Pass' ? 'text-green-600' : 'text-red-600'
+                            }`}>
+                              {attempt.score}%
+                            </div>
+                            <div className={`text-xs font-medium ${
+                              attempt.result === 'Pass' ? 'text-green-600' : 'text-red-600'
+                            }`}>
+                              {attempt.result}
+                            </div>
+                          </div>
                           <svg
-                            className="w-5 h-5 text-blue-600"
+                            className="w-4 h-4 text-gray-400 group-hover:text-blue-600 transition"
                             fill="none"
                             stroke="currentColor"
                             viewBox="0 0 24 24"
@@ -247,70 +290,21 @@ export default function StudentDashboard() {
                         </div>
                       </div>
                     </div>
-                  </div>
-                </Link>
-              ))}
-            </div>
+                  </Link>
+                ))}
+              </div>
+              
+              {attempts.length > 5 && (
+                <div className="mt-4 text-center">
+                  <Link href="/dashboard/attempts">
+                    <button className="text-blue-600 hover:text-blue-700 font-medium text-sm">
+                      View all {attempts.length} attempts →
+                    </button>
+                  </Link>
+                </div>
+              )}
+            </>
           )}
-        </div>
-
-          {/* Average Score */}
-          <div className="bg-white rounded-2xl p-8 border border-gray-200 hover:border-blue-300 transition duration-300 shadow-sm hover:shadow-md">
-            <div className="flex items-start justify-between mb-4">
-              <div>
-                <p className="text-gray-600 text-sm font-medium mb-2">Average Score</p>
-                <p className="text-4xl font-bold text-gray-900">
-                  {stats.completedCount > 0 ? `${Math.round(stats.averageScore)}%` : "—"}
-                </p>
-              </div>
-              <div className="w-12 h-12 bg-green-100 rounded-lg flex items-center justify-center">
-                <svg
-                  className="w-6 h-6 text-green-600"
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M13 10V3L4 14h7v7l9-11h-7z"
-                  />
-                </svg>
-              </div>
-            </div>
-            <p className="text-xs text-gray-500">
-              {stats.completedCount === 0
-                ? "Complete your first exam to see statistics"
-                : "Across all attempts"}
-            </p>
-          </div>
-
-          {/* Pass Rate */}
-          <div className="bg-white rounded-2xl p-8 border border-gray-200 hover:border-blue-300 transition duration-300 shadow-sm hover:shadow-md">
-            <div className="flex items-start justify-between mb-4">
-              <div>
-                <p className="text-gray-600 text-sm font-medium mb-2">Pass Rate</p>
-                <p className="text-4xl font-bold text-gray-900">
-                  {stats.completedCount > 0 ? `${passRate}%` : "—"}
-                </p>
-              </div>
-              <div className="w-12 h-12 bg-emerald-100 rounded-lg flex items-center justify-center">
-                <svg
-                  className="w-6 h-6 text-emerald-600"
-                  fill="currentColor"
-                  viewBox="0 0 24 24"
-                >
-                  <path d="M10 15.172l9.192-9.193a1 1 0 111.415 1.415l-10.606 10.606a1 1 0 01-1.415 0l-5.656-5.657a1 1 0 111.415-1.415l4.243 4.242z" />
-                </svg>
-              </div>
-            </div>
-            <p className="text-xs text-gray-500">
-              {stats.completedCount > 0
-                ? `${stats.passCount} of ${stats.completedCount} passed`
-                : "No exams attempted"}
-            </p>
-          </div>
         </div>
 
         {/* AI Recommendations Section */}
