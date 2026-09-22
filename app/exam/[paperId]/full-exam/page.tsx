@@ -9,14 +9,6 @@ interface Question {
   text: string;
 }
 
-interface ExamPart {
-  id: string;
-  partName: string;
-  questionCount: number;
-  passingScore: number;
-  questions: Question[];
-}
-
 interface ExamConfig {
   totalTime: number;
   passingScore: number;
@@ -29,11 +21,13 @@ export default function FullExamMode() {
   const paperId = params.paperId as string;
 
   const [examConfig, setExamConfig] = useState<ExamConfig | null>(null);
-  const [parts, setParts] = useState<ExamPart[]>([]);
+  const [questions, setQuestions] = useState<Question[]>([]);
   const [loading, setLoading] = useState(true);
   const [submitting, setSubmitting] = useState(false);
   const [timeLeft, setTimeLeft] = useState(0);
   const [answers, setAnswers] = useState<Record<string, string>>({});
+  const [flagged, setFlagged] = useState<Set<string>>(new Set());
+  const [currentQIndex, setCurrentQIndex] = useState(0);
   const [submitted, setSubmitted] = useState(false);
   const [result, setResult] = useState<any>(null);
 
@@ -56,17 +50,8 @@ export default function FullExamMode() {
       if (res.ok) {
         const data = await res.json();
         setExamConfig(data.examConfig);
-        // Convert flat questions array to parts format (all questions in one part)
         if (data.questions && Array.isArray(data.questions)) {
-          setParts([
-            {
-              id: 'full-exam',
-              partName: 'Full Exam',
-              questionCount: data.questions.length,
-              passingScore: data.examConfig.passingScore,
-              questions: data.questions
-            }
-          ]);
+          setQuestions(data.questions);
           setTimeLeft(data.examConfig.totalTime * 60);
         } else {
           alert('No questions found for this exam');
@@ -96,8 +81,36 @@ export default function FullExamMode() {
     return () => clearInterval(interval);
   }, [timeLeft, submitted, examConfig]);
 
-  const handleAnswerChange = (questionId: string, answer: string) => {
+  const handleAnswerChange = (answer: string) => {
+    const questionId = questions[currentQIndex].id;
     setAnswers({ ...answers, [questionId]: answer });
+  };
+
+  const toggleFlag = () => {
+    const questionId = questions[currentQIndex].id;
+    const newFlagged = new Set(flagged);
+    if (newFlagged.has(questionId)) {
+      newFlagged.delete(questionId);
+    } else {
+      newFlagged.add(questionId);
+    }
+    setFlagged(newFlagged);
+  };
+
+  const handlePrevious = () => {
+    if (currentQIndex > 0) {
+      setCurrentQIndex(currentQIndex - 1);
+    }
+  };
+
+  const handleNext = () => {
+    if (currentQIndex < questions.length - 1) {
+      setCurrentQIndex(currentQIndex + 1);
+    }
+  };
+
+  const handleJumpToQuestion = (index: number) => {
+    setCurrentQIndex(index);
   };
 
   const handleSubmit = async () => {
@@ -207,25 +220,35 @@ export default function FullExamMode() {
     );
   }
 
-  const totalQuestions = parts.reduce((sum, p) => sum + p.questions.length, 0);
+  if (questions.length === 0) {
+    return <div style={{ padding: "20px" }}>Loading questions...</div>;
+  }
+
+  const currentQuestion = questions[currentQIndex];
   const answeredCount = Object.keys(answers).length;
+  const isFlagged = flagged.has(currentQuestion.id);
+  const isAnswered = currentQuestion.id in answers;
 
   return (
-    <div style={{ maxWidth: "900px", margin: "0 auto", padding: "20px" }}>
+    <div style={{ minHeight: "100vh", display: "flex", flexDirection: "column", backgroundColor: "#f5f5f5" }}>
+      {/* Header */}
       <div
         style={{
+          padding: "15px 30px",
+          backgroundColor: "white",
+          borderBottom: "1px solid #e5e7eb",
           display: "flex",
           justifyContent: "space-between",
           alignItems: "center",
-          marginBottom: "20px",
-          paddingBottom: "20px",
-          borderBottom: "1px solid #e5e7eb",
         }}
       >
-        <h1 style={{ margin: "0" }}>Full Exam Mode</h1>
+        <h1 style={{ margin: "0", fontSize: "18px", fontWeight: "600" }}>FULL EXAM Mode</h1>
+        <div style={{ fontSize: "14px", color: "#666" }}>
+          Question {currentQIndex + 1} of {questions.length}
+        </div>
         <div
           style={{
-            fontSize: "18px",
+            fontSize: "20px",
             fontWeight: "600",
             color: timeLeft < 300 ? "#ef4444" : "#3b82f6",
           }}
@@ -234,111 +257,259 @@ export default function FullExamMode() {
         </div>
       </div>
 
-      <div style={{ marginBottom: "20px", fontSize: "14px", color: "#666" }}>
-        Progress: {answeredCount} / {totalQuestions} answered
-      </div>
-
-      {parts.map((part) => (
-        <div key={part.id} style={{ marginBottom: "30px" }}>
-          <h2 style={{ marginBottom: "15px", fontSize: "18px" }}>
-            {part.partName} ({part.questions.length} questions) - {part.passingScore}% to pass
-          </h2>
-
-          {part.questions.map((question, idx) => (
-            <div
-              key={question.id}
+      {/* Main Content & Sidebar */}
+      <div style={{ display: "flex", flex: 1, overflow: "hidden" }}>
+        {/* Left Main Content */}
+        <div
+          style={{
+            flex: 1,
+            display: "flex",
+            flexDirection: "column",
+            padding: "30px",
+            overflowY: "auto",
+          }}
+        >
+          {/* Question */}
+          <div
+            style={{
+              padding: "25px",
+              backgroundColor: "white",
+              borderRadius: "8px",
+              marginBottom: "25px",
+              border: "1px solid #e5e7eb",
+              flex: 1,
+            }}
+          >
+            <p
               style={{
-                padding: "15px",
-                marginBottom: "15px",
-                backgroundColor: "#f9fafb",
-                borderRadius: "6px",
-                border: "1px solid #e5e7eb",
+                margin: "0 0 20px 0",
+                fontSize: "18px",
+                lineHeight: "1.6",
+                fontWeight: "500",
+                color: "#1f2937",
               }}
             >
-              <p style={{ margin: "0 0 12px 0", fontWeight: "500" }}>
-                {idx + 1}. {question.text}
-              </p>
-              <div style={{ display: "grid", gap: "8px" }}>
-                {["A", "B", "C", "D"].map((option) => (
-                  <label
-                    key={option}
+              {currentQuestion.text}
+            </p>
+
+            {/* Answer Options */}
+            <div style={{ marginTop: "25px" }}>
+              {["A", "B", "C", "D"].map((option) => (
+                <label
+                  key={option}
+                  style={{
+                    display: "flex",
+                    alignItems: "center",
+                    padding: "15px",
+                    marginBottom: "12px",
+                    backgroundColor:
+                      answers[currentQuestion.id] === option ? "#dbeafe" : "white",
+                    border:
+                      answers[currentQuestion.id] === option
+                        ? "2px solid #3b82f6"
+                        : "1px solid #e5e7eb",
+                    borderRadius: "6px",
+                    cursor: "pointer",
+                    transition: "all 0.2s",
+                  }}
+                >
+                  <input
+                    type="radio"
+                    name="answer"
+                    value={option}
+                    checked={answers[currentQuestion.id] === option}
+                    onChange={() => handleAnswerChange(option)}
+                    style={{ marginRight: "12px", cursor: "pointer" }}
+                  />
+                  <span style={{ fontWeight: "500", fontSize: "16px" }}>{option}</span>
+                </label>
+              ))}
+            </div>
+          </div>
+
+          {/* Bottom Navigation */}
+          <div
+            style={{
+              display: "flex",
+              justifyContent: "space-between",
+              alignItems: "center",
+              paddingTop: "20px",
+              borderTop: "1px solid #e5e7eb",
+            }}
+          >
+            <div style={{ display: "flex", gap: "12px" }}>
+              <button
+                onClick={handlePrevious}
+                disabled={currentQIndex === 0}
+                style={{
+                  padding: "10px 20px",
+                  backgroundColor: currentQIndex === 0 ? "#f3f4f6" : "#white",
+                  color: currentQIndex === 0 ? "#9ca3af" : "#1f2937",
+                  border: "1px solid #d1d5db",
+                  borderRadius: "6px",
+                  cursor: currentQIndex === 0 ? "not-allowed" : "pointer",
+                  fontWeight: "500",
+                }}
+              >
+                ← Previous
+              </button>
+              <button
+                onClick={handleNext}
+                disabled={currentQIndex === questions.length - 1}
+                style={{
+                  padding: "10px 20px",
+                  backgroundColor:
+                    currentQIndex === questions.length - 1 ? "#f3f4f6" : "white",
+                  color:
+                    currentQIndex === questions.length - 1 ? "#9ca3af" : "#1f2937",
+                  border: "1px solid #d1d5db",
+                  borderRadius: "6px",
+                  cursor: currentQIndex === questions.length - 1 ? "not-allowed" : "pointer",
+                  fontWeight: "500",
+                }}
+              >
+                Next →
+              </button>
+            </div>
+
+            <button
+              onClick={toggleFlag}
+              style={{
+                padding: "10px 16px",
+                backgroundColor: "white",
+                color: isFlagged ? "#f97316" : "#9ca3af",
+                border: `2px solid ${isFlagged ? "#f97316" : "#e5e7eb"}`,
+                borderRadius: "6px",
+                cursor: "pointer",
+                fontWeight: "500",
+                transition: "all 0.2s",
+              }}
+            >
+              {isFlagged ? "🚩 Flagged" : "🚩 Flag for review"}
+            </button>
+          </div>
+        </div>
+
+        {/* Right Sidebar */}
+        <div
+          style={{
+            width: "300px",
+            backgroundColor: "white",
+            borderLeft: "1px solid #e5e7eb",
+            padding: "20px",
+            display: "flex",
+            flexDirection: "column",
+            overflowY: "auto",
+          }}
+        >
+          {/* Progress Counter */}
+          <div style={{ marginBottom: "20px", paddingBottom: "15px", borderBottom: "1px solid #e5e7eb" }}>
+            <p style={{ margin: "0 0 8px 0", fontSize: "13px", color: "#666", fontWeight: "500" }}>
+              PROGRESS
+            </p>
+            <p style={{ margin: "0", fontSize: "18px", fontWeight: "600", color: "#1f2937" }}>
+              {answeredCount} answered | {questions.length - answeredCount} left
+            </p>
+          </div>
+
+          {/* Question Navigator Grid */}
+          <div style={{ marginBottom: "20px" }}>
+            <p style={{ margin: "0 0 12px 0", fontSize: "13px", color: "#666", fontWeight: "500" }}>
+              QUESTION NAVIGATOR
+            </p>
+            <div
+              style={{
+                display: "grid",
+                gridTemplateColumns: "repeat(5, 1fr)",
+                gap: "8px",
+                maxHeight: "400px",
+                overflowY: "auto",
+                paddingRight: "5px",
+              }}
+            >
+              {questions.map((q, idx) => {
+                const qAnswered = q.id in answers;
+                const qFlagged = flagged.has(q.id);
+                const isCurrent = idx === currentQIndex;
+
+                return (
+                  <button
+                    key={q.id}
+                    onClick={() => handleJumpToQuestion(idx)}
                     style={{
-                      display: "flex",
-                      alignItems: "center",
                       padding: "10px",
-                      backgroundColor:
-                        answers[question.id] === option ? "#dbeafe" : "white",
-                      border:
-                        answers[question.id] === option
-                          ? "1px solid #3b82f6"
-                          : "1px solid #e5e7eb",
+                      backgroundColor: isCurrent
+                        ? "#3b82f6"
+                        : qAnswered
+                        ? "#e0e7ff"
+                        : "white",
+                      color: isCurrent ? "white" : "#1f2937",
+                      border: isCurrent
+                        ? "2px solid #3b82f6"
+                        : qAnswered
+                        ? "1px solid #c7d2fe"
+                        : "1px solid #d1d5db",
                       borderRadius: "4px",
                       cursor: "pointer",
+                      fontWeight: "500",
+                      fontSize: "12px",
+                      transition: "all 0.2s",
+                      position: "relative",
                     }}
                   >
-                    <input
-                      type="radio"
-                      name={`q-${question.id}`}
-                      value={option}
-                      checked={answers[question.id] === option}
-                      onChange={(e) =>
-                        handleAnswerChange(question.id, e.target.value)
-                      }
-                      style={{ marginRight: "10px" }}
-                    />
-                    <span>{option}</span>
-                  </label>
-                ))}
-              </div>
+                    {idx + 1}
+                    {qFlagged && (
+                      <span
+                        style={{
+                          position: "absolute",
+                          top: "-6px",
+                          right: "-6px",
+                          fontSize: "12px",
+                        }}
+                      >
+                        🚩
+                      </span>
+                    )}
+                  </button>
+                );
+              })}
             </div>
-          ))}
-        </div>
-      ))}
+          </div>
 
-      <div
-        style={{
-          display: "flex",
-          gap: "12px",
-          justifyContent: "flex-end",
-          paddingTop: "20px",
-          borderTop: "1px solid #e5e7eb",
-        }}
-      >
-        <button
-          onClick={() => router.back()}
-          style={{
-            padding: "10px 20px",
-            backgroundColor: "#e5e7eb",
-            color: "#1f2937",
-            border: "none",
-            borderRadius: "6px",
-            cursor: "pointer",
-            fontWeight: "600",
-          }}
-        >
-          Back
-        </button>
-        <button
-          onClick={handleSubmit}
-          disabled={submitting || answeredCount < totalQuestions}
-          style={{
-            padding: "10px 24px",
-            backgroundColor:
-              submitting || answeredCount < totalQuestions
-                ? "#9ca3af"
-                : "#3b82f6",
-            color: "white",
-            border: "none",
-            borderRadius: "6px",
-            cursor:
-              submitting || answeredCount < totalQuestions
-                ? "not-allowed"
-                : "pointer",
-            fontWeight: "600",
-          }}
-        >
-          {submitting ? "Submitting..." : "Submit Exam"}
-        </button>
+          {/* Action Buttons */}
+          <div style={{ marginTop: "auto", display: "flex", flexDirection: "column", gap: "10px" }}>
+            <button
+              style={{
+                padding: "12px",
+                backgroundColor: "#e5e7eb",
+                color: "#374151",
+                border: "none",
+                borderRadius: "6px",
+                cursor: "pointer",
+                fontWeight: "600",
+                fontSize: "14px",
+              }}
+            >
+              💾 Save Progress
+            </button>
+            <button
+              onClick={handleSubmit}
+              disabled={submitting}
+              style={{
+                padding: "12px",
+                backgroundColor: submitting ? "#9ca3af" : "#3b82f6",
+                color: "white",
+                border: "none",
+                borderRadius: "6px",
+                cursor: submitting ? "not-allowed" : "pointer",
+                fontWeight: "600",
+                fontSize: "14px",
+              }}
+            >
+              {submitting ? "Submitting..." : "✓ Submit Exam"}
+            </button>
+          </div>
+        </div>
       </div>
     </div>
   );
