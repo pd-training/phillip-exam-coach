@@ -32,7 +32,7 @@ export async function GET(
         p."passingScore"
       FROM examattempt ea
       JOIN "User" u ON ea.userid = u.id
-      JOIN "Paper" p ON ea.paperid = p.id
+      JOIN "Paper" p ON CAST(ea.paperid AS UUID) = p.id
       WHERE ea.id = ${params.attemptId}
     ` as any[];
 
@@ -55,7 +55,7 @@ export async function GET(
         q."explanation",
         q."chapterNumber"
       FROM "Question" q
-      WHERE q."paperId" = ${attempt.paperid}
+      WHERE q."paperId" = CAST(${attempt.paperid} AS UUID)
       ORDER BY q."chapterNumber" ASC, q.id ASC
     ` as any[];
 
