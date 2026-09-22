@@ -10,74 +10,52 @@ export async function GET(
   try {
     const paperId = params.id;
 
-    // Get paper config
-    const paperResult = await prisma.$queryRaw`
-      SELECT "totalTime", "passingScore" FROM "Paper" WHERE id = ${paperId}
-    ` as any[];
+    console.log('Fetching full exam - paperId:', paperId);
 
-    if (!paperResult || paperResult.length === 0) {
+    // Get paper config using ORM
+    const paper = await (prisma as any).paper.findUnique({
+      where: { id: paperId },
+      select: {
+        id: true,
+        totalTime: true,
+        passingScore: true,
+      }
+    });
+
+    if (!paper) {
       return NextResponse.json({ error: 'Paper not found' }, { status: 404 });
     }
 
-    const paper = paperResult[0];
-
-    // Get exam parts with questions
-    const parts = await prisma.$queryRaw`
-      SELECT 
-        ep.id, 
-        ep."partName", 
-        ep."chapterStart", 
-        ep."chapterEnd", 
-        ep."questionCount", 
-        ep."passingScore", 
-        ep."orderIndex"
-      FROM "ExamPart" ep
-      WHERE ep."paperId" = ${paperId}
-      ORDER BY ep."orderIndex" ASC
-    ` as any[];
-
     // Get all questions for this paper
-    const questions = await prisma.$queryRaw`
-      SELECT 
-        id, 
-        "chapterNumber", 
-        "questionText", 
-        "correctAnswer", 
-        explanation
-      FROM "Question"
-      WHERE "paperId" = ${paperId}
-      ORDER BY "chapterNumber" ASC, id ASC
-    ` as any[];
-
-    // Organize questions by part based on chapter ranges
-    const partsWithQuestions = parts.map((part: any) => {
-      const partQuestions = questions.filter(
-        (q: any) => q.chapterNumber >= part.chapterStart && q.chapterNumber <= part.chapterEnd
-      );
-      
-      // Randomly select questionCount questions from this part
-      const shuffled = [...partQuestions].sort(() => Math.random() - 0.5);
-      const selected = shuffled.slice(0, Math.min(part.questionCount, partQuestions.length));
-
-      return {
-        ...part,
-        questions: selected.map((q: any) => ({
-          id: q.id,
-          text: q.questionText,
-          // Don't send correctAnswer/explanation yet (for full exam, feedback after submit)
-        })),
-      };
+    const questions = await (prisma as any).question.findMany({
+      where: { paperId: paperId },
+      select: {
+        id: true,
+        chapterNumber: true,
+        questionText: true,
+        correctAnswer: true,
+        explanation: true,
+      },
+      orderBy: { chapterNumber: 'asc' }
     });
 
+    console.log('Found questions:', questions.length);
+
+    // Return in exam format
     return NextResponse.json({
       examConfig: {
         totalTime: paper.totalTime,
         passingScore: paper.passingScore,
       },
-      parts: partsWithQuestions,
+      questions: questions.map((q: any) => ({
+        id: q.id,
+        text: q.questionText,
+        chapter: q.chapterNumber,
+      })),
+      totalQuestions: questions.length,
     });
   } catch (error: any) {
-    console.error('Get full exam error:', error);
+    console.error('Get full exam error:', error.message);
     return NextResponse.json(
       { error: error.message || 'Failed to fetch exam' },
       { status: 500 }
@@ -90,21 +68,50 @@ export async function POST(
   { params }: { params: { id: string } }
 ) {
   try {
-    const body = await request.json();
+    // Parse JSON
+    let body;
+    try {
+      body = await request.json();
+    } catch (parseError: any) {
+      console.error('JSON parse error:', parseError.message);
+      return NextResponse.json({ error: 'Invalid JSON' }, { status: 400 });
+    }
+
     const { userId, answers } = body; // answers = { [questionId]: 'A' }
     const paperId = params.id;
 
-    // Get all correct answers
-    const questionsResult = await prisma.$queryRaw`
-      SELECT id, "correctAnswer" FROM "Question"
-      WHERE "paperId" = ${paperId}
-    ` as any[];
+    console.log('Submitting exam - userId:', userId, 'paperId:', paperId, 'answers:', Object.keys(answers || {}).length);
+
+    if (!userId || !answers || Object.keys(answers).length === 0) {
+      return NextResponse.json(
+        { error: 'userId and answers required' },
+        { status: 400 }
+      );
+    }
+
+    // Get all questions to check answers
+    const allQuestions = await (prisma as any).question.findMany({
+      where: { paperId: paperId },
+      select: {
+        id: true,
+        correctAnswer: true,
+      }
+    });
+
+    console.log('Found total questions:', allQuestions.length);
+
+    if (allQuestions.length === 0) {
+      return NextResponse.json(
+        { error: 'No questions found for this exam' },
+        { status: 400 }
+      );
+    }
 
     // Calculate score
     let correctCount = 0;
     const answerDetails: any[] = [];
 
-    for (const q of questionsResult) {
+    for (const q of allQuestions) {
       const studentAnswer = answers[q.id];
       const isCorrect = studentAnswer === q.correctAnswer;
       if (isCorrect) correctCount++;
@@ -117,31 +124,40 @@ export async function POST(
       });
     }
 
-    const totalQuestions = questionsResult.length;
+    const totalQuestions = allQuestions.length;
     const score = Math.round((correctCount / totalQuestions) * 100);
 
     // Get passing score requirement
-    const paperResult = await prisma.$queryRaw`
-      SELECT "passingScore" FROM "Paper" WHERE id = ${paperId}
-    ` as any[];
+    const paper = await (prisma as any).paper.findUnique({
+      where: { id: paperId },
+      select: { passingScore: true }
+    });
 
-    const passingScore = paperResult[0]?.passingScore || 75;
+    const passingScore = paper?.passingScore || 75;
     const passed = score >= passingScore;
 
-    // Save exam attempt
-    await prisma.$queryRaw`
-      INSERT INTO examattempt (id, paperid, userid, startedat, submittedat, score, passed, createdat)
-      VALUES (
-        gen_random_uuid(),
-        ${paperId},
-        ${userId},
-        NOW(),
-        NOW(),
-        ${score},
-        ${passed},
-        NOW()
-      )
-    `;
+    console.log('Exam result - score:', score, 'passed:', passed);
+
+    // Save exam attempt using raw SQL (examattempt is lowercase)
+    try {
+      await prisma.$queryRaw`
+        INSERT INTO examattempt (id, paperid, userid, startedat, submittedat, score, passed, createdat)
+        VALUES (
+          gen_random_uuid(),
+          ${paperId},
+          ${userId},
+          NOW(),
+          NOW(),
+          ${score},
+          ${passed},
+          NOW()
+        )
+      `;
+      console.log('Exam attempt saved');
+    } catch (insertError: any) {
+      console.error('Error saving exam attempt:', insertError.message);
+      // Don't fail the response just because we couldn't save attempt
+    }
 
     return NextResponse.json({
       score,
@@ -152,7 +168,7 @@ export async function POST(
       answers: answerDetails,
     });
   } catch (error: any) {
-    console.error('Submit exam error:', error);
+    console.error('Submit exam error:', error.message || error);
     return NextResponse.json(
       { error: error.message || 'Failed to submit exam' },
       { status: 500 }
