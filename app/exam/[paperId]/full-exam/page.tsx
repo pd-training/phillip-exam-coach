@@ -3,6 +3,7 @@
 import { useState, useEffect } from "react";
 import { useSession } from "next-auth/react";
 import { useRouter, useParams } from "next/navigation";
+import StudentNav from "@/components/StudentNav";
 
 interface Question {
   id: string;
@@ -254,45 +255,28 @@ export default function FullExamMode() {
   const isAnswered = currentQuestion.id in answers;
 
   return (
-    <div style={{ minHeight: "100vh", display: "flex", flexDirection: "column", backgroundColor: "#f5f5f5" }}>
-      {/* Header */}
-      <div
-        style={{
-          padding: "15px 30px",
-          backgroundColor: "white",
-          borderBottom: "1px solid #e5e7eb",
-          display: "flex",
-          justifyContent: "space-between",
-          alignItems: "center",
-        }}
-      >
-        <h1 style={{ margin: "0", fontSize: "18px", fontWeight: "600" }}>FULL EXAM Mode</h1>
-        <div style={{ fontSize: "14px", color: "#666" }}>
-          Question {currentQIndex + 1} of {questions.length}
-        </div>
-        <div
-          style={{
-            fontSize: "20px",
-            fontWeight: "600",
-            color: timeLeft < 300 ? "#ef4444" : "#3b82f6",
-          }}
-        >
-          Time: {formatTime(timeLeft)}
+    <div className="min-h-screen bg-gray-50 flex flex-col">
+      <StudentNav />
+
+      {/* Exam Header */}
+      <div className="bg-white border-b border-gray-200 px-6 py-4 sticky top-16 z-40">
+        <div className="max-w-7xl mx-auto flex justify-between items-center">
+          <h1 className="text-xl font-bold text-gray-900">Full Exam Mode</h1>
+          <div className="flex items-center gap-8">
+            <div className="text-sm text-gray-600">
+              Question <span className="font-semibold text-gray-900">{currentQIndex + 1}</span> of <span className="font-semibold text-gray-900">{questions.length}</span>
+            </div>
+            <div className={`text-xl font-bold ${timeLeft < 300 ? "text-red-600" : "text-blue-600"}`}>
+              ⏱ {formatTime(timeLeft)}
+            </div>
+          </div>
         </div>
       </div>
 
       {/* Main Content & Sidebar */}
-      <div style={{ display: "flex", flex: 1, overflow: "hidden" }}>
+      <div className="flex flex-1 overflow-hidden">
         {/* Left Main Content */}
-        <div
-          style={{
-            flex: 1,
-            display: "flex",
-            flexDirection: "column",
-            padding: "30px",
-            overflowY: "auto",
-          }}
-        >
+        <div className="flex-1 flex flex-col p-8 overflow-y-auto bg-white">
           {/* Question */}
           <div
             style={{

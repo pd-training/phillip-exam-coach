@@ -3,6 +3,7 @@
 import { useState, useEffect } from "react";
 import { useSession } from "next-auth/react";
 import { useRouter, useParams } from "next/navigation";
+import StudentNav from "@/components/StudentNav";
 
 interface Question {
   id: string;
@@ -108,40 +109,28 @@ export default function QuickQuizMode() {
   if (completed) {
     const percentage = Math.round((score / questions.length) * 100);
     return (
-      <div style={{ maxWidth: "600px", margin: "0 auto", padding: "20px" }}>
-        <h1>Quiz Complete!</h1>
-        <div
-          style={{
-            padding: "20px",
-            backgroundColor: "#dcfce7",
-            borderRadius: "8px",
-            marginBottom: "20px",
-            textAlign: "center",
-          }}
-        >
-          <p style={{ margin: "0 0 10px 0", fontSize: "24px", fontWeight: "bold" }}>
-            Score: {percentage}%
-          </p>
-          <p style={{ margin: "0" }}>
-            {score} out of {questions.length} correct
-          </p>
-        </div>
+      <div className="min-h-screen bg-gray-50 flex flex-col">
+        <StudentNav />
 
-        <button
-          onClick={() => router.back()}
-          style={{
-            width: "100%",
-            padding: "12px",
-            backgroundColor: "#3b82f6",
-            color: "white",
-            border: "none",
-            borderRadius: "6px",
-            cursor: "pointer",
-            fontWeight: "600",
-          }}
-        >
-          Back to Practice
-        </button>
+        <div className="flex-1 flex items-center justify-center px-6 py-12">
+          <div className="bg-white rounded-2xl border border-gray-200 p-8 w-full max-w-2xl text-center">
+            <h1 className="text-3xl font-bold text-gray-900 mb-8">🎉 Quiz Complete!</h1>
+            
+            <div className="bg-green-50 border-2 border-green-200 rounded-xl p-8 mb-8">
+              <p className="text-5xl font-bold text-green-600 mb-3">{percentage}%</p>
+              <p className="text-gray-700 font-medium">
+                {score} out of {questions.length} correct
+              </p>
+            </div>
+
+            <button
+              onClick={() => router.back()}
+              className="w-full px-6 py-3 bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-semibold transition"
+            >
+              Back to Practice
+            </button>
+          </div>
+        </div>
       </div>
     );
   }
@@ -150,33 +139,22 @@ export default function QuickQuizMode() {
   const progress = currentQIndex + 1;
 
   return (
-    <div style={{ maxWidth: "700px", margin: "0 auto", padding: "20px" }}>
-      <div
-        style={{
-          marginBottom: "20px",
-          display: "flex",
-          justifyContent: "space-between",
-          alignItems: "center",
-        }}
-      >
-        <h1 style={{ margin: "0" }}>Quick Quiz</h1>
-        <div style={{ fontSize: "14px", color: "#666" }}>
-          Question {progress} of {questions.length}
-        </div>
-      </div>
+    <div className="min-h-screen bg-gray-50 flex flex-col">
+      <StudentNav />
 
-      {/* Progress bar */}
-      <div
-        style={{
-          width: "100%",
-          height: "8px",
-          backgroundColor: "#e5e7eb",
-          borderRadius: "4px",
-          marginBottom: "20px",
-          overflow: "hidden",
-        }}
-      >
-        <div
+      <div className="flex-1 flex items-center justify-center px-6 py-12">
+        <div className="bg-white rounded-2xl border border-gray-200 p-8 w-full max-w-2xl">
+          {/* Header */}
+          <div className="mb-8 flex justify-between items-center">
+            <h1 className="text-3xl font-bold text-gray-900">Quick Quiz</h1>
+            <div className="text-sm font-medium text-gray-600">
+              Question <span className="text-blue-600 font-bold">{progress}</span> of <span className="text-gray-900 font-bold">{questions.length}</span>
+            </div>
+          </div>
+
+          {/* Progress bar */}
+          <div className="w-full h-2 bg-gray-200 rounded-full mb-8 overflow-hidden">
+            <div
           style={{
             height: "100%",
             width: `${(progress / questions.length) * 100}%`,

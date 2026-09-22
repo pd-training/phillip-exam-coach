@@ -1,14 +1,17 @@
 "use client";
 
+import StudentNav from "@/components/StudentNav";
 import { useSession } from "next-auth/react";
 import { useRouter, useParams } from "next/navigation";
 import { useState, useEffect } from "react";
+import Link from "next/link";
 
 interface PaperInfo {
   id: string;
   title: string;
   durationMinutes: number;
   totalQuestions: number;
+  description?: string;
 }
 
 export default function PracticePage() {
@@ -20,10 +23,8 @@ export default function PracticePage() {
   const [paper, setPaper] = useState<PaperInfo | null>(null);
   const [loading, setLoading] = useState(true);
 
-  // Handle auth redirects
   useEffect(() => {
     if (status === "loading") return;
-
     if (status === "unauthenticated") {
       router.push("/login");
       return;
@@ -50,7 +51,14 @@ export default function PracticePage() {
   };
 
   if (status === "loading" || loading) {
-    return <div style={{ padding: "20px" }}>Loading...</div>;
+    return (
+      <div className="min-h-screen bg-gray-50">
+        <StudentNav />
+        <div className="flex items-center justify-center h-[calc(100vh-64px)]">
+          <div className="w-12 h-12 border-4 border-gray-300 border-t-blue-600 rounded-full animate-spin" />
+        </div>
+      </div>
+    );
   }
 
   if (status === "unauthenticated") {
@@ -58,207 +66,149 @@ export default function PracticePage() {
   }
 
   if (!paper) {
-    return <div style={{ padding: "20px" }}>Paper not found</div>;
+    return (
+      <div className="min-h-screen bg-gray-50">
+        <StudentNav />
+        <div className="max-w-7xl mx-auto px-6 py-12">
+          <div className="text-center">
+            <p className="text-gray-600">Paper not found</p>
+            <Link href="/dashboard">
+              <button className="mt-4 px-6 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-medium">
+                Back to Dashboard
+              </button>
+            </Link>
+          </div>
+        </div>
+      </div>
+    );
   }
 
   return (
-    <div style={{ minHeight: "100vh", backgroundColor: "#f5f5f5" }}>
-      {/* Back Link */}
-      <div style={{ backgroundColor: "white", borderBottom: "1px solid #e5e7eb", padding: "20px 0" }}>
-        <div style={{ maxWidth: "1000px", margin: "0 auto", paddingLeft: "20px" }}>
+    <div className="min-h-screen bg-gray-50">
+      <StudentNav />
+
+      {/* Hero Section */}
+      <div className="bg-gradient-to-r from-blue-600 to-blue-700 text-white py-12 px-6">
+        <div className="max-w-7xl mx-auto">
           <button
             onClick={() => router.back()}
-            style={{
-              padding: "0",
-              backgroundColor: "transparent",
-              color: "#3b82f6",
-              border: "none",
-              cursor: "pointer",
-              fontWeight: "600",
-              fontSize: "14px",
-            }}
+            className="text-blue-100 hover:text-white font-medium text-sm mb-6 transition"
           >
-            ← Back to papers
+            ← Back
           </button>
+          <h1 className="text-4xl font-bold mb-2">{paper.title}</h1>
+          <p className="text-blue-100">Choose your practice mode</p>
         </div>
       </div>
 
       {/* Main Content */}
-      <div style={{ maxWidth: "1000px", margin: "0 auto", padding: "40px 20px" }}>
-        {/* Paper Header */}
-        <div style={{ marginBottom: "40px" }}>
-          <h1
-            style={{
-              margin: "0 0 12px 0",
-              fontSize: "42px",
-              fontWeight: "700",
-              color: "#3b82f6",
-            }}
-          >
-            {paper.title}
-          </h1>
-          <p style={{ margin: "0", fontSize: "16px", color: "#666" }}>
-            Rules, Ethics and Skills for Securities Exchange Dealers
-          </p>
-        </div>
-
-        {/* Full Exam Mode Card */}
-        <div
-          style={{
-            padding: "25px",
-            backgroundColor: "white",
-            border: "1px solid #e5e7eb",
-            borderRadius: "10px",
-            marginBottom: "30px",
-            display: "flex",
-            justifyContent: "space-between",
-            alignItems: "center",
-            cursor: "pointer",
-            transition: "all 0.2s",
-          }}
-          onClick={() => router.push(`/exam/${paperId}/full-exam`)}
-          onMouseOver={(e) => {
-            e.currentTarget.style.boxShadow = "0 4px 12px rgba(0,0,0,0.08)";
-            e.currentTarget.style.transform = "translateY(-2px)";
-          }}
-          onMouseOut={(e) => {
-            e.currentTarget.style.boxShadow = "none";
-            e.currentTarget.style.transform = "translateY(0)";
-          }}
-        >
-          <div style={{ display: "flex", alignItems: "center", gap: "20px" }}>
-            <div
-              style={{
-                fontSize: "48px",
-                backgroundColor: "#d1fae5",
-                padding: "16px",
-                borderRadius: "8px",
-              }}
-            >
-              📄
+      <div className="max-w-5xl mx-auto px-6 py-12">
+        {/* Paper Info */}
+        <div className="bg-white rounded-2xl p-8 border border-gray-200 mb-12">
+          <div className="grid md:grid-cols-4 gap-8">
+            <div>
+              <p className="text-gray-600 text-sm font-medium mb-2">Total Questions</p>
+              <p className="text-3xl font-bold text-gray-900">{paper.totalQuestions}</p>
             </div>
             <div>
-              <h3 style={{ margin: "0 0 8px 0", fontSize: "20px", fontWeight: "600" }}>
-                Full Exam Mode
-              </h3>
-              <p style={{ margin: "0", fontSize: "15px", color: "#666" }}>
-                {paper.totalQuestions} questions — {paper.durationMinutes} min
-              </p>
+              <p className="text-gray-600 text-sm font-medium mb-2">Duration</p>
+              <p className="text-3xl font-bold text-gray-900">{paper.durationMinutes}m</p>
+            </div>
+            <div>
+              <p className="text-gray-600 text-sm font-medium mb-2">Format</p>
+              <p className="text-3xl font-bold text-gray-900">MCQ</p>
+            </div>
+            <div>
+              <p className="text-gray-600 text-sm font-medium mb-2">Difficulty</p>
+              <p className="text-3xl font-bold text-gray-900">Mixed</p>
             </div>
           </div>
-
-          <button
-            style={{
-              padding: "12px 28px",
-              backgroundColor: "#3b82f6",
-              color: "white",
-              border: "none",
-              borderRadius: "6px",
-              cursor: "pointer",
-              fontWeight: "600",
-              fontSize: "14px",
-            }}
-          >
-            Start exam
-          </button>
         </div>
 
-        {/* Info Banner */}
-        <div
-          style={{
-            padding: "16px",
-            backgroundColor: "#fef3c7",
-            border: "1px solid #fde68a",
-            borderRadius: "8px",
-            marginBottom: "40px",
-            display: "flex",
-            gap: "12px",
-            alignItems: "flex-start",
-          }}
-        >
-          <span style={{ fontSize: "20px", marginTop: "2px" }}>⭐</span>
-          <p style={{ margin: "0", fontSize: "14px", color: "#92400e", lineHeight: "1.5" }}>
-            Recommended focus areas unlock after you complete at least one real mock exam on this paper.
-          </p>
-        </div>
+        {/* Practice Modes */}
+        <div className="mb-12">
+          <h2 className="text-2xl font-bold text-gray-900 mb-8">Select Practice Mode</h2>
 
-        {/* Practice Modes Section */}
-        <div>
-          <h2 style={{ margin: "0 0 20px 0", fontSize: "18px", fontWeight: "600", color: "#1f2937" }}>
-            Practice modes
-          </h2>
+          <div className="grid md:grid-cols-2 gap-8">
+            {/* Full Exam */}
+            <button
+              onClick={() => router.push(`/exam/${paperId}/full-exam`)}
+              className="group bg-white rounded-2xl p-8 border-2 border-gray-200 hover:border-blue-600 hover:shadow-lg transition duration-300 text-left"
+            >
+              <div className="flex items-start justify-between mb-6">
+                <div className="w-14 h-14 bg-blue-100 rounded-lg flex items-center justify-center group-hover:bg-blue-600 transition">
+                  <svg className="w-7 h-7 text-blue-600 group-hover:text-white transition" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
+                  </svg>
+                </div>
+                <span className="text-sm font-bold text-blue-600 bg-blue-50 px-3 py-1 rounded-full">Recommended</span>
+              </div>
+              <h3 className="text-xl font-bold text-gray-900 mb-2">Full Exam Mode</h3>
+              <p className="text-gray-600 text-sm mb-6">
+                Take the complete exam under timed conditions. Get your score and detailed review of all answers.
+              </p>
+              <div className="flex items-center gap-2 text-blue-600 font-semibold group-hover:gap-3 transition">
+                <span>Start Exam</span>
+                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                </svg>
+              </div>
+            </button>
 
-          <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(350px, 1fr))", gap: "20px" }}>
-            {/* Quick Quiz Card */}
-            <div
-              style={{
-                padding: "25px",
-                backgroundColor: "white",
-                border: "1px solid #e5e7eb",
-                borderRadius: "10px",
-                cursor: "pointer",
-                transition: "all 0.2s",
-              }}
+            {/* Quick Quiz */}
+            <button
               onClick={() => router.push(`/exam/${paperId}/quick-quiz`)}
-              onMouseOver={(e) => {
-                e.currentTarget.style.boxShadow = "0 4px 12px rgba(0,0,0,0.08)";
-                e.currentTarget.style.transform = "translateY(-2px)";
-              }}
-              onMouseOut={(e) => {
-                e.currentTarget.style.boxShadow = "none";
-                e.currentTarget.style.transform = "translateY(0)";
-              }}
+              className="group bg-white rounded-2xl p-8 border-2 border-gray-200 hover:border-green-600 hover:shadow-lg transition duration-300 text-left"
             >
-              <div style={{ fontSize: "40px", marginBottom: "16px" }}>⚡</div>
-              <h3 style={{ margin: "0 0 8px 0", fontSize: "16px", fontWeight: "600" }}>
-                Quick Quiz
-              </h3>
-              <p style={{ margin: "0 0 12px 0", fontSize: "13px", color: "#666" }}>
-                15 Questions
+              <div className="w-14 h-14 bg-green-100 rounded-lg flex items-center justify-center mb-6 group-hover:bg-green-600 transition">
+                <svg className="w-7 h-7 text-green-600 group-hover:text-white transition" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
+                </svg>
+              </div>
+              <h3 className="text-xl font-bold text-gray-900 mb-2">Quick Quiz</h3>
+              <p className="text-gray-600 text-sm mb-6">
+                Rapid-fire questions without time limits. Perfect for quick revision and refreshing your knowledge.
               </p>
-              <p style={{ margin: "0 0 16px 0", fontSize: "14px", color: "#1f2937", lineHeight: "1.5" }}>
-                Take a focused practice session with random questions
-              </p>
-              <p style={{ margin: "0", fontSize: "13px", color: "#999", fontStyle: "italic" }}>
-                Perfect for a quick review or when you have limited time.
-              </p>
-            </div>
-
-            {/* Practice by Chapter Card */}
-            <div
-              style={{
-                padding: "25px",
-                backgroundColor: "white",
-                border: "1px solid #e5e7eb",
-                borderRadius: "10px",
-                cursor: "pointer",
-                transition: "all 0.2s",
-              }}
-              onClick={() => router.push(`/exam/${paperId}/practice-chapter`)}
-              onMouseOver={(e) => {
-                e.currentTarget.style.boxShadow = "0 4px 12px rgba(0,0,0,0.08)";
-                e.currentTarget.style.transform = "translateY(-2px)";
-              }}
-              onMouseOut={(e) => {
-                e.currentTarget.style.boxShadow = "none";
-                e.currentTarget.style.transform = "translateY(0)";
-              }}
-            >
-              <div style={{ fontSize: "40px", marginBottom: "16px" }}>📚</div>
-              <h3 style={{ margin: "0 0 8px 0", fontSize: "16px", fontWeight: "600" }}>
-                Practice by Chapter
-              </h3>
-              <p style={{ margin: "0 0 12px 0", fontSize: "13px", color: "#666" }}>
-                Chapter drills
-              </p>
-              <p style={{ margin: "0 0 16px 0", fontSize: "14px", color: "#1f2937", lineHeight: "1.5" }}>
-                Pick one chapter and drill questions from it
-              </p>
-              <p style={{ margin: "0", fontSize: "13px", color: "#999", fontStyle: "italic" }}>
-                Build mastery one topic at a time.
-              </p>
-            </div>
+              <div className="flex items-center gap-2 text-green-600 font-semibold group-hover:gap-3 transition">
+                <span>Start Quiz</span>
+                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                </svg>
+              </div>
+            </button>
           </div>
+
+          {/* Practice by Chapter */}
+          <div className="mt-8">
+            <h3 className="text-lg font-bold text-gray-900 mb-4">Practice by Chapter</h3>
+            <p className="text-gray-600 text-sm mb-6">
+              Focus on specific chapters and master each topic one step at a time.
+            </p>
+            <Link href={`/exam/${paperId}/practice-chapter`}>
+              <button className="px-6 py-3 border-2 border-blue-600 text-blue-600 hover:bg-blue-50 rounded-lg font-semibold transition">
+                View Chapters →
+              </button>
+            </Link>
+          </div>
+        </div>
+
+        {/* Tips */}
+        <div className="bg-blue-50 border border-blue-200 rounded-2xl p-8">
+          <h3 className="text-lg font-bold text-blue-900 mb-4">💡 Study Tips</h3>
+          <ul className="space-y-3 text-blue-800 text-sm">
+            <li className="flex gap-3">
+              <span className="text-blue-600 font-bold">→</span>
+              <span>Start with Full Exam Mode to assess your current level</span>
+            </li>
+            <li className="flex gap-3">
+              <span className="text-blue-600 font-bold">→</span>
+              <span>Use Practice by Chapter to target weak areas</span>
+            </li>
+            <li className="flex gap-3">
+              <span className="text-blue-600 font-bold">→</span>
+              <span>Review explanations carefully to understand concepts</span>
+            </li>
+          </ul>
         </div>
       </div>
     </div>

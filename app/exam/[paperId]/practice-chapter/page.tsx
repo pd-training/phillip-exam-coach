@@ -3,6 +3,7 @@
 import { useState, useEffect } from "react";
 import { useSession } from "next-auth/react";
 import { useRouter, useParams } from "next/navigation";
+import StudentNav from "@/components/StudentNav";
 
 interface Chapter {
   number: number;
@@ -140,146 +141,108 @@ export default function PracticeChapterMode() {
   // Chapter selection view
   if (selectedChapter === null) {
     return (
-      <div style={{ maxWidth: "700px", margin: "0 auto", padding: "20px" }}>
-        <h1>Practice by Chapter</h1>
-        <p style={{ color: "#666", marginBottom: "20px" }}>
-          Select a chapter to practice questions from that topic.
-        </p>
+      <div className="min-h-screen bg-gray-50 flex flex-col">
+        <StudentNav />
 
-        <div style={{ display: "grid", gap: "12px" }}>
-          {chapters.map((ch) => (
+        {/* Hero Section */}
+        <div className="bg-gradient-to-r from-blue-600 to-blue-700 text-white py-12 px-6">
+          <div className="max-w-5xl mx-auto">
             <button
-              key={ch.number}
-              onClick={() => handleSelectChapter(ch.number)}
-              style={{
-                padding: "16px",
-                textAlign: "left",
-                backgroundColor: "#f9fafb",
-                border: "1px solid #e5e7eb",
-                borderRadius: "6px",
-                cursor: "pointer",
-                transition: "all 0.2s",
-              }}
-              onMouseOver={(e) => {
-                e.currentTarget.style.backgroundColor = "#f3f4f6";
-                e.currentTarget.style.borderColor = "#d1d5db";
-              }}
-              onMouseOut={(e) => {
-                e.currentTarget.style.backgroundColor = "#f9fafb";
-                e.currentTarget.style.borderColor = "#e5e7eb";
-              }}
+              onClick={() => router.back()}
+              className="text-blue-100 hover:text-white font-medium text-sm mb-6 transition"
             >
-              <div style={{ fontWeight: "600", marginBottom: "4px" }}>
-                {ch.title}
-              </div>
-              <div style={{ fontSize: "14px", color: "#666" }}>
-                {ch.questionCount} questions
-              </div>
+              ← Back
             </button>
-          ))}
+            <h1 className="text-4xl font-bold mb-2">Practice by Chapter</h1>
+            <p className="text-blue-100">Select a chapter to practice questions from that specific topic</p>
+          </div>
         </div>
 
-        <button
-          onClick={() => router.back()}
-          style={{
-            marginTop: "20px",
-            padding: "12px 20px",
-            backgroundColor: "#e5e7eb",
-            color: "#1f2937",
-            border: "none",
-            borderRadius: "6px",
-            cursor: "pointer",
-            fontWeight: "600",
-          }}
-        >
-          Back
-        </button>
+        {/* Chapters Grid */}
+        <div className="max-w-5xl mx-auto px-6 py-12 flex-1">
+          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {chapters.map((ch) => (
+              <button
+                key={ch.number}
+                onClick={() => handleSelectChapter(ch.number)}
+                className="bg-white rounded-2xl p-6 border-2 border-gray-200 hover:border-blue-600 hover:shadow-lg transition duration-300 text-left group"
+              >
+                <div className="flex items-start justify-between mb-4">
+                  <div className="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center group-hover:bg-blue-600 transition">
+                    <span className="text-lg font-bold text-blue-600 group-hover:text-white transition">
+                      {ch.number}
+                    </span>
+                  </div>
+                  <span className="text-xs font-bold text-blue-600 bg-blue-50 px-2 py-1 rounded-full group-hover:bg-blue-600 group-hover:text-white transition">
+                    {ch.questionCount}
+                  </span>
+                </div>
+                <h3 className="text-lg font-bold text-gray-900 mb-1 group-hover:text-blue-600 transition">
+                  {ch.title}
+                </h3>
+                <p className="text-sm text-gray-600">
+                  {ch.questionCount} {ch.questionCount === 1 ? "question" : "questions"}
+                </p>
+              </button>
+            ))}
+          </div>
+        </div>
       </div>
     );
   }
 
   // Question drill view
   if (questions.length === 0) {
-    return <div style={{ padding: "20px" }}>Loading questions...</div>;
+    return (
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+        <StudentNav />
+        <div className="w-12 h-12 border-4 border-gray-300 border-t-blue-600 rounded-full animate-spin" />
+      </div>
+    );
   }
 
   const currentQuestion = questions[currentQIndex];
   const progress = currentQIndex + 1;
 
   return (
-    <div style={{ maxWidth: "700px", margin: "0 auto", padding: "20px" }}>
-      <div
-        style={{
-          marginBottom: "20px",
-          display: "flex",
-          justifyContent: "space-between",
-          alignItems: "center",
-        }}
-      >
-        <h1 style={{ margin: "0" }}>
-          Chapter {selectedChapter} — {questions.length} random questions
-        </h1>
-        <div style={{ fontSize: "14px", color: "#666" }}>
-          Question {progress} of {questions.length}
-        </div>
-      </div>
+    <div className="min-h-screen bg-gray-50 flex flex-col">
+      <StudentNav />
 
-      {/* Progress bar */}
-      <div
-        style={{
-          width: "100%",
-          height: "8px",
-          backgroundColor: "#e5e7eb",
-          borderRadius: "4px",
-          marginBottom: "20px",
-          overflow: "hidden",
-        }}
-      >
-        <div
-          style={{
-            height: "100%",
-            width: `${(progress / questions.length) * 100}%`,
-            backgroundColor: "#3b82f6",
-            transition: "width 0.3s",
-          }}
-        />
+      <div className="flex-1 flex items-center justify-center px-6 py-12">
+        <div className="bg-white rounded-2xl border border-gray-200 p-8 w-full max-w-2xl">
+          {/* Header */}
+          <div className="mb-8 flex justify-between items-center">
+            <h1 className="text-2xl font-bold text-gray-900">
+              Chapter {selectedChapter}
+            </h1>
+            <div className="text-sm font-medium text-gray-600">
+              Question <span className="text-blue-600 font-bold">{progress}</span> of <span className="text-gray-900 font-bold">{questions.length}</span>
+            </div>
+          </div>
+
+          {/* Progress bar */}
+          <div className="w-full h-2 bg-gray-200 rounded-full mb-8 overflow-hidden">
+            <div
+              className="h-full bg-blue-600 transition-all duration-300"
       </div>
 
       {/* Question */}
-      <div
-        style={{
-          padding: "20px",
-          backgroundColor: "#f9fafb",
-          borderRadius: "8px",
-          marginBottom: "20px",
-          border: "1px solid #e5e7eb",
-        }}
-      >
-        <p style={{ margin: "0", fontWeight: "500", fontSize: "16px", lineHeight: "1.5" }}>
+      <div className="bg-blue-50 border border-blue-200 rounded-xl p-6 mb-8">
+        <p className="m-0 font-medium text-lg leading-relaxed text-gray-900">
           {currentQuestion.text}
         </p>
       </div>
 
       {/* Answer options */}
-      <div style={{ marginBottom: "20px" }}>
+      <div className="space-y-3 mb-8">
         {["A", "B", "C", "D"].map((option) => (
           <label
             key={option}
-            style={{
-              display: "flex",
-              alignItems: "center",
-              padding: "12px",
-              marginBottom: "10px",
-              backgroundColor:
-                selectedAnswer === option ? "#dbeafe" : "white",
-              border:
-                selectedAnswer === option
-                  ? "2px solid #3b82f6"
-                  : "1px solid #e5e7eb",
-              borderRadius: "6px",
-              cursor: showingFeedback ? "not-allowed" : "pointer",
-              opacity: showingFeedback && selectedAnswer !== option ? 0.6 : 1,
-            }}
+            className={`flex items-center p-4 rounded-lg border-2 cursor-pointer transition ${
+              selectedAnswer === option
+                ? "bg-blue-50 border-blue-600"
+                : "bg-white border-gray-200 hover:border-gray-300"
+            } ${showingFeedback && selectedAnswer !== option ? "opacity-50" : "opacity-100"}`}
           >
             <input
               type="radio"
@@ -288,58 +251,41 @@ export default function PracticeChapterMode() {
               checked={selectedAnswer === option}
               onChange={(e) => setSelectedAnswer(e.target.value)}
               disabled={showingFeedback}
-              style={{ marginRight: "12px" }}
+              className="mr-4 w-4 h-4"
             />
-            <span style={{ fontWeight: "500" }}>{option}</span>
+            <span className="font-medium text-gray-900">{option}</span>
           </label>
         ))}
       </div>
 
       {/* Feedback */}
       {showingFeedback && feedback && (
-        <div
-          style={{
-            padding: "15px",
-            marginBottom: "20px",
-            backgroundColor: feedback.isCorrect ? "#dcfce7" : "#fee2e2",
-            borderRadius: "6px",
-            borderLeft: `4px solid ${feedback.isCorrect ? "#22c55e" : "#ef4444"}`,
-          }}
-        >
-          <p
-            style={{
-              margin: "0 0 10px 0",
-              fontWeight: "600",
-              color: feedback.isCorrect ? "#166534" : "#991b1b",
-            }}
-          >
+        <div className={`rounded-lg p-6 mb-8 border-l-4 ${
+          feedback.isCorrect
+            ? "bg-green-50 border-green-500"
+            : "bg-red-50 border-red-500"
+        }`}>
+          <p className={`m-0 mb-3 font-bold ${
+            feedback.isCorrect ? "text-green-700" : "text-red-700"
+          }`}>
             {feedback.isCorrect ? "✓ Correct!" : "✗ Incorrect"}
           </p>
           {!feedback.isCorrect && (
-            <p style={{ margin: "0 0 10px 0", fontSize: "14px" }}>
+            <p className="m-0 mb-3 text-sm text-gray-700">
               Correct answer: <strong>{feedback.correctAnswer}</strong>
             </p>
           )}
-          <p style={{ margin: "0", fontSize: "14px", lineHeight: "1.5" }}>
+          <p className="m-0 text-sm leading-relaxed text-gray-700">
             {feedback.explanation}
           </p>
         </div>
       )}
 
       {/* Buttons */}
-      <div style={{ display: "flex", gap: "12px" }}>
+      <div className="flex gap-4">
         <button
           onClick={() => setSelectedChapter(null)}
-          style={{
-            flex: 1,
-            padding: "12px",
-            backgroundColor: "#e5e7eb",
-            color: "#1f2937",
-            border: "none",
-            borderRadius: "6px",
-            cursor: "pointer",
-            fontWeight: "600",
-          }}
+          className="flex-1 px-6 py-3 bg-gray-200 hover:bg-gray-300 text-gray-900 rounded-lg font-semibold transition"
         >
           Back to Chapters
         </button>
@@ -347,33 +293,18 @@ export default function PracticeChapterMode() {
           <button
             onClick={handleSubmitAnswer}
             disabled={!selectedAnswer}
-            style={{
-              flex: 1,
-              padding: "12px",
-              backgroundColor:
-                selectedAnswer ? "#3b82f6" : "#9ca3af",
-              color: "white",
-              border: "none",
-              borderRadius: "6px",
-              cursor: selectedAnswer ? "pointer" : "not-allowed",
-              fontWeight: "600",
-            }}
+            className={`flex-1 px-6 py-3 rounded-lg font-semibold transition ${
+              selectedAnswer
+                ? "bg-blue-600 hover:bg-blue-700 text-white"
+                : "bg-gray-300 text-gray-500 cursor-not-allowed"
+            }`}
           >
             Submit
           </button>
         ) : (
           <button
             onClick={handleNext}
-            style={{
-              flex: 1,
-              padding: "12px",
-              backgroundColor: "#3b82f6",
-              color: "white",
-              border: "none",
-              borderRadius: "6px",
-              cursor: "pointer",
-              fontWeight: "600",
-            }}
+            className="flex-1 px-6 py-3 bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-semibold transition"
           >
             {currentQIndex < questions.length - 1 ? "Next Question" : "Back to Chapters"}
           </button>
