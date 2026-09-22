@@ -163,7 +163,7 @@ export default function QuickQuizMode() {
           </div>
 
           {/* Question */}
-      <div
+          <div
         style={{
           padding: "20px",
           backgroundColor: "#f9fafb",
@@ -171,148 +171,155 @@ export default function QuickQuizMode() {
           marginBottom: "20px",
           border: "1px solid #e5e7eb",
         }}
-      >
-        <p style={{ margin: "0", fontWeight: "500", fontSize: "16px", lineHeight: "1.5" }}>
-          {currentQuestion.text}
-        </p>
-        <p style={{ margin: "10px 0 0 0", fontSize: "12px", color: "#999" }}>
-          Chapter {currentQuestion.chapter}
-        </p>
-      </div>
-
-      {/* Answer options */}
-      <div style={{ marginBottom: "20px" }}>
-        {["A", "B", "C", "D"].map((option) => (
-          <label
-            key={option}
             style={{
-              display: "flex",
-              alignItems: "center",
-              padding: "12px",
-              marginBottom: "10px",
-              backgroundColor:
-                selectedAnswer === option ? "#dbeafe" : "white",
-              border:
-                selectedAnswer === option
-                  ? "2px solid #3b82f6"
-                  : "1px solid #e5e7eb",
-              borderRadius: "6px",
-              cursor: showingFeedback ? "not-allowed" : "pointer",
-              opacity: showingFeedback && selectedAnswer !== option ? 0.6 : 1,
+              padding: "20px",
+              backgroundColor: "#f9fafb",
+              borderRadius: "8px",
+              marginBottom: "20px",
+              border: "1px solid #e5e7eb",
             }}
           >
-            <input
-              type="radio"
-              name="answer"
-              value={option}
-              checked={selectedAnswer === option}
-              onChange={(e) => setSelectedAnswer(e.target.value)}
-              disabled={showingFeedback}
-              style={{ marginRight: "12px" }}
-            />
-            <span style={{ fontWeight: "500" }}>{option}</span>
-          </label>
-        ))}
-      </div>
-
-      {/* Feedback */}
-      {showingFeedback && feedback && (
-        <div
-          style={{
-            padding: "15px",
-            marginBottom: "20px",
-            backgroundColor: feedback.isCorrect ? "#dcfce7" : "#fee2e2",
-            borderRadius: "6px",
-            borderLeft: `4px solid ${feedback.isCorrect ? "#22c55e" : "#ef4444"}`,
-          }}
-        >
-          <p
-            style={{
-              margin: "0 0 10px 0",
-              fontWeight: "600",
-              color: feedback.isCorrect ? "#166534" : "#991b1b",
-            }}
-          >
-            {feedback.isCorrect ? "✓ Correct!" : "✗ Incorrect"}
-          </p>
-          {!feedback.isCorrect && (
-            <p style={{ margin: "0 0 10px 0", fontSize: "14px" }}>
-              Correct answer: <strong>{feedback.correctAnswer}</strong>
+            <p style={{ margin: "0", fontWeight: "500", fontSize: "16px", lineHeight: "1.5" }}>
+              {currentQuestion.text}
             </p>
+            <p style={{ margin: "10px 0 0 0", fontSize: "12px", color: "#999" }}>
+              Chapter {currentQuestion.chapter}
+            </p>
+          </div>
+
+          {/* Answer options */}
+          <div style={{ marginBottom: "20px" }}>
+            {["A", "B", "C", "D"].map((option) => (
+              <label
+                key={option}
+                style={{
+                  display: "flex",
+                  alignItems: "center",
+                  padding: "12px",
+                  marginBottom: "10px",
+                  backgroundColor:
+                    selectedAnswer === option ? "#dbeafe" : "white",
+                  border:
+                    selectedAnswer === option
+                      ? "2px solid #3b82f6"
+                      : "1px solid #e5e7eb",
+                  borderRadius: "6px",
+                  cursor: showingFeedback ? "not-allowed" : "pointer",
+                  opacity: showingFeedback && selectedAnswer !== option ? 0.6 : 1,
+                }}
+              >
+                <input
+                  type="radio"
+                  name="answer"
+                  value={option}
+                  checked={selectedAnswer === option}
+                  onChange={(e) => setSelectedAnswer(e.target.value)}
+                  disabled={showingFeedback}
+                  style={{ marginRight: "12px" }}
+                />
+                <span style={{ fontWeight: "500" }}>{option}</span>
+              </label>
+            ))}
+              </div>
+
+          {/* Feedback */}
+          {showingFeedback && feedback && (
+            <div
+              style={{
+                padding: "15px",
+                marginBottom: "20px",
+                backgroundColor: feedback.isCorrect ? "#dcfce7" : "#fee2e2",
+                borderRadius: "6px",
+                borderLeft: `4px solid ${feedback.isCorrect ? "#22c55e" : "#ef4444"}`,
+              }}
+            >
+              <p
+                style={{
+                  margin: "0 0 10px 0",
+                  fontWeight: "600",
+                  color: feedback.isCorrect ? "#166534" : "#991b1b",
+                }}
+              >
+                {feedback.isCorrect ? "✓ Correct!" : "✗ Incorrect"}
+              </p>
+              {!feedback.isCorrect && (
+                <p style={{ margin: "0 0 10px 0", fontSize: "14px" }}>
+                  Correct answer: <strong>{feedback.correctAnswer}</strong>
+                </p>
+              )}
+              <p style={{ margin: "0", fontSize: "14px", lineHeight: "1.5" }}>
+                {feedback.explanation}
+              </p>
+            </div>
           )}
-          <p style={{ margin: "0", fontSize: "14px", lineHeight: "1.5" }}>
-            {feedback.explanation}
-          </p>
-        </div>
-      )}
 
-      {/* Buttons */}
-      <div style={{ display: "flex", gap: "12px" }}>
-        <button
-          onClick={() => router.back()}
-          style={{
-            flex: 1,
-            padding: "12px",
-            backgroundColor: "#e5e7eb",
-            color: "#1f2937",
-            border: "none",
-            borderRadius: "6px",
-            cursor: "pointer",
-            fontWeight: "600",
-          }}
-        >
-          Back
-        </button>
-        {!showingFeedback ? (
-          <button
-            onClick={handleSubmitAnswer}
-            disabled={!selectedAnswer}
+          {/* Buttons */}
+          <div style={{ display: "flex", gap: "12px" }}>
+            <button
+                onClick={() => router.back()}
+              style={{
+                flex: 1,
+                padding: "12px",
+                backgroundColor: "#e5e7eb",
+                color: "#1f2937",
+                border: "none",
+                borderRadius: "6px",
+                cursor: "pointer",
+                fontWeight: "600",
+              }}
+            >
+              Back
+            </button>
+            {!showingFeedback ? (
+              <button
+                onClick={handleSubmitAnswer}
+                disabled={!selectedAnswer}
+                style={{
+                  flex: 1,
+                  padding: "12px",
+                  backgroundColor:
+                    selectedAnswer ? "#3b82f6" : "#9ca3af",
+                  color: "white",
+                  border: "none",
+                  borderRadius: "6px",
+                  cursor: selectedAnswer ? "pointer" : "not-allowed",
+                  fontWeight: "600",
+                }}
+              >
+                Submit
+              </button>
+            ) : (
+              <button
+                onClick={handleNext}
+                style={{
+                  flex: 1,
+                  padding: "12px",
+                  backgroundColor: "#3b82f6",
+                  color: "white",
+                  border: "none",
+                  borderRadius: "6px",
+                  cursor: "pointer",
+                  fontWeight: "600",
+                }}
+              >
+                {currentQIndex < questions.length - 1 ? "Next Question" : "See Results"}
+              </button>
+            )}
+          </div>
+
+          {/* Score tracker */}
+          <div
             style={{
-              flex: 1,
+              marginTop: "20px",
               padding: "12px",
-              backgroundColor:
-                selectedAnswer ? "#3b82f6" : "#9ca3af",
-              color: "white",
-              border: "none",
+              backgroundColor: "#f0f9ff",
               borderRadius: "6px",
-              cursor: selectedAnswer ? "pointer" : "not-allowed",
-              fontWeight: "600",
+              textAlign: "center",
+              fontSize: "14px",
             }}
           >
-            Submit
-          </button>
-        ) : (
-          <button
-            onClick={handleNext}
-            style={{
-              flex: 1,
-              padding: "12px",
-              backgroundColor: "#3b82f6",
-              color: "white",
-              border: "none",
-              borderRadius: "6px",
-              cursor: "pointer",
-              fontWeight: "600",
-            }}
-          >
-            {currentQIndex < questions.length - 1 ? "Next Question" : "See Results"}
-          </button>
-        )}
-      </div>
-
-      {/* Score tracker */}
-      <div
-        style={{
-          marginTop: "20px",
-          padding: "12px",
-          backgroundColor: "#f0f9ff",
-          borderRadius: "6px",
-          textAlign: "center",
-          fontSize: "14px",
-        }}
-      >
-        Correct so far: {score} / {answered}
-      </div>
+            Correct so far: {score} / {answered}
+          </div>
         </div>
       </div>
     </div>
