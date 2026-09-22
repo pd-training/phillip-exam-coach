@@ -145,11 +145,6 @@ export default function AssignPapersPage() {
           <button
             onClick={handleAssign}
             className="w-full px-6 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-medium transition"
-              border: "none",
-              borderRadius: "4px",
-              cursor: "pointer",
-              fontWeight: "600"
-            }}
           >
             Assign Paper
           </button>

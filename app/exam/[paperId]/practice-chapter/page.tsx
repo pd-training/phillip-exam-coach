@@ -228,7 +228,7 @@ export default function PracticeChapterMode() {
             />
           </div>
 
-      {/* Question */}
+          {/* Question */}
       <div className="bg-blue-50 border border-blue-200 rounded-xl p-6 mb-8">
         <p className="m-0 font-medium text-lg leading-relaxed text-gray-900">
           {currentQuestion.text}
@@ -326,6 +326,8 @@ export default function PracticeChapterMode() {
       >
         Correct so far: {score} / {answered}
       </div>
-    </div>
+        </div>  {/* Close card div */}
+      </div>  {/* Close centering container div */}
+    </div>  {/* Close outer wrapper div */}
   );
 }
