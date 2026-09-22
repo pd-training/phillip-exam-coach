@@ -30,10 +30,21 @@ interface RecommendedChapter {
   scoreOnPaper: number;
 }
 
+interface Attempt {
+  id: string;
+  paperid: string;
+  paperTitle: string;
+  score: number;
+  result: string;
+  timeTaken: number;
+  submittedat: string;
+}
+
 export default function StudentDashboard() {
   const router = useRouter();
   const { data: session, status } = useSession();
   const [papers, setPapers] = useState<Paper[]>([]);
+  const [attempts, setAttempts] = useState<Attempt[]>([]);
   const [stats, setStats] = useState<AttemptStats>({
     completedCount: 0,
     averageScore: 0,
@@ -95,6 +106,7 @@ export default function StudentDashboard() {
             averageScore: 0,
             passCount: 0,
           });
+          setAttempts(data.attempts || []);
         }
 
         if (recommendationsRes.ok) {
@@ -132,18 +144,22 @@ export default function StudentDashboard() {
       <div className="max-w-7xl mx-auto px-6 py-12">
         {/* Stats Cards */}
         <div className="grid md:grid-cols-3 gap-8 mb-12">
-          {/* Completed Attempts */}
-          <div className="bg-white rounded-2xl p-8 border border-gray-200 hover:border-blue-300 transition duration-300 shadow-sm hover:shadow-md">
-            <div className="flex items-start justify-between mb-4">
-              <div>
-                <p className="text-gray-600 text-sm font-medium mb-2">Completed Attempts</p>
-                <p className="text-4xl font-bold text-gray-900">
-                  {stats.completedCount}
-                </p>
-              </div>
-              <div className="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center">
+        {/* Completed Attempts Section */}
+        <div>
+          <div className="mb-8">
+            <h2 className="text-2xl font-bold text-gray-900 mb-2">Recent Exam Attempts</h2>
+            <p className="text-gray-600">
+              {attempts.length === 0
+                ? "No completed attempts yet"
+                : `${attempts.length} exam${attempts.length !== 1 ? "s" : ""} completed`}
+            </p>
+          </div>
+
+          {attempts.length === 0 ? (
+            <div className="bg-white rounded-2xl p-12 border border-gray-200 text-center">
+              <div className="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
                 <svg
-                  className="w-6 h-6 text-blue-600"
+                  className="w-8 h-8 text-gray-400"
                   fill="none"
                   stroke="currentColor"
                   viewBox="0 0 24 24"
@@ -152,13 +168,78 @@ export default function StudentDashboard() {
                     strokeLinecap="round"
                     strokeLinejoin="round"
                     strokeWidth={2}
-                    d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"
+                    d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
                   />
                 </svg>
               </div>
+              <p className="text-gray-600 font-medium mb-2">No completed attempts</p>
+              <p className="text-gray-500 text-sm">
+                Complete your first full exam to review your performance
+              </p>
             </div>
-            <p className="text-xs text-gray-500">Practice exams completed</p>
-          </div>
+          ) : (
+            <div className="space-y-3">
+              {attempts.map((attempt) => (
+                <Link key={attempt.id} href={`/exam/attempts/${attempt.id}`}>
+                  <div className="bg-white rounded-2xl p-6 border border-gray-200 hover:border-blue-300 hover:shadow-lg transition duration-300 cursor-pointer group">
+                    <div className="flex items-center justify-between">
+                      <div className="flex-1">
+                        <h3 className="font-semibold text-gray-900 group-hover:text-blue-600 transition mb-2">
+                          {attempt.paperTitle}
+                        </h3>
+                        <div className="flex items-center gap-6 text-sm text-gray-600">
+                          <span>
+                            {new Date(attempt.submittedat).toLocaleDateString('en-US', {
+                              year: 'numeric',
+                              month: 'short',
+                              day: 'numeric',
+                            })}{' '}
+                            at{' '}
+                            {new Date(attempt.submittedat).toLocaleTimeString('en-US', {
+                              hour: 'numeric',
+                              minute: '2-digit',
+                              hour12: true,
+                            })}
+                          </span>
+                          <span>Time taken: {attempt.timeTaken} minutes</span>
+                        </div>
+                      </div>
+                      <div className="flex items-center gap-4">
+                        <div className="text-right">
+                          <div className={`text-2xl font-bold ${
+                            attempt.result === 'Pass' ? 'text-green-600' : 'text-red-600'
+                          }`}>
+                            {attempt.score}%
+                          </div>
+                          <div className={`text-sm font-medium ${
+                            attempt.result === 'Pass' ? 'text-green-600' : 'text-red-600'
+                          }`}>
+                            {attempt.result}
+                          </div>
+                        </div>
+                        <div className="w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center group-hover:bg-blue-200 transition">
+                          <svg
+                            className="w-5 h-5 text-blue-600"
+                            fill="none"
+                            stroke="currentColor"
+                            viewBox="0 0 24 24"
+                          >
+                            <path
+                              strokeLinecap="round"
+                              strokeLinejoin="round"
+                              strokeWidth={2}
+                              d="M9 5l7 7-7 7"
+                            />
+                          </svg>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </Link>
+              ))}
+            </div>
+          )}
+        </div>
 
           {/* Average Score */}
           <div className="bg-white rounded-2xl p-8 border border-gray-200 hover:border-blue-300 transition duration-300 shadow-sm hover:shadow-md">
