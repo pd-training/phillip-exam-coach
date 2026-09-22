@@ -56,8 +56,21 @@ export default function FullExamMode() {
       if (res.ok) {
         const data = await res.json();
         setExamConfig(data.examConfig);
-        setParts(data.parts);
-        setTimeLeft(data.examConfig.totalTime * 60); // Convert to seconds
+        // Convert flat questions array to parts format (all questions in one part)
+        if (data.questions && Array.isArray(data.questions)) {
+          setParts([
+            {
+              id: 'full-exam',
+              partName: 'Full Exam',
+              questionCount: data.questions.length,
+              passingScore: data.examConfig.passingScore,
+              questions: data.questions
+            }
+          ]);
+          setTimeLeft(data.examConfig.totalTime * 60);
+        } else {
+          alert('No questions found for this exam');
+        }
       }
     } catch (error) {
       console.error("Fetch exam error:", error);
