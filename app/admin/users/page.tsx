@@ -118,66 +118,38 @@ export default function UserManagement() {
   if (status === "loading" || !session?.user) return null;
 
   return (
-    <div style={{ backgroundColor: "#f8f9fa", minHeight: "100vh" }}>
+    <div className="min-h-screen bg-gray-50">
       <AdminNav />
 
-      <div style={{ maxWidth: "1400px", margin: "0 auto", padding: "30px 20px" }}>
+      <div className="max-w-7xl mx-auto px-6 py-12">
         {/* Page Title */}
-        <div style={{ marginBottom: "30px" }}>
-          <h1 style={{ fontSize: "28px", fontWeight: "bold", color: "#1f2937", margin: "0 0 8px 0" }}>
-            👥 Users
-          </h1>
-          <p style={{ color: "#6b7280", margin: "0", fontSize: "14px" }}>Manage advisors and students</p>
+        <div className="mb-8">
+          <h1 className="text-4xl font-bold text-gray-900 mb-2">Users</h1>
+          <p className="text-gray-600">Manage advisors and students</p>
         </div>
 
         {/* Success Message */}
         {success && (
-          <div style={{
-            backgroundColor: "#d1fae5",
-            border: "1px solid #6ee7b7",
-            color: "#065f46",
-            padding: "12px 16px",
-            borderRadius: "8px",
-            marginBottom: "20px",
-            fontSize: "14px",
-            fontWeight: "500",
-          }}>
+          <div className="bg-green-50 border border-green-200 text-green-800 px-4 py-3 rounded-lg mb-6 text-sm font-medium">
             ✅ {success}
           </div>
         )}
 
         {/* Search Bar */}
-        <div style={{ marginBottom: "30px" }}>
+        <div className="mb-8">
           <input
             type="text"
             placeholder="Search by name or email..."
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
-            style={{
-              width: "100%",
-              maxWidth: "500px",
-              padding: "12px 16px",
-              fontSize: "14px",
-              border: "1px solid #d1d5db",
-              borderRadius: "8px",
-              boxSizing: "border-box",
-            }}
+            className="w-full max-w-md px-4 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:border-blue-600"
           />
         </div>
 
         {/* Users Table */}
-        <div style={{
-          backgroundColor: "white",
-          borderRadius: "12px",
-          border: "1px solid #e5e7eb",
-          marginBottom: "40px",
-          overflow: "hidden",
-        }}>
-          <div style={{ overflowX: "auto" }}>
-            <table style={{
-              width: "100%",
-              borderCollapse: "collapse",
-            }}>
+        <div className="bg-white rounded-2xl border border-gray-200 mb-12 overflow-hidden">
+          <div className="overflow-x-auto">
+            <table className="w-full">
               <thead>
                 <tr style={{ backgroundColor: "#f9fafb", borderBottom: "1px solid #e5e7eb" }}>
                   <th style={{ padding: "16px", textAlign: "left", fontSize: "12px", fontWeight: "600", color: "#6b7280", textTransform: "uppercase" }}>

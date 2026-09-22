@@ -421,63 +421,51 @@ export default function PapersManagement() {
   }
 
   return (
-    <div style={{ backgroundColor: "#f8f9fa", minHeight: "100vh" }}>
+    <div className="min-h-screen bg-gray-50">
       <AdminNav />
 
       {/* Main Content */}
-      <div style={{ maxWidth: "1400px", margin: "0 auto", padding: "30px 20px" }}>
+      <div className="max-w-7xl mx-auto px-6 py-12">
         {/* Page Header */}
-        <div style={{ marginBottom: "30px" }}>
-          <h1 style={{ margin: "0 0 8px 0", fontSize: "28px" }}>📚 Papers & Questions</h1>
-          <p style={{ color: "#666", margin: "0", fontSize: "14px" }}>Manage exam papers, questions, and exam format</p>
+        <div className="mb-8">
+          <h1 className="text-4xl font-bold text-gray-900 mb-2">Papers & Questions</h1>
+          <p className="text-gray-600">Manage exam papers, questions, and exam format</p>
         </div>
 
         {/* Tabs */}
-        <div style={{ display: "flex", gap: "8px", marginBottom: "30px", borderBottom: "2px solid #e5e7eb" }}>
-          {(["availability", "questions", "format"] as const).map((tab) => (
-            <button
-              key={tab}
-              onClick={() => setActiveTab(tab)}
-              style={{
-                padding: "12px 20px",
-                backgroundColor: activeTab === tab ? "#3b82f6" : "transparent",
-                color: activeTab === tab ? "white" : "#666",
-                border: "none",
-                cursor: "pointer",
-                fontSize: "14px",
-                fontWeight: activeTab === tab ? "600" : "500",
-                borderRadius: "4px 4px 0 0",
-              }}
-            >
-              {tab === "availability" && "📋 Paper Availability"}
-              {tab === "questions" && "❓ Question Bank"}
-              {tab === "format" && "⚙️ Exam Format"}
-            </button>
-          ))}
+        <div className="border-b border-gray-200 mb-8">
+          <div className="flex gap-8">
+            {(["availability", "questions", "format"] as const).map((tab) => (
+              <button
+                key={tab}
+                onClick={() => setActiveTab(tab)}
+                className={`px-1 py-4 font-medium border-b-2 transition ${
+                  activeTab === tab
+                    ? "text-blue-600 border-blue-600"
+                    : "text-gray-600 border-transparent hover:text-gray-900"
+                }`}
+              >
+                {tab === "availability" && "Paper Availability"}
+                {tab === "questions" && "Question Bank"}
+                {tab === "format" && "Exam Format"}
+              </button>
+            ))}
+          </div>
         </div>
 
         {/* TAB 1: Paper Availability */}
         {activeTab === "availability" && (
-          <div style={{ backgroundColor: "white", padding: "24px", borderRadius: "12px", border: "1px solid #e5e7eb" }}>
-            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "20px" }}>
-              <h3 style={{ margin: "0" }}>Paper Availability</h3>
+          <div className="bg-white rounded-2xl p-8 border border-gray-200">
+            <div className="flex justify-between items-center mb-6">
+              <h3 className="text-xl font-bold text-gray-900">Paper Availability</h3>
               <button
                 onClick={() => setActiveModal("createPaper")}
-                style={{
-                  padding: "8px 16px",
-                  backgroundColor: "#3b82f6",
-                  color: "white",
-                  border: "none",
-                  borderRadius: "6px",
-                  fontSize: "13px",
-                  fontWeight: "600",
-                  cursor: "pointer",
-                }}
+                className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-medium text-sm transition"
               >
-                ➕ Create New Paper
+                + Create New Paper
               </button>
             </div>
-            <p style={{ color: "#666", marginBottom: "20px", fontSize: "14px" }}>
+            <p className="text-gray-600 mb-6">
               Toggle papers on/off to control student access. Existing exam attempts are not affected.
             </p>
 

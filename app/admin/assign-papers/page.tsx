@@ -98,26 +98,22 @@ export default function AssignPapersPage() {
   }
 
   return (
-    <div style={{ backgroundColor: "#f8f9fa", minHeight: "100vh" }}>
+    <div className="min-h-screen bg-gray-50">
       <AdminNav />
 
-      <div style={{ maxWidth: "1400px", margin: "0 auto", padding: "30px 20px" }}>
-        <h1 style={{ marginBottom: "8px", fontSize: "28px", fontWeight: "700" }}>📋 Assign Papers</h1>
-        <p style={{ color: "#666", marginBottom: "24px", fontSize: "14px" }}>Grant students access to exam papers</p>
-        <div style={{ maxWidth: "500px" }}>
-          <div style={{ marginBottom: "16px" }}>
-            <label style={{ display: "block", marginBottom: "8px", fontWeight: "600" }}>
+      <div className="max-w-7xl mx-auto px-6 py-12">
+        <h1 className="text-4xl font-bold text-gray-900 mb-2">Assign Papers</h1>
+        <p className="text-gray-600 mb-8">Grant students access to exam papers</p>
+        
+        <div className="bg-white rounded-2xl border border-gray-200 p-8 max-w-2xl">
+          <div className="mb-6">
+            <label className="block text-sm font-semibold text-gray-900 mb-2">
               Student:
             </label>
             <select
               value={selectedUser}
               onChange={(e) => setSelectedUser(e.target.value)}
-              style={{
-                width: "100%",
-                padding: "8px",
-                border: "1px solid #ddd",
-                borderRadius: "4px"
-              }}
+              className="w-full px-4 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:border-blue-600"
             >
               <option value="">-- Select student --</option>
               {users.map((u) => (
@@ -128,19 +124,14 @@ export default function AssignPapersPage() {
             </select>
           </div>
 
-          <div style={{ marginBottom: "16px" }}>
-            <label style={{ display: "block", marginBottom: "8px", fontWeight: "600" }}>
+          <div className="mb-6">
+            <label className="block text-sm font-semibold text-gray-900 mb-2">
               Paper:
             </label>
             <select
               value={selectedPaper}
               onChange={(e) => setSelectedPaper(e.target.value)}
-              style={{
-                width: "100%",
-                padding: "8px",
-                border: "1px solid #ddd",
-                borderRadius: "4px"
-              }}
+              className="w-full px-4 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:border-blue-600"
             >
               <option value="">-- Select paper --</option>
               {papers.map((p: any) => (
@@ -153,11 +144,7 @@ export default function AssignPapersPage() {
 
           <button
             onClick={handleAssign}
-            style={{
-              width: "100%",
-              padding: "10px",
-              backgroundColor: "#3b82f6",
-              color: "white",
+            className="w-full px-6 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-medium transition"
               border: "none",
               borderRadius: "4px",
               cursor: "pointer",
@@ -168,7 +155,7 @@ export default function AssignPapersPage() {
           </button>
 
           {message && (
-            <p style={{ marginTop: "16px", fontSize: "14px", color: "#666" }}>
+            <p className="mt-4 text-sm text-gray-700">
               {message}
             </p>
           )}
