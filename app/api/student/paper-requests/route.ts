@@ -111,21 +111,31 @@ export async function POST(request: Request) {
     }
 
     // Create new paper request
-    const result = await prisma.$queryRaw`
-      INSERT INTO "PaperRequest" ("userId", "paperId", status, "requestedAt")
-      VALUES (${userId}, ${paperId}, 'pending', NOW())
-      RETURNING id, "paperId", status, "requestedAt"
-    ` as any[];
+    console.log('About to INSERT paper request - userId:', userId, 'paperId:', paperId);
+    try {
+      await prisma.$queryRaw`
+        INSERT INTO "PaperRequest" ("userId", "paperId", status, "requestedAt")
+        VALUES (${userId}, ${paperId}, 'pending', NOW())
+      `;
+      console.log('INSERT successful');
+    } catch (insertError: any) {
+      console.error('INSERT error code:', insertError.code);
+      console.error('INSERT error message:', insertError.message);
+      console.error('Full INSERT error:', JSON.stringify(insertError, null, 2));
+      throw insertError;
+    }
 
     return Response.json({
       success: true,
-      request: result[0],
       message: "Request submitted. Admin will review shortly.",
     });
   } catch (error: any) {
-    console.error("Create paper request error:", error.message || error);
+    const errorMsg = error?.message || error?.toString() || 'Unknown error';
+    const errorCode = error?.code || 'UNKNOWN';
+    console.error('Create paper request error - Code:', errorCode, 'Message:', errorMsg);
+    console.error('Full error:', JSON.stringify(error, null, 2));
     return Response.json(
-      { error: error.message || "Failed to create request" },
+      { error: errorMsg, code: errorCode },
       { status: 500 }
     );
   }
