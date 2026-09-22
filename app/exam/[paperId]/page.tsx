@@ -62,130 +62,203 @@ export default function PracticePage() {
   }
 
   return (
-    <div style={{ maxWidth: "900px", margin: "0 auto", padding: "20px" }}>
-      <div style={{ marginBottom: "30px" }}>
-        <button
-          onClick={() => router.back()}
-          style={{
-            padding: "8px 16px",
-            backgroundColor: "transparent",
-            color: "#3b82f6",
-            border: "none",
-            cursor: "pointer",
-            fontWeight: "600",
-            fontSize: "14px",
-          }}
-        >
-          ← Back to papers
-        </button>
+    <div style={{ minHeight: "100vh", backgroundColor: "#f5f5f5" }}>
+      {/* Back Link */}
+      <div style={{ backgroundColor: "white", borderBottom: "1px solid #e5e7eb", padding: "20px 0" }}>
+        <div style={{ maxWidth: "1000px", margin: "0 auto", paddingLeft: "20px" }}>
+          <button
+            onClick={() => router.back()}
+            style={{
+              padding: "0",
+              backgroundColor: "transparent",
+              color: "#3b82f6",
+              border: "none",
+              cursor: "pointer",
+              fontWeight: "600",
+              fontSize: "14px",
+            }}
+          >
+            ← Back to papers
+          </button>
+        </div>
       </div>
 
-      <h1 style={{ marginBottom: "10px" }}>{paper.title}</h1>
-      <p style={{ color: "#666", marginBottom: "30px" }}>
-        {paper.totalQuestions} questions • {paper.durationMinutes} minutes
-      </p>
+      {/* Main Content */}
+      <div style={{ maxWidth: "1000px", margin: "0 auto", padding: "40px 20px" }}>
+        {/* Paper Header */}
+        <div style={{ marginBottom: "40px" }}>
+          <h1
+            style={{
+              margin: "0 0 12px 0",
+              fontSize: "42px",
+              fontWeight: "700",
+              color: "#3b82f6",
+            }}
+          >
+            {paper.title}
+          </h1>
+          <p style={{ margin: "0", fontSize: "16px", color: "#666" }}>
+            Rules, Ethics and Skills for Securities Exchange Dealers
+          </p>
+        </div>
 
-      <div style={{ display: "grid", gap: "20px", gridTemplateColumns: "repeat(auto-fit, minmax(300px, 1fr))" }}>
-        {/* Full Exam Mode */}
+        {/* Full Exam Mode Card */}
         <div
           style={{
-            padding: "20px",
-            backgroundColor: "#f0f9ff",
-            border: "1px solid #bfdbfe",
-            borderRadius: "8px",
+            padding: "25px",
+            backgroundColor: "white",
+            border: "1px solid #e5e7eb",
+            borderRadius: "10px",
+            marginBottom: "30px",
+            display: "flex",
+            justifyContent: "space-between",
+            alignItems: "center",
             cursor: "pointer",
             transition: "all 0.2s",
           }}
           onClick={() => router.push(`/exam/${paperId}/full-exam`)}
           onMouseOver={(e) => {
-            e.currentTarget.style.backgroundColor = "#e0f2fe";
-            e.currentTarget.style.borderColor = "#7dd3fc";
+            e.currentTarget.style.boxShadow = "0 4px 12px rgba(0,0,0,0.08)";
             e.currentTarget.style.transform = "translateY(-2px)";
           }}
           onMouseOut={(e) => {
-            e.currentTarget.style.backgroundColor = "#f0f9ff";
-            e.currentTarget.style.borderColor = "#bfdbfe";
+            e.currentTarget.style.boxShadow = "none";
             e.currentTarget.style.transform = "translateY(0)";
           }}
         >
-          <div style={{ fontSize: "32px", marginBottom: "12px" }}>📖</div>
-          <h3 style={{ margin: "0 0 8px 0" }}>Full Exam Mode</h3>
-          <p style={{ margin: "0 0 12px 0", color: "#666", fontSize: "14px" }}>
-            Complete full exam following the exam configuration with timer. Get feedback after submitting all answers.
-          </p>
-          <ul style={{ margin: "12px 0 0 0", paddingLeft: "20px", color: "#666", fontSize: "13px" }}>
-            <li>Timer: {paper.durationMinutes} minutes</li>
-            <li>All questions at once</li>
-            <li>Feedback after submission</li>
-          </ul>
+          <div style={{ display: "flex", alignItems: "center", gap: "20px" }}>
+            <div
+              style={{
+                fontSize: "48px",
+                backgroundColor: "#d1fae5",
+                padding: "16px",
+                borderRadius: "8px",
+              }}
+            >
+              📄
+            </div>
+            <div>
+              <h3 style={{ margin: "0 0 8px 0", fontSize: "20px", fontWeight: "600" }}>
+                Full Exam Mode
+              </h3>
+              <p style={{ margin: "0", fontSize: "15px", color: "#666" }}>
+                {paper.totalQuestions} questions — {paper.durationMinutes} min
+              </p>
+            </div>
+          </div>
+
+          <button
+            style={{
+              padding: "12px 28px",
+              backgroundColor: "#3b82f6",
+              color: "white",
+              border: "none",
+              borderRadius: "6px",
+              cursor: "pointer",
+              fontWeight: "600",
+              fontSize: "14px",
+            }}
+          >
+            Start exam
+          </button>
         </div>
 
-        {/* Quick Quiz Mode */}
+        {/* Info Banner */}
         <div
           style={{
-            padding: "20px",
+            padding: "16px",
             backgroundColor: "#fef3c7",
             border: "1px solid #fde68a",
             borderRadius: "8px",
-            cursor: "pointer",
-            transition: "all 0.2s",
-          }}
-          onClick={() => router.push(`/exam/${paperId}/quick-quiz`)}
-          onMouseOver={(e) => {
-            e.currentTarget.style.backgroundColor = "#fef08a";
-            e.currentTarget.style.borderColor = "#fcd34d";
-            e.currentTarget.style.transform = "translateY(-2px)";
-          }}
-          onMouseOut={(e) => {
-            e.currentTarget.style.backgroundColor = "#fef3c7";
-            e.currentTarget.style.borderColor = "#fde68a";
-            e.currentTarget.style.transform = "translateY(0)";
+            marginBottom: "40px",
+            display: "flex",
+            gap: "12px",
+            alignItems: "flex-start",
           }}
         >
-          <div style={{ fontSize: "32px", marginBottom: "12px" }}>⚡</div>
-          <h3 style={{ margin: "0 0 8px 0" }}>Quick Quiz</h3>
-          <p style={{ margin: "0 0 12px 0", color: "#666", fontSize: "14px" }}>
-            15 random questions with immediate feedback after each question.
+          <span style={{ fontSize: "20px", marginTop: "2px" }}>⭐</span>
+          <p style={{ margin: "0", fontSize: "14px", color: "#92400e", lineHeight: "1.5" }}>
+            Recommended focus areas unlock after you complete at least one real mock exam on this paper.
           </p>
-          <ul style={{ margin: "12px 0 0 0", paddingLeft: "20px", color: "#666", fontSize: "13px" }}>
-            <li>15 random questions</li>
-            <li>Immediate feedback</li>
-            <li>Perfect for quick review</li>
-          </ul>
         </div>
 
-        {/* Practice by Chapter Mode */}
-        <div
-          style={{
-            padding: "20px",
-            backgroundColor: "#f0fdf4",
-            border: "1px solid #bbf7d0",
-            borderRadius: "8px",
-            cursor: "pointer",
-            transition: "all 0.2s",
-          }}
-          onClick={() => router.push(`/exam/${paperId}/practice-chapter`)}
-          onMouseOver={(e) => {
-            e.currentTarget.style.backgroundColor = "#ecfdf5";
-            e.currentTarget.style.borderColor = "#86efac";
-            e.currentTarget.style.transform = "translateY(-2px)";
-          }}
-          onMouseOut={(e) => {
-            e.currentTarget.style.backgroundColor = "#f0fdf4";
-            e.currentTarget.style.borderColor = "#bbf7d0";
-            e.currentTarget.style.transform = "translateY(0)";
-          }}
-        >
-          <div style={{ fontSize: "32px", marginBottom: "12px" }}>📚</div>
-          <h3 style={{ margin: "0 0 8px 0" }}>Practice by Chapter</h3>
-          <p style={{ margin: "0 0 12px 0", color: "#666", fontSize: "14px" }}>
-            Select a chapter and drill through all questions with immediate feedback.
-          </p>
-          <ul style={{ margin: "12px 0 0 0", paddingLeft: "20px", color: "#666", fontSize: "13px" }}>
-            <li>Choose chapter to focus</li>
-            <li>Immediate feedback</li>
-            <li>Build mastery by topic</li>
-          </ul>
+        {/* Practice Modes Section */}
+        <div>
+          <h2 style={{ margin: "0 0 20px 0", fontSize: "18px", fontWeight: "600", color: "#1f2937" }}>
+            Practice modes
+          </h2>
+
+          <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(350px, 1fr))", gap: "20px" }}>
+            {/* Quick Quiz Card */}
+            <div
+              style={{
+                padding: "25px",
+                backgroundColor: "white",
+                border: "1px solid #e5e7eb",
+                borderRadius: "10px",
+                cursor: "pointer",
+                transition: "all 0.2s",
+              }}
+              onClick={() => router.push(`/exam/${paperId}/quick-quiz`)}
+              onMouseOver={(e) => {
+                e.currentTarget.style.boxShadow = "0 4px 12px rgba(0,0,0,0.08)";
+                e.currentTarget.style.transform = "translateY(-2px)";
+              }}
+              onMouseOut={(e) => {
+                e.currentTarget.style.boxShadow = "none";
+                e.currentTarget.style.transform = "translateY(0)";
+              }}
+            >
+              <div style={{ fontSize: "40px", marginBottom: "16px" }}>⚡</div>
+              <h3 style={{ margin: "0 0 8px 0", fontSize: "16px", fontWeight: "600" }}>
+                Quick Quiz
+              </h3>
+              <p style={{ margin: "0 0 12px 0", fontSize: "13px", color: "#666" }}>
+                15 Questions
+              </p>
+              <p style={{ margin: "0 0 16px 0", fontSize: "14px", color: "#1f2937", lineHeight: "1.5" }}>
+                Take a focused practice session with random questions
+              </p>
+              <p style={{ margin: "0", fontSize: "13px", color: "#999", fontStyle: "italic" }}>
+                Perfect for a quick review or when you have limited time.
+              </p>
+            </div>
+
+            {/* Practice by Chapter Card */}
+            <div
+              style={{
+                padding: "25px",
+                backgroundColor: "white",
+                border: "1px solid #e5e7eb",
+                borderRadius: "10px",
+                cursor: "pointer",
+                transition: "all 0.2s",
+              }}
+              onClick={() => router.push(`/exam/${paperId}/practice-chapter`)}
+              onMouseOver={(e) => {
+                e.currentTarget.style.boxShadow = "0 4px 12px rgba(0,0,0,0.08)";
+                e.currentTarget.style.transform = "translateY(-2px)";
+              }}
+              onMouseOut={(e) => {
+                e.currentTarget.style.boxShadow = "none";
+                e.currentTarget.style.transform = "translateY(0)";
+              }}
+            >
+              <div style={{ fontSize: "40px", marginBottom: "16px" }}>📚</div>
+              <h3 style={{ margin: "0 0 8px 0", fontSize: "16px", fontWeight: "600" }}>
+                Practice by Chapter
+              </h3>
+              <p style={{ margin: "0 0 12px 0", fontSize: "13px", color: "#666" }}>
+                Chapter drills
+              </p>
+              <p style={{ margin: "0 0 16px 0", fontSize: "14px", color: "#1f2937", lineHeight: "1.5" }}>
+                Pick one chapter and drill questions from it
+              </p>
+              <p style={{ margin: "0", fontSize: "13px", color: "#999", fontStyle: "italic" }}>
+                Build mastery one topic at a time.
+              </p>
+            </div>
+          </div>
         </div>
       </div>
     </div>
