@@ -62,10 +62,7 @@ export async function POST(request: Request) {
       return Response.json({ error: "Invalid paperId format" }, { status: 400 });
     }
 
-    if (!uuidRegex.test(userId)) {
-      console.error('Invalid userId format:', userId);
-      return Response.json({ error: "Invalid userId format" }, { status: 400 });
-    }
+    // userId is a CUID, not a UUID - skip UUID validation for userId
 
     // Check if student already has this paper (via approved request)
     let existingApprovedRequest;

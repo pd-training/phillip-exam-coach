@@ -27,15 +27,7 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Validate UUIDs
-    const uuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
-    if (!uuidRegex.test(userId) || !uuidRegex.test(paperId)) {
-      console.error('Invalid UUID format - userId:', userId, 'paperId:', paperId);
-      return NextResponse.json(
-        { error: 'Invalid userId or paperId format' },
-        { status: 400 }
-      );
-    }
+    console.log('Proceeding with userId (CUID):', userId, 'paperId (UUID):', paperId);
 
     // Check for ANY existing request (regardless of status)
     let existing;
