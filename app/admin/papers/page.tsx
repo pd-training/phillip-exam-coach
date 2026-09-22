@@ -220,7 +220,20 @@ export default function PapersManagement() {
 
   // Update question
   const handleUpdateQuestion = async () => {
-    if (!selectedQuestion || !selectedPaperId) return;
+    if (!selectedQuestion || !selectedPaperId) {
+      alert("No question or paper selected");
+      return;
+    }
+
+    if (!editQuestionText.trim()) {
+      alert("Question text is required");
+      return;
+    }
+
+    if (!editAnswer || !['A', 'B', 'C', 'D'].includes(editAnswer)) {
+      alert("Please select a valid correct answer");
+      return;
+    }
 
     setSubmitting(true);
     try {
@@ -228,24 +241,31 @@ export default function PapersManagement() {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          questionText: editQuestionText,
+          questionText: editQuestionText.trim(),
           correctAnswer: editAnswer,
           chapterNumber: parseInt(editChapter),
-          explanation: editExplanation,
-          optionA: editOptionA,
-          optionB: editOptionB,
-          optionC: editOptionC,
-          optionD: editOptionD,
+          explanation: editExplanation.trim(),
+          optionA: editOptionA.trim(),
+          optionB: editOptionB.trim(),
+          optionC: editOptionC.trim(),
+          optionD: editOptionD.trim(),
         }),
       });
 
+      const data = await res.json();
+
       if (res.ok) {
+        alert("Question updated successfully!");
         await fetchQuestions(selectedPaperId);
         setActiveModal(null);
         setSelectedQuestion(null);
+      } else {
+        console.error("Update failed:", data);
+        alert(`Error: ${data.error || 'Failed to update question'}`);
       }
-    } catch (error) {
+    } catch (error: any) {
       console.error("Update failed:", error);
+      alert(`Error: ${error.message || 'Failed to update question'}`);
     } finally {
       setSubmitting(false);
     }
@@ -253,24 +273,46 @@ export default function PapersManagement() {
 
   // Delete question
   const handleDeleteQuestion = async (questionId: string) => {
-    if (!selectedPaperId || !confirm("Delete this question?")) return;
+    if (!selectedPaperId) {
+      alert("No paper selected");
+      return;
+    }
+
+    if (!confirm("Are you sure you want to delete this question? This action cannot be undone.")) {
+      return;
+    }
 
     try {
       const res = await fetch(`/api/papers/${selectedPaperId}/questions/${questionId}`, {
         method: "DELETE",
       });
 
+      const data = await res.json();
+
       if (res.ok) {
+        alert("Question deleted successfully!");
         await fetchQuestions(selectedPaperId);
+      } else {
+        console.error("Delete failed:", data);
+        alert(`Error: ${data.error || 'Failed to delete question'}`);
       }
-    } catch (error) {
+    } catch (error: any) {
       console.error("Delete failed:", error);
+      alert(`Error: ${error.message || 'Failed to delete question'}`);
     }
   };
 
   // Update paper details
   const handleUpdatePaper = async () => {
-    if (!selectedPaperId) return;
+    if (!selectedPaperId) {
+      alert("No paper selected");
+      return;
+    }
+
+    if (!editPaperTitle.trim()) {
+      alert("Paper title is required");
+      return;
+    }
 
     setSubmitting(true);
     try {
@@ -278,17 +320,24 @@ export default function PapersManagement() {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          title: editPaperTitle,
-          description: editPaperDescription,
+          title: editPaperTitle.trim(),
+          description: editPaperDescription.trim(),
         }),
       });
 
+      const data = await res.json();
+
       if (res.ok) {
+        alert("Paper details updated successfully!");
         await fetchPapers();
         setActiveModal(null);
+      } else {
+        console.error("Update failed:", data);
+        alert(`Error: ${data.error || 'Failed to update paper details'}`);
       }
-    } catch (error) {
+    } catch (error: any) {
       console.error("Update failed:", error);
+      alert(`Error: ${error.message || 'Failed to update paper details'}`);
     } finally {
       setSubmitting(false);
     }
@@ -296,7 +345,15 @@ export default function PapersManagement() {
 
   // Update chapter title
   const handleUpdateChapter = async () => {
-    if (!selectedPaperId) return;
+    if (!selectedPaperId || editChapterNumber === null) {
+      alert("Paper or chapter not selected");
+      return;
+    }
+
+    if (!editChapterTitle.trim()) {
+      alert("Chapter title is required");
+      return;
+    }
 
     setSubmitting(true);
     try {
@@ -304,16 +361,23 @@ export default function PapersManagement() {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          title: editChapterTitle,
+          title: editChapterTitle.trim(),
         }),
       });
 
+      const data = await res.json();
+
       if (res.ok) {
+        alert("Chapter updated successfully!");
         await fetchQuestions(selectedPaperId);
         setActiveModal(null);
+      } else {
+        console.error("Update failed:", data);
+        alert(`Error: ${data.error || 'Failed to update chapter'}`);
       }
-    } catch (error) {
+    } catch (error: any) {
       console.error("Update failed:", error);
+      alert(`Error: ${error.message || 'Failed to update chapter'}`);
     } finally {
       setSubmitting(false);
     }
@@ -321,8 +385,18 @@ export default function PapersManagement() {
 
   // Save exam format
   const handleSaveExamFormat = async () => {
-    if (!selectedPaperId || parts.length === 0) {
+    if (!selectedPaperId) {
+      alert("No paper selected");
+      return;
+    }
+
+    if (parts.length === 0) {
       alert("Please configure at least one part");
+      return;
+    }
+
+    if (!totalTime || parseInt(totalTime) <= 0) {
+      alert("Please enter a valid total time");
       return;
     }
 
@@ -344,13 +418,15 @@ export default function PapersManagement() {
         }),
       });
 
+      const data = await res.json();
+
       if (res.ok) {
         alert("Exam format saved successfully!");
         setActiveModal(null);
         setParts([]);
       } else {
-        const errorData = await res.json();
-        alert(`Error: ${errorData.error || 'Failed to save exam format'}`);
+        console.error("Save failed:", data);
+        alert(`Error: ${data.error || 'Failed to save exam format'}`);
       }
     } catch (error: any) {
       console.error("Save failed:", error);

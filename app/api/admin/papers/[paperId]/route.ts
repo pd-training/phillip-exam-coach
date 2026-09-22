@@ -16,24 +16,48 @@ export async function PATCH(
       return NextResponse.json({ error: "Unauthorized" }, { status: 403 });
     }
 
+    const paperId = params.paperId;
+    if (!paperId) {
+      return NextResponse.json({ error: "Paper ID is required" }, { status: 400 });
+    }
+
     const body = await request.json();
     const { title, description } = body;
 
-    console.log('Updating paper:', params.paperId, 'title:', title);
+    if (!title || !title.trim()) {
+      return NextResponse.json({ error: "Paper title is required" }, { status: 400 });
+    }
+
+    console.log('Updating paper:', paperId, 'with title:', title);
+
+    // Validate paper exists first
+    const existingPaper = await (prisma as any).paper.findUnique({
+      where: { id: paperId },
+    });
+
+    if (!existingPaper) {
+      return NextResponse.json({ error: "Paper not found" }, { status: 404 });
+    }
 
     const paper = await (prisma as any).paper.update({
-      where: { id: params.paperId },
+      where: { id: paperId },
       data: {
-        ...(title && { title }),
-        ...(description !== undefined && { description }),
+        title: title.trim(),
+        ...(description !== undefined && { description: description?.trim() || '' }),
       }
     });
 
-    return NextResponse.json({ paper });
+    console.log('Paper updated successfully:', paper.id);
+
+    return NextResponse.json({ 
+      paper,
+      message: "Paper details updated successfully"
+    });
   } catch (error: any) {
-    console.error('Update paper error:', error.message);
+    console.error('Update paper error:', error);
+    const errorMessage = error.message || 'Failed to update paper';
     return NextResponse.json(
-      { error: error.message || 'Failed to update paper' },
+      { error: errorMessage },
       { status: 500 }
     );
   }

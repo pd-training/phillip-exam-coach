@@ -16,27 +16,65 @@ export async function PATCH(
       return NextResponse.json({ error: "Unauthorized" }, { status: 403 });
     }
 
+    const paperId = params.paperId;
+    const chapterNum = params.chapterNum;
+
+    if (!paperId || !chapterNum) {
+      return NextResponse.json({ error: "Paper ID and chapter number are required" }, { status: 400 });
+    }
+
     const body = await request.json();
     const { title } = body;
-    const chapterNumber = parseInt(params.chapterNum);
 
-    console.log('Updating chapter:', chapterNumber, 'for paper:', params.paperId);
+    if (!title || !title.trim()) {
+      return NextResponse.json({ error: "Chapter title is required" }, { status: 400 });
+    }
+
+    const chapterNumber = parseInt(chapterNum);
+    if (isNaN(chapterNumber)) {
+      return NextResponse.json({ error: "Invalid chapter number" }, { status: 400 });
+    }
+
+    console.log('Updating chapter:', chapterNumber, 'for paper:', paperId);
+
+    // Verify paper exists
+    const paper = await (prisma as any).paper.findUnique({
+      where: { id: paperId },
+    });
+
+    if (!paper) {
+      return NextResponse.json({ error: "Paper not found" }, { status: 404 });
+    }
 
     const chapter = await (prisma as any).chapter.update({
       where: {
         paperId_number: {
-          paperId: params.paperId,
+          paperId: paperId,
           number: chapterNumber,
         }
       },
-      data: { title }
+      data: { title: title.trim() }
     });
 
-    return NextResponse.json({ chapter });
+    console.log('Chapter updated successfully:', chapter.id);
+
+    return NextResponse.json({ 
+      chapter,
+      message: "Chapter updated successfully"
+    });
   } catch (error: any) {
-    console.error('Update chapter error:', error.message);
+    console.error('Update chapter error:', error);
+    
+    if (error.code === 'P2025') {
+      return NextResponse.json(
+        { error: "Chapter not found" },
+        { status: 404 }
+      );
+    }
+
+    const errorMessage = error.message || 'Failed to update chapter';
     return NextResponse.json(
-      { error: error.message || 'Failed to update chapter' },
+      { error: errorMessage },
       { status: 500 }
     );
   }
