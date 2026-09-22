@@ -6,13 +6,6 @@ import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import Link from "next/link";
 
-interface Paper {
-  id: string;
-  title: string;
-  durationMinutes: number;
-  totalQuestions: number;
-  createdAt: string;
-}
 
 interface AttemptStats {
   completedCount: number;
@@ -43,7 +36,6 @@ interface Attempt {
 export default function StudentDashboard() {
   const router = useRouter();
   const { data: session, status } = useSession();
-  const [papers, setPapers] = useState<Paper[]>([]);
   const [attempts, setAttempts] = useState<Attempt[]>([]);
   const [stats, setStats] = useState<AttemptStats>({
     completedCount: 0,
@@ -88,24 +80,15 @@ export default function StudentDashboard() {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const [papersRes, attemptsRes, recommendationsRes] = await Promise.all([
-          fetch("/api/student/papers"),
+        const [attemptsRes, recommendationsRes] = await Promise.all([
           fetch("/api/student/attempts"),
           fetch("/api/student/recommendations"),
         ]);
 
         console.log("API Responses:", {
-          papers: papersRes.status,
           attempts: attemptsRes.status,
           recommendations: recommendationsRes.status,
         });
-
-        if (papersRes.ok) {
-          const data = await papersRes.json();
-          setPapers(data.papers || []);
-        } else {
-          console.error("Failed to fetch papers:", papersRes.status);
-        }
 
         if (attemptsRes.ok) {
           const data = await attemptsRes.json();
@@ -401,62 +384,6 @@ export default function StudentDashboard() {
           )}
         </div>
 
-        {/* Available Papers Section */}
-        <div>
-          <div className="mb-8">
-            <h2 className="text-2xl font-bold text-gray-900 mb-2">Your Papers</h2>
-            <p className="text-gray-600">
-              {papers.length === 0
-                ? "No papers assigned yet"
-                : `${papers.length} paper${papers.length !== 1 ? "s" : ""} available for practice`}
-            </p>
-          </div>
-
-          {papers.length === 0 ? (
-            <div className="bg-white rounded-2xl p-12 border border-gray-200 text-center">
-              <div className="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                <svg
-                  className="w-8 h-8 text-gray-400"
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
-                  />
-                </svg>
-              </div>
-              <p className="text-gray-600 font-medium mb-2">No papers assigned</p>
-              <p className="text-gray-500 text-sm mb-6">
-                Your instructor will assign papers for you to practice
-              </p>
-              <Link href="/practice">
-                <button className="inline-block px-6 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-medium transition">
-                  Go to Practice
-                </button>
-              </Link>
-            </div>
-          ) : (
-            <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
-              {papers.map((paper) => (
-                <Link key={paper.id} href={`/exam/${paper.id}`}>
-                  <div className="bg-white rounded-2xl p-6 border border-gray-200 hover:border-blue-300 hover:shadow-lg transition duration-300 cursor-pointer h-full flex flex-col justify-between group">
-                    <h3 className="text-xl font-bold text-gray-900 group-hover:text-blue-600 transition">
-                      {paper.title}
-                    </h3>
-
-                    <button className="mt-6 w-full py-3 bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-semibold transition">
-                      Start Practicing
-                    </button>
-                  </div>
-                </Link>
-              ))}
-            </div>
-          )}
-        </div>
       </div>
     </div>
   );
