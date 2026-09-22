@@ -70,53 +70,76 @@ const AnalyticsIcon = () => (
 
 const Step1Illustration = () => (
   <svg viewBox="0 0 200 200" className="w-full h-auto">
-    <rect x="40" y="40" width="120" height="100" rx="8" fill="none" stroke="#3b82f6" strokeWidth="2" />
-    <rect x="50" y="50" width="30" height="30" fill="#dbeafe" rx="2" />
-    <rect x="90" y="50" width="30" height="30" fill="#dbeafe" rx="2" />
-    <rect x="130" y="50" width="20" height="30" fill="#dbeafe" rx="2" />
-    <line x1="50" y1="90" x2="150" y2="90" stroke="#e5e7eb" strokeWidth="1" />
-    <text x="100" y="120" textAnchor="middle" fontSize="14" fill="#666" fontFamily="sans-serif">
-      Select Exam
-    </text>
+    {/* Clipboard */}
+    <rect x="45" y="35" width="85" height="110" rx="4" fill="#dbeafe" stroke="#3b82f6" strokeWidth="2" />
+    {/* Clip */}
+    <circle cx="87.5" cy="42" r="5" fill="#3b82f6" />
+    {/* Paper lines */}
+    <line x1="55" y1="55" x2="125" y2="55" stroke="#3b82f6" strokeWidth="2" />
+    <line x1="55" y1="68" x2="125" y2="68" stroke="#e5e7eb" strokeWidth="1.5" />
+    <line x1="55" y1="79" x2="125" y2="79" stroke="#e5e7eb" strokeWidth="1.5" />
+    <line x1="55" y1="90" x2="115" y2="90" stroke="#e5e7eb" strokeWidth="1.5" />
+    <line x1="55" y1="101" x2="110" y2="101" stroke="#e5e7eb" strokeWidth="1.5" />
+    <line x1="55" y1="112" x2="120" y2="112" stroke="#e5e7eb" strokeWidth="1.5" />
+    {/* Checkmark */}
+    <circle cx="145" cy="50" r="16" fill="#10b981" opacity="0.2" />
+    <path d="M 140 50 L 143 53 L 150 46" stroke="#10b981" strokeWidth="2" fill="none" strokeLinecap="round" strokeLinejoin="round" />
   </svg>
 );
 
 const Step2Illustration = () => (
   <svg viewBox="0 0 200 200" className="w-full h-auto">
-    <circle cx="100" cy="80" r="35" fill="none" stroke="#3b82f6" strokeWidth="2" />
-    <circle cx="75" cy="70" r="6" fill="#10b981" />
-    <circle cx="125" cy="70" r="6" fill="#10b981" />
-    <path d="M 85 95 Q 100 105 115 95" stroke="#3b82f6" strokeWidth="2" fill="none" />
-    <text x="100" y="145" textAnchor="middle" fontSize="14" fill="#666" fontFamily="sans-serif">
-      Practice
-    </text>
+    {/* Test form */}
+    <rect x="40" y="40" width="100" height="110" rx="6" fill="none" stroke="#3b82f6" strokeWidth="2" />
+    {/* Questions */}
+    <circle cx="55" cy="60" r="3" fill="#3b82f6" />
+    <line x1="62" y1="55" x2="120" y2="55" stroke="#3b82f6" strokeWidth="1.5" />
+    <line x1="62" y1="65" x2="120" y2="65" stroke="#3b82f6" strokeWidth="1.5" />
+    {/* Answer options */}
+    <rect x="50" y="75" width="12" height="12" rx="2" fill="none" stroke="#3b82f6" strokeWidth="1.5" />
+    <line x1="65" y1="78" x2="115" y2="78" stroke="#e5e7eb" strokeWidth="1" />
+    <rect x="50" y="92" width="12" height="12" rx="2" fill="#3b82f6" />
+    <line x1="65" y1="95" x2="115" y2="95" stroke="#e5e7eb" strokeWidth="1" />
+    <rect x="50" y="109" width="12" height="12" rx="2" fill="none" stroke="#3b82f6" strokeWidth="1.5" />
+    <line x1="65" y1="112" x2="115" y2="112" stroke="#e5e7eb" strokeWidth="1" />
+    {/* Checkmark */}
+    <path d="M 150 75 L 155 80 L 165 70" stroke="#10b981" strokeWidth="2.5" fill="none" strokeLinecap="round" strokeLinejoin="round" />
   </svg>
 );
 
 const Step3Illustration = () => (
   <svg viewBox="0 0 200 200" className="w-full h-auto">
-    <circle cx="100" cy="70" r="20" fill="#3b82f6" opacity="0.2" />
-    <path d="M 100 55 L 115 70 L 100 85 L 85 70 Z" fill="#3b82f6" />
-    <line x1="100" y1="85" x2="100" y2="120" stroke="#3b82f6" strokeWidth="2" />
-    <circle cx="80" cy="130" r="8" fill="#dbeafe" />
-    <circle cx="100" cy="130" r="8" fill="#dbeafe" />
-    <circle cx="120" cy="130" r="8" fill="#dbeafe" />
-    <text x="100" y="160" textAnchor="middle" fontSize="14" fill="#666" fontFamily="sans-serif">
-      AI Insights
-    </text>
+    {/* Chart bars */}
+    <rect x="35" y="110" width="15" height="30" rx="2" fill="#3b82f6" opacity="0.6" />
+    <rect x="58" y="95" width="15" height="45" rx="2" fill="#3b82f6" />
+    <rect x="81" y="75" width="15" height="65" rx="2" fill="#3b82f6" opacity="0.6" />
+    <rect x="104" y="60" width="15" height="80" rx="2" fill="#3b82f6" />
+    {/* Baseline */}
+    <line x1="30" y1="140" x2="130" y2="140" stroke="#e5e7eb" strokeWidth="2" />
+    {/* Light bulb (AI insight) */}
+    <circle cx="155" cy="65" r="12" fill="#fbbf24" opacity="0.3" stroke="#fbbf24" strokeWidth="1.5" />
+    <path d="M 155 77 L 150 85 L 160 85 Z" fill="#fbbf24" opacity="0.3" stroke="#fbbf24" strokeWidth="1.5" />
+    <line x1="155" y1="85" x2="155" y2="92" stroke="#fbbf24" strokeWidth="2" />
   </svg>
 );
 
 const Step4Illustration = () => (
   <svg viewBox="0 0 200 200" className="w-full h-auto">
-    <path d="M 50 60 L 150 60 L 130 100 L 70 100 Z" fill="none" stroke="#3b82f6" strokeWidth="2" rx="2" />
-    <rect x="65" y="110" width="70" height="50" rx="4" fill="#dbeafe" stroke="#3b82f6" strokeWidth="2" />
-    <line x1="75" y1="125" x2="145" y2="125" stroke="#3b82f6" strokeWidth="1" />
-    <line x1="75" y1="135" x2="145" y2="135" stroke="#3b82f6" strokeWidth="1" />
-    <line x1="75" y1="145" x2="125" y2="145" stroke="#3b82f6" strokeWidth="1" />
-    <text x="100" y="175" textAnchor="middle" fontSize="14" fill="#666" fontFamily="sans-serif">
-      Study Smart
-    </text>
+    {/* Stack of books */}
+    <rect x="50" y="100" width="60" height="15" rx="2" fill="#3b82f6" stroke="#1d4ed8" strokeWidth="1.5" />
+    <line x1="50" y1="100" x2="110" y2="100" stroke="#1d4ed8" strokeWidth="1" />
+    <rect x="45" y="82" width="60" height="15" rx="2" fill="#60a5fa" stroke="#1d4ed8" strokeWidth="1.5" />
+    <line x1="45" y1="82" x2="105" y2="82" stroke="#1d4ed8" strokeWidth="1" />
+    <rect x="40" y="64" width="60" height="15" rx="2" fill="#93c5fd" stroke="#1d4ed8" strokeWidth="1.5" />
+    <line x1="40" y1="64" x2="100" y2="64" stroke="#1d4ed8" strokeWidth="1" />
+    {/* Trophy/achievement */}
+    <circle cx="150" cy="75" r="15" fill="#f59e0b" opacity="0.2" />
+    <path d="M 145 70 L 150 65 L 155 70 L 155 75 Q 150 82 145 75 Z" fill="#f59e0b" />
+    <rect x="148" y="82" width="4" height="8" fill="#f59e0b" />
+    {/* Stars around trophy */}
+    <text x="128" y="68" fontSize="12" fill="#f59e0b">★</text>
+    <text x="168" y="78" fontSize="12" fill="#f59e0b">★</text>
+    <text x="155" y="50" fontSize="12" fill="#f59e0b">★</text>
   </svg>
 );
 
