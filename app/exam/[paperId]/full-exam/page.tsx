@@ -128,8 +128,8 @@ export default function FullExamMode() {
 
       if (res.ok) {
         const data = await res.json();
-        setResult(data);
-        setSubmitted(true);
+        // Redirect to review page with sidebar navigation
+        router.push(`/exam/attempts/${data.attemptId}`);
       } else {
         alert("Failed to submit exam");
       }

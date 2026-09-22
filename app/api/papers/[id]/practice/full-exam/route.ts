@@ -186,6 +186,7 @@ export async function POST(
     }
 
     return NextResponse.json({
+      attemptId,
       score,
       passed,
       correctCount,
