@@ -60,8 +60,11 @@ export default function PracticePage() {
       const accessData = await accessRes.json();
       const studentPapers = accessData.papers || [];
       
-      // Check if student has access to this paper
-      const hasAccess = studentPapers.some((p: any) => p.id === paperId);
+      console.log("Checking access for paperId:", paperId);
+      console.log("Student has papers:", studentPapers.map((p: any) => ({ id: p.id, paperId: p.paperId })));
+      
+      // Check if student has access to this paper (compare against paperId, not id)
+      const hasAccess = studentPapers.some((p: any) => p.paperId === paperId);
       
       if (!hasAccess) {
         console.error("Student does not have access to this paper:", paperId);
