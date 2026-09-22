@@ -94,9 +94,17 @@ export default function StudentDashboard() {
           fetch("/api/student/recommendations"),
         ]);
 
+        console.log("API Responses:", {
+          papers: papersRes.status,
+          attempts: attemptsRes.status,
+          recommendations: recommendationsRes.status,
+        });
+
         if (papersRes.ok) {
           const data = await papersRes.json();
           setPapers(data.papers || []);
+        } else {
+          console.error("Failed to fetch papers:", papersRes.status);
         }
 
         if (attemptsRes.ok) {
@@ -107,11 +115,16 @@ export default function StudentDashboard() {
             passCount: 0,
           });
           setAttempts(data.attempts || []);
+        } else {
+          console.error("Failed to fetch attempts:", attemptsRes.status);
         }
 
         if (recommendationsRes.ok) {
           const data = await recommendationsRes.json();
           setRecommendedChapters(data.recommendations || []);
+        } else {
+          console.error("Failed to fetch recommendations:", recommendationsRes.status);
+          // Don't break the page if recommendations fail
         }
       } catch (error) {
         console.error("Error fetching data:", error);

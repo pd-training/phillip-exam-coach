@@ -18,6 +18,8 @@ export async function GET(
     const userId = (session.user as any).id;
     const attemptId = params.attemptId;
 
+    console.log("Fetching attempt details for attemptId:", attemptId, "userId:", userId);
+
     if (!attemptId) {
       return Response.json({ error: "Attempt ID is required" }, { status: 400 });
     }
@@ -39,32 +41,41 @@ export async function GET(
         p."passingScore"
       FROM examattempt ea
       JOIN "User" u ON ea.userid = u.id
-      JOIN "Paper" p ON ea.paperid = p.id
+      JOIN "Paper" p ON ea.paperid::uuid = p.id
       WHERE ea.id = ${attemptId}
       AND ea.userid = ${userId}
     ` as any[];
 
+    console.log("Attempt query result:", attemptRes?.length);
+
     if (!attemptRes || attemptRes.length === 0) {
+      console.log("Attempt not found or access denied");
       return Response.json({ error: "Attempt not found or access denied" }, { status: 404 });
     }
 
     const attempt = attemptRes[0];
+    console.log("Attempt found:", attempt.id, "Paper:", attempt.paper_name);
 
     // Get questions for this paper
+    console.log("Fetching questions for paperId:", attempt.paperid);
     const questions = await (prisma as any).question.findMany({
       where: { paperId: attempt.paperid },
       orderBy: { id: 'asc' },
     });
 
+    console.log("Found questions:", questions.length);
+
     // Get student answers from StudentAnswer table if it exists
     let studentAnswers: any[] = [];
     try {
+      console.log("Fetching student answers for attemptId:", attemptId);
       studentAnswers = await (prisma as any).studentAnswer.findMany({
         where: { attemptId },
       });
-    } catch (err) {
-      // StudentAnswer table might not exist yet
-      console.log("StudentAnswer table not found, attempting to fetch from attempt data");
+      console.log("Found student answers:", studentAnswers.length);
+    } catch (err: any) {
+      console.log("StudentAnswer table not found or empty:", err.message);
+      // StudentAnswer table might not exist yet - continue with empty answers
     }
 
     // Map student answers to questions
@@ -87,6 +98,8 @@ export async function GET(
       };
     });
 
+    console.log("Returning attempt details with", questionsWithAnswers.length, "questions");
+
     return Response.json({
       attempt: {
         id: attempt.id,
@@ -106,8 +119,12 @@ export async function GET(
     });
   } catch (error: any) {
     console.error("Error fetching student attempt details:", error);
+    console.error("Error stack:", error.stack);
     return Response.json(
-      { error: "Failed to fetch attempt details" },
+      { 
+        error: "Failed to fetch attempt details",
+        details: error.message
+      },
       { status: 500 }
     );
   }
