@@ -14,6 +14,16 @@ interface PaperInfo {
   description?: string;
 }
 
+interface RecommendedChapter {
+  id: string;
+  paperTitle: string;
+  paperId: string;
+  chapterNumber: number;
+  chapterTitle: string;
+  weaknessScore: number;
+  scoreOnPaper: number;
+}
+
 export default function PracticePage() {
   const router = useRouter();
   const { data: session, status } = useSession();
@@ -21,6 +31,7 @@ export default function PracticePage() {
   const paperId = params.paperId as string;
 
   const [paper, setPaper] = useState<PaperInfo | null>(null);
+  const [recommendedChapters, setRecommendedChapters] = useState<RecommendedChapter[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -38,13 +49,26 @@ export default function PracticePage() {
 
   const fetchPaper = async () => {
     try {
-      const res = await fetch(`/api/papers/${paperId}`);
-      if (res.ok) {
-        const data = await res.json();
+      const [paperRes, recommendationsRes] = await Promise.all([
+        fetch(`/api/papers/${paperId}`),
+        fetch(`/api/student/recommendations`),
+      ]);
+
+      if (paperRes.ok) {
+        const data = await paperRes.json();
         setPaper(data.paper);
       }
+
+      if (recommendationsRes.ok) {
+        const data = await recommendationsRes.json();
+        // Filter recommendations to only show those for this paper (limit to 3)
+        const filtered = (data.recommendations || [])
+          .filter((rec: RecommendedChapter) => rec.paperId === paperId)
+          .slice(0, 3);
+        setRecommendedChapters(filtered);
+      }
     } catch (error) {
-      console.error("Failed to fetch paper:", error);
+      console.error("Failed to fetch data:", error);
     } finally {
       setLoading(false);
     }
@@ -169,6 +193,57 @@ export default function PracticePage() {
             </Link>
           </div>
         </div>
+
+        {/* AI Recommended Chapters */}
+        {recommendedChapters.length > 0 && (
+          <div className="mb-12">
+            <div className="flex items-center gap-3 mb-6">
+              <div className="w-8 h-8 bg-gradient-to-br from-yellow-300 to-orange-400 rounded flex items-center justify-center">
+                <svg className="w-5 h-5 text-white" fill="currentColor" viewBox="0 0 24 24">
+                  <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z" />
+                </svg>
+              </div>
+              <h2 className="text-2xl font-bold text-gray-900">AI-Recommended Chapters</h2>
+            </div>
+            <p className="text-gray-600 mb-6">Based on your past exam performance, focus on these chapters:</p>
+
+            <div className="space-y-3">
+              {recommendedChapters.map((chapter, idx) => (
+                <Link key={chapter.id} href={`/exam/${paperId}/practice-chapter/${chapter.chapterNumber}`}>
+                  <div className="bg-white rounded-lg p-4 border border-gray-200 hover:border-orange-300 hover:shadow-md transition duration-300 cursor-pointer group">
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center gap-4 flex-1">
+                        <div className="w-8 h-8 bg-orange-100 rounded flex items-center justify-center font-bold text-orange-600 group-hover:bg-orange-600 group-hover:text-white transition">
+                          {idx + 1}
+                        </div>
+                        <div>
+                          <p className="font-semibold text-gray-900">{chapter.chapterTitle}</p>
+                          <p className="text-xs text-gray-600">Chapter {chapter.chapterNumber}</p>
+                        </div>
+                      </div>
+                      <div className="flex items-center gap-3">
+                        <div className="text-right">
+                          <div className="text-sm font-bold text-red-600">
+                            {Math.round(100 - chapter.weaknessScore)}% correct
+                          </div>
+                          <div className="w-20 h-1.5 bg-gray-200 rounded-full overflow-hidden">
+                            <div
+                              className="h-full bg-orange-500"
+                              style={{ width: `${Math.round(100 - chapter.weaknessScore)}%` }}
+                            />
+                          </div>
+                        </div>
+                        <svg className="w-4 h-4 text-gray-400 group-hover:text-orange-600 transition flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                        </svg>
+                      </div>
+                    </div>
+                  </div>
+                </Link>
+              ))}
+            </div>
+          </div>
+        )}
 
         {/* Tips */}
         <div className="bg-blue-50 border border-blue-200 rounded-2xl p-8">
