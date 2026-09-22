@@ -326,8 +326,8 @@ export default function PracticeChapterMode() {
       >
         Correct so far: {score} / {answered}
       </div>
-        </div>  {/* Close card div */}
-      </div>  {/* Close centering container div */}
-    </div>  {/* Close outer wrapper div */}
+        </div>
+      </div>
+    </div>
   );
 }

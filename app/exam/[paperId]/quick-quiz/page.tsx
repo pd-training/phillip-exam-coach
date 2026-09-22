@@ -162,7 +162,7 @@ export default function QuickQuizMode() {
             />
           </div>
 
-      {/* Question */}
+          {/* Question */}
       <div
         style={{
           padding: "20px",
@@ -312,6 +312,8 @@ export default function QuickQuizMode() {
         }}
       >
         Correct so far: {score} / {answered}
+      </div>
+        </div>
       </div>
     </div>
   );
