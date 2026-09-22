@@ -53,35 +53,79 @@ export async function PATCH(
       return NextResponse.json({ error: 'Question does not belong to this paper' }, { status: 403 });
     }
 
-    await (prisma as any).question.update({
-      where: { id: qid },
-      data: {
+    // Prepare update data
+    const updateData: any = {
+      questionText: questionText.trim(),
+      correctAnswer: correctAnswer?.toUpperCase().charAt(0),
+      chapterNumber: parseInt(chapterNumber),
+      explanation: explanation?.trim() || '',
+    };
+
+    // Only include option fields if they're provided
+    if (optionA !== undefined) updateData.optionA = optionA?.trim() || '';
+    if (optionB !== undefined) updateData.optionB = optionB?.trim() || '';
+    if (optionC !== undefined) updateData.optionC = optionC?.trim() || '';
+    if (optionD !== undefined) updateData.optionD = optionD?.trim() || '';
+
+    try {
+      await (prisma as any).question.update({
+        where: { id: qid },
+        data: updateData
+      });
+    } catch (updateError: any) {
+      console.log('Warning: Update failed, trying without option columns:', updateError.message);
+      
+      // Retry without option columns
+      const basicUpdateData = {
         questionText: questionText.trim(),
         correctAnswer: correctAnswer?.toUpperCase().charAt(0),
         chapterNumber: parseInt(chapterNumber),
         explanation: explanation?.trim() || '',
-        optionA: optionA?.trim() || '',
-        optionB: optionB?.trim() || '',
-        optionC: optionC?.trim() || '',
-        optionD: optionD?.trim() || '',
+      };
+      
+      try {
+        await (prisma as any).question.update({
+          where: { id: qid },
+          data: basicUpdateData
+        });
+      } catch (retryError) {
+        console.error('Fallback update also failed:', retryError);
+        throw retryError;
       }
-    });
+    }
 
-    const question = await (prisma as any).question.findUnique({
-      where: { id: qid },
-      select: {
-        id: true,
-        paperId: true,
-        chapterNumber: true,
-        questionText: true,
-        correctAnswer: true,
-        explanation: true,
-        optionA: true,
-        optionB: true,
-        optionC: true,
-        optionD: true,
-      }
-    });
+    // Fetch updated question (with graceful fallback)
+    let question;
+    try {
+      question = await (prisma as any).question.findUnique({
+        where: { id: qid },
+        select: {
+          id: true,
+          paperId: true,
+          chapterNumber: true,
+          questionText: true,
+          correctAnswer: true,
+          explanation: true,
+          optionA: true,
+          optionB: true,
+          optionC: true,
+          optionD: true,
+        }
+      });
+    } catch (e: any) {
+      console.log('Warning: Could not fetch updated question with options, trying without:', e.message);
+      question = await (prisma as any).question.findUnique({
+        where: { id: qid },
+        select: {
+          id: true,
+          paperId: true,
+          chapterNumber: true,
+          questionText: true,
+          correctAnswer: true,
+          explanation: true,
+        }
+      });
+    }
 
     console.log('Question updated successfully:', question.id);
 
