@@ -9,7 +9,7 @@ export async function PATCH(
 ) {
   try {
     const body = await request.json();
-    const { questionText, correctAnswer, chapterNumber, explanation } = body;
+    const { questionText, correctAnswer, chapterNumber, explanation, optionA, optionB, optionC, optionD } = body;
 
     console.log('Updating question:', params.qid);
 
@@ -20,6 +20,10 @@ export async function PATCH(
         correctAnswer: correctAnswer?.toUpperCase().charAt(0),
         chapterNumber,
         explanation,
+        optionA,
+        optionB,
+        optionC,
+        optionD,
       }
     });
 
@@ -32,6 +36,10 @@ export async function PATCH(
         questionText: true,
         correctAnswer: true,
         explanation: true,
+        optionA: true,
+        optionB: true,
+        optionC: true,
+        optionD: true,
       }
     });
 

@@ -21,6 +21,10 @@ export async function GET(
         questionText: true,
         correctAnswer: true,
         explanation: true,
+        optionA: true,
+        optionB: true,
+        optionC: true,
+        optionD: true,
       },
       orderBy: [{ chapterNumber: 'asc' }, { id: 'asc' }]
     });
