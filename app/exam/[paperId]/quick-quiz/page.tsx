@@ -164,13 +164,6 @@ export default function QuickQuizMode() {
 
           {/* Question */}
           <div
-        style={{
-          padding: "20px",
-          backgroundColor: "#f9fafb",
-          borderRadius: "8px",
-          marginBottom: "20px",
-          border: "1px solid #e5e7eb",
-        }}
             style={{
               padding: "20px",
               backgroundColor: "#f9fafb",
