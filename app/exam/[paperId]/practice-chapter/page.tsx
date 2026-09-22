@@ -217,7 +217,7 @@ export default function PracticeChapterMode() {
         }}
       >
         <h1 style={{ margin: "0" }}>
-          Chapter {selectedChapter}
+          Chapter {selectedChapter} — {questions.length} random questions
         </h1>
         <div style={{ fontSize: "14px", color: "#666" }}>
           Question {progress} of {questions.length}

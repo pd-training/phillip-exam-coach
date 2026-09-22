@@ -3,6 +3,16 @@ import prisma from '@/lib/prisma';
 
 export const dynamic = 'force-dynamic';
 
+// Fisher-Yates shuffle
+function shuffleArray<T>(array: T[]): T[] {
+  const arr = [...array];
+  for (let i = arr.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [arr[i], arr[j]] = [arr[j], arr[i]];
+  }
+  return arr;
+}
+
 export async function GET(
   request: NextRequest,
   { params }: { params: { id: string; num: string } }
@@ -14,7 +24,7 @@ export async function GET(
     console.log('Fetching chapter questions - paperId:', paperId, 'chapter:', chapterNumber);
 
     // Get all questions for this chapter
-    const questions = await (prisma as any).question.findMany({
+    const allQuestions = await (prisma as any).question.findMany({
       where: {
         paperId: paperId,
         chapterNumber: chapterNumber
@@ -25,26 +35,30 @@ export async function GET(
         correctAnswer: true,
         explanation: true,
       },
-      orderBy: { id: 'asc' }
     });
 
-    console.log('Found questions:', questions.length);
+    console.log('Found total questions in chapter:', allQuestions.length);
 
-    if (questions.length === 0) {
+    if (allQuestions.length === 0) {
       return NextResponse.json(
         { error: 'No questions found for this chapter' },
         { status: 404 }
       );
     }
 
+    // Shuffle and limit to 10 questions per attempt
+    const shuffled = shuffleArray(allQuestions);
+    const selectedQuestions = shuffled.slice(0, 10);
+
     return NextResponse.json({
       chapter: chapterNumber,
-      questions: questions.map((q: any) => ({
+      questions: selectedQuestions.map((q: any) => ({
         id: q.id,
         text: q.questionText,
         // Don't send correctAnswer/explanation until answered
       })),
-      totalQuestions: questions.length,
+      totalQuestionsInChapter: allQuestions.length,
+      questionsThisAttempt: selectedQuestions.length,
     });
   } catch (error: any) {
     console.error('Get chapter questions error:', error.message);
