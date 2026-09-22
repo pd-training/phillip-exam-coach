@@ -167,22 +167,14 @@ export default function PracticeChapterMode() {
                 onClick={() => handleSelectChapter(ch.number)}
                 className="bg-white rounded-2xl p-6 border-2 border-gray-200 hover:border-blue-600 hover:shadow-lg transition duration-300 text-left group"
               >
-                <div className="flex items-start justify-between mb-4">
-                  <div className="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center group-hover:bg-blue-600 transition">
-                    <span className="text-lg font-bold text-blue-600 group-hover:text-white transition">
-                      {ch.number}
-                    </span>
-                  </div>
-                  <span className="text-xs font-bold text-blue-600 bg-blue-50 px-2 py-1 rounded-full group-hover:bg-blue-600 group-hover:text-white transition">
-                    {ch.questionCount}
+                <div className="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center mb-4 group-hover:bg-blue-600 transition">
+                  <span className="text-lg font-bold text-blue-600 group-hover:text-white transition">
+                    {ch.number}
                   </span>
                 </div>
-                <h3 className="text-lg font-bold text-gray-900 mb-1 group-hover:text-blue-600 transition">
+                <h3 className="text-lg font-bold text-gray-900 group-hover:text-blue-600 transition">
                   {ch.title}
                 </h3>
-                <p className="text-sm text-gray-600">
-                  {ch.questionCount} {ch.questionCount === 1 ? "question" : "questions"}
-                </p>
               </button>
             ))}
           </div>

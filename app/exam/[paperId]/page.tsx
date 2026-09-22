@@ -103,28 +103,6 @@ export default function PracticePage() {
 
       {/* Main Content */}
       <div className="max-w-5xl mx-auto px-6 py-12">
-        {/* Paper Info */}
-        <div className="bg-white rounded-2xl p-8 border border-gray-200 mb-12">
-          <div className="grid md:grid-cols-4 gap-8">
-            <div>
-              <p className="text-gray-600 text-sm font-medium mb-2">Total Questions</p>
-              <p className="text-3xl font-bold text-gray-900">{paper.totalQuestions}</p>
-            </div>
-            <div>
-              <p className="text-gray-600 text-sm font-medium mb-2">Duration</p>
-              <p className="text-3xl font-bold text-gray-900">{paper.durationMinutes}m</p>
-            </div>
-            <div>
-              <p className="text-gray-600 text-sm font-medium mb-2">Format</p>
-              <p className="text-3xl font-bold text-gray-900">MCQ</p>
-            </div>
-            <div>
-              <p className="text-gray-600 text-sm font-medium mb-2">Difficulty</p>
-              <p className="text-3xl font-bold text-gray-900">Mixed</p>
-            </div>
-          </div>
-        </div>
-
         {/* Practice Modes */}
         <div className="mb-12">
           <h2 className="text-2xl font-bold text-gray-900 mb-8">Select Practice Mode</h2>
