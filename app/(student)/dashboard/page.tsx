@@ -23,9 +23,11 @@ interface AttemptStats {
 interface RecommendedChapter {
   id: string;
   paperTitle: string;
+  paperId: string;
   chapterNumber: number;
   chapterTitle: string;
   weaknessScore: number;
+  scoreOnPaper: number;
 }
 
 export default function StudentDashboard() {
@@ -37,30 +39,8 @@ export default function StudentDashboard() {
     averageScore: 0,
     passCount: 0,
   });
+  const [recommendedChapters, setRecommendedChapters] = useState<RecommendedChapter[]>([]);
   const [loading, setLoading] = useState(true);
-  const [recommendedChapters] = useState<RecommendedChapter[]>([
-    {
-      id: "1",
-      paperTitle: "RES5",
-      chapterNumber: 15,
-      chapterTitle: "Real Estate Valuation",
-      weaknessScore: 45,
-    },
-    {
-      id: "2",
-      paperTitle: "RES5",
-      chapterNumber: 21,
-      chapterTitle: "Investment Analysis",
-      weaknessScore: 52,
-    },
-    {
-      id: "3",
-      paperTitle: "RES5",
-      chapterNumber: 11,
-      chapterTitle: "Property Rights",
-      weaknessScore: 58,
-    },
-  ]);
 
   // Handle auth redirects
   useEffect(() => {
@@ -97,9 +77,10 @@ export default function StudentDashboard() {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const [papersRes, attemptsRes] = await Promise.all([
+        const [papersRes, attemptsRes, recommendationsRes] = await Promise.all([
           fetch("/api/papers"),
           fetch("/api/student/attempts"),
+          fetch("/api/student/recommendations"),
         ]);
 
         if (papersRes.ok) {
@@ -114,6 +95,11 @@ export default function StudentDashboard() {
             averageScore: 0,
             passCount: 0,
           });
+        }
+
+        if (recommendationsRes.ok) {
+          const data = await recommendationsRes.json();
+          setRecommendedChapters(data.recommendations || []);
         }
       } catch (error) {
         console.error("Error fetching data:", error);
@@ -306,16 +292,16 @@ export default function StudentDashboard() {
                   <div className="flex items-center gap-4">
                     <div className="text-right">
                       <div className="text-sm font-bold text-red-600">
-                        {100 - chapter.weaknessScore}% correct
+                        {Math.round(100 - chapter.weaknessScore)}% correct
                       </div>
                       <div className="w-32 h-2 bg-gray-300 rounded-full overflow-hidden">
                         <div
                           className="h-full bg-gradient-to-r from-red-500 to-orange-500"
-                          style={{ width: `${100 - chapter.weaknessScore}%` }}
+                          style={{ width: `${Math.round(100 - chapter.weaknessScore)}%` }}
                         />
                       </div>
                     </div>
-                    <Link href={`/exam/${papers[0]?.id || ""}/practice-chapter/15`}>
+                    <Link href={`/exam/${chapter.paperId}/practice-chapter/${chapter.chapterNumber}`}>
                       <button className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-medium text-sm transition">
                         Practice
                       </button>
@@ -330,7 +316,7 @@ export default function StudentDashboard() {
         {/* Available Papers Section */}
         <div>
           <div className="mb-8">
-            <h2 className="text-2xl font-bold text-gray-900 mb-2">Your Assigned Papers</h2>
+            <h2 className="text-2xl font-bold text-gray-900 mb-2">Your Papers</h2>
             <p className="text-gray-600">
               {papers.length === 0
                 ? "No papers assigned yet"
@@ -369,50 +355,12 @@ export default function StudentDashboard() {
             <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
               {papers.map((paper) => (
                 <Link key={paper.id} href={`/exam/${paper.id}`}>
-                  <div className="bg-white rounded-2xl p-6 border border-gray-200 hover:border-blue-300 hover:shadow-lg transition duration-300 cursor-pointer h-full flex flex-col group">
-                    <div className="flex-1">
-                      <h3 className="text-xl font-bold text-gray-900 mb-3 group-hover:text-blue-600 transition">
-                        {paper.title}
-                      </h3>
-                      <div className="space-y-2 mb-6">
-                        <div className="flex items-center gap-2 text-gray-600">
-                          <svg
-                            className="w-4 h-4"
-                            fill="none"
-                            stroke="currentColor"
-                            viewBox="0 0 24 24"
-                          >
-                            <path
-                              strokeLinecap="round"
-                              strokeLinejoin="round"
-                              strokeWidth={2}
-                              d="M12 8v4l3 2m6-3a9 9 0 11-18 0 9 9 0 0118 0z"
-                            />
-                          </svg>
-                          <span className="text-sm">{paper.durationMinutes} minutes</span>
-                        </div>
-                        <div className="flex items-center gap-2 text-gray-600">
-                          <svg
-                            className="w-4 h-4"
-                            fill="none"
-                            stroke="currentColor"
-                            viewBox="0 0 24 24"
-                          >
-                            <path
-                              strokeLinecap="round"
-                              strokeLinejoin="round"
-                              strokeWidth={2}
-                              d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z"
-                            />
-                          </svg>
-                          <span className="text-sm">
-                            {paper.totalQuestions} questions
-                          </span>
-                        </div>
-                      </div>
-                    </div>
+                  <div className="bg-white rounded-2xl p-6 border border-gray-200 hover:border-blue-300 hover:shadow-lg transition duration-300 cursor-pointer h-full flex flex-col justify-between group">
+                    <h3 className="text-xl font-bold text-gray-900 group-hover:text-blue-600 transition">
+                      {paper.title}
+                    </h3>
 
-                    <button className="w-full py-3 bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-semibold transition">
+                    <button className="mt-6 w-full py-3 bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-semibold transition">
                       Start Practicing
                     </button>
                   </div>
