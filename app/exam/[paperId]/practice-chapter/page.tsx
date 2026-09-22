@@ -158,23 +158,39 @@ export default function PracticeChapterMode() {
           </div>
         </div>
 
-        {/* Chapters Grid */}
+        {/* Chapters List */}
         <div className="max-w-5xl mx-auto px-6 py-12 flex-1">
-          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+          <div className="space-y-2">
             {chapters.map((ch) => (
               <button
                 key={ch.number}
                 onClick={() => handleSelectChapter(ch.number)}
-                className="bg-white rounded-2xl p-6 border-2 border-gray-200 hover:border-blue-600 hover:shadow-lg transition duration-300 text-left group"
+                className="w-full bg-white rounded-lg p-4 border border-gray-200 hover:border-blue-500 hover:bg-blue-50 transition duration-200 text-left flex items-center justify-between group"
               >
-                <div className="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center mb-4 group-hover:bg-blue-600 transition">
-                  <span className="text-lg font-bold text-blue-600 group-hover:text-white transition">
+                <div className="flex items-center gap-4 flex-1">
+                  <div className="w-10 h-10 bg-gray-100 rounded flex items-center justify-center group-hover:bg-blue-600 group-hover:text-white transition font-semibold text-gray-900">
                     {ch.number}
-                  </span>
+                  </div>
+                  <div className="flex-1">
+                    <h3 className="font-semibold text-gray-900 group-hover:text-blue-600 transition">
+                      {ch.title}
+                    </h3>
+                    <p className="text-xs text-gray-500">{ch.questionCount} questions</p>
+                  </div>
                 </div>
-                <h3 className="text-lg font-bold text-gray-900 group-hover:text-blue-600 transition">
-                  {ch.title}
-                </h3>
+                <svg
+                  className="w-5 h-5 text-gray-400 group-hover:text-blue-600 transition flex-shrink-0"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M9 5l7 7-7 7"
+                  />
+                </svg>
               </button>
             ))}
           </div>
