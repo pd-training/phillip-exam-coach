@@ -164,9 +164,10 @@ export async function POST(
     console.log('Exam result - score:', score, 'passed:', passed);
 
     // Save exam attempt using raw SQL (examattempt is lowercase)
+    let attemptId = '';
     try {
       console.log('Saving attempt - userId:', userId, 'paperId:', paperId, 'score:', score);
-      const attemptId = crypto.randomUUID();
+      attemptId = crypto.randomUUID();
       await prisma.$queryRaw`
         INSERT INTO examattempt (id, paperid, userid, startedat, submittedat, score, passed, createdat)
         VALUES (
