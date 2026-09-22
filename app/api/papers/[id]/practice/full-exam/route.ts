@@ -94,7 +94,9 @@ export async function POST(
       where: { paperId: paperId },
       select: {
         id: true,
+        questionText: true,
         correctAnswer: true,
+        explanation: true,
       }
     });
 
@@ -118,9 +120,11 @@ export async function POST(
 
       answerDetails.push({
         questionId: q.id,
+        questionText: q.questionText,
         studentAnswer,
         correctAnswer: q.correctAnswer,
         isCorrect,
+        explanation: q.explanation,
       });
     }
 

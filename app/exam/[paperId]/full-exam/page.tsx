@@ -198,6 +198,25 @@ export default function FullExamMode() {
                   Correct answer: {answer.correctAnswer}
                 </p>
               )}
+              {answer.explanation && (
+                <div style={{
+                  marginTop: "12px",
+                  padding: "12px",
+                  backgroundColor: answer.isCorrect ? "#ecfdf5" : "#fef3c7",
+                  border: `1px solid ${answer.isCorrect ? "#d1fae5" : "#fde68a"}`,
+                  borderRadius: "4px",
+                  fontSize: "13px",
+                  lineHeight: "1.5",
+                  color: "#374151",
+                }}>
+                  <p style={{ margin: "0 0 6px 0", fontWeight: "600", color: "#1f2937" }}>
+                    📝 Explanation
+                  </p>
+                  <p style={{ margin: "0" }}>
+                    {answer.explanation}
+                  </p>
+                </div>
+              )}
             </div>
           ))}
         </div>
