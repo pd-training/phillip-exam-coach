@@ -48,14 +48,23 @@ export default function AttemptDetailsPage() {
   useEffect(() => {
     const fetchAttemptDetails = async () => {
       try {
+        console.log("Fetching attempt details for:", attemptId);
         const response = await fetch(`/api/admin/attempts/${attemptId}`);
+        console.log("Response status:", response.status);
+        
         if (!response.ok) {
-          throw new Error('Failed to load attempt details');
+          const errorData = await response.json().catch(() => ({}));
+          throw new Error(errorData.error || 'Failed to load attempt details');
         }
         const data = await response.json();
+        console.log("API Response data:", data);
+        console.log("Attempt:", data.attempt);
+        console.log("Questions:", data.questions, "count:", data.questions?.length);
+        
         setAttempt(data.attempt);
-        setQuestions(data.questions);
+        setQuestions(data.questions || []);
       } catch (err: any) {
+        console.error("Error fetching attempt:", err);
         setError(err.message);
       } finally {
         setLoading(false);

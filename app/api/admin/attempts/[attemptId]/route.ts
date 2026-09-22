@@ -53,7 +53,7 @@ export async function GET(
     console.log("Attempt data:", attempt);
 
     // Get answer details from the examattempt table (if stored) or reconstruct from questions
-    console.log("Fetching questions for paperid:", attempt.paperid);
+    console.log("Fetching questions for paperid:", attempt.paperid, "type:", typeof attempt.paperid);
     
     let answersRes: any[] = [];
     try {
@@ -69,9 +69,10 @@ export async function GET(
           q."explanation",
           q."chapterNumber"
         FROM "Question" q
-        WHERE q."paperId" = ${attempt.paperid}
+        WHERE q."paperId"::text = ${attempt.paperid}::text
         ORDER BY q."chapterNumber" ASC, q.id ASC
       ` as any[];
+      console.log("✓ Questions fetched with options:", answersRes?.length, "questions");
     } catch (e: any) {
       console.log("Warning: Could not fetch questions with all columns, retrying without options:", e.message);
       try {
@@ -83,16 +84,20 @@ export async function GET(
             q."explanation",
             q."chapterNumber"
           FROM "Question" q
-          WHERE q."paperId" = ${attempt.paperid}
+          WHERE q."paperId"::text = ${attempt.paperid}::text
           ORDER BY q."chapterNumber" ASC, q.id ASC
         ` as any[];
+        console.log("✓ Questions fetched without options:", answersRes?.length, "questions");
       } catch (retryError) {
-        console.log("Could not fetch questions at all:", retryError);
+        console.log("✗ Could not fetch questions at all:", retryError);
         answersRes = [];
       }
     }
 
     console.log("Questions query returned:", answersRes?.length, "questions");
+    if (answersRes.length === 0) {
+      console.warn("WARNING: No questions found for paper", attempt.paperid);
+    }
 
     // Get student answers if stored (check if answers table exists)
     let studentAnswers: any = {};
