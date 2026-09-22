@@ -43,6 +43,7 @@ export default function AttemptDetailsPage() {
   const [questions, setQuestions] = useState<Question[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
+  const [currentQIndex, setCurrentQIndex] = useState(0);
 
   useEffect(() => {
     const fetchAttemptDetails = async () => {
@@ -96,10 +97,10 @@ export default function AttemptDetailsPage() {
     );
   }
 
+  const currentQuestion = questions[currentQIndex];
   const timeTaken = Math.round(
     (new Date(attempt.submittedat).getTime() - new Date(attempt.startedat).getTime()) / 60000
   );
-
   const correctCount = questions.filter(q => q.isCorrect).length;
 
   return (
@@ -107,127 +108,71 @@ export default function AttemptDetailsPage() {
       <AdminNav />
 
       {/* Header */}
-      <div className="bg-gradient-to-r from-blue-600 to-blue-700 text-white py-12 px-6 border-b border-blue-800">
-        <div className="max-w-7xl mx-auto">
-          <div className="mb-4">
+      <div className="bg-gradient-to-r from-blue-600 to-blue-700 text-white py-8 px-6 border-b border-blue-800">
+        <div className="max-w-7xl mx-auto flex justify-between items-center">
+          <div>
             <Link href="/admin/dashboard">
-              <button className="text-blue-100 hover:text-white font-medium text-sm">
+              <button className="text-blue-100 hover:text-white font-medium text-sm mb-4 block">
                 ← Back to Dashboard
               </button>
             </Link>
+            <h1 className="text-3xl font-bold">{attempt.student_name}'s Exam Review</h1>
+            <p className="text-blue-100 mt-1">{attempt.paper_name} | Score: {attempt.score}% | {attempt.passed ? '✓ PASSED' : '✗ FAILED'}</p>
           </div>
-          <h1 className="text-4xl font-bold mb-2">Exam Attempt Details</h1>
-          <p className="text-blue-100">Review student's answers and responses</p>
+          <div className="text-right">
+            <p className="text-blue-100 text-sm">Student Email</p>
+            <p className="text-sm font-mono">{attempt.student_email}</p>
+          </div>
         </div>
       </div>
 
-      {/* Content */}
-      <div className="max-w-7xl mx-auto px-6 py-12">
-        {/* Student & Attempt Info */}
-        <div className="grid md:grid-cols-2 gap-8 mb-12">
-          {/* Student Info */}
-          <div className="bg-white rounded-2xl p-8 border border-gray-200">
-            <h2 className="text-xl font-bold text-gray-900 mb-6">Student Information</h2>
-            <div className="space-y-4">
-              <div>
-                <p className="text-gray-600 text-sm font-medium mb-1">Name</p>
-                <p className="text-lg font-semibold text-gray-900">{attempt.student_name}</p>
-              </div>
-              <div>
-                <p className="text-gray-600 text-sm font-medium mb-1">Email</p>
-                <p className="text-base text-gray-700">{attempt.student_email}</p>
-              </div>
-              <div>
-                <p className="text-gray-600 text-sm font-medium mb-1">Paper</p>
-                <p className="text-lg font-semibold text-gray-900">{attempt.paper_name}</p>
-              </div>
-            </div>
-          </div>
-
-          {/* Score Card */}
-          <div className="bg-white rounded-2xl p-8 border border-gray-200">
-            <h2 className="text-xl font-bold text-gray-900 mb-6">Performance Summary</h2>
-            <div className="space-y-6">
-              <div>
-                <p className="text-gray-600 text-sm font-medium mb-2">Score</p>
-                <div className="flex items-center gap-4">
-                  <div className={`text-4xl font-bold ${attempt.score >= attempt.passingScore ? 'text-green-600' : 'text-red-600'}`}>
-                    {attempt.score}%
-                  </div>
-                  <span className={`px-4 py-2 rounded-full font-semibold ${
-                    attempt.passed
-                      ? 'bg-green-100 text-green-800'
-                      : 'bg-red-100 text-red-800'
+      {/* Main Content */}
+      <div className="flex flex-1 overflow-hidden" style={{ height: 'calc(100vh - 200px)' }}>
+        {/* Left Content - Question */}
+        <div className="flex-1 overflow-y-auto p-8 bg-white">
+          {currentQuestion ? (
+            <div className="max-w-3xl">
+              {/* Question Header */}
+              <div className="mb-8">
+                <div className="flex items-center gap-3 mb-4">
+                  <div className={`w-10 h-10 rounded-full flex items-center justify-center font-bold text-lg ${
+                    currentQuestion.isCorrect
+                      ? 'bg-green-100 text-green-700'
+                      : 'bg-red-100 text-red-700'
                   }`}>
-                    {attempt.passed ? 'PASSED' : 'FAILED'}
-                  </span>
-                </div>
-              </div>
-              
-              <div className="border-t border-gray-200 pt-6">
-                <p className="text-gray-600 text-sm font-medium mb-2">Correct Answers</p>
-                <p className="text-2xl font-bold text-gray-900">{correctCount} of {attempt.totalQuestions}</p>
-              </div>
-
-              <div>
-                <p className="text-gray-600 text-sm font-medium mb-2">Time Taken</p>
-                <p className="text-xl font-semibold text-gray-900">{timeTaken} minutes</p>
-              </div>
-
-              <div>
-                <p className="text-gray-600 text-sm font-medium mb-2">Submitted</p>
-                <p className="text-base text-gray-700">
-                  {new Date(attempt.submittedat).toLocaleString()}
-                </p>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        {/* Questions Review */}
-        <div className="bg-white rounded-2xl border border-gray-200 overflow-hidden">
-          <div className="p-8 border-b border-gray-200">
-            <h2 className="text-2xl font-bold text-gray-900">Question Review</h2>
-            <p className="text-gray-600 mt-1">Detailed breakdown of each question and student response</p>
-          </div>
-
-          <div className="divide-y divide-gray-200">
-            {questions.map((question, idx) => (
-              <div key={question.id} className="p-8 hover:bg-gray-50 transition">
-                {/* Question Header */}
-                <div className="flex items-start justify-between mb-6">
-                  <div className="flex-1">
-                    <div className="flex items-center gap-3 mb-3">
-                      <span className={`w-8 h-8 rounded-full flex items-center justify-center font-bold text-sm ${
-                        question.isCorrect
-                          ? 'bg-green-100 text-green-700'
-                          : 'bg-red-100 text-red-700'
-                      }`}>
-                        {question.isCorrect ? '✓' : '✗'}
-                      </span>
-                      <h3 className="text-lg font-bold text-gray-900">
-                        Question {idx + 1} (Chapter {question.chapterNumber})
-                      </h3>
-                    </div>
-                    <p className="text-base text-gray-700 mb-6">{question.questionText}</p>
+                    {currentQuestion.isCorrect ? '✓' : '✗'}
+                  </div>
+                  <div>
+                    <h2 className="text-xl font-bold text-gray-900">
+                      Question {currentQIndex + 1} of {questions.length}
+                    </h2>
+                    <p className="text-sm text-gray-600">Chapter {currentQuestion.chapterNumber}</p>
                   </div>
                 </div>
+              </div>
 
-                {/* Options */}
-                <div className="bg-gray-50 rounded-lg p-6 mb-6 space-y-3">
+              {/* Question Text */}
+              <div className="bg-gray-50 rounded-lg p-6 mb-8 border border-gray-200">
+                <p className="text-lg text-gray-900 leading-relaxed">{currentQuestion.questionText}</p>
+              </div>
+
+              {/* Answer Options */}
+              <div className="mb-8">
+                <h3 className="font-semibold text-gray-900 mb-4">Student Response vs Correct Answer</h3>
+                <div className="space-y-3">
                   {[
-                    { key: 'A', text: question.optionA },
-                    { key: 'B', text: question.optionB },
-                    { key: 'C', text: question.optionC },
-                    { key: 'D', text: question.optionD },
+                    { key: 'A', text: currentQuestion.optionA },
+                    { key: 'B', text: currentQuestion.optionB },
+                    { key: 'C', text: currentQuestion.optionC },
+                    { key: 'D', text: currentQuestion.optionD },
                   ].map((option) => {
-                    const isStudentAnswer = question.studentAnswer === option.key;
-                    const isCorrectAnswer = question.correctAnswer === option.key;
+                    const isStudentAnswer = currentQuestion.studentAnswer === option.key;
+                    const isCorrectAnswer = currentQuestion.correctAnswer === option.key;
 
                     return (
                       <div
                         key={option.key}
-                        className={`p-4 rounded-lg border-2 ${
+                        className={`p-4 rounded-lg border-2 transition ${
                           isCorrectAnswer
                             ? 'border-green-500 bg-green-50'
                             : isStudentAnswer
@@ -236,21 +181,21 @@ export default function AttemptDetailsPage() {
                         }`}
                       >
                         <div className="flex items-start gap-3">
-                          <div className={`w-6 h-6 rounded-full border-2 flex items-center justify-center flex-shrink-0 font-bold text-sm ${
+                          <div className={`w-8 h-8 rounded-full border-2 flex items-center justify-center font-bold text-sm flex-shrink-0 ${
                             isCorrectAnswer
                               ? 'border-green-500 bg-green-100 text-green-700'
                               : isStudentAnswer
                               ? 'border-red-500 bg-red-100 text-red-700'
-                              : 'border-gray-300'
+                              : 'border-gray-300 bg-gray-100 text-gray-600'
                           }`}>
                             {option.key}
                           </div>
                           <div className="flex-1">
-                            <p className="text-sm text-gray-700 font-medium">{option.text}</p>
+                            <p className="text-gray-800 font-medium">{option.text}</p>
                             <div className="flex gap-2 mt-2">
-                              {isCorrectAnswer && <span className="text-xs bg-green-200 text-green-800 px-2 py-1 rounded">Correct Answer</span>}
-                              {isStudentAnswer && !isCorrectAnswer && <span className="text-xs bg-red-200 text-red-800 px-2 py-1 rounded">Student Selected</span>}
-                              {isStudentAnswer && isCorrectAnswer && <span className="text-xs bg-green-200 text-green-800 px-2 py-1 rounded">Student Selected (Correct)</span>}
+                              {isCorrectAnswer && <span className="text-xs bg-green-200 text-green-800 px-2 py-1 rounded font-medium">✓ Correct Answer</span>}
+                              {isStudentAnswer && !isCorrectAnswer && <span className="text-xs bg-red-200 text-red-800 px-2 py-1 rounded font-medium">✗ Student's Answer</span>}
+                              {isStudentAnswer && isCorrectAnswer && <span className="text-xs bg-green-200 text-green-800 px-2 py-1 rounded font-medium">✓ Student's Answer</span>}
                             </div>
                           </div>
                         </div>
@@ -258,29 +203,90 @@ export default function AttemptDetailsPage() {
                     );
                   })}
                 </div>
-
-                {/* Explanation */}
-                {question.explanation && (
-                  <div className="bg-blue-50 border border-blue-200 rounded-lg p-6">
-                    <h4 className="font-bold text-blue-900 mb-2">📝 Explanation</h4>
-                    <p className="text-sm text-blue-800">{question.explanation}</p>
-                  </div>
-                )}
               </div>
-            ))}
-          </div>
+
+              {/* Explanation */}
+              {currentQuestion.explanation && (
+                <div className="bg-blue-50 border border-blue-200 rounded-lg p-6">
+                  <h3 className="font-bold text-blue-900 mb-2">📝 Explanation</h3>
+                  <p className="text-sm text-blue-800 leading-relaxed">{currentQuestion.explanation}</p>
+                </div>
+              )}
+            </div>
+          ) : (
+            <div className="text-center text-gray-600">No questions to display</div>
+          )}
         </div>
 
-        {/* Footer */}
-        <div className="mt-8 flex justify-between">
-          <Link href="/admin/dashboard">
-            <button className="px-6 py-3 border-2 border-gray-300 text-gray-900 rounded-lg font-semibold hover:bg-gray-50 transition">
-              Back to Dashboard
-            </button>
-          </Link>
-          <div className="text-sm text-gray-600 pt-3">
-            Attempt ID: {attempt.id}
+        {/* Right Sidebar - Navigation */}
+        <div className="w-80 bg-white border-l border-gray-200 overflow-y-auto flex flex-col">
+          {/* Student & Performance Summary */}
+          <div className="p-6 border-b border-gray-200">
+            <p className="text-sm font-semibold text-gray-600 mb-3">STUDENT INFO</p>
+            <div className="space-y-2 text-sm mb-4 pb-4 border-b border-gray-200">
+              <p className="text-gray-700"><span className="font-semibold">Name:</span> {attempt.student_name}</p>
+              <p className="text-gray-700"><span className="font-semibold">Email:</span> {attempt.student_email}</p>
+            </div>
+            <p className="text-sm font-semibold text-gray-600 mb-2">PERFORMANCE</p>
+            <div className="space-y-2 text-sm">
+              <div className="flex justify-between">
+                <span className="text-gray-700">Correct:</span>
+                <span className="font-bold text-green-600">{correctCount}/{attempt.totalQuestions}</span>
+              </div>
+              <div className="flex justify-between">
+                <span className="text-gray-700">Score:</span>
+                <span className={`font-bold ${attempt.score >= attempt.passingScore ? 'text-green-600' : 'text-red-600'}`}>{attempt.score}%</span>
+              </div>
+              <div className="flex justify-between">
+                <span className="text-gray-700">Time Taken:</span>
+                <span className="font-bold">{timeTaken} min</span>
+              </div>
+            </div>
           </div>
+
+          {/* Question Navigator */}
+          <div className="flex-1 p-6 overflow-y-auto">
+            <p className="text-sm font-semibold text-gray-600 mb-4">QUESTIONS</p>
+            <div className="grid grid-cols-4 gap-2">
+              {questions.map((q, idx) => (
+                <button
+                  key={q.id}
+                  onClick={() => setCurrentQIndex(idx)}
+                  className={`w-full aspect-square rounded-lg font-semibold text-sm transition ${
+                    currentQIndex === idx
+                      ? 'bg-blue-600 text-white border-2 border-blue-700'
+                      : q.isCorrect
+                      ? 'bg-green-100 text-green-700 border border-green-300 hover:bg-green-200'
+                      : 'bg-red-100 text-red-700 border border-red-300 hover:bg-red-200'
+                  }`}
+                >
+                  {idx + 1}
+                </button>
+              ))}
+            </div>
+          </div>
+
+          {/* Question Details */}
+          {currentQuestion && (
+            <div className="p-6 border-t border-gray-200 text-sm">
+              <p className="text-gray-600 mb-1">
+                <span className="font-semibold">Chapter:</span> {currentQuestion.chapterNumber}
+              </p>
+              <p className={`font-semibold ${currentQuestion.isCorrect ? 'text-green-600' : 'text-red-600'}`}>
+                {currentQuestion.isCorrect ? '✓ Correct' : '✗ Incorrect'}
+              </p>
+              {currentQuestion.studentAnswer && (
+                <p className="text-gray-700 mt-2">
+                  <span className="font-semibold">Student's Answer:</span> {currentQuestion.studentAnswer}
+                </p>
+              )}
+              {!currentQuestion.studentAnswer && (
+                <p className="text-gray-500 mt-2">
+                  <span className="font-semibold">Student's Answer:</span> Not answered
+                </p>
+              )}
+            </div>
+          )}
         </div>
       </div>
     </div>
