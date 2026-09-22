@@ -12,13 +12,14 @@ export async function GET(
 
     console.log('Fetching full exam - paperId:', paperId);
 
-    // Get paper config using ORM
+    // Get paper config including totalQuestions
     const paper = await (prisma as any).paper.findUnique({
       where: { id: paperId },
       select: {
         id: true,
         totalTime: true,
         passingScore: true,
+        totalQuestions: true,
       }
     });
 
@@ -27,7 +28,7 @@ export async function GET(
     }
 
     // Get all questions for this paper
-    const questions = await (prisma as any).question.findMany({
+    const allQuestions = await (prisma as any).question.findMany({
       where: { paperId: paperId },
       select: {
         id: true,
@@ -39,7 +40,15 @@ export async function GET(
       orderBy: { chapterNumber: 'asc' }
     });
 
-    console.log('Found questions:', questions.length);
+    console.log('Found total questions in bank:', allQuestions.length, 'Paper configured for:', paper.totalQuestions);
+
+    // Randomly select the configured number of questions
+    const numToSelect = Math.min(paper.totalQuestions || allQuestions.length, allQuestions.length);
+    const selectedQuestions = allQuestions
+      .sort(() => Math.random() - 0.5)
+      .slice(0, numToSelect);
+
+    console.log('Selected questions for exam:', selectedQuestions.length);
 
     // Return in exam format
     return NextResponse.json({
@@ -47,12 +56,12 @@ export async function GET(
         totalTime: paper.totalTime,
         passingScore: paper.passingScore,
       },
-      questions: questions.map((q: any) => ({
+      questions: selectedQuestions.map((q: any) => ({
         id: q.id,
         text: q.questionText,
         chapter: q.chapterNumber,
       })),
-      totalQuestions: questions.length,
+      totalQuestions: selectedQuestions.length,
     });
   } catch (error: any) {
     console.error('Get full exam error:', error.message);
@@ -89,6 +98,19 @@ export async function POST(
       );
     }
 
+    // Get paper config to know totalQuestions
+    const paper = await (prisma as any).paper.findUnique({
+      where: { id: paperId },
+      select: { 
+        passingScore: true,
+        totalQuestions: true,
+      }
+    });
+
+    if (!paper) {
+      return NextResponse.json({ error: 'Paper not found' }, { status: 404 });
+    }
+
     // Get all questions to check answers
     const allQuestions = await (prisma as any).question.findMany({
       where: { paperId: paperId },
@@ -100,7 +122,7 @@ export async function POST(
       }
     });
 
-    console.log('Found total questions:', allQuestions.length);
+    console.log('Found total questions in bank:', allQuestions.length, 'Paper configured for:', paper.totalQuestions);
 
     if (allQuestions.length === 0) {
       return NextResponse.json(
@@ -109,11 +131,15 @@ export async function POST(
       );
     }
 
-    // Calculate score
+    // Calculate score - only score the answers that were submitted (up to totalQuestions)
     let correctCount = 0;
     const answerDetails: any[] = [];
+    const submittedAnswerIds = Object.keys(answers);
+    
+    // Find the questions that match the submitted answers
+    const answeredQuestions = allQuestions.filter(q => submittedAnswerIds.includes(q.id));
 
-    for (const q of allQuestions) {
+    for (const q of answeredQuestions) {
       const studentAnswer = answers[q.id];
       const isCorrect = studentAnswer === q.correctAnswer;
       if (isCorrect) correctCount++;
@@ -128,16 +154,11 @@ export async function POST(
       });
     }
 
-    const totalQuestions = allQuestions.length;
-    const score = Math.round((correctCount / totalQuestions) * 100);
-
-    // Get passing score requirement
-    const paper = await (prisma as any).paper.findUnique({
-      where: { id: paperId },
-      select: { passingScore: true }
-    });
-
-    const passingScore = paper?.passingScore || 75;
+    // Score is based on the number of questions answered (limited by paper's totalQuestions setting)
+    const numAnswered = answeredQuestions.length;
+    const totalQuestions = Math.min(numAnswered, paper.totalQuestions || numAnswered);
+    const score = totalQuestions > 0 ? Math.round((correctCount / totalQuestions) * 100) : 0;
+    const passingScore = paper.passingScore || 75;
     const passed = score >= passingScore;
 
     console.log('Exam result - score:', score, 'passed:', passed);
