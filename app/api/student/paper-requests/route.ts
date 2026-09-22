@@ -81,15 +81,23 @@ export async function POST(request: Request) {
     console.log('Checking for existing requests...');
     let existingRequest;
     try {
-      existingRequest = await prisma.$queryRaw`
-        SELECT id, status FROM "PaperRequest"
-        WHERE "userId" = ${userId}
-        AND "paperId" = ${paperId}
-      ` as any[];
+      existingRequest = await (prisma as any).paperRequest.findMany({
+        where: {
+          userId: userId,
+          paperId: paperId
+        },
+        select: {
+          id: true,
+          status: true
+        }
+      });
 
       console.log('Existing requests found:', existingRequest?.length || 0);
     } catch (checkError: any) {
-      console.error("Error checking existing request:", checkError.message);
+      console.error("Error checking existing request:", {
+        code: checkError.code,
+        message: checkError.message
+      });
       existingRequest = [];
     }
 
@@ -110,16 +118,18 @@ export async function POST(request: Request) {
     // Create new paper request
     console.log('Creating paper request - userId:', userId, 'paperId:', paperId);
     try {
-      await prisma.$queryRaw`
-        INSERT INTO "PaperRequest" ("userId", "paperId", status, "requestedAt")
-        VALUES (${userId}, ${paperId}, 'pending', NOW())
-      `;
+      await (prisma as any).paperRequest.create({
+        data: {
+          userId: userId,
+          paperId: paperId,
+          status: 'pending'
+        }
+      });
       console.log('INSERT successful');
     } catch (insertError: any) {
       console.error('INSERT error:', {
         code: insertError.code,
-        message: insertError.message,
-        detail: insertError.meta?.cause || 'unknown'
+        message: insertError.message
       });
       throw insertError;
     }

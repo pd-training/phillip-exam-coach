@@ -40,20 +40,26 @@ export async function POST(request: NextRequest) {
     console.log('Proceeding with userId (CUID):', userId, 'paperId (UUID):', paperId);
 
     // Check for ANY existing request (regardless of status)
+    console.log('Checking for existing requests...');
     let existing;
     try {
-      existing = await prisma.$queryRaw`
-        SELECT id, status FROM "PaperRequest"
-        WHERE "userId" = ${userId}
-        AND "paperId" = ${paperId}
-      ` as any[];
-      
+      existing = await (prisma as any).paperRequest.findMany({
+        where: {
+          userId: userId,
+          paperId: paperId
+        },
+        select: {
+          id: true,
+          status: true
+        }
+      });
+
       console.log('Existing requests found:', existing?.length || 0);
       if (existing && existing.length > 0) {
         console.log('Existing request status:', existing[0].status);
       }
-    } catch (e) {
-      console.error('Error checking existing request:', e);
+    } catch (e: any) {
+      console.error('Error checking existing request:', e.message);
       existing = [];
     }
 
@@ -63,17 +69,16 @@ export async function POST(request: NextRequest) {
       if (req.status === 'approved') {
         return NextResponse.json({ success: true, message: 'Paper already assigned' });
       }
-      
+
       // If pending or rejected, update to approved
       console.log('Updating existing request to approved');
       try {
-        await prisma.$queryRaw`
-          UPDATE "PaperRequest"
-          SET status = 'approved', "reviewedAt" = NOW()
-          WHERE id = ${req.id}
-        `;
+        await (prisma as any).paperRequest.update({
+          where: { id: req.id },
+          data: { status: 'approved', reviewedAt: new Date() }
+        });
       } catch (updateError: any) {
-        console.error('UPDATE error:', updateError.message || updateError);
+        console.error('UPDATE error:', updateError.message);
         throw updateError;
       }
       return NextResponse.json({ success: true, message: 'Paper assigned successfully' });
@@ -82,13 +87,17 @@ export async function POST(request: NextRequest) {
     // No existing request, create new approved request
     console.log('Creating new PaperRequest for userId:', userId, 'paperId:', paperId);
     try {
-      await prisma.$queryRaw`
-        INSERT INTO "PaperRequest" ("userId", "paperId", status, "requestedAt", "reviewedAt")
-        VALUES (${userId}, ${paperId}, 'approved', NOW(), NOW())
-      `;
+      await (prisma as any).paperRequest.create({
+        data: {
+          userId: userId,
+          paperId: paperId,
+          status: 'approved',
+          reviewedAt: new Date()
+        }
+      });
       console.log('INSERT successful');
     } catch (insertError: any) {
-      console.error('INSERT error:', insertError.message || insertError);
+      console.error('INSERT error:', insertError.message);
       throw insertError;
     }
 
