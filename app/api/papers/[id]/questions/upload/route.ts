@@ -17,12 +17,15 @@ export async function POST(
 
     const paperId = params.id;
 
-    // Verify paper exists
-    const paperResult = await prisma.$queryRaw`
-      SELECT id FROM "Paper" WHERE id = ${paperId}::uuid
-    ` as any[];
+    console.log('Uploading questions for paper:', paperId);
 
-    if (!paperResult || paperResult.length === 0) {
+    // Verify paper exists
+    const paper = await (prisma as any).paper.findUnique({
+      where: { id: paperId },
+      select: { id: true }
+    });
+
+    if (!paper) {
       return NextResponse.json({ error: 'Paper not found' }, { status: 404 });
     }
 
@@ -76,31 +79,44 @@ export async function POST(
       );
     }
 
-    // Delete existing questions for this paper
-    await prisma.$queryRaw`
-      DELETE FROM "Question" WHERE "paperId" = ${paperId}::uuid
-    `;
+    console.log('Parsed questions:', questions.length);
 
-    // Bulk insert new questions
+    // Delete existing questions for this paper
+    await (prisma as any).question.deleteMany({
+      where: { paperId: paperId }
+    });
+
+    // Bulk insert new questions using createMany
     let insertedCount = 0;
-    for (const q of questions) {
-      try {
-        await prisma.$queryRaw`
-          INSERT INTO "Question" (id, "paperId", "chapterNumber", "questionText", "correctAnswer", explanation, "createdAt", "updatedAt")
-          VALUES (gen_random_uuid(), ${q.paperId}::uuid, ${q.chapterNumber}, ${q.questionText}, ${q.correctAnswer}, ${q.explanation}, NOW(), NOW())
-        `;
-        insertedCount++;
-      } catch (e) {
-        console.error('Insert error:', e);
+    try {
+      const result = await (prisma as any).question.createMany({
+        data: questions,
+        skipDuplicates: false
+      });
+      insertedCount = result.count;
+      console.log('Inserted questions:', insertedCount);
+    } catch (e: any) {
+      console.error('Bulk insert error:', e.message);
+      // Fallback to inserting one by one
+      for (const q of questions) {
+        try {
+          await (prisma as any).question.create({
+            data: q
+          });
+          insertedCount++;
+        } catch (err) {
+          console.error('Single insert error:', err);
+        }
       }
     }
 
     // Update paper's total questions count
-    await prisma.$queryRaw`
-      UPDATE "Paper"
-      SET "totalQuestions" = ${insertedCount}
-      WHERE id = ${paperId}::uuid
-    `;
+    await (prisma as any).paper.update({
+      where: { id: paperId },
+      data: { totalQuestions: insertedCount }
+    });
+
+    console.log('Upload complete - inserted:', insertedCount);
 
     return NextResponse.json({
       success: true,
@@ -108,20 +124,9 @@ export async function POST(
       message: `${insertedCount} questions imported successfully`,
     });
   } catch (error: any) {
-    console.error('Upload error:', error);
-
-    if (error.message?.includes('relation "Question" does not exist')) {
-      return NextResponse.json(
-        {
-          error: 'Database tables not initialized. Please wait for deployment to complete and try again.',
-          details: 'The Question table is being created during deployment.',
-        },
-        { status: 503 }
-      );
-    }
-
+    console.error('Upload error:', error.message);
     return NextResponse.json(
-      { error: error.message || 'Upload failed' },
+      { error: error.message || 'Failed to upload questions' },
       { status: 500 }
     );
   }
