@@ -47,18 +47,28 @@ export async function POST(request: Request) {
     }
 
     const userId = (session.user as any).id;
-    const { paperId } = await request.json();
-
-    console.log('Paper request - userId:', userId, 'paperId:', paperId);
 
     if (!userId) {
       console.error('No userId in session');
       return Response.json({ error: "Session error: no userId" }, { status: 401 });
     }
 
+    // Parse request body
+    let body;
+    try {
+      body = await request.json();
+    } catch (parseError: any) {
+      console.error('JSON parse error:', parseError.message);
+      return Response.json({ error: "Invalid request body" }, { status: 400 });
+    }
+
+    const paperId = body?.paperId?.trim();
+
     if (!paperId) {
       return Response.json({ error: "paperId required" }, { status: 400 });
     }
+
+    console.log('Paper request - userId:', userId, 'paperId:', paperId);
 
     // Validate paperId is a valid UUID
     const uuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
@@ -67,9 +77,8 @@ export async function POST(request: Request) {
       return Response.json({ error: "Invalid paperId format" }, { status: 400 });
     }
 
-    // userId is a CUID, not a UUID - skip UUID validation for userId
-
     // Check if request already exists (any status)
+    console.log('Checking for existing requests...');
     let existingRequest;
     try {
       existingRequest = await prisma.$queryRaw`
@@ -77,23 +86,21 @@ export async function POST(request: Request) {
         WHERE "userId" = ${userId}
         AND "paperId" = ${paperId}
       ` as any[];
-      
-      console.log('Existing requests:', existingRequest?.length || 0);
-    } catch (e) {
-      console.error("Error checking existing request:", e);
+
+      console.log('Existing requests found:', existingRequest?.length || 0);
+    } catch (checkError: any) {
+      console.error("Error checking existing request:", checkError.message);
       existingRequest = [];
     }
 
     if (existingRequest && existingRequest.length > 0) {
       const req = existingRequest[0];
-      // Approved: user already has access
       if (req.status === 'approved') {
         return Response.json(
           { error: "You already have access to this paper" },
           { status: 400 }
         );
       }
-      // Pending or Rejected: already requested
       return Response.json(
         { error: `Request already ${req.status} for this paper` },
         { status: 400 }
@@ -101,7 +108,7 @@ export async function POST(request: Request) {
     }
 
     // Create new paper request
-    console.log('About to INSERT paper request - userId:', userId, 'paperId:', paperId);
+    console.log('Creating paper request - userId:', userId, 'paperId:', paperId);
     try {
       await prisma.$queryRaw`
         INSERT INTO "PaperRequest" ("userId", "paperId", status, "requestedAt")
@@ -109,9 +116,11 @@ export async function POST(request: Request) {
       `;
       console.log('INSERT successful');
     } catch (insertError: any) {
-      console.error('INSERT error code:', insertError.code);
-      console.error('INSERT error message:', insertError.message);
-      console.error('Full INSERT error:', JSON.stringify(insertError, null, 2));
+      console.error('INSERT error:', {
+        code: insertError.code,
+        message: insertError.message,
+        detail: insertError.meta?.cause || 'unknown'
+      });
       throw insertError;
     }
 
@@ -120,19 +129,18 @@ export async function POST(request: Request) {
       message: "Request submitted. Admin will review shortly.",
     });
   } catch (error: any) {
-    const errorMsg = error?.message || error?.toString() || 'Unknown error';
+    const errorMsg = error?.message || 'Unknown error';
     const errorCode = error?.code || 'UNKNOWN';
-    
-    // Handle specific DB errors
+
+    // Map PostgreSQL error codes
     let userMessage = errorMsg;
     if (errorCode === '23503') {
       userMessage = 'Invalid student or paper ID';
     } else if (errorCode === '23505') {
-      userMessage = 'Request already exists for this paper';
+      userMessage = 'Request already exists';
     }
-    
-    console.error('Create paper request error - Code:', errorCode, 'Message:', errorMsg);
-    console.error('Full error:', JSON.stringify(error, null, 2));
+
+    console.error('Paper request error - Code:', errorCode, 'Message:', errorMsg);
     return Response.json(
       { error: userMessage, code: errorCode },
       { status: 500 }
