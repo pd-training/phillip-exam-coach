@@ -9,6 +9,7 @@ import { useRouter } from "next/navigation";
 interface Paper {
   id: string;
   title: string;
+  description?: string;
   durationMinutes: number;
   totalQuestions: number;
   isAvailable: boolean;
@@ -23,6 +24,10 @@ interface Question {
   questionText: string;
   correctAnswer: string;
   explanation: string;
+  optionA?: string;
+  optionB?: string;
+  optionC?: string;
+  optionD?: string;
   createdAt: string;
 }
 
@@ -37,7 +42,7 @@ interface ExamPart {
 }
 
 type ActiveTab = "availability" | "questions" | "format";
-type ActiveModal = null | "uploadQuestions" | "viewQuestions" | "editQuestion" | "configureFormat" | "createPaper";
+type ActiveModal = null | "uploadQuestions" | "viewQuestions" | "editQuestion" | "configureFormat" | "createPaper" | "editPaper" | "editChapter";
 
 export default function PapersManagement() {
   const router = useRouter();
@@ -66,6 +71,18 @@ export default function PapersManagement() {
   const [editAnswer, setEditAnswer] = useState("A");
   const [editChapter, setEditChapter] = useState("1");
   const [editExplanation, setEditExplanation] = useState("");
+  const [editOptionA, setEditOptionA] = useState("");
+  const [editOptionB, setEditOptionB] = useState("");
+  const [editOptionC, setEditOptionC] = useState("");
+  const [editOptionD, setEditOptionD] = useState("");
+
+  // Paper edit form
+  const [editPaperTitle, setEditPaperTitle] = useState("");
+  const [editPaperDescription, setEditPaperDescription] = useState("");
+
+  // Chapter edit form
+  const [editChapterNumber, setEditChapterNumber] = useState("1");
+  const [editChapterTitle, setEditChapterTitle] = useState("");
 
   // Exam format form
   const [totalTime, setTotalTime] = useState("120");
@@ -215,6 +232,10 @@ export default function PapersManagement() {
           correctAnswer: editAnswer,
           chapterNumber: parseInt(editChapter),
           explanation: editExplanation,
+          optionA: editOptionA,
+          optionB: editOptionB,
+          optionC: editOptionC,
+          optionD: editOptionD,
         }),
       });
 
@@ -244,6 +265,57 @@ export default function PapersManagement() {
       }
     } catch (error) {
       console.error("Delete failed:", error);
+    }
+  };
+
+  // Update paper details
+  const handleUpdatePaper = async () => {
+    if (!selectedPaperId) return;
+
+    setSubmitting(true);
+    try {
+      const res = await fetch(`/api/admin/papers/${selectedPaperId}`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          title: editPaperTitle,
+          description: editPaperDescription,
+        }),
+      });
+
+      if (res.ok) {
+        await fetchPapers();
+        setActiveModal(null);
+      }
+    } catch (error) {
+      console.error("Update failed:", error);
+    } finally {
+      setSubmitting(false);
+    }
+  };
+
+  // Update chapter title
+  const handleUpdateChapter = async () => {
+    if (!selectedPaperId) return;
+
+    setSubmitting(true);
+    try {
+      const res = await fetch(`/api/admin/papers/${selectedPaperId}/chapters/${editChapterNumber}`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          title: editChapterTitle,
+        }),
+      });
+
+      if (res.ok) {
+        await fetchQuestions(selectedPaperId);
+        setActiveModal(null);
+      }
+    } catch (error) {
+      console.error("Update failed:", error);
+    } finally {
+      setSubmitting(false);
     }
   };
 
@@ -445,6 +517,26 @@ export default function PapersManagement() {
                       >
                         {paper.isAvailable ? "✓ Available" : "✕ Unavailable"}
                       </span>
+                      <button
+                        onClick={() => {
+                          setSelectedPaperId(paper.id);
+                          setEditPaperTitle(paper.title);
+                          setEditPaperDescription(paper.description || "");
+                          setActiveModal("editPaper");
+                        }}
+                        style={{
+                          padding: "6px 16px",
+                          backgroundColor: "#white",
+                          color: "#3b82f6",
+                          border: "1px solid #3b82f6",
+                          borderRadius: "6px",
+                          fontSize: "12px",
+                          fontWeight: "600",
+                          cursor: "pointer",
+                        }}
+                      >
+                        ✏️ Edit
+                      </button>
                       <button
                         onClick={() => togglePaperAvailability(paper.id, paper.isAvailable)}
                         disabled={togglingId === paper.id}
@@ -723,6 +815,10 @@ export default function PapersManagement() {
                             setEditAnswer(q.correctAnswer);
                             setEditChapter(String(q.chapterNumber));
                             setEditExplanation(q.explanation);
+                            setEditOptionA(q.optionA || "");
+                            setEditOptionB(q.optionB || "");
+                            setEditOptionC(q.optionC || "");
+                            setEditOptionD(q.optionD || "");
                             setActiveModal("editQuestion");
                           }}
                           style={{ color: "#3b82f6", backgroundColor: "transparent", border: "none", cursor: "pointer", fontSize: "11px", textDecoration: "underline" }}
@@ -804,6 +900,46 @@ export default function PapersManagement() {
             </select>
           </div>
 
+          <div style={{ marginBottom: "16px", padding: "12px", backgroundColor: "#f3f4f6", borderRadius: "6px", border: "1px solid #e5e7eb" }}>
+            <label style={{ display: "block", fontSize: "13px", fontWeight: "600", marginBottom: "10px", color: "#1f2937" }}>📋 Answer Options</label>
+            
+            <div style={{ marginBottom: "10px" }}>
+              <label style={{ display: "block", fontSize: "12px", fontWeight: "500", marginBottom: "4px", color: "#374151" }}>Option A</label>
+              <textarea
+                value={editOptionA}
+                onChange={(e) => setEditOptionA(e.target.value)}
+                style={{ width: "100%", padding: "8px", border: "1px solid #d1d5db", borderRadius: "4px", fontSize: "13px", minHeight: "40px", boxSizing: "border-box", fontFamily: "inherit" }}
+              />
+            </div>
+
+            <div style={{ marginBottom: "10px" }}>
+              <label style={{ display: "block", fontSize: "12px", fontWeight: "500", marginBottom: "4px", color: "#374151" }}>Option B</label>
+              <textarea
+                value={editOptionB}
+                onChange={(e) => setEditOptionB(e.target.value)}
+                style={{ width: "100%", padding: "8px", border: "1px solid #d1d5db", borderRadius: "4px", fontSize: "13px", minHeight: "40px", boxSizing: "border-box", fontFamily: "inherit" }}
+              />
+            </div>
+
+            <div style={{ marginBottom: "10px" }}>
+              <label style={{ display: "block", fontSize: "12px", fontWeight: "500", marginBottom: "4px", color: "#374151" }}>Option C</label>
+              <textarea
+                value={editOptionC}
+                onChange={(e) => setEditOptionC(e.target.value)}
+                style={{ width: "100%", padding: "8px", border: "1px solid #d1d5db", borderRadius: "4px", fontSize: "13px", minHeight: "40px", boxSizing: "border-box", fontFamily: "inherit" }}
+              />
+            </div>
+
+            <div>
+              <label style={{ display: "block", fontSize: "12px", fontWeight: "500", marginBottom: "4px", color: "#374151" }}>Option D</label>
+              <textarea
+                value={editOptionD}
+                onChange={(e) => setEditOptionD(e.target.value)}
+                style={{ width: "100%", padding: "8px", border: "1px solid #d1d5db", borderRadius: "4px", fontSize: "13px", minHeight: "40px", boxSizing: "border-box", fontFamily: "inherit" }}
+              />
+            </div>
+          </div>
+
           <div style={{ marginBottom: "16px" }}>
             <label style={{ display: "block", fontSize: "14px", fontWeight: "500", marginBottom: "6px" }}>Explanation</label>
             <textarea
@@ -831,6 +967,129 @@ export default function PapersManagement() {
             </button>
             <button
               onClick={handleUpdateQuestion}
+              disabled={submitting}
+              style={{
+                padding: "10px 24px",
+                backgroundColor: submitting ? "#9ca3af" : "#3b82f6",
+                color: "white",
+                border: "none",
+                borderRadius: "6px",
+                fontSize: "14px",
+                fontWeight: "600",
+                cursor: submitting ? "not-allowed" : "pointer",
+              }}
+            >
+              {submitting ? "Saving..." : "Save"}
+            </button>
+          </div>
+        </Modal>
+      )}
+
+      {/* MODAL: Edit Paper */}
+      {activeModal === "editPaper" && selectedPaperId && (
+        <Modal onClose={() => { setActiveModal(null); }}>
+          <h2 style={{ marginTop: "0" }}>Edit Paper Details</h2>
+
+          <div style={{ marginBottom: "16px" }}>
+            <label style={{ display: "block", fontSize: "14px", fontWeight: "500", marginBottom: "6px" }}>Paper Title *</label>
+            <input
+              type="text"
+              value={editPaperTitle}
+              onChange={(e) => setEditPaperTitle(e.target.value)}
+              style={{ width: "100%", padding: "10px", border: "1px solid #d1d5db", borderRadius: "6px", fontSize: "14px", boxSizing: "border-box" }}
+            />
+          </div>
+
+          <div style={{ marginBottom: "16px" }}>
+            <label style={{ display: "block", fontSize: "14px", fontWeight: "500", marginBottom: "6px" }}>Description</label>
+            <textarea
+              value={editPaperDescription}
+              onChange={(e) => setEditPaperDescription(e.target.value)}
+              style={{ width: "100%", padding: "10px", border: "1px solid #d1d5db", borderRadius: "6px", fontSize: "14px", minHeight: "80px", boxSizing: "border-box", fontFamily: "inherit" }}
+            />
+          </div>
+
+          <div style={{ display: "flex", gap: "12px", justifyContent: "flex-end" }}>
+            <button
+              onClick={() => { setActiveModal(null); }}
+              style={{
+                padding: "10px 20px",
+                backgroundColor: "#e5e7eb",
+                color: "#1f2937",
+                border: "none",
+                borderRadius: "6px",
+                fontSize: "14px",
+                fontWeight: "600",
+                cursor: "pointer",
+              }}
+            >
+              Cancel
+            </button>
+            <button
+              onClick={handleUpdatePaper}
+              disabled={submitting}
+              style={{
+                padding: "10px 24px",
+                backgroundColor: submitting ? "#9ca3af" : "#3b82f6",
+                color: "white",
+                border: "none",
+                borderRadius: "6px",
+                fontSize: "14px",
+                fontWeight: "600",
+                cursor: submitting ? "not-allowed" : "pointer",
+              }}
+            >
+              {submitting ? "Saving..." : "Save"}
+            </button>
+          </div>
+        </Modal>
+      )}
+
+      {/* MODAL: Edit Chapter */}
+      {activeModal === "editChapter" && selectedPaperId && (
+        <Modal onClose={() => { setActiveModal(null); }}>
+          <h2 style={{ marginTop: "0" }}>Edit Chapter Title</h2>
+
+          <div style={{ marginBottom: "16px" }}>
+            <label style={{ display: "block", fontSize: "14px", fontWeight: "500", marginBottom: "6px" }}>Chapter Number</label>
+            <input
+              type="number"
+              value={editChapterNumber}
+              onChange={(e) => setEditChapterNumber(e.target.value)}
+              min="1"
+              max="27"
+              style={{ width: "100%", padding: "10px", border: "1px solid #d1d5db", borderRadius: "6px", fontSize: "14px", boxSizing: "border-box" }}
+            />
+          </div>
+
+          <div style={{ marginBottom: "16px" }}>
+            <label style={{ display: "block", fontSize: "14px", fontWeight: "500", marginBottom: "6px" }}>Chapter Title *</label>
+            <input
+              type="text"
+              value={editChapterTitle}
+              onChange={(e) => setEditChapterTitle(e.target.value)}
+              style={{ width: "100%", padding: "10px", border: "1px solid #d1d5db", borderRadius: "6px", fontSize: "14px", boxSizing: "border-box" }}
+            />
+          </div>
+
+          <div style={{ display: "flex", gap: "12px", justifyContent: "flex-end" }}>
+            <button
+              onClick={() => { setActiveModal(null); }}
+              style={{
+                padding: "10px 20px",
+                backgroundColor: "#e5e7eb",
+                color: "#1f2937",
+                border: "none",
+                borderRadius: "6px",
+                fontSize: "14px",
+                fontWeight: "600",
+                cursor: "pointer",
+              }}
+            >
+              Cancel
+            </button>
+            <button
+              onClick={handleUpdateChapter}
               disabled={submitting}
               style={{
                 padding: "10px 24px",
