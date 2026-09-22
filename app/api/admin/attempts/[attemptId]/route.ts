@@ -15,6 +15,13 @@ export async function GET(
       return Response.json({ error: "Unauthorized" }, { status: 403 });
     }
 
+    const attemptId = params.attemptId;
+    if (!attemptId) {
+      return Response.json({ error: "Attempt ID is required" }, { status: 400 });
+    }
+
+    console.log("Fetching attempt with ID:", attemptId);
+
     // Get attempt details
     const attemptRes = await prisma.$queryRaw`
       SELECT 
@@ -32,17 +39,22 @@ export async function GET(
         p."passingScore"
       FROM examattempt ea
       JOIN "User" u ON ea.userid = u.id
-      JOIN "Paper" p ON CAST(ea.paperid AS UUID) = p.id
-      WHERE ea.id = ${params.attemptId}
+      JOIN "Paper" p ON ea.paperid = p.id
+      WHERE ea.id = ${attemptId}
     ` as any[];
+
+    console.log("Attempt query result:", attemptRes);
 
     if (!attemptRes || attemptRes.length === 0) {
       return Response.json({ error: "Attempt not found" }, { status: 404 });
     }
 
     const attempt = attemptRes[0];
+    console.log("Attempt data:", attempt);
 
     // Get answer details from the examattempt table (if stored) or reconstruct from questions
+    console.log("Fetching questions for paperid:", attempt.paperid);
+    
     const answersRes = await prisma.$queryRaw`
       SELECT 
         q.id,
@@ -55,9 +67,11 @@ export async function GET(
         q."explanation",
         q."chapterNumber"
       FROM "Question" q
-      WHERE q."paperId" = CAST(${attempt.paperid} AS UUID)
+      WHERE q."paperId" = ${attempt.paperid}
       ORDER BY q."chapterNumber" ASC, q.id ASC
     ` as any[];
+
+    console.log("Questions query returned:", answersRes?.length, "questions");
 
     // Get student answers if stored (check if answers table exists)
     let studentAnswers: any = {};
@@ -67,16 +81,21 @@ export async function GET(
           "questionId",
           "selectedAnswer"
         FROM "StudentAnswer"
-        WHERE "attemptId" = ${params.attemptId}
+        WHERE "attemptId" = ${attemptId}
       ` as any[];
+
+      console.log("StudentAnswers query returned:", studentAnswersRes?.length, "answers");
 
       studentAnswersRes.forEach((ans: any) => {
         studentAnswers[ans.questionId] = ans.selectedAnswer;
       });
-    } catch (e) {
+    } catch (e: any) {
       // Table might not exist, continue without it
+      console.log("StudentAnswer table query failed (table may not exist):", e.message);
     }
 
+    console.log("Returning attempt details with", answersRes.length, "questions");
+    
     return Response.json({
       attempt,
       questions: answersRes.map((q: any) => ({
@@ -87,8 +106,9 @@ export async function GET(
     });
   } catch (error: any) {
     console.error("Get attempt error:", error);
+    console.error("Error stack:", error.stack);
     return Response.json(
-      { error: error.message || "Failed to fetch attempt" },
+      { error: error.message || "Failed to fetch attempt", details: error.toString() },
       { status: 500 }
     );
   }
