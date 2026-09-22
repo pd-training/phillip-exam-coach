@@ -12,22 +12,50 @@ export async function GET(
 
     console.log('Fetching all questions for paper:', paperId);
 
-    const questions = await (prisma as any).question.findMany({
-      where: { paperId: paperId },
-      select: {
-        id: true,
-        paperId: true,
-        chapterNumber: true,
-        questionText: true,
-        correctAnswer: true,
-        explanation: true,
-        optionA: true,
-        optionB: true,
-        optionC: true,
-        optionD: true,
-      },
-      orderBy: [{ chapterNumber: 'asc' }, { id: 'asc' }]
-    });
+    let questions: any[] = [];
+
+    // Try fetching with option columns first
+    try {
+      questions = await (prisma as any).question.findMany({
+        where: { paperId: paperId },
+        select: {
+          id: true,
+          paperId: true,
+          chapterNumber: true,
+          questionText: true,
+          correctAnswer: true,
+          explanation: true,
+          optionA: true,
+          optionB: true,
+          optionC: true,
+          optionD: true,
+        },
+        orderBy: [{ chapterNumber: 'asc' }, { id: 'asc' }]
+      });
+    } catch (e: any) {
+      console.log('Warning: Could not fetch questions with option columns, retrying without them:', e.message);
+      
+      // Fallback: fetch without option columns
+      try {
+        questions = await (prisma as any).question.findMany({
+          where: { paperId: paperId },
+          select: {
+            id: true,
+            paperId: true,
+            chapterNumber: true,
+            questionText: true,
+            correctAnswer: true,
+            explanation: true,
+          },
+          orderBy: [{ chapterNumber: 'asc' }, { id: 'asc' }]
+        });
+        
+        console.log('Fallback query succeeded, found questions without options:', questions.length);
+      } catch (fallbackError: any) {
+        console.error('Fallback query also failed:', fallbackError.message);
+        throw fallbackError;
+      }
+    }
 
     console.log('Found questions:', questions.length);
 
