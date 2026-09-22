@@ -28,6 +28,7 @@ model Account {
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@unique([provider, providerAccountId])
+  @@map("Account")
 }
 
 model Session {
@@ -36,6 +37,8 @@ model Session {
   userId       String
   expires      DateTime
   user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("Session")
 }
 
 model User {
@@ -52,6 +55,8 @@ model User {
   sessions       Session[]
   studentPapers  StudentPaper[]
   paperRequests  PaperRequest[]
+
+  @@map("User")
 }
 
 // Papers & Questions
@@ -79,6 +84,7 @@ model Paper {
   paperRequests  PaperRequest[]
 
   @@index([isAvailable])
+  @@map("Paper")
 }
 
 model Chapter {
@@ -93,6 +99,7 @@ model Chapter {
 
   @@unique([paperId, number])
   @@index([paperId])
+  @@map("Chapter")
 }
 
 model Question {
@@ -113,6 +120,7 @@ model Question {
 
   @@index([paperId])
   @@index([chapterNumber])
+  @@map("Question")
 }
 
 model ExamPart {
@@ -131,6 +139,7 @@ model ExamPart {
 
   @@index([paperId])
   @@index([orderIndex])
+  @@map("ExamPart")
 }
 
 // Exam Attempts
@@ -145,6 +154,8 @@ model ExamAttempt {
   createdAt   DateTime @default(now())
 
   paper Paper @relation(fields: [paperId], references: [id], onDelete: Cascade)
+
+  @@map("examattempt")
 }
 
 // Student Paper Access
@@ -164,6 +175,7 @@ model StudentPaper {
   @@unique([userId, paperId])
   @@index([userId])
   @@index([status])
+  @@map("StudentPaper")
 }
 
 // Paper Access Requests
@@ -183,6 +195,7 @@ model PaperRequest {
 
   @@index([userId])
   @@index([status])
+  @@map("PaperRequest")
 }
 
 // Legacy models (placeholder)
@@ -190,4 +203,6 @@ model QuestionPool {
   id        String   @id @default(cuid())
   name      String
   createdAt DateTime @default(now())
+
+  @@map("QuestionPool")
 }
