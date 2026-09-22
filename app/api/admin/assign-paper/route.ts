@@ -16,7 +16,17 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    const { userId, paperId } = await request.json();
+    // Parse request body safely
+    let body;
+    try {
+      body = await request.json();
+    } catch (parseError: any) {
+      console.error('JSON parse error:', parseError.message);
+      return NextResponse.json({ error: 'Invalid request body' }, { status: 400 });
+    }
+
+    const userId = body?.userId?.trim?.() || body?.userId;
+    const paperId = body?.paperId?.trim?.() || body?.paperId;
 
     console.log('Assign paper - userId:', userId, 'paperId:', paperId);
 
@@ -84,13 +94,20 @@ export async function POST(request: NextRequest) {
 
     return NextResponse.json({ success: true, message: 'Paper assigned successfully' });
   } catch (error: any) {
-    const errorMsg = error?.message || error?.toString() || 'Unknown error';
+    const errorMsg = error?.message || 'Unknown error';
     const errorCode = error?.code || 'UNKNOWN';
+
+    // Map PostgreSQL error codes
+    let userMessage = errorMsg;
+    if (errorCode === '23503') {
+      userMessage = 'Invalid student or paper ID';
+    } else if (errorCode === '23505') {
+      userMessage = 'Request already exists';
+    }
+
     console.error('Assign paper error - Code:', errorCode, 'Message:', errorMsg);
-    console.error('Full error:', JSON.stringify(error, null, 2));
-    
     return NextResponse.json(
-      { error: errorMsg, code: errorCode },
+      { error: userMessage, code: errorCode },
       { status: 500 }
     );
   }
