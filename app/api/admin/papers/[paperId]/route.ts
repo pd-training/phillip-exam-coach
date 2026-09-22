@@ -44,6 +44,11 @@ async function updatePaper(paperId: string, body: any) {
     updateData.isAvailable = isAvailable;
   }
 
+  // If no fields to update, return existing paper
+  if (Object.keys(updateData).length === 0) {
+    return { error: null, status: 200, paper: existingPaper };
+  }
+
   const paper = await (prisma as any).paper.update({
     where: { id: paperId },
     data: updateData,
