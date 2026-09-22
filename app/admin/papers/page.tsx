@@ -767,7 +767,7 @@ export default function PapersManagement() {
         <Modal onClose={() => { setActiveModal(null); setUploadFile(null); setUploadProgress(""); }}>
           <h2 style={{ marginTop: "0" }}>Upload Questions</h2>
           <p style={{ color: "#666", fontSize: "13px", marginBottom: "16px" }}>
-            CSV format: Chapter, Question, Answer (A-D), Explanation
+            CSV format: Chapter, Question, Option A, Option B, Option C, Option D, Answer (A-D), Explanation
           </p>
 
           <div style={{ marginBottom: "16px" }}>

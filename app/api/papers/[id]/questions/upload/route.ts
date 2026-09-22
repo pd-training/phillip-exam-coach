@@ -3,6 +3,10 @@ import prisma from '@/lib/prisma';
 
 export const dynamic = 'force-dynamic';
 
+// Expected CSV format (with header row):
+// chapter,question,optionA,optionB,optionC,optionD,answer,explanation
+// 1,"What is..?","Option A text","Option B text","Option C text","Option D text","A","Explanation here"
+
 export async function POST(
   request: NextRequest,
   { params }: { params: { id: string } }
@@ -57,9 +61,17 @@ export async function POST(
       }
       parts.push(current.trim().replace(/^"(.*)"$/, '$1'));
 
-      if (parts.length < 3) continue;
+      if (parts.length < 4) continue;
 
-      const [chapter, question, answer, explanation] = parts;
+      // Expected CSV format: chapter, question, optionA, optionB, optionC, optionD, answer, explanation
+      const chapter = parts[0];
+      const question = parts[1];
+      const optionA = parts[2] || '';
+      const optionB = parts[3] || '';
+      const optionC = parts[4] || '';
+      const optionD = parts[5] || '';
+      const answer = parts[6];
+      const explanation = parts[7] || '';
 
       if (!chapter || !question || !answer) continue;
 
@@ -67,8 +79,12 @@ export async function POST(
         paperId: paperId,
         chapterNumber: parseInt(chapter) || 1,
         questionText: question,
+        optionA: optionA.trim(),
+        optionB: optionB.trim(),
+        optionC: optionC.trim(),
+        optionD: optionD.trim(),
         correctAnswer: answer.toUpperCase().charAt(0),
-        explanation: explanation || '',
+        explanation: explanation.trim(),
       });
     }
 
