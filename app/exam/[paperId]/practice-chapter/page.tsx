@@ -229,103 +229,103 @@ export default function PracticeChapterMode() {
           </div>
 
           {/* Question */}
-      <div className="bg-blue-50 border border-blue-200 rounded-xl p-6 mb-8">
-        <p className="m-0 font-medium text-lg leading-relaxed text-gray-900">
-          {currentQuestion.text}
-        </p>
-      </div>
-
-      {/* Answer options */}
-      <div className="space-y-3 mb-8">
-        {["A", "B", "C", "D"].map((option) => (
-          <label
-            key={option}
-            className={`flex items-center p-4 rounded-lg border-2 cursor-pointer transition ${
-              selectedAnswer === option
-                ? "bg-blue-50 border-blue-600"
-                : "bg-white border-gray-200 hover:border-gray-300"
-            } ${showingFeedback && selectedAnswer !== option ? "opacity-50" : "opacity-100"}`}
-          >
-            <input
-              type="radio"
-              name="answer"
-              value={option}
-              checked={selectedAnswer === option}
-              onChange={(e) => setSelectedAnswer(e.target.value)}
-              disabled={showingFeedback}
-              className="mr-4 w-4 h-4"
-            />
-            <span className="font-medium text-gray-900">{option}</span>
-          </label>
-        ))}
-      </div>
-
-      {/* Feedback */}
-      {showingFeedback && feedback && (
-        <div className={`rounded-lg p-6 mb-8 border-l-4 ${
-          feedback.isCorrect
-            ? "bg-green-50 border-green-500"
-            : "bg-red-50 border-red-500"
-        }`}>
-          <p className={`m-0 mb-3 font-bold ${
-            feedback.isCorrect ? "text-green-700" : "text-red-700"
-          }`}>
-            {feedback.isCorrect ? "✓ Correct!" : "✗ Incorrect"}
-          </p>
-          {!feedback.isCorrect && (
-            <p className="m-0 mb-3 text-sm text-gray-700">
-              Correct answer: <strong>{feedback.correctAnswer}</strong>
+          <div className="bg-blue-50 border border-blue-200 rounded-xl p-6 mb-8">
+            <p className="m-0 font-medium text-lg leading-relaxed text-gray-900">
+              {currentQuestion.text}
             </p>
+          </div>
+
+          {/* Answer options */}
+          <div className="space-y-3 mb-8">
+            {["A", "B", "C", "D"].map((option) => (
+              <label
+                key={option}
+                className={`flex items-center p-4 rounded-lg border-2 cursor-pointer transition ${
+                  selectedAnswer === option
+                    ? "bg-blue-50 border-blue-600"
+                    : "bg-white border-gray-200 hover:border-gray-300"
+                } ${showingFeedback && selectedAnswer !== option ? "opacity-50" : "opacity-100"}`}
+              >
+                <input
+                  type="radio"
+                  name="answer"
+                  value={option}
+                  checked={selectedAnswer === option}
+                  onChange={(e) => setSelectedAnswer(e.target.value)}
+                  disabled={showingFeedback}
+                  className="mr-4 w-4 h-4"
+                />
+                <span className="font-medium text-gray-900">{option}</span>
+              </label>
+            ))}
+          </div>
+
+          {/* Feedback */}
+          {showingFeedback && feedback && (
+            <div className={`rounded-lg p-6 mb-8 border-l-4 ${
+              feedback.isCorrect
+                ? "bg-green-50 border-green-500"
+                : "bg-red-50 border-red-500"
+            }`}>
+              <p className={`m-0 mb-3 font-bold ${
+                feedback.isCorrect ? "text-green-700" : "text-red-700"
+              }`}>
+                {feedback.isCorrect ? "✓ Correct!" : "✗ Incorrect"}
+              </p>
+              {!feedback.isCorrect && (
+                <p className="m-0 mb-3 text-sm text-gray-700">
+                  Correct answer: <strong>{feedback.correctAnswer}</strong>
+                </p>
+              )}
+              <p className="m-0 text-sm leading-relaxed text-gray-700">
+                {feedback.explanation}
+              </p>
+            </div>
           )}
-          <p className="m-0 text-sm leading-relaxed text-gray-700">
-            {feedback.explanation}
-          </p>
-        </div>
-      )}
 
-      {/* Buttons */}
-      <div className="flex gap-4">
-        <button
-          onClick={() => setSelectedChapter(null)}
-          className="flex-1 px-6 py-3 bg-gray-200 hover:bg-gray-300 text-gray-900 rounded-lg font-semibold transition"
-        >
-          Back to Chapters
-        </button>
-        {!showingFeedback ? (
-          <button
-            onClick={handleSubmitAnswer}
-            disabled={!selectedAnswer}
-            className={`flex-1 px-6 py-3 rounded-lg font-semibold transition ${
-              selectedAnswer
-                ? "bg-blue-600 hover:bg-blue-700 text-white"
-                : "bg-gray-300 text-gray-500 cursor-not-allowed"
-            }`}
-          >
-            Submit
-          </button>
-        ) : (
-          <button
-            onClick={handleNext}
-            className="flex-1 px-6 py-3 bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-semibold transition"
-          >
-            {currentQIndex < questions.length - 1 ? "Next Question" : "Back to Chapters"}
-          </button>
-        )}
-      </div>
+          {/* Buttons */}
+          <div className="flex gap-4">
+            <button
+              onClick={() => setSelectedChapter(null)}
+              className="flex-1 px-6 py-3 bg-gray-200 hover:bg-gray-300 text-gray-900 rounded-lg font-semibold transition"
+            >
+              Back to Chapters
+            </button>
+            {!showingFeedback ? (
+              <button
+                onClick={handleSubmitAnswer}
+                disabled={!selectedAnswer}
+                className={`flex-1 px-6 py-3 rounded-lg font-semibold transition ${
+                  selectedAnswer
+                    ? "bg-blue-600 hover:bg-blue-700 text-white"
+                    : "bg-gray-300 text-gray-500 cursor-not-allowed"
+                }`}
+              >
+                Submit
+              </button>
+            ) : (
+              <button
+                onClick={handleNext}
+                className="flex-1 px-6 py-3 bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-semibold transition"
+              >
+                {currentQIndex < questions.length - 1 ? "Next Question" : "Back to Chapters"}
+              </button>
+            )}
+          </div>
 
-      {/* Score tracker */}
-      <div
-        style={{
-          marginTop: "20px",
-          padding: "12px",
-          backgroundColor: "#f0f9ff",
-          borderRadius: "6px",
-          textAlign: "center",
-          fontSize: "14px",
-        }}
-      >
-        Correct so far: {score} / {answered}
-      </div>
+          {/* Score tracker */}
+          <div
+            style={{
+              marginTop: "20px",
+              padding: "12px",
+              backgroundColor: "#f0f9ff",
+              borderRadius: "6px",
+              textAlign: "center",
+              fontSize: "14px",
+            }}
+          >
+            Correct so far: {score} / {answered}
+          </div>
         </div>
       </div>
     </div>
