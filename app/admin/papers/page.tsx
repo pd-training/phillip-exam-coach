@@ -78,7 +78,7 @@ export default function PapersManagement() {
 
   // Paper edit form
   const [editPaperTitle, setEditPaperTitle] = useState("");
-  const [editPaperDescription, setEditPaperDescription] = useState("");
+
   const [editPaperDuration, setEditPaperDuration] = useState("120");
   const [editPaperTotalQuestions, setEditPaperTotalQuestions] = useState("0");
   const [editPaperPassingScore, setEditPaperPassingScore] = useState("75");
@@ -428,7 +428,6 @@ export default function PapersManagement() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           title: editPaperTitle.trim(),
-          description: editPaperDescription.trim(),
         }),
       });
 
@@ -618,7 +617,7 @@ export default function PapersManagement() {
         {/* Tabs */}
         <div className="border-b border-gray-200 mb-8">
           <div className="flex gap-8">
-            {(["availability", "questions", "format"] as const).map((tab) => (
+            {(["availability", "questions"] as const).map((tab) => (
               <button
                 key={tab}
                 onClick={() => setActiveTab(tab)}
@@ -630,7 +629,6 @@ export default function PapersManagement() {
               >
                 {tab === "availability" && "Paper Availability"}
                 {tab === "questions" && "Question Bank"}
-                {tab === "format" && "Exam Format"}
               </button>
             ))}
           </div>
@@ -692,7 +690,6 @@ export default function PapersManagement() {
                         onClick={() => {
                           setSelectedPaperId(paper.id);
                           setEditPaperTitle(paper.title);
-                          setEditPaperDescription(paper.description || "");
                           setEditPaperAvailability(paper.isAvailable);
                           fetchPaperSettings(paper.id);
                           setActiveModal("paperSettings");
@@ -810,56 +807,7 @@ export default function PapersManagement() {
           </div>
         )}
 
-        {/* TAB 3: Exam Format */}
-        {activeTab === "format" && (
-          <div style={{ backgroundColor: "white", padding: "24px", borderRadius: "12px", border: "1px solid #e5e7eb" }}>
-            <h3 style={{ marginTop: "0", marginBottom: "20px" }}>Exam Format Configuration</h3>
 
-            {papers.length === 0 ? (
-              <p style={{ color: "#999" }}>Create papers first to configure exam format.</p>
-            ) : (
-              <div style={{ display: "grid", gap: "24px" }}>
-                {papers.map((paper) => (
-                  <div
-                    key={paper.id}
-                    style={{
-                      padding: "20px",
-                      backgroundColor: "#f9fafb",
-                      borderRadius: "8px",
-                      border: "1px solid #e5e7eb",
-                    }}
-                  >
-                    <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "16px" }}>
-                      <h4 style={{ margin: "0" }}>{paper.title}</h4>
-                      <button
-                        onClick={() => {
-                          setSelectedPaperId(paper.id);
-                          setActiveModal("configureFormat");
-                          fetchExamFormat(paper.id);
-                        }}
-                        style={{
-                          padding: "8px 16px",
-                          backgroundColor: "#3b82f6",
-                          color: "white",
-                          border: "none",
-                          borderRadius: "6px",
-                          fontSize: "12px",
-                          fontWeight: "600",
-                          cursor: "pointer",
-                        }}
-                      >
-                        ⚙️ Configure
-                      </button>
-                    </div>
-                    <p style={{ margin: "0", fontSize: "13px", color: "#666" }}>
-                      Total Time: {paper.totalTime} minutes
-                    </p>
-                  </div>
-                ))}
-              </div>
-            )}
-          </div>
-        )}
       </div>
 
       {/* MODAL: Upload Questions */}
@@ -1158,31 +1106,154 @@ export default function PapersManagement() {
         </Modal>
       )}
 
-      {/* MODAL: Edit Paper */}
-      {activeModal === "editPaper" && selectedPaperId && (
+      {/* MODAL: Paper Settings (Consolidated) */}
+      {activeModal === "paperSettings" && selectedPaperId && (
         <Modal onClose={() => { setActiveModal(null); }}>
-          <h2 style={{ marginTop: "0" }}>Edit Paper Details</h2>
+          <h2 style={{ marginTop: "0" }}>Paper Settings</h2>
+          <div style={{ maxHeight: "70vh", overflowY: "auto" }}>
+            {/* Paper Details Section */}
+            <div style={{ marginBottom: "24px", paddingBottom: "20px", borderBottom: "1px solid #e5e7eb" }}>
+              <h4 style={{ margin: "0 0 12px 0", color: "#374151" }}>Paper Details</h4>
+              
+              <div style={{ marginBottom: "16px" }}>
+                <label style={{ display: "block", fontSize: "14px", fontWeight: "500", marginBottom: "6px" }}>Title *</label>
+                <input
+                  type="text"
+                  value={editPaperTitle}
+                  onChange={(e) => setEditPaperTitle(e.target.value)}
+                  style={{ width: "100%", padding: "10px", border: "1px solid #d1d5db", borderRadius: "6px", fontSize: "14px", boxSizing: "border-box" }}
+                />
+              </div>
 
-          <div style={{ marginBottom: "16px" }}>
-            <label style={{ display: "block", fontSize: "14px", fontWeight: "500", marginBottom: "6px" }}>Paper Title *</label>
-            <input
-              type="text"
-              value={editPaperTitle}
-              onChange={(e) => setEditPaperTitle(e.target.value)}
-              style={{ width: "100%", padding: "10px", border: "1px solid #d1d5db", borderRadius: "6px", fontSize: "14px", boxSizing: "border-box" }}
-            />
+              <div style={{ marginBottom: "16px" }}>
+                <label style={{ display: "flex", alignItems: "center", gap: "8px", fontSize: "14px", fontWeight: "500", cursor: "pointer" }}>
+                  <input
+                    type="checkbox"
+                    checked={editPaperAvailability}
+                    onChange={(e) => setEditPaperAvailability(e.target.checked)}
+                    style={{ width: "18px", height: "18px", cursor: "pointer" }}
+                  />
+                  {editPaperAvailability ? "✓ Available for Students" : "✕ Not Available"}
+                </label>
+              </div>
+            </div>
+
+            {/* Exam Format Section */}
+            <div style={{ marginBottom: "24px", paddingBottom: "20px", borderBottom: "1px solid #e5e7eb" }}>
+              <h4 style={{ margin: "0 0 12px 0", color: "#374151" }}>Exam Settings</h4>
+              
+              <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "12px", marginBottom: "16px" }}>
+                <div>
+                  <label style={{ display: "block", fontSize: "14px", fontWeight: "500", marginBottom: "6px" }}>Duration (min)</label>
+                  <input
+                    type="number"
+                    value={editPaperDuration}
+                    onChange={(e) => setEditPaperDuration(e.target.value)}
+                    min="1"
+                    style={{ width: "100%", padding: "10px", border: "1px solid #d1d5db", borderRadius: "6px", fontSize: "14px", boxSizing: "border-box" }}
+                  />
+                </div>
+                <div>
+                  <label style={{ display: "block", fontSize: "14px", fontWeight: "500", marginBottom: "6px" }}>Total Questions</label>
+                  <input
+                    type="number"
+                    value={editPaperTotalQuestions}
+                    onChange={(e) => setEditPaperTotalQuestions(e.target.value)}
+                    min="0"
+                    style={{ width: "100%", padding: "10px", border: "1px solid #d1d5db", borderRadius: "6px", fontSize: "14px", boxSizing: "border-box" }}
+                  />
+                </div>
+              </div>
+
+              <div>
+                <label style={{ display: "block", fontSize: "14px", fontWeight: "500", marginBottom: "6px" }}>Passing Score (%)</label>
+                <input
+                  type="number"
+                  value={editPaperPassingScore}
+                  onChange={(e) => setEditPaperPassingScore(e.target.value)}
+                  min="0"
+                  max="100"
+                  style={{ width: "100%", padding: "10px", border: "1px solid #d1d5db", borderRadius: "6px", fontSize: "14px", boxSizing: "border-box" }}
+                />
+              </div>
+            </div>
+
+            {/* Chapter Titles Section */}
+            {chapters.length > 0 && (
+              <div style={{ marginBottom: "24px", paddingBottom: "20px", borderBottom: "1px solid #e5e7eb" }}>
+                <h4 style={{ margin: "0 0 12px 0", color: "#374151" }}>Chapter Titles</h4>
+                <div style={{ display: "flex", flexDirection: "column", gap: "8px" }}>
+                  {chapters.map((ch) => (
+                    <div key={ch.id} style={{ display: "flex", gap: "8px", alignItems: "center" }}>
+                      <span style={{ width: "50px", fontSize: "14px", fontWeight: "600", color: "#6b7280" }}>Ch {ch.number}:</span>
+                      {editingChapterId === ch.id ? (
+                        <>
+                          <input
+                            type="text"
+                            value={editingChapterTitle}
+                            onChange={(e) => setEditingChapterTitle(e.target.value)}
+                            style={{ flex: 1, padding: "8px", border: "1px solid #3b82f6", borderRadius: "4px", fontSize: "13px" }}
+                            autoFocus
+                          />
+                          <button
+                            onClick={() => handleUpdateChapterTitle(ch.id, ch.number)}
+                            style={{
+                              padding: "6px 12px",
+                              backgroundColor: "#10b981",
+                              color: "white",
+                              border: "none",
+                              borderRadius: "4px",
+                              fontSize: "12px",
+                              fontWeight: "600",
+                              cursor: "pointer",
+                            }}
+                          >
+                            ✓
+                          </button>
+                          <button
+                            onClick={() => { setEditingChapterId(null); setEditingChapterTitle(""); }}
+                            style={{
+                              padding: "6px 12px",
+                              backgroundColor: "#ef4444",
+                              color: "white",
+                              border: "none",
+                              borderRadius: "4px",
+                              fontSize: "12px",
+                              fontWeight: "600",
+                              cursor: "pointer",
+                            }}
+                          >
+                            ✕
+                          </button>
+                        </>
+                      ) : (
+                        <>
+                          <span style={{ flex: 1, fontSize: "13px", color: "#374151" }}>{ch.title}</span>
+                          <button
+                            onClick={() => { setEditingChapterId(ch.id); setEditingChapterTitle(ch.title); }}
+                            style={{
+                              padding: "6px 12px",
+                              backgroundColor: "#f3f4f6",
+                              color: "#3b82f6",
+                              border: "1px solid #d1d5db",
+                              borderRadius: "4px",
+                              fontSize: "12px",
+                              fontWeight: "600",
+                              cursor: "pointer",
+                            }}
+                          >
+                            Edit
+                          </button>
+                        </>
+                      )}
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
           </div>
 
-          <div style={{ marginBottom: "16px" }}>
-            <label style={{ display: "block", fontSize: "14px", fontWeight: "500", marginBottom: "6px" }}>Description</label>
-            <textarea
-              value={editPaperDescription}
-              onChange={(e) => setEditPaperDescription(e.target.value)}
-              style={{ width: "100%", padding: "10px", border: "1px solid #d1d5db", borderRadius: "6px", fontSize: "14px", minHeight: "80px", boxSizing: "border-box", fontFamily: "inherit" }}
-            />
-          </div>
-
-          <div style={{ display: "flex", gap: "12px", justifyContent: "flex-end" }}>
+          <div style={{ display: "flex", gap: "12px", justifyContent: "flex-end", marginTop: "20px", paddingTop: "20px", borderTop: "1px solid #e5e7eb" }}>
             <button
               onClick={() => { setActiveModal(null); }}
               style={{
@@ -1199,7 +1270,7 @@ export default function PapersManagement() {
               Cancel
             </button>
             <button
-              onClick={handleUpdatePaper}
+              onClick={handleSavePaperSettings}
               disabled={submitting}
               style={{
                 padding: "10px 24px",
@@ -1212,70 +1283,7 @@ export default function PapersManagement() {
                 cursor: submitting ? "not-allowed" : "pointer",
               }}
             >
-              {submitting ? "Saving..." : "Save"}
-            </button>
-          </div>
-        </Modal>
-      )}
-
-      {/* MODAL: Edit Chapter */}
-      {activeModal === "editChapter" && selectedPaperId && (
-        <Modal onClose={() => { setActiveModal(null); }}>
-          <h2 style={{ marginTop: "0" }}>Edit Chapter Title</h2>
-
-          <div style={{ marginBottom: "16px" }}>
-            <label style={{ display: "block", fontSize: "14px", fontWeight: "500", marginBottom: "6px" }}>Chapter Number</label>
-            <input
-              type="number"
-              value={editChapterNumber}
-              onChange={(e) => setEditChapterNumber(e.target.value)}
-              min="1"
-              max="27"
-              style={{ width: "100%", padding: "10px", border: "1px solid #d1d5db", borderRadius: "6px", fontSize: "14px", boxSizing: "border-box" }}
-            />
-          </div>
-
-          <div style={{ marginBottom: "16px" }}>
-            <label style={{ display: "block", fontSize: "14px", fontWeight: "500", marginBottom: "6px" }}>Chapter Title *</label>
-            <input
-              type="text"
-              value={editChapterTitle}
-              onChange={(e) => setEditChapterTitle(e.target.value)}
-              style={{ width: "100%", padding: "10px", border: "1px solid #d1d5db", borderRadius: "6px", fontSize: "14px", boxSizing: "border-box" }}
-            />
-          </div>
-
-          <div style={{ display: "flex", gap: "12px", justifyContent: "flex-end" }}>
-            <button
-              onClick={() => { setActiveModal(null); }}
-              style={{
-                padding: "10px 20px",
-                backgroundColor: "#e5e7eb",
-                color: "#1f2937",
-                border: "none",
-                borderRadius: "6px",
-                fontSize: "14px",
-                fontWeight: "600",
-                cursor: "pointer",
-              }}
-            >
-              Cancel
-            </button>
-            <button
-              onClick={handleUpdateChapter}
-              disabled={submitting}
-              style={{
-                padding: "10px 24px",
-                backgroundColor: submitting ? "#9ca3af" : "#3b82f6",
-                color: "white",
-                border: "none",
-                borderRadius: "6px",
-                fontSize: "14px",
-                fontWeight: "600",
-                cursor: submitting ? "not-allowed" : "pointer",
-              }}
-            >
-              {submitting ? "Saving..." : "Save"}
+              {submitting ? "Saving..." : "Save All Settings"}
             </button>
           </div>
         </Modal>
@@ -1361,183 +1369,7 @@ export default function PapersManagement() {
         </Modal>
       )}
 
-      {/* MODAL: Configure Exam Format */}
-      {activeModal === "configureFormat" && (
-        <Modal onClose={() => { setActiveModal(null); setParts([]); }}>
-          <h2 style={{ marginTop: "0" }}>Configure Exam Format</h2>
 
-          <div style={{ marginBottom: "24px" }}>
-            <label style={{ display: "block", fontSize: "14px", fontWeight: "500", marginBottom: "6px" }}>
-              Total Time (minutes) *
-            </label>
-            <input
-              type="number"
-              value={totalTime}
-              onChange={(e) => setTotalTime(e.target.value)}
-              min="30"
-              style={{ width: "100%", padding: "10px", border: "1px solid #d1d5db", borderRadius: "6px", fontSize: "14px", boxSizing: "border-box" }}
-            />
-          </div>
-
-          <h4 style={{ margin: "0 0 16px 0", fontSize: "14px" }}>Exam Parts</h4>
-
-          {parts.length > 0 && (
-            <div style={{ marginBottom: "20px", display: "grid", gap: "12px" }}>
-              {parts.map((part, idx) => (
-                <div
-                  key={idx}
-                  style={{
-                    padding: "12px",
-                    backgroundColor: "#f9fafb",
-                    borderRadius: "6px",
-                    border: "1px solid #e5e7eb",
-                    display: "flex",
-                    justifyContent: "space-between",
-                    alignItems: "center",
-                  }}
-                >
-                  <div style={{ fontSize: "13px" }}>
-                    <strong>{part.partName}</strong> | Chapters {part.chapterStart}-{part.chapterEnd} | {part.questionCount} Q | {part.passingScore}%
-                  </div>
-                  <button
-                    onClick={() => removePart(idx)}
-                    style={{
-                      padding: "4px 8px",
-                      backgroundColor: "#fee2e2",
-                      color: "#991b1b",
-                      border: "none",
-                      borderRadius: "4px",
-                      fontSize: "12px",
-                      fontWeight: "600",
-                      cursor: "pointer",
-                    }}
-                  >
-                    Remove
-                  </button>
-                </div>
-              ))}
-            </div>
-          )}
-
-          <div style={{
-            padding: "16px",
-            backgroundColor: "#f0f9ff",
-            borderRadius: "6px",
-            border: "1px solid #bfdbfe",
-            marginBottom: "16px",
-            display: "grid",
-            gap: "12px",
-          }}>
-            <div>
-              <label style={{ fontSize: "13px", fontWeight: "500", display: "block", marginBottom: "4px" }}>Part Name</label>
-              <input
-                type="text"
-                value={newPart.partName}
-                onChange={(e) => setNewPart({ ...newPart, partName: e.target.value })}
-                placeholder="e.g., Part I, Part II"
-                style={{ width: "100%", padding: "8px", border: "1px solid #d1d5db", borderRadius: "4px", fontSize: "13px", boxSizing: "border-box" }}
-              />
-            </div>
-
-            <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "8px" }}>
-              <div>
-                <label style={{ fontSize: "13px", fontWeight: "500", display: "block", marginBottom: "4px" }}>Chapter Start</label>
-                <input
-                  type="number"
-                  value={newPart.chapterStart}
-                  onChange={(e) => setNewPart({ ...newPart, chapterStart: parseInt(e.target.value) })}
-                  min="1"
-                  style={{ width: "100%", padding: "8px", border: "1px solid #d1d5db", borderRadius: "4px", fontSize: "13px", boxSizing: "border-box" }}
-                />
-              </div>
-              <div>
-                <label style={{ fontSize: "13px", fontWeight: "500", display: "block", marginBottom: "4px" }}>Chapter End</label>
-                <input
-                  type="number"
-                  value={newPart.chapterEnd}
-                  onChange={(e) => setNewPart({ ...newPart, chapterEnd: parseInt(e.target.value) })}
-                  min="1"
-                  style={{ width: "100%", padding: "8px", border: "1px solid #d1d5db", borderRadius: "4px", fontSize: "13px", boxSizing: "border-box" }}
-                />
-              </div>
-            </div>
-
-            <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "8px" }}>
-              <div>
-                <label style={{ fontSize: "13px", fontWeight: "500", display: "block", marginBottom: "4px" }}>Questions to Draw</label>
-                <input
-                  type="number"
-                  value={newPart.questionCount}
-                  onChange={(e) => setNewPart({ ...newPart, questionCount: parseInt(e.target.value) })}
-                  min="1"
-                  style={{ width: "100%", padding: "8px", border: "1px solid #d1d5db", borderRadius: "4px", fontSize: "13px", boxSizing: "border-box" }}
-                />
-              </div>
-              <div>
-                <label style={{ fontSize: "13px", fontWeight: "500", display: "block", marginBottom: "4px" }}>Passing Score (%)</label>
-                <input
-                  type="number"
-                  value={newPart.passingScore}
-                  onChange={(e) => setNewPart({ ...newPart, passingScore: parseInt(e.target.value) })}
-                  min="0"
-                  max="100"
-                  style={{ width: "100%", padding: "8px", border: "1px solid #d1d5db", borderRadius: "4px", fontSize: "13px", boxSizing: "border-box" }}
-                />
-              </div>
-            </div>
-
-            <button
-              onClick={addPart}
-              style={{
-                padding: "8px 16px",
-                backgroundColor: "#3b82f6",
-                color: "white",
-                border: "none",
-                borderRadius: "4px",
-                fontSize: "13px",
-                fontWeight: "600",
-                cursor: "pointer",
-              }}
-            >
-              + Add Part
-            </button>
-          </div>
-
-          <div style={{ display: "flex", gap: "12px", justifyContent: "flex-end" }}>
-            <button
-              onClick={() => { setActiveModal(null); setParts([]); }}
-              style={{
-                padding: "10px 20px",
-                backgroundColor: "#e5e7eb",
-                color: "#1f2937",
-                border: "none",
-                borderRadius: "6px",
-                fontSize: "14px",
-                fontWeight: "600",
-                cursor: "pointer",
-              }}
-            >
-              Cancel
-            </button>
-            <button
-              onClick={handleSaveExamFormat}
-              disabled={submitting || parts.length === 0}
-              style={{
-                padding: "10px 24px",
-                backgroundColor: submitting || parts.length === 0 ? "#9ca3af" : "#3b82f6",
-                color: "white",
-                border: "none",
-                borderRadius: "6px",
-                fontSize: "14px",
-                fontWeight: "600",
-                cursor: submitting || parts.length === 0 ? "not-allowed" : "pointer",
-              }}
-            >
-              {submitting ? "Saving..." : "Save Format"}
-            </button>
-          </div>
-        </Modal>
-      )}
     </div>
   );
 }
