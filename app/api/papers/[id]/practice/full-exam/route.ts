@@ -85,7 +85,7 @@ export async function GET(
         );
 
         // Get unique chapters in this part's questions
-        const chaptersInPart = [...new Set(questionsInPartRange.map(q => q.chapterNumber))].sort((a, b) => a - b);
+        const chaptersInPart = [...new Set(questionsInPartRange.map(q => q.chapterNumber))].sort((a, b) => Number(a) - Number(b));
 
         // Randomly select the configured number of questions for this part
         const numToSelect = Math.min(part.questionCount, questionsInPartRange.length);
