@@ -361,17 +361,6 @@ export default function StudentDashboard() {
                     </div>
                   </div>
                   <div className="flex items-center gap-4">
-                    <div className="text-right">
-                      <div className="text-sm font-bold text-red-600">
-                        {Math.round(100 - chapter.weaknessScore)}% correct
-                      </div>
-                      <div className="w-32 h-2 bg-gray-300 rounded-full overflow-hidden">
-                        <div
-                          className="h-full bg-gradient-to-r from-red-500 to-orange-500"
-                          style={{ width: `${Math.round(100 - chapter.weaknessScore)}%` }}
-                        />
-                      </div>
-                    </div>
                     <Link href={`/exam/${chapter.paperId}/practice-chapter/${chapter.chapterNumber}`}>
                       <button className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-medium text-sm transition">
                         Practice
