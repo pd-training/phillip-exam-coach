@@ -4,7 +4,7 @@ backend:
     build:
       commands:
         - npm install
-        - npx prisma migrate deploy
+        - npm run prisma:migrate:safe
 frontend:
   phases:
     preBuild:
