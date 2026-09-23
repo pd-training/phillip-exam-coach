@@ -305,7 +305,7 @@ export default function StudentDashboard() {
                   </svg>
                 </div>
                 <h2 className="text-2xl font-bold text-gray-900">
-                  AI-Recommended Focus Areas
+                  Focus Areas for Improvement
                 </h2>
               </div>
               <p className="text-gray-600">
