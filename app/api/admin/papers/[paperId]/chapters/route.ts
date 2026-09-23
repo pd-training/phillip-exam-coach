@@ -25,6 +25,7 @@ export async function GET(
     // Verify paper exists
     const paper = await (prisma as any).paper.findUnique({
       where: { id: paperId },
+      select: { id: true }
     });
 
     if (!paper) {
