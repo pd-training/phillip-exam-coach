@@ -976,6 +976,8 @@ export default function PapersManagement() {
               </div>
             )}
           </div>
+
+          {uploadProgress && (
             <div style={{ padding: "12px", backgroundColor: uploadProgress.startsWith("✅") ? "#dcfce7" : "#fee2e2", borderRadius: "6px", marginBottom: "16px", fontSize: "13px", color: uploadProgress.startsWith("✅") ? "#166534" : "#991b1b" }}>
               {uploadProgress}
             </div>
