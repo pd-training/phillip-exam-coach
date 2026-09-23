@@ -36,6 +36,7 @@ export default function FullExamMode() {
   const [currentQIndex, setCurrentQIndex] = useState(0);
   const [submitted, setSubmitted] = useState(false);
   const [result, setResult] = useState<any>(null);
+  const [showIncompleteWarning, setShowIncompleteWarning] = useState(false);
 
   // Auth check
   useEffect(() => {
@@ -74,7 +75,8 @@ export default function FullExamMode() {
   // Timer
   useEffect(() => {
     if (!submitted && timeLeft <= 0 && examConfig) {
-      handleSubmit();
+      // Auto-submit when time is up (bypass warning)
+      submitAttempt();
       return;
     }
 
@@ -119,7 +121,8 @@ export default function FullExamMode() {
     setCurrentQIndex(index);
   };
 
-  const handleSubmit = async () => {
+  // Actual submission to API
+  const submitAttempt = async () => {
     setSubmitting(true);
     try {
       // Calculate time taken (in seconds)
@@ -148,6 +151,26 @@ export default function FullExamMode() {
     } finally {
       setSubmitting(false);
     }
+  };
+
+  // Check if all questions are answered, show warning if not
+  const handleSubmit = () => {
+    const answeredCount = Object.keys(answers).length;
+    const totalQuestions = questions.length;
+
+    if (answeredCount < totalQuestions) {
+      // Show warning - not all questions answered
+      setShowIncompleteWarning(true);
+    } else {
+      // All questions answered - proceed with submission
+      submitAttempt();
+    }
+  };
+
+  // Confirm submission even if incomplete
+  const handleConfirmSubmit = () => {
+    setShowIncompleteWarning(false);
+    submitAttempt();
   };
 
   const formatTime = (seconds: number) => {
@@ -538,6 +561,104 @@ export default function FullExamMode() {
           </div>
         </div>
       </div>
+
+      {/* Incomplete Answers Warning Modal */}
+      {showIncompleteWarning && (
+        <div style={{
+          position: "fixed",
+          top: 0,
+          left: 0,
+          right: 0,
+          bottom: 0,
+          backgroundColor: "rgba(0, 0, 0, 0.5)",
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+          zIndex: 1000,
+        }}>
+          <div style={{
+            backgroundColor: "white",
+            borderRadius: "12px",
+            padding: "32px",
+            maxWidth: "450px",
+            boxShadow: "0 10px 25px rgba(0, 0, 0, 0.2)",
+          }}>
+            <div style={{
+              display: "flex",
+              alignItems: "center",
+              marginBottom: "16px",
+            }}>
+              <div style={{
+                fontSize: "32px",
+                marginRight: "12px",
+              }}>
+                ⚠️
+              </div>
+              <h2 style={{
+                margin: "0",
+                fontSize: "20px",
+                fontWeight: "600",
+                color: "#1f2937",
+              }}>
+                Not All Questions Answered
+              </h2>
+            </div>
+            <p style={{
+              margin: "0 0 24px 0",
+              color: "#6b7280",
+              fontSize: "14px",
+              lineHeight: "1.6",
+            }}>
+              You have {Object.keys(answers).length} out of {questions.length} questions answered. 
+              Would you like to submit anyway or go back to complete the remaining questions?
+            </p>
+            <div style={{
+              display: "flex",
+              gap: "12px",
+            }}>
+              <button
+                onClick={() => setShowIncompleteWarning(false)}
+                style={{
+                  flex: 1,
+                  padding: "12px",
+                  backgroundColor: "#e5e7eb",
+                  color: "#374151",
+                  border: "none",
+                  borderRadius: "6px",
+                  cursor: "pointer",
+                  fontWeight: "600",
+                  fontSize: "14px",
+                  transition: "background-color 0.2s",
+                }}
+                onMouseEnter={(e) => (e.currentTarget.style.backgroundColor = "#d1d5db")}
+                onMouseLeave={(e) => (e.currentTarget.style.backgroundColor = "#e5e7eb")}
+              >
+                ← Go Back
+              </button>
+              <button
+                onClick={handleConfirmSubmit}
+                disabled={submitting}
+                style={{
+                  flex: 1,
+                  padding: "12px",
+                  backgroundColor: submitting ? "#9ca3af" : "#3b82f6",
+                  color: "white",
+                  border: "none",
+                  borderRadius: "6px",
+                  cursor: submitting ? "not-allowed" : "pointer",
+                  fontWeight: "600",
+                  fontSize: "14px",
+                  transition: "background-color 0.2s",
+                }}
+                onMouseEnter={(e) => !submitting && (e.currentTarget.style.backgroundColor = "#2563eb")}
+                onMouseLeave={(e) => !submitting && (e.currentTarget.style.backgroundColor = "#3b82f6")}
+              >
+                {submitting ? "Submitting..." : "✓ Submit Anyway"}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
