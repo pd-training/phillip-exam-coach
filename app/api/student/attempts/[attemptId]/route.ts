@@ -51,8 +51,9 @@ export async function GET(
       ` as any[];
     } catch (err: any) {
       // If answers column doesn't exist, fetch without it
-      if (err.message && err.message.includes('column ea.answers does not exist')) {
-        console.log('answers column does not exist yet, fetching without it');
+      const errorMsg = err.message || '';
+      if (errorMsg.includes('column') && errorMsg.includes('answers') && errorMsg.includes('does not exist')) {
+        console.log('answers column does not exist yet, fetching without it:', errorMsg);
         attemptRes = await prisma.$queryRaw`
           SELECT 
             ea.id,
@@ -135,13 +136,14 @@ export async function GET(
         studentAnswersMap = typeof attempt.answers === 'string' 
           ? JSON.parse(attempt.answers) 
           : attempt.answers;
-        console.log("Loaded student answers from attempt:", Object.keys(studentAnswersMap).length);
+        console.log("✅ Loaded student answers from attempt:", Object.keys(studentAnswersMap).length, "questions answered");
       } catch (err) {
-        console.log("Could not parse answers from attempt:", err);
+        console.log("⚠️ Could not parse answers from attempt (column might not exist yet):", err);
         studentAnswersMap = {};
       }
     } else {
-      console.log("No answers found in attempt - column may not exist yet or exam is old");
+      console.log("⚠️ No answers found in attempt - add answers column to database:");
+      console.log("   GET /api/admin/add-answers-column");
     }
 
     // Map student answers to questions

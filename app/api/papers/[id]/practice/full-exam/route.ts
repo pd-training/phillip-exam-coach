@@ -213,7 +213,8 @@ export async function POST(
         console.log('Exam attempt saved with ID:', attemptId, '(with answers)');
       } catch (insertWithAnswersError: any) {
         // If answers column doesn't exist, try without it
-        if (insertWithAnswersError.message && insertWithAnswersError.message.includes('column "answers"')) {
+        const errorMsg = insertWithAnswersError.message || '';
+        if (errorMsg.includes('column') && errorMsg.includes('answers')) {
           console.log('answers column does not exist, saving without it');
           await prisma.$queryRaw`
             INSERT INTO examattempt (id, paperid, userid, startedat, submittedat, score, passed, createdat)
@@ -228,7 +229,7 @@ export async function POST(
               NOW()
             )
           `;
-          console.log('Exam attempt saved with ID:', attemptId, '(without answers - run migration)');
+          console.log('Exam attempt saved with ID:', attemptId, '(without answers - migration pending)');
         } else {
           throw insertWithAnswersError;
         }
