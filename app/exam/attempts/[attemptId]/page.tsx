@@ -221,8 +221,8 @@ export default function AttemptReviewPage() {
           <div className="flex-1 overflow-y-auto py-8 pr-6">
             {currentQuestion ? (
               <div className="max-w-2xl">
-              {/* Question Header */}
-              <div className="mb-8">
+                {/* Question Header */}
+                <div className="mb-8">
                 <div className="flex items-center gap-3 mb-4">
                   <div className={`w-10 h-10 rounded-full flex items-center justify-center font-bold text-lg ${
                     currentQuestion.isCorrect
@@ -368,6 +368,7 @@ export default function AttemptReviewPage() {
           )}
         </div>
       </div>
+    </div>
     </div>
   );
 }
