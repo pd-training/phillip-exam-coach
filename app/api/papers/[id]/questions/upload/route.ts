@@ -36,8 +36,11 @@ export async function POST(
       return NextResponse.json({ error: 'Paper not found' }, { status: 404 });
     }
 
-    // Read CSV file
-    const text = await file.text();
+    // Read CSV file and handle both Windows (\r\n) and Unix (\n) line endings
+    let text = await file.text();
+    // Normalize line endings to Unix format
+    text = text.replace(/\r\n/g, '\n').replace(/\r/g, '\n');
+    
     const lines = text.split('\n');
     const questions = [];
 
@@ -46,7 +49,7 @@ export async function POST(
       const line = lines[i].trim();
       if (!line) continue;
 
-      // Parse CSV (handle quoted fields)
+      // CSV parsing: handle quoted fields with commas inside
       const parts = [];
       let current = '';
       let inQuotes = false;
@@ -54,22 +57,25 @@ export async function POST(
       for (let j = 0; j < line.length; j++) {
         const char = line[j];
         if (char === '"') {
+          // Toggle quote state, but don't add the quote to current
           inQuotes = !inQuotes;
         } else if (char === ',' && !inQuotes) {
-          parts.push(current.trim().replace(/^"(.*)"$/, '$1'));
+          // Unquoted comma = field separator
+          parts.push(current.trim());
           current = '';
         } else {
           current += char;
         }
       }
-      parts.push(current.trim().replace(/^"(.*)"$/, '$1'));
+      // Don't forget the last field
+      parts.push(current.trim());
 
       // Support two CSV formats:
       // Format 1 (8 columns): chapter, question, optionA, optionB, optionC, optionD, answer, explanation
       // Format 2 (4 columns): chapter, question, answer, explanation (generates placeholder options)
       
-      const chapter = parts[0]?.trim() || '';
-      const question = parts[1]?.trim() || '';
+      const chapter = parts[0] || '';
+      const question = parts[1] || '';
       
       let optionA: string;
       let optionB: string;
@@ -79,17 +85,17 @@ export async function POST(
       let explanation: string;
 
       if (parts.length >= 8) {
-        // 8-column format with explicit options
-        optionA = (parts[2]?.trim() || '').replace(/^"(.*)"$/, '$1');
-        optionB = (parts[3]?.trim() || '').replace(/^"(.*)"$/, '$1');
-        optionC = (parts[4]?.trim() || '').replace(/^"(.*)"$/, '$1');
-        optionD = (parts[5]?.trim() || '').replace(/^"(.*)"$/, '$1');
-        answer = parts[6]?.trim() || '';
-        explanation = (parts[7]?.trim() || '').replace(/^"(.*)"$/, '$1');
+        // 8-column format with explicit options (quotes already removed during parsing)
+        optionA = parts[2] || '';
+        optionB = parts[3] || '';
+        optionC = parts[4] || '';
+        optionD = parts[5] || '';
+        answer = parts[6] || '';
+        explanation = parts[7] || '';
       } else if (parts.length >= 4) {
         // 4-column format without options — generate placeholders
-        answer = parts[2]?.trim() || '';
-        explanation = (parts[3]?.trim() || '').replace(/^"(.*)"$/, '$1');
+        answer = parts[2] || '';
+        explanation = parts[3] || '';
         
         // Generate placeholder options based on correct answer
         optionA = answer === 'A' ? '[Correct Answer]' : 'Option A';
