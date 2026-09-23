@@ -169,7 +169,7 @@ export default function PapersManagement() {
     try {
       console.log('Fetching paper settings for:', paperId);
       
-      // Fetch exam config
+      // Fetch exam config and parts
       try {
         const res = await fetch(`/api/papers/${paperId}/exam-format`);
         const data = await res.json();
@@ -180,8 +180,23 @@ export default function PapersManagement() {
           setEditPaperTotalQuestions(data.examConfig.totalQuestions?.toString() || "0");
           setEditPaperPassingScore(data.examConfig.passingScore?.toString() || "75");
         }
+
+        // Load exam parts if they exist
+        if (data.parts && Array.isArray(data.parts) && data.parts.length > 0) {
+          const loadedParts = data.parts.map((part: any) => ({
+            partName: part.partName,
+            chapterStart: part.chapterStart,
+            chapterEnd: part.chapterEnd,
+            questionCount: part.questionCount,
+            passingScore: part.passingScore,
+          }));
+          setParts(loadedParts);
+        } else {
+          setParts([]);
+        }
       } catch (examErr) {
         console.warn('Exam format fetch error (non-fatal):', examErr);
+        setParts([]);
       }
       
       // Fetch chapters
@@ -223,6 +238,7 @@ export default function PapersManagement() {
 
     setSubmitting(true);
     try {
+      // Save paper settings
       const res = await fetch(`/api/admin/papers/${selectedPaperId}`, {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
@@ -237,14 +253,38 @@ export default function PapersManagement() {
 
       const data = await res.json();
 
-      if (res.ok) {
-        alert("Paper settings updated successfully!");
-        await fetchPapers();
-        setActiveModal(null);
-      } else {
+      if (!res.ok) {
         console.error("Save failed:", data);
         alert(`Error: ${data.error || 'Failed to save paper settings'}`);
+        setSubmitting(false);
+        return;
       }
+
+      // Save exam format/parts if any parts are defined
+      if (parts.length > 0) {
+        const examRes = await fetch(`/api/papers/${selectedPaperId}/exam-format`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            totalTime: parseInt(editPaperDuration) || 120,
+            parts: parts,
+          }),
+        });
+
+        if (!examRes.ok) {
+          const examData = await examRes.json();
+          console.error("Exam format save failed:", examData);
+          alert(`Error: ${examData.error || 'Failed to save exam format'}`);
+          setSubmitting(false);
+          return;
+        }
+      }
+
+      alert("Paper settings updated successfully!");
+      await fetchPapers();
+      setParts([]);
+      setNewPart({ partName: "", chapterStart: 1, chapterEnd: 13, questionCount: 110, passingScore: 75 });
+      setActiveModal(null);
     } catch (error) {
       console.error("Save error:", error);
       alert("Error saving paper settings");
@@ -1200,6 +1240,132 @@ export default function PapersManagement() {
                   max="100"
                   style={{ width: "100%", padding: "10px", border: "1px solid #d1d5db", borderRadius: "6px", fontSize: "14px", boxSizing: "border-box" }}
                 />
+              </div>
+            </div>
+
+            {/* Exam Parts Section */}
+            <div style={{ marginBottom: "24px", paddingBottom: "20px", borderBottom: "1px solid #e5e7eb" }}>
+              <h4 style={{ margin: "0 0 12px 0", color: "#374151" }}>Exam Parts (Optional)</h4>
+              <p style={{ fontSize: "13px", color: "#6b7280", marginBottom: "12px" }}>Create multiple exam parts (e.g., Part I, Part II) with different chapter ranges and passing scores.</p>
+              
+              {parts.length > 0 && (
+                <div style={{ marginBottom: "16px", display: "flex", flexDirection: "column", gap: "12px" }}>
+                  {parts.map((part, idx) => (
+                    <div key={idx} style={{ backgroundColor: "#f9fafb", padding: "12px", borderRadius: "6px", border: "1px solid #e5e7eb" }}>
+                      <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "8px", marginBottom: "8px" }}>
+                        <div>
+                          <label style={{ fontSize: "12px", color: "#666", display: "block", marginBottom: "4px" }}>Part Name</label>
+                          <span style={{ fontSize: "13px", fontWeight: "600", color: "#1f2937" }}>{part.partName}</span>
+                        </div>
+                        <div>
+                          <label style={{ fontSize: "12px", color: "#666", display: "block", marginBottom: "4px" }}>Chapters</label>
+                          <span style={{ fontSize: "13px", color: "#1f2937" }}>Ch {part.chapterStart} - {part.chapterEnd}</span>
+                        </div>
+                        <div>
+                          <label style={{ fontSize: "12px", color: "#666", display: "block", marginBottom: "4px" }}>Questions</label>
+                          <span style={{ fontSize: "13px", color: "#1f2937" }}>{part.questionCount}</span>
+                        </div>
+                        <div>
+                          <label style={{ fontSize: "12px", color: "#666", display: "block", marginBottom: "4px" }}>Passing Score</label>
+                          <span style={{ fontSize: "13px", color: "#1f2937" }}>{part.passingScore}%</span>
+                        </div>
+                      </div>
+                      <button
+                        onClick={() => removePart(idx)}
+                        style={{
+                          padding: "6px 12px",
+                          backgroundColor: "#ef4444",
+                          color: "white",
+                          border: "none",
+                          borderRadius: "4px",
+                          fontSize: "12px",
+                          fontWeight: "600",
+                          cursor: "pointer",
+                        }}
+                      >
+                        ✕ Remove
+                      </button>
+                    </div>
+                  ))}
+                </div>
+              )}
+
+              <div style={{ backgroundColor: "#f0f9ff", padding: "12px", borderRadius: "6px", border: "1px solid #bfdbfe", marginBottom: "12px" }}>
+                <div style={{ marginBottom: "12px" }}>
+                  <label style={{ display: "block", fontSize: "13px", fontWeight: "500", marginBottom: "4px" }}>Part Name (e.g., Part I, Part II)</label>
+                  <input
+                    type="text"
+                    value={newPart.partName}
+                    onChange={(e) => setNewPart({ ...newPart, partName: e.target.value })}
+                    placeholder="Part I"
+                    style={{ width: "100%", padding: "8px", border: "1px solid #d1d5db", borderRadius: "4px", fontSize: "13px", boxSizing: "border-box" }}
+                  />
+                </div>
+
+                <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "8px", marginBottom: "12px" }}>
+                  <div>
+                    <label style={{ display: "block", fontSize: "13px", fontWeight: "500", marginBottom: "4px" }}>Start Chapter</label>
+                    <input
+                      type="number"
+                      value={newPart.chapterStart}
+                      onChange={(e) => setNewPart({ ...newPart, chapterStart: parseInt(e.target.value) || 1 })}
+                      min="1"
+                      style={{ width: "100%", padding: "8px", border: "1px solid #d1d5db", borderRadius: "4px", fontSize: "13px", boxSizing: "border-box" }}
+                    />
+                  </div>
+                  <div>
+                    <label style={{ display: "block", fontSize: "13px", fontWeight: "500", marginBottom: "4px" }}>End Chapter</label>
+                    <input
+                      type="number"
+                      value={newPart.chapterEnd}
+                      onChange={(e) => setNewPart({ ...newPart, chapterEnd: parseInt(e.target.value) || 13 })}
+                      min="1"
+                      style={{ width: "100%", padding: "8px", border: "1px solid #d1d5db", borderRadius: "4px", fontSize: "13px", boxSizing: "border-box" }}
+                    />
+                  </div>
+                </div>
+
+                <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "8px", marginBottom: "12px" }}>
+                  <div>
+                    <label style={{ display: "block", fontSize: "13px", fontWeight: "500", marginBottom: "4px" }}>Question Count</label>
+                    <input
+                      type="number"
+                      value={newPart.questionCount}
+                      onChange={(e) => setNewPart({ ...newPart, questionCount: parseInt(e.target.value) || 0 })}
+                      min="1"
+                      style={{ width: "100%", padding: "8px", border: "1px solid #d1d5db", borderRadius: "4px", fontSize: "13px", boxSizing: "border-box" }}
+                    />
+                  </div>
+                  <div>
+                    <label style={{ display: "block", fontSize: "13px", fontWeight: "500", marginBottom: "4px" }}>Passing Score (%)</label>
+                    <input
+                      type="number"
+                      value={newPart.passingScore}
+                      onChange={(e) => setNewPart({ ...newPart, passingScore: parseInt(e.target.value) || 75 })}
+                      min="0"
+                      max="100"
+                      style={{ width: "100%", padding: "8px", border: "1px solid #d1d5db", borderRadius: "4px", fontSize: "13px", boxSizing: "border-box" }}
+                    />
+                  </div>
+                </div>
+
+                <button
+                  onClick={addPart}
+                  disabled={!newPart.partName.trim()}
+                  style={{
+                    width: "100%",
+                    padding: "8px 12px",
+                    backgroundColor: newPart.partName.trim() ? "#3b82f6" : "#d1d5db",
+                    color: "white",
+                    border: "none",
+                    borderRadius: "4px",
+                    fontSize: "13px",
+                    fontWeight: "600",
+                    cursor: newPart.partName.trim() ? "pointer" : "not-allowed",
+                  }}
+                >
+                  + Add Part
+                </button>
               </div>
             </div>
 
