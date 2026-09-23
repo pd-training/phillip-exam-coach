@@ -182,8 +182,8 @@ export default function PapersManagement() {
         }
 
         // Load exam parts if they exist
-        if (data.parts && Array.isArray(data.parts) && data.parts.length > 0) {
-          const loadedParts = data.parts.map((part: any) => ({
+        if (data.examFormat?.parts && Array.isArray(data.examFormat.parts) && data.examFormat.parts.length > 0) {
+          const loadedParts = data.examFormat.parts.map((part: any) => ({
             partName: part.partName,
             chapterStart: part.chapterStart,
             chapterEnd: part.chapterEnd,
