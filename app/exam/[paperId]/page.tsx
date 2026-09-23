@@ -169,7 +169,7 @@ export default function PracticePage() {
       </div>
 
       {/* Main Content */}
-      <div className="max-w-5xl mx-auto px-6 py-12">
+      <div className="max-w-7xl mx-auto px-6 py-12">
         {/* Practice Modes */}
         <div className="mb-12">
           <h2 className="text-2xl font-bold text-gray-900 mb-8">Select Practice Mode</h2>
