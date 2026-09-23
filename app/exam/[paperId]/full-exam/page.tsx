@@ -262,9 +262,9 @@ export default function FullExamMode() {
                       : "⭕ Not Answered"
                   }
                 </p>
-                {question.questionText && (
+                {question.text && (
                   <p style={{ margin: "0 0 12px 0", fontSize: "14px", lineHeight: "1.5", color: "#1f2937" }}>
-                    {question.questionText}
+                    {question.text}
                   </p>
                 )}
                 
