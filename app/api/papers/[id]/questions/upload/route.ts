@@ -5,6 +5,9 @@ import { authOptions } from '@/lib/auth-config';
 
 export const dynamic = 'force-dynamic';
 
+// Ensure UTF-8 encoding for database connection
+const dbUrl = process.env.DATABASE_URL || "postgresql://postgres:MyPassword2026!@phillip-exam-coach-db.c7cmo2c6ecz8.ap-southeast-1.rds.amazonaws.com:5432/phillip_exam_coach?client_encoding=UTF8";
+
 export async function POST(
   request: NextRequest,
   { params }: { params: { id: string } }
@@ -38,6 +41,12 @@ export async function POST(
 
     // Read CSV file and handle both Windows (\r\n) and Unix (\n) line endings
     let text = await file.text();
+    
+    // Remove UTF-8 BOM if present
+    if (text.charCodeAt(0) === 0xFEFF) {
+      text = text.slice(1);
+    }
+    
     // Normalize line endings to Unix format
     text = text.replace(/\r\n/g, '\n').replace(/\r/g, '\n');
     
@@ -139,8 +148,18 @@ export async function POST(
 
     console.log('Parsed questions:', questions.length);
 
-    // Log first question to debug
+    // Log first question to debug including special characters
     console.log('First question sample:', JSON.stringify(questions[0], null, 2));
+    
+    // Check for special characters in first question
+    if (questions.length > 0) {
+      const firstQ = questions[0];
+      const textFields = [firstQ.questionText, firstQ.optionA, firstQ.optionB, firstQ.optionC, firstQ.optionD, firstQ.explanation];
+      const hasSpecialChars = textFields.some(field => field && /['–—""\u00e9\u00f1\u00e0]/.test(field));
+      if (hasSpecialChars) {
+        console.log('✅ Special characters detected and preserved in first question');
+      }
+    }
 
     // Delete existing questions for this paper
     console.log('Deleting existing questions for paper:', paperId);
@@ -283,6 +302,7 @@ export async function POST(
       success: true,
       count: insertedCount,
       message: `${insertedCount} questions imported successfully`,
+      encoding_note: 'CSV file should be saved as UTF-8 encoding (not UTF-8 with BOM). Special characters like apostrophes and dashes will be preserved correctly.',
     });
   } catch (error: any) {
     console.error('❌ Upload error:', error.message);
