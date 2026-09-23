@@ -21,6 +21,7 @@ interface Attempt {
   submittedat: string;
   student_name: string;
   paper_name: string;
+  passingScore: number;
 }
 
 interface PaperRequest {
