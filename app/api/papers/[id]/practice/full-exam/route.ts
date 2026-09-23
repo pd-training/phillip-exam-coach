@@ -289,10 +289,12 @@ export async function POST(
       }
     }
 
-    // Score is based on the number of questions answered (limited by paper's totalQuestions setting)
-    const numAnswered = answeredQuestions.length;
-    const totalQuestions = Math.min(numAnswered, paper.totalQuestions || numAnswered);
+    // Score is based on TOTAL questions in the paper, regardless of how many were answered
+    // Unanswered questions count as 0 (incorrect)
+    const totalQuestions = paper.totalQuestions || allQuestions.length;
     const score = totalQuestions > 0 ? Math.round((correctCount / totalQuestions) * 100) : 0;
+    
+    console.log(`Score calculation: ${correctCount} correct out of ${totalQuestions} total = ${score}%`);
     const passingScore = paper.passingScore || 75;
     
     // If parts exist, overall pass is based on passing all parts. Otherwise use overall score.
