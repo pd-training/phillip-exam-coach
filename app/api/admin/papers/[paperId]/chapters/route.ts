@@ -44,11 +44,21 @@ export async function GET(
 
     return NextResponse.json(chapters);
   } catch (error: any) {
-    console.error('Fetch chapters error:', error);
+    console.error('Fetch chapters error:', error.message);
+    console.error('Error code:', error.code);
+    console.error('Full error:', JSON.stringify({
+      message: error.message,
+      code: error.code,
+      meta: error.meta
+    }));
 
     const errorMessage = error.message || 'Failed to fetch chapters';
     return NextResponse.json(
-      { error: errorMessage },
+      { 
+        error: errorMessage,
+        code: error.code,
+        details: error.meta?.cause || 'No details'
+      },
       { status: 500 }
     );
   }

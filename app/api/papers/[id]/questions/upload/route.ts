@@ -210,6 +210,45 @@ export async function POST(
 
     console.log('Upload complete - inserted:', insertedCount);
 
+    // Auto-create chapters from the questions that were just inserted
+    console.log('Creating chapters from uploaded questions...');
+    try {
+      const uniqueChapters = await (prisma as any).question.findMany({
+        where: { paperId: paperId },
+        select: { chapterNumber: true },
+        distinct: ['chapterNumber'],
+        orderBy: { chapterNumber: 'asc' }
+      });
+
+      for (const qChapter of uniqueChapters) {
+        try {
+          const existing = await (prisma as any).chapter.findUnique({
+            where: {
+              paperId_number: {
+                paperId: paperId,
+                number: qChapter.chapterNumber
+              }
+            }
+          });
+
+          if (!existing) {
+            await (prisma as any).chapter.create({
+              data: {
+                paperId: paperId,
+                number: qChapter.chapterNumber,
+                title: `Chapter ${qChapter.chapterNumber}`
+              }
+            });
+            console.log('✅ Created chapter:', qChapter.chapterNumber);
+          }
+        } catch (chErr: any) {
+          console.log('ℹ️  Chapter creation skipped:', chErr.message.substring(0, 100));
+        }
+      }
+    } catch (chapErr: any) {
+      console.warn('⚠️  Chapter auto-creation failed (non-fatal):', chapErr.message);
+    }
+
     if (insertedCount === 0) {
       console.error('❌ CRITICAL: No questions were inserted despite', questions.length, 'valid questions in CSV');
       
