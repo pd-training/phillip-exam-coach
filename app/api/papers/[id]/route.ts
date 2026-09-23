@@ -10,6 +10,7 @@ export async function GET(
 ) {
   try {
     const paperId = params.id;
+    const session = await getServerSession(authOptions);
     
     console.log('Fetching paper:', paperId);
 
@@ -32,6 +33,16 @@ export async function GET(
       return Response.json(
         { success: false, error: 'Paper not found' },
         { status: 404 }
+      );
+    }
+
+    // Check availability: students cannot access unavailable papers
+    const userRole = (session?.user as any)?.role;
+    if (!paper.isAvailable && userRole !== 'ADMIN') {
+      console.log('Student tried to access unavailable paper:', paperId);
+      return Response.json(
+        { success: false, error: 'This paper is no longer available' },
+        { status: 403 }
       );
     }
 

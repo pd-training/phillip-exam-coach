@@ -33,6 +33,7 @@ export default function PracticePage() {
   const [paper, setPaper] = useState<PaperInfo | null>(null);
   const [recommendedChapters, setRecommendedChapters] = useState<RecommendedChapter[]>([]);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     if (status === "loading") return;
@@ -83,8 +84,13 @@ export default function PracticePage() {
         const data = await paperRes.json();
         setPaper(data.paper || data);
         console.log("Paper loaded:", data.paper?.title || data.title);
+      } else if (paperRes.status === 403) {
+        console.error("Paper is no longer available");
+        setError("This paper is no longer available. It may have been disabled by an administrator.");
+        setPaper(null);
       } else {
         console.error("Failed to fetch paper:", paperRes.status);
+        setError("Failed to load paper. Please try again.");
         setPaper(null);
       }
 
@@ -125,7 +131,14 @@ export default function PracticePage() {
         <StudentNav />
         <div className="max-w-7xl mx-auto px-6 py-12">
           <div className="text-center">
-            <p className="text-gray-600">Paper not found</p>
+            {error ? (
+              <>
+                <p className="text-red-600 font-medium mb-2">{error}</p>
+                <p className="text-gray-600 text-sm">Please return to your dashboard to see available papers.</p>
+              </>
+            ) : (
+              <p className="text-gray-600">Paper not found</p>
+            )}
             <Link href="/dashboard">
               <button className="mt-4 px-6 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-medium">
                 Back to Dashboard
