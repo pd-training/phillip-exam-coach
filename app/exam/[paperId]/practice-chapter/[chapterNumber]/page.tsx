@@ -239,7 +239,7 @@ export default function PracticeChapterMode() {
           {/* Header */}
           <div className="mb-8 flex justify-between items-center">
             <div>
-              <p className="text-sm text-gray-600 mb-1">{paperTitle}</p>
+              <p className="text-xs font-semibold text-blue-600 uppercase tracking-wide mb-2">{paperTitle}</p>
               <h1 className="text-2xl font-bold text-gray-900">
                 Chapter {selectedChapter}
               </h1>
