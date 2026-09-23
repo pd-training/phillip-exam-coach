@@ -1,17 +1,21 @@
 import { NextRequest, NextResponse } from 'next/server';
 import prisma from '@/lib/prisma';
+import { getServerSession } from 'next-auth/next';
+import { authOptions } from '@/lib/auth-config';
 
 export const dynamic = 'force-dynamic';
-
-// Expected CSV format (with header row):
-// chapter,question,optionA,optionB,optionC,optionD,answer,explanation
-// 1,"What is..?","Option A text","Option B text","Option C text","Option D text","A","Explanation here"
 
 export async function POST(
   request: NextRequest,
   { params }: { params: { id: string } }
 ) {
   try {
+    const session = await getServerSession(authOptions);
+
+    if (!session?.user || (session.user as any)?.role !== "ADMIN") {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 403 });
+    }
+
     const formData = await request.formData();
     const file = formData.get('file') as File;
 
@@ -104,54 +108,40 @@ export async function POST(
 
     // Bulk insert new questions using createMany
     let insertedCount = 0;
+    
+    // First, try inserting WITHOUT option columns (safest approach)
+    const questionsWithoutOptions = questions.map(q => ({
+      paperId: q.paperId,
+      chapterNumber: q.chapterNumber,
+      questionText: q.questionText,
+      correctAnswer: q.correctAnswer,
+      explanation: q.explanation,
+    }));
+    
     try {
       const result = await (prisma as any).question.createMany({
-        data: questions,
+        data: questionsWithoutOptions,
         skipDuplicates: false
       });
       insertedCount = result.count;
-      console.log('Inserted questions with options:', insertedCount);
-    } catch (e: any) {
-      console.error('Bulk insert error (with options):', e.message);
+      console.log('Inserted questions (without options):', insertedCount);
+    } catch (withoutOptionsError: any) {
+      console.error('Insert without options error:', withoutOptionsError.message);
       
-      // Fallback: try without option columns if they don't exist
-      if (e.message?.includes('optionA') || e.message?.includes('optionB') || e.message?.includes('optionC') || e.message?.includes('optionD')) {
-        console.log('Option columns not available, retrying without them');
+      // Second attempt: try WITH option columns
+      try {
+        const result = await (prisma as any).question.createMany({
+          data: questions,
+          skipDuplicates: false
+        });
+        insertedCount = result.count;
+        console.log('Inserted questions (with options):', insertedCount);
+      } catch (withOptionsError: any) {
+        console.error('Insert with options error:', withOptionsError.message);
         
-        // Remove option fields and retry
-        const questionsWithoutOptions = questions.map(q => ({
-          paperId: q.paperId,
-          chapterNumber: q.chapterNumber,
-          questionText: q.questionText,
-          correctAnswer: q.correctAnswer,
-          explanation: q.explanation,
-        }));
-        
-        try {
-          const retryResult = await (prisma as any).question.createMany({
-            data: questionsWithoutOptions,
-            skipDuplicates: false
-          });
-          insertedCount = retryResult.count;
-          console.log('Inserted questions without options:', insertedCount);
-        } catch (retryError: any) {
-          console.error('Fallback insert error:', retryError.message);
-          // Final fallback: insert one by one
-          for (const q of questionsWithoutOptions) {
-            try {
-              await (prisma as any).question.create({
-                data: q
-              });
-              insertedCount++;
-            } catch (err) {
-              console.error('Single insert error:', err);
-            }
-          }
-        }
-      } else {
-        // Other error - try inserting one by one
-        console.log('Retrying one by one');
-        for (const q of questions) {
+        // Final fallback: insert one by one without options
+        console.log('Falling back to one-by-one insert');
+        for (const q of questionsWithoutOptions) {
           try {
             await (prisma as any).question.create({
               data: q
@@ -159,23 +149,6 @@ export async function POST(
             insertedCount++;
           } catch (err: any) {
             console.error('Single insert error:', err.message);
-            // If options are the issue, try without them
-            if (err.message?.includes('option')) {
-              try {
-                await (prisma as any).question.create({
-                  data: {
-                    paperId: q.paperId,
-                    chapterNumber: q.chapterNumber,
-                    questionText: q.questionText,
-                    correctAnswer: q.correctAnswer,
-                    explanation: q.explanation,
-                  }
-                });
-                insertedCount++;
-              } catch (fallbackErr) {
-                console.error('Fallback single insert error:', fallbackErr);
-              }
-            }
           }
         }
       }
@@ -189,6 +162,13 @@ export async function POST(
 
     console.log('Upload complete - inserted:', insertedCount);
 
+    if (insertedCount === 0) {
+      return NextResponse.json(
+        { error: 'Failed to insert any questions. Check CSV format and database connection.' },
+        { status: 500 }
+      );
+    }
+
     return NextResponse.json({
       success: true,
       count: insertedCount,
@@ -197,7 +177,7 @@ export async function POST(
   } catch (error: any) {
     console.error('Upload error:', error.message);
     return NextResponse.json(
-      { error: error.message || 'Failed to upload questions' },
+      { error: `Upload failed: ${error.message}` },
       { status: 500 }
     );
   }
