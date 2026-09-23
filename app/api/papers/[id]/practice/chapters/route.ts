@@ -12,6 +12,12 @@ export async function GET(
 
     console.log('Fetching chapters for paper:', paperId);
 
+    // Get paper title
+    const paper = await (prisma as any).paper.findUnique({
+      where: { id: paperId },
+      select: { title: true }
+    });
+
     // Get all chapters with their titles
     const chapters = await (prisma as any).chapter.findMany({
       where: { paperId: paperId },
@@ -25,6 +31,7 @@ export async function GET(
     console.log('Found chapters:', chapters.length);
 
     return NextResponse.json({
+      paperTitle: paper?.title || 'Practice Chapter',
       chapters: chapters,
     });
   } catch (error: any) {

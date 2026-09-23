@@ -47,6 +47,7 @@ export default function PracticeChapterMode() {
   const [showingFeedback, setShowingFeedback] = useState(false);
   const [score, setScore] = useState(0);
   const [answered, setAnswered] = useState(0);
+  const [paperTitle, setPaperTitle] = useState<string>("");
 
   // Auth check
   useEffect(() => {
@@ -74,6 +75,7 @@ export default function PracticeChapterMode() {
       if (res.ok) {
         const data = await res.json();
         setChapters(data.chapters);
+        setPaperTitle(data.paperTitle || "Practice Chapter");
       }
     } catch (error) {
       console.error("Fetch chapters error:", error);
@@ -236,9 +238,12 @@ export default function PracticeChapterMode() {
         <div className="bg-white rounded-2xl border border-gray-200 p-8 w-full max-w-2xl">
           {/* Header */}
           <div className="mb-8 flex justify-between items-center">
-            <h1 className="text-2xl font-bold text-gray-900">
-              Chapter {selectedChapter}
-            </h1>
+            <div>
+              <p className="text-sm text-gray-600 mb-1">{paperTitle}</p>
+              <h1 className="text-2xl font-bold text-gray-900">
+                Chapter {selectedChapter}
+              </h1>
+            </div>
             <div className="text-sm font-medium text-gray-600">
               Question <span className="text-blue-600 font-bold">{progress}</span> of <span className="text-gray-900 font-bold">{questions.length}</span>
             </div>

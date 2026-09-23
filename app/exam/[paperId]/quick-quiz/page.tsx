@@ -41,6 +41,7 @@ export default function QuickQuizMode() {
   const [score, setScore] = useState(0);
   const [answered, setAnswered] = useState(0);
   const [completed, setCompleted] = useState(false);
+  const [paperTitle, setPaperTitle] = useState<string>("");
 
   // Auth check
   useEffect(() => {
@@ -61,6 +62,7 @@ export default function QuickQuizMode() {
       if (res.ok) {
         const data = await res.json();
         setQuestions(data.questions);
+        setPaperTitle(data.paperTitle || "Quick Quiz");
       }
     } catch (error) {
       console.error("Fetch quiz error:", error);
@@ -154,7 +156,10 @@ export default function QuickQuizMode() {
         <div className="bg-white rounded-2xl border border-gray-200 p-8 w-full max-w-2xl">
           {/* Header */}
           <div className="mb-8 flex justify-between items-center">
-            <h1 className="text-3xl font-bold text-gray-900">Quick Quiz</h1>
+            <div>
+              <p className="text-sm text-gray-600 mb-1">{paperTitle}</p>
+              <h1 className="text-3xl font-bold text-gray-900">Quick Quiz</h1>
+            </div>
             <div className="text-sm font-medium text-gray-600">
               Question <span className="text-blue-600 font-bold">{progress}</span> of <span className="text-gray-900 font-bold">{questions.length}</span>
             </div>

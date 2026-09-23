@@ -12,6 +12,12 @@ export async function GET(
 
     console.log('Fetching quick quiz questions for paper:', paperId);
 
+    // Get paper title
+    const paper = await (prisma as any).paper.findUnique({
+      where: { id: paperId },
+      select: { title: true }
+    });
+
     // Get all questions for this paper
     const allQuestions = await (prisma as any).question.findMany({
       where: { paperId: paperId },
@@ -42,6 +48,7 @@ export async function GET(
     const questions = shuffled.slice(0, Math.min(15, shuffled.length));
 
     return NextResponse.json({
+      paperTitle: paper?.title || 'Quick Quiz',
       questions: questions.map((q: any) => ({
         id: q.id,
         text: q.questionText,

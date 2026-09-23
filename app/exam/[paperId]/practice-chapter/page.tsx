@@ -46,6 +46,7 @@ export default function PracticeChapterMode() {
   const [showingFeedback, setShowingFeedback] = useState(false);
   const [score, setScore] = useState(0);
   const [answered, setAnswered] = useState(0);
+  const [paperTitle, setPaperTitle] = useState<string>("");
 
   // Auth check
   useEffect(() => {
@@ -66,6 +67,7 @@ export default function PracticeChapterMode() {
       if (res.ok) {
         const data = await res.json();
         setChapters(data.chapters);
+        setPaperTitle(data.paperTitle || "Practice Chapter");
       }
     } catch (error) {
       console.error("Fetch chapters error:", error);
@@ -160,7 +162,7 @@ export default function PracticeChapterMode() {
             >
               ← Back
             </button>
-            <h1 className="text-4xl font-bold mb-2">Practice by Chapter</h1>
+            <h1 className="text-4xl font-bold mb-2">{paperTitle}</h1>
             <p className="text-blue-100">Select a chapter to practice questions from that specific topic</p>
           </div>
         </div>
