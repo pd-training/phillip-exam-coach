@@ -374,64 +374,9 @@ export default function FullExamMode() {
         <div className="max-w-7xl mx-auto px-6 h-full flex overflow-hidden">
           {/* Left Main Content */}
           <div className="flex-1 flex flex-col py-8 pr-6 overflow-y-auto">
-            {/* Exam Structure Info - Show at the beginning */}
-            {currentQIndex === 0 && parts.length > 0 && (
-              <div
-                style={{
-                  padding: "20px",
-                  backgroundColor: "#f0f9ff",
-                  border: "2px solid #0284c7",
-                  borderRadius: "8px",
-                  marginBottom: "24px",
-                }}
-              >
-                <div style={{ fontSize: "16px", fontWeight: "700", color: "#0c4a6e", marginBottom: "12px" }}>
-                  📋 Exam Structure
-                </div>
-                <div style={{ display: "grid", gridTemplateColumns: parts.length <= 2 ? "repeat(" + parts.length + ", 1fr)" : "repeat(auto-fit, minmax(250px, 1fr))", gap: "12px" }}>
-                  {parts.map((part, idx) => (
-                    <div key={idx} style={{
-                      backgroundColor: "white",
-                      padding: "12px",
-                      borderRadius: "6px",
-                      border: "1px solid #bfdbfe",
-                    }}>
-                      <div style={{ fontWeight: "600", color: "#1e40af", marginBottom: "6px" }}>
-                        {part.partName}
-                      </div>
-                      <div style={{ fontSize: "13px", color: "#0c4a6e", lineHeight: "1.5" }}>
-                        <div>📊 {part.questionCount} questions</div>
-                        <div>✓ Passing: {part.passingScore}%</div>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-                <div style={{ fontSize: "12px", color: "#0c4a6e", marginTop: "12px", fontStyle: "italic" }}>
-                  Total: {questions.length} questions • Time: {examConfig?.totalTime} minutes
-                </div>
-              </div>
-            )}
 
-            {/* Part Separator */}
-            {currentPart && currentPart.questionInPart === 1 && (
-              <div
-                style={{
-                  padding: "16px",
-                  backgroundColor: "#eff6ff",
-                  border: "2px solid #3b82f6",
-                  borderRadius: "8px",
-                  marginBottom: "24px",
-                  textAlign: "center",
-                }}
-              >
-                <div style={{ fontSize: "16px", fontWeight: "600", color: "#1e40af" }}>
-                  🎯 {currentPart.partName}
-                </div>
-                <div style={{ fontSize: "13px", color: "#1e40af", marginTop: "4px" }}>
-                  {currentPart.totalInPart} questions • Passing score: {currentPart.passingScore}%
-                </div>
-              </div>
-            )}
+
+
 
             {/* Question */}
             <div
