@@ -265,17 +265,6 @@ export default function PapersManagement() {
       alert("Error updating chapter title");
     }
   };
-    try {
-      const res = await fetch(`/api/papers/${paperId}/exam-format`);
-      if (res.ok) {
-        const data = await res.json();
-        setTotalTime(String(data.examFormat?.totalTime || 120));
-        setParts(data.examFormat?.parts || []);
-      }
-    } catch (error) {
-      console.error("Failed to fetch exam format:", error);
-    }
-  };
 
   // Toggle paper availability
   const togglePaperAvailability = async (paperId: string, currentStatus: boolean) => {
