@@ -79,8 +79,8 @@ export default function AdminDashboard() {
   const handleApproveRequest = async (requestId: string) => {
     try {
       setActionLoading(requestId);
-      const response = await fetch('/api/admin/assign-paper', {
-        method: 'POST',
+      const response = await fetch('/api/admin/dashboard/paper-requests', {
+        method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ requestId, action: 'approve' }),
       });
@@ -100,8 +100,8 @@ export default function AdminDashboard() {
   const handleRejectRequest = async (requestId: string) => {
     try {
       setActionLoading(requestId);
-      const response = await fetch('/api/admin/assign-paper', {
-        method: 'POST',
+      const response = await fetch('/api/admin/dashboard/paper-requests', {
+        method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ requestId, action: 'reject' }),
       });
