@@ -34,6 +34,7 @@ export async function GET(
         ea.passed,
         ea.startedat,
         ea.submittedat,
+        ea.answers,
         u.name as student_name,
         u.email as student_email,
         p.title as paper_name,
@@ -96,23 +97,23 @@ export async function GET(
       }
     }
 
-    // Get student answers from StudentAnswer table if it exists
-    let studentAnswers: any[] = [];
-    try {
-      console.log("Fetching student answers for attemptId:", attemptId);
-      studentAnswers = await (prisma as any).studentAnswer.findMany({
-        where: { attemptId },
-      });
-      console.log("Found student answers:", studentAnswers.length);
-    } catch (err: any) {
-      console.log("StudentAnswer table not found or empty:", err.message);
-      // StudentAnswer table might not exist yet - continue with empty answers
+    // Get student answers from the answers field in examattempt
+    let studentAnswersMap: Record<string, string> = {};
+    if (attempt.answers) {
+      try {
+        studentAnswersMap = typeof attempt.answers === 'string' 
+          ? JSON.parse(attempt.answers) 
+          : attempt.answers;
+        console.log("Loaded student answers from attempt:", Object.keys(studentAnswersMap).length);
+      } catch (err) {
+        console.log("Could not parse answers from attempt:", err);
+      }
     }
 
     // Map student answers to questions
     const questionsWithAnswers = questions.map((q: any) => {
-      const studentAnswer = studentAnswers.find(sa => sa.questionId === q.id);
-      const isCorrect = studentAnswer?.answer === q.correctAnswer;
+      const studentAnswerValue = studentAnswersMap[q.id];
+      const isCorrect = studentAnswerValue === q.correctAnswer;
 
       return {
         id: q.id,
@@ -124,7 +125,7 @@ export async function GET(
         optionD: q.optionD,
         explanation: q.explanation,
         chapterNumber: q.chapterNumber,
-        studentAnswer: studentAnswer?.answer || null,
+        studentAnswer: studentAnswerValue || null,
         isCorrect: isCorrect || false,
       };
     });

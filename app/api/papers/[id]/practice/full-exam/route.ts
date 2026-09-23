@@ -191,8 +191,11 @@ export async function POST(
       const now = new Date();
       const startTime = new Date(now.getTime() - (timeTaken || 0) * 1000); // Subtract timeTaken seconds
       
+      // Store answers as JSON
+      const answersJson = JSON.stringify(answers);
+      
       await prisma.$queryRaw`
-        INSERT INTO examattempt (id, paperid, userid, startedat, submittedat, score, passed, createdat)
+        INSERT INTO examattempt (id, paperid, userid, startedat, submittedat, score, passed, answers, createdat)
         VALUES (
           ${attemptId},
           ${paperId}::uuid,
@@ -201,6 +204,7 @@ export async function POST(
           ${now},
           ${score},
           ${passed},
+          ${answersJson}::jsonb,
           NOW()
         )
       `;
