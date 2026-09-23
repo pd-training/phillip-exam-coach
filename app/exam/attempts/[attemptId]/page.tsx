@@ -168,8 +168,8 @@ export default function AttemptReviewPage() {
       <StudentNav />
 
       {/* Header */}
-      <div className="bg-gradient-to-r from-blue-600 to-blue-700 text-white py-8 px-6 border-b border-blue-800">
-        <div className="max-w-7xl mx-auto flex justify-between items-center">
+      <div className="bg-gradient-to-r from-blue-600 to-blue-700 text-white py-8 px-0 border-b border-blue-800">
+        <div className="max-w-7xl mx-auto px-6 flex justify-between items-center">
           <div>
             <Link href="/dashboard">
               <button className="text-blue-100 hover:text-white font-medium text-sm mb-4 block">

@@ -155,8 +155,8 @@ export default function PracticePage() {
       <StudentNav />
 
       {/* Hero Section */}
-      <div className="bg-gradient-to-r from-blue-600 to-blue-700 text-white py-12 px-6">
-        <div className="max-w-7xl mx-auto">
+      <div className="bg-gradient-to-r from-blue-600 to-blue-700 text-white py-12 px-0">
+        <div className="max-w-7xl mx-auto px-6">
           <button
             onClick={() => router.back()}
             className="text-blue-100 hover:text-white font-medium text-sm mb-6 transition"
