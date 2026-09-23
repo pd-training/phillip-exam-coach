@@ -64,17 +64,41 @@ export async function POST(
       }
       parts.push(current.trim().replace(/^"(.*)"$/, '$1'));
 
-      if (parts.length < 5) continue; // Need at least chapter, question, optionA, answer, explanation
-
-      // Expected CSV format: chapter, question, optionA, optionB, optionC, optionD, answer, explanation
+      // Support two CSV formats:
+      // Format 1 (8 columns): chapter, question, optionA, optionB, optionC, optionD, answer, explanation
+      // Format 2 (4 columns): chapter, question, answer, explanation (generates placeholder options)
+      
       const chapter = parts[0]?.trim() || '';
       const question = parts[1]?.trim() || '';
-      const optionA = (parts[2]?.trim() || '').replace(/^"(.*)"$/, '$1');
-      const optionB = (parts[3]?.trim() || '').replace(/^"(.*)"$/, '$1');
-      const optionC = (parts[4]?.trim() || '').replace(/^"(.*)"$/, '$1');
-      const optionD = (parts[5]?.trim() || '').replace(/^"(.*)"$/, '$1');
-      const answer = parts[6]?.trim() || '';
-      const explanation = (parts[7]?.trim() || '').replace(/^"(.*)"$/, '$1');
+      
+      let optionA: string;
+      let optionB: string;
+      let optionC: string;
+      let optionD: string;
+      let answer: string;
+      let explanation: string;
+
+      if (parts.length >= 8) {
+        // 8-column format with explicit options
+        optionA = (parts[2]?.trim() || '').replace(/^"(.*)"$/, '$1');
+        optionB = (parts[3]?.trim() || '').replace(/^"(.*)"$/, '$1');
+        optionC = (parts[4]?.trim() || '').replace(/^"(.*)"$/, '$1');
+        optionD = (parts[5]?.trim() || '').replace(/^"(.*)"$/, '$1');
+        answer = parts[6]?.trim() || '';
+        explanation = (parts[7]?.trim() || '').replace(/^"(.*)"$/, '$1');
+      } else if (parts.length >= 4) {
+        // 4-column format without options — generate placeholders
+        answer = parts[2]?.trim() || '';
+        explanation = (parts[3]?.trim() || '').replace(/^"(.*)"$/, '$1');
+        
+        // Generate placeholder options based on correct answer
+        optionA = answer === 'A' ? '[Correct Answer]' : 'Option A';
+        optionB = answer === 'B' ? '[Correct Answer]' : 'Option B';
+        optionC = answer === 'C' ? '[Correct Answer]' : 'Option C';
+        optionD = answer === 'D' ? '[Correct Answer]' : 'Option D';
+      } else {
+        continue; // Not enough columns
+      }
 
       // Validate required fields
       if (!chapter || !question || !optionA || !optionB || !optionC || !optionD || !answer) {
@@ -102,20 +126,12 @@ export async function POST(
     if (questions.length === 0) {
       console.error('No questions parsed from CSV');
       return NextResponse.json(
-        { error: 'No valid questions found in CSV. Expected format: chapter,question,optionA,optionB,optionC,optionD,answer,explanation' },
+        { error: 'No valid questions found in CSV. Supported formats: (1) 8-column: chapter,question,optionA,optionB,optionC,optionD,answer,explanation OR (2) 4-column: chapter,question,answer,explanation (options auto-generated)' },
         { status: 400 }
       );
     }
 
     console.log('Parsed questions:', questions.length);
-    
-    if (questions.length === 0) {
-      console.error('No questions parsed from CSV');
-      return NextResponse.json(
-        { error: 'No valid questions found in CSV. Expected format: chapter,question,optionA,optionB,optionC,optionD,answer,explanation' },
-        { status: 400 }
-      );
-    }
 
     // Log first question to debug
     console.log('First question sample:', JSON.stringify(questions[0], null, 2));
@@ -184,7 +200,7 @@ export async function POST(
       console.error('❌ CRITICAL: No questions were inserted despite', questions.length, 'valid questions in CSV');
       return NextResponse.json(
         { 
-          error: 'Failed to insert any questions. The CSV format may be incorrect or there is a database error. Check that all 8 columns are present: chapter, question, optionA, optionB, optionC, optionD, answer, explanation. Check server logs for details.' 
+          error: 'Failed to insert any questions. The CSV format may be incorrect or there is a database error. Supported formats: (1) 8-column with explicit options or (2) 4-column with auto-generated placeholder options. Check server logs for details.' 
         },
         { status: 500 }
       );
