@@ -167,7 +167,10 @@ export async function POST(
       console.error('Error code:', bulkError.code);
       console.error('Full error:', JSON.stringify(bulkError, null, 2));
       
-      // Fallback: insert one by one
+      // Log first question that would fail
+      console.error('Attempting to insert first question:', JSON.stringify(questions[0], null, 2));
+      
+      // Fallback: insert one by one with detailed logging
       console.log('Falling back to one-by-one insert with', questions.length, 'questions...');
       for (let idx = 0; idx < questions.length; idx++) {
         const q = questions[idx];
@@ -176,14 +179,17 @@ export async function POST(
             data: q
           });
           insertedCount++;
-          if (idx < 3) {
-            console.log(`✅ Question ${idx + 1} inserted`);
+          if (idx < 5 || idx % 50 === 0) {
+            console.log(`✅ Question ${idx + 1}/${questions.length} inserted`);
           }
         } catch (err: any) {
+          console.error(`❌ Question ${idx + 1} error:`, err.message);
           if (idx < 3) {
-            console.error(`❌ Question ${idx + 1} error:`, err.message);
-            console.error('Data was:', JSON.stringify(q, null, 2));
+            console.error('Question data:', JSON.stringify(q, null, 2));
+            console.error('Error code:', err.code);
+            console.error('Error meta:', err.meta);
           }
+          // Continue to next question instead of aborting
         }
       }
       if (insertedCount > 0) {
@@ -222,8 +228,19 @@ export async function POST(
   } catch (error: any) {
     console.error('❌ Upload error:', error.message);
     console.error('Stack:', error.stack);
+    console.error('Full error object:', JSON.stringify({
+      message: error.message,
+      code: error.code,
+      meta: error.meta,
+      status: error.status,
+    }, null, 2));
+    
     return NextResponse.json(
-      { error: `Upload failed: ${error.message}` },
+      { 
+        error: `Upload failed: ${error.message}`,
+        details: error.code || 'Unknown error',
+        stack: error.meta?.cause || 'No additional details'
+      },
       { status: 500 }
     );
   }
