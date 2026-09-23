@@ -76,16 +76,24 @@ export async function POST(
       const answer = parts[6]?.trim() || '';
       const explanation = (parts[7]?.trim() || '').replace(/^"(.*)"$/, '$1');
 
-      if (!chapter || !question || !answer) continue;
+      // Validate required fields
+      if (!chapter || !question || !optionA || !optionB || !optionC || !optionD || !answer) {
+        continue;
+      }
+
+      // Validate answer is A-D
+      if (!['A', 'B', 'C', 'D'].includes(answer.toUpperCase())) {
+        continue;
+      }
 
       questions.push({
         paperId: paperId,
-        chapterNumber: parseInt(chapter) || 1,
+        chapterNumber: Math.max(1, parseInt(chapter) || 1),
         questionText: question,
-        optionA: optionA || '',
-        optionB: optionB || '',
-        optionC: optionC || '',
-        optionD: optionD || '',
+        optionA: optionA,
+        optionB: optionB,
+        optionC: optionC,
+        optionD: optionD,
         correctAnswer: answer.toUpperCase().charAt(0),
         explanation: explanation || '',
       });
@@ -122,7 +130,8 @@ export async function POST(
     // Bulk insert new questions WITH option columns (required by schema)
     let insertedCount = 0;
     
-    console.log('Attempting bulk insert with options...');
+    console.log('Attempting bulk insert with', questions.length, 'questions...');
+    console.log('Sample question:', JSON.stringify(questions[0], null, 2));
     
     try {
       const result = await (prisma as any).question.createMany({
@@ -134,9 +143,10 @@ export async function POST(
     } catch (bulkError: any) {
       console.error('❌ Bulk insert error:', bulkError.message);
       console.error('Error code:', bulkError.code);
+      console.error('Full error:', JSON.stringify(bulkError, null, 2));
       
       // Fallback: insert one by one
-      console.log('Falling back to one-by-one insert...');
+      console.log('Falling back to one-by-one insert with', questions.length, 'questions...');
       for (let idx = 0; idx < questions.length; idx++) {
         const q = questions[idx];
         try {
@@ -144,14 +154,21 @@ export async function POST(
             data: q
           });
           insertedCount++;
+          if (idx < 3) {
+            console.log(`✅ Question ${idx + 1} inserted`);
+          }
         } catch (err: any) {
-          if (idx === 0) {
-            console.error('❌ First question insert error:', err.message);
-            console.error('Question data:', JSON.stringify(q, null, 2));
+          if (idx < 3) {
+            console.error(`❌ Question ${idx + 1} error:`, err.message);
+            console.error('Data was:', JSON.stringify(q, null, 2));
           }
         }
       }
-      console.log('✅ One-by-one insert complete:', insertedCount, 'questions inserted');
+      if (insertedCount > 0) {
+        console.log('✅ One-by-one insert complete:', insertedCount, 'questions inserted');
+      } else {
+        console.error('❌ No questions inserted in fallback');
+      }
     }
 
     // Update paper's total questions count (with select to avoid description field)
@@ -164,19 +181,25 @@ export async function POST(
     console.log('Upload complete - inserted:', insertedCount);
 
     if (insertedCount === 0) {
+      console.error('❌ CRITICAL: No questions were inserted despite', questions.length, 'valid questions in CSV');
       return NextResponse.json(
-        { error: 'Failed to insert any questions. Check CSV format and database connection.' },
+        { 
+          error: 'Failed to insert any questions. The CSV format may be incorrect or there is a database error. Check that all 8 columns are present: chapter, question, optionA, optionB, optionC, optionD, answer, explanation. Check server logs for details.' 
+        },
         { status: 500 }
       );
     }
 
+    console.log('✅ Upload succeeded - inserted:', insertedCount, 'questions');
+    
     return NextResponse.json({
       success: true,
       count: insertedCount,
       message: `${insertedCount} questions imported successfully`,
     });
   } catch (error: any) {
-    console.error('Upload error:', error.message, error.stack);
+    console.error('❌ Upload error:', error.message);
+    console.error('Stack:', error.stack);
     return NextResponse.json(
       { error: `Upload failed: ${error.message}` },
       { status: 500 }
