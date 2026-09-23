@@ -28,6 +28,21 @@ export async function GET(
       return NextResponse.json({ error: 'Paper not found' }, { status: 404 });
     }
 
+    // Check if this paper has exam parts
+    const examParts = await (prisma as any).examPart.findMany({
+      where: { paperId: paperId },
+      orderBy: { orderIndex: 'asc' },
+      select: {
+        id: true,
+        partName: true,
+        chapterStart: true,
+        chapterEnd: true,
+        questionCount: true,
+        passingScore: true,
+        orderIndex: true,
+      }
+    });
+
     // Get all questions for this paper
     const allQuestions = await (prisma as any).question.findMany({
       where: { paperId: paperId },
@@ -46,17 +61,58 @@ export async function GET(
     });
 
     console.log('Found total questions in bank:', allQuestions.length, 'Paper configured for:', paper.totalQuestions);
+    console.log('Exam parts found:', examParts.length);
 
-    // Randomly select the configured number of questions
-    // If totalQuestions is 0 or not set, use all questions; otherwise use the configured amount
-    const numToSelect = paper.totalQuestions > 0 
-      ? Math.min(paper.totalQuestions, allQuestions.length) 
-      : allQuestions.length;
-    const selectedQuestions = allQuestions
-      .sort(() => Math.random() - 0.5)
-      .slice(0, numToSelect);
+    let selectedQuestions: any[] = [];
+    let questionsByPart: any[] = [];
 
-    console.log('Selected questions for exam:', selectedQuestions.length, 'from', numToSelect, 'configured');
+    // If exam parts are defined, use them to structure the exam
+    if (examParts && examParts.length > 0) {
+      console.log('Using exam parts structure');
+      
+      for (const part of examParts) {
+        // Filter questions in the chapter range for this part
+        const questionsInPartRange = allQuestions.filter(
+          q => q.chapterNumber >= part.chapterStart && q.chapterNumber <= part.chapterEnd
+        );
+
+        // Randomly select the configured number of questions for this part
+        const numToSelect = Math.min(part.questionCount, questionsInPartRange.length);
+        const partQuestions = questionsInPartRange
+          .sort(() => Math.random() - 0.5)
+          .slice(0, numToSelect);
+
+        selectedQuestions.push(...partQuestions);
+        
+        questionsByPart.push({
+          part: part.partName,
+          partId: part.id,
+          passingScore: part.passingScore,
+          questions: partQuestions.map((q: any) => ({
+            id: q.id,
+            text: q.questionText,
+            chapter: q.chapterNumber,
+            optionA: q.optionA,
+            optionB: q.optionB,
+            optionC: q.optionC,
+            optionD: q.optionD,
+          })),
+        });
+      }
+      
+      console.log('Selected questions for exam with parts:', selectedQuestions.length);
+    } else {
+      // No parts defined - use standard selection
+      console.log('No exam parts defined, using standard selection');
+      const numToSelect = paper.totalQuestions > 0 
+        ? Math.min(paper.totalQuestions, allQuestions.length) 
+        : allQuestions.length;
+      selectedQuestions = allQuestions
+        .sort(() => Math.random() - 0.5)
+        .slice(0, numToSelect);
+
+      console.log('Selected questions for exam:', selectedQuestions.length, 'from', numToSelect, 'configured');
+    }
 
     // Return in exam format
     return NextResponse.json({
@@ -65,6 +121,7 @@ export async function GET(
         totalTime: paper.durationMinutes,
         passingScore: paper.passingScore,
         totalQuestions: paper.totalQuestions > 0 ? paper.totalQuestions : undefined,
+        hasParts: examParts.length > 0,
       },
       questions: selectedQuestions.map((q: any) => ({
         id: q.id,
@@ -75,6 +132,8 @@ export async function GET(
         optionC: q.optionC,
         optionD: q.optionD,
       })),
+      questionsByPart: questionsByPart,
+      parts: examParts,
       totalQuestions: selectedQuestions.length,
     });
   } catch (error: any) {

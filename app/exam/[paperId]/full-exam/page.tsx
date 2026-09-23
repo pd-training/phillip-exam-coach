@@ -18,6 +18,14 @@ interface ExamConfig {
   title: string;
   totalTime: number;
   passingScore: number;
+  hasParts?: boolean;
+}
+
+interface ExamPart {
+  id: string;
+  partName: string;
+  passingScore: number;
+  questions?: Question[];
 }
 
 export default function FullExamMode() {
@@ -28,6 +36,7 @@ export default function FullExamMode() {
 
   const [examConfig, setExamConfig] = useState<ExamConfig | null>(null);
   const [questions, setQuestions] = useState<Question[]>([]);
+  const [parts, setParts] = useState<ExamPart[]>([]);
   const [loading, setLoading] = useState(true);
   const [submitting, setSubmitting] = useState(false);
   const [timeLeft, setTimeLeft] = useState(0);
@@ -60,6 +69,12 @@ export default function FullExamMode() {
         if (data.questions && Array.isArray(data.questions)) {
           setQuestions(data.questions);
           setTimeLeft(data.examConfig.totalTime * 60);
+          
+          // Set exam parts if they exist
+          if (data.parts && Array.isArray(data.parts) && data.parts.length > 0) {
+            setParts(data.parts);
+            console.log('Exam parts loaded:', data.parts);
+          }
         } else {
           alert('No questions found for this exam');
         }
@@ -296,6 +311,28 @@ export default function FullExamMode() {
   const isFlagged = flagged.has(currentQuestion.id);
   const isAnswered = currentQuestion.id in answers;
 
+  // Determine which part the current question belongs to
+  const getCurrentPart = () => {
+    if (parts.length === 0) return null;
+    
+    // Find cumulative question index across parts
+    let questionIndex = 0;
+    for (const part of parts) {
+      const partQuestionCount = part.questions?.length || 0;
+      if (currentQIndex < questionIndex + partQuestionCount) {
+        return {
+          ...part,
+          questionInPart: currentQIndex - questionIndex + 1,
+          totalInPart: partQuestionCount,
+        };
+      }
+      questionIndex += partQuestionCount;
+    }
+    return null;
+  };
+
+  const currentPart = getCurrentPart();
+
   return (
     <div className="min-h-screen bg-gray-50 flex flex-col">
       <StudentNav />
@@ -305,7 +342,12 @@ export default function FullExamMode() {
         <div className="max-w-7xl mx-auto flex justify-between items-center">
           <div>
             <h1 className="text-xl font-bold text-gray-900">{examConfig?.title || "Full Exam Mode"}</h1>
-            <p className="text-sm text-gray-500 mt-1">Full Exam Mode</p>
+            <p className="text-sm text-gray-500 mt-1">
+              {currentPart 
+                ? `${currentPart.partName} (Q${currentPart.questionInPart}/${currentPart.totalInPart})`
+                : "Full Exam Mode"
+              }
+            </p>
           </div>
           <div className="flex items-center gap-8">
             <div className="text-sm text-gray-600">
@@ -323,6 +365,27 @@ export default function FullExamMode() {
         <div className="max-w-7xl mx-auto px-6 h-full flex overflow-hidden">
           {/* Left Main Content */}
           <div className="flex-1 flex flex-col py-8 pr-6 overflow-y-auto">
+            {/* Part Separator */}
+            {currentPart && currentPart.questionInPart === 1 && (
+              <div
+                style={{
+                  padding: "16px",
+                  backgroundColor: "#eff6ff",
+                  border: "2px solid #3b82f6",
+                  borderRadius: "8px",
+                  marginBottom: "24px",
+                  textAlign: "center",
+                }}
+              >
+                <div style={{ fontSize: "16px", fontWeight: "600", color: "#1e40af" }}>
+                  🎯 {currentPart.partName}
+                </div>
+                <div style={{ fontSize: "13px", color: "#1e40af", marginTop: "4px" }}>
+                  {currentPart.totalInPart} questions • Passing score: {currentPart.passingScore}%
+                </div>
+              </div>
+            )}
+
             {/* Question */}
             <div
               style={{
