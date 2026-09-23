@@ -149,7 +149,7 @@ export default function UserDetailPage() {
           display: "flex",
           justifyContent: "space-between",
           alignItems: "center",
-      }}>
+        }}>
         <Link href="/admin/users">
           <a style={{ color: "#3b82f6", fontSize: "14px", textDecoration: "none", fontWeight: "500" }}>
             ← Back to users
@@ -168,7 +168,7 @@ export default function UserDetailPage() {
         >
           🚪 Log out
         </button>
-      </div>
+        </div>
 
       {/* Content */}
       <div style={{ maxWidth: "900px", margin: "0 auto", padding: "40px 20px" }}>
