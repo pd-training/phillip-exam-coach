@@ -110,18 +110,73 @@ export async function POST(
         skipDuplicates: false
       });
       insertedCount = result.count;
-      console.log('Inserted questions:', insertedCount);
+      console.log('Inserted questions with options:', insertedCount);
     } catch (e: any) {
-      console.error('Bulk insert error:', e.message);
-      // Fallback to inserting one by one
-      for (const q of questions) {
+      console.error('Bulk insert error (with options):', e.message);
+      
+      // Fallback: try without option columns if they don't exist
+      if (e.message?.includes('optionA') || e.message?.includes('optionB') || e.message?.includes('optionC') || e.message?.includes('optionD')) {
+        console.log('Option columns not available, retrying without them');
+        
+        // Remove option fields and retry
+        const questionsWithoutOptions = questions.map(q => ({
+          paperId: q.paperId,
+          chapterNumber: q.chapterNumber,
+          questionText: q.questionText,
+          correctAnswer: q.correctAnswer,
+          explanation: q.explanation,
+        }));
+        
         try {
-          await (prisma as any).question.create({
-            data: q
+          const retryResult = await (prisma as any).question.createMany({
+            data: questionsWithoutOptions,
+            skipDuplicates: false
           });
-          insertedCount++;
-        } catch (err) {
-          console.error('Single insert error:', err);
+          insertedCount = retryResult.count;
+          console.log('Inserted questions without options:', insertedCount);
+        } catch (retryError: any) {
+          console.error('Fallback insert error:', retryError.message);
+          // Final fallback: insert one by one
+          for (const q of questionsWithoutOptions) {
+            try {
+              await (prisma as any).question.create({
+                data: q
+              });
+              insertedCount++;
+            } catch (err) {
+              console.error('Single insert error:', err);
+            }
+          }
+        }
+      } else {
+        // Other error - try inserting one by one
+        console.log('Retrying one by one');
+        for (const q of questions) {
+          try {
+            await (prisma as any).question.create({
+              data: q
+            });
+            insertedCount++;
+          } catch (err: any) {
+            console.error('Single insert error:', err.message);
+            // If options are the issue, try without them
+            if (err.message?.includes('option')) {
+              try {
+                await (prisma as any).question.create({
+                  data: {
+                    paperId: q.paperId,
+                    chapterNumber: q.chapterNumber,
+                    questionText: q.questionText,
+                    correctAnswer: q.correctAnswer,
+                    explanation: q.explanation,
+                  }
+                });
+                insertedCount++;
+              } catch (fallbackErr) {
+                console.error('Fallback single insert error:', fallbackErr);
+              }
+            }
+          }
         }
       }
     }
