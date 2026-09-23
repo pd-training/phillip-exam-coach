@@ -175,41 +175,39 @@ export default function PracticePage() {
     <div className="min-h-screen bg-gray-50">
       <StudentNav />
 
-      {/* Page Header */}
-      <div className="bg-white border-b border-gray-200">
-        <div className="max-w-6xl mx-auto px-6 py-6">
-          <div className="mb-6">
-            <h1 className="text-3xl font-bold text-gray-900">Practice</h1>
-            <p className="text-gray-600 mt-1">Prepare for your CMFAS exams</p>
-          </div>
-
-          {/* Tabs */}
-          <div className="flex gap-6 border-t border-gray-200 pt-0">
-            <button
-              onClick={() => setTab('your-papers')}
-              className={`px-1 py-4 font-medium transition border-b-2 ${
-                tab === 'your-papers'
-                  ? 'text-blue-600 border-blue-600'
-                  : 'text-gray-600 border-transparent hover:text-gray-900'
-              }`}
-            >
-              Your papers ({papers.length})
-            </button>
-            <button
-              onClick={() => setTab('browse')}
-              className={`px-1 py-4 font-medium transition border-b-2 ${
-                tab === 'browse'
-                  ? 'text-blue-600 border-blue-600'
-                  : 'text-gray-600 border-transparent hover:text-gray-900'
-              }`}
-            >
-              Browse papers ({allPapers.length})
-            </button>
-          </div>
+      {/* Hero Section */}
+      <div className="bg-gradient-to-r from-blue-600 to-blue-700 text-white py-12 px-0">
+        <div className="max-w-7xl mx-auto px-6">
+          <h1 className="text-4xl font-bold mb-2">Practice</h1>
+          <p className="text-blue-100">Prepare for your CMFAS exams</p>
         </div>
       </div>
 
-      <div className="max-w-6xl mx-auto px-6 py-8">
+      {/* Main Content */}
+      <div className="max-w-7xl mx-auto px-6 py-8">
+        {/* Tabs */}
+        <div className="flex gap-6 border-b border-gray-200 mb-8 -mx-6 px-6">
+          <button
+            onClick={() => setTab('your-papers')}
+            className={`px-1 py-4 font-medium transition border-b-2 ${
+              tab === 'your-papers'
+                ? 'text-blue-600 border-blue-600'
+                : 'text-gray-600 border-transparent hover:text-gray-900'
+            }`}
+          >
+            Your papers ({papers.length})
+          </button>
+          <button
+            onClick={() => setTab('browse')}
+            className={`px-1 py-4 font-medium transition border-b-2 ${
+              tab === 'browse'
+                ? 'text-blue-600 border-blue-600'
+                : 'text-gray-600 border-transparent hover:text-gray-900'
+            }`}
+          >
+            Browse papers ({allPapers.length})
+          </button>
+        </div>
         {error && (
           <div className="mb-6 p-4 bg-red-50 border border-red-200 rounded-lg text-red-800">
             {error}
