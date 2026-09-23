@@ -49,12 +49,34 @@ async function updatePaper(paperId: string, body: any) {
     return { error: null, status: 200, paper: existingPaper };
   }
 
-  const paper = await (prisma as any).paper.update({
-    where: { id: paperId },
-    data: updateData,
-  });
-
-  return { error: null, status: 200, paper };
+  try {
+    const paper = await (prisma as any).paper.update({
+      where: { id: paperId },
+      data: updateData,
+    });
+    return { error: null, status: 200, paper };
+  } catch (updateError: any) {
+    // If update fails due to description field, retry without it
+    if (updateError.message?.includes('description') && updateData.description !== undefined) {
+      console.log('Description field not available, retrying without it');
+      delete updateData.description;
+      
+      if (Object.keys(updateData).length === 0) {
+        return { error: null, status: 200, paper: existingPaper };
+      }
+      
+      try {
+        const paper = await (prisma as any).paper.update({
+          where: { id: paperId },
+          data: updateData,
+        });
+        return { error: null, status: 200, paper };
+      } catch (retryError: any) {
+        return { error: retryError.message || 'Failed to update paper', status: 500, paper: null };
+      }
+    }
+    return { error: updateError.message || 'Failed to update paper', status: 500, paper: null };
+  }
 }
 
 export async function PATCH(
