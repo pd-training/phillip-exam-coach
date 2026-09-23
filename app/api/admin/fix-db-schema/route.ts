@@ -15,20 +15,49 @@ export async function POST(request: NextRequest) {
 
     console.log('Attempting to add missing Question columns...');
 
-    // Manually add the missing columns if they don't exist
-    const queries = [
-      `ALTER TABLE "Question" ADD COLUMN IF NOT EXISTS "optionB" TEXT NOT NULL DEFAULT ''`,
-      `ALTER TABLE "Question" ADD COLUMN IF NOT EXISTS "optionC" TEXT NOT NULL DEFAULT ''`,
-      `ALTER TABLE "Question" ADD COLUMN IF NOT EXISTS "optionD" TEXT NOT NULL DEFAULT ''`,
-    ];
+    // Check which columns are missing
+    const columnCheckQuery = `
+      SELECT column_name FROM information_schema.columns 
+      WHERE table_name = 'Question' 
+      AND column_name IN ('optionB', 'optionC', 'optionD')
+    `;
+    
+    try {
+      const result = await (prisma as any).$queryRawUnsafe(columnCheckQuery);
+      console.log('Existing option columns:', result.map((r: any) => r.column_name));
+    } catch (err: any) {
+      console.log('Column check query failed:', err.message);
+    }
 
-    for (const query of queries) {
-      try {
-        await (prisma as any).$executeRawUnsafe(query);
-        console.log('✅ Executed:', query.substring(0, 50) + '...');
-      } catch (err: any) {
-        console.log('ℹ️  Column might already exist:', err.message.substring(0, 100));
-      }
+    // Add missing columns one by one
+    const missingColumns = [];
+    
+    try {
+      await (prisma as any).$executeRawUnsafe(`ALTER TABLE "Question" ADD COLUMN "optionB" TEXT NOT NULL DEFAULT ''`);
+      console.log('✅ Added optionB');
+    } catch (err: any) {
+      console.log('optionB error:', err.message.substring(0, 100));
+      if (!err.message.includes('already exists')) missingColumns.push('optionB');
+    }
+
+    try {
+      await (prisma as any).$executeRawUnsafe(`ALTER TABLE "Question" ADD COLUMN "optionC" TEXT NOT NULL DEFAULT ''`);
+      console.log('✅ Added optionC');
+    } catch (err: any) {
+      console.log('optionC error:', err.message.substring(0, 100));
+      if (!err.message.includes('already exists')) missingColumns.push('optionC');
+    }
+
+    try {
+      await (prisma as any).$executeRawUnsafe(`ALTER TABLE "Question" ADD COLUMN "optionD" TEXT NOT NULL DEFAULT ''`);
+      console.log('✅ Added optionD');
+    } catch (err: any) {
+      console.log('optionD error:', err.message.substring(0, 100));
+      if (!err.message.includes('already exists')) missingColumns.push('optionD');
+    }
+
+    if (missingColumns.length > 0) {
+      console.error('Failed to add columns:', missingColumns);
     }
 
     // Verify columns exist by trying to insert a test row
@@ -72,3 +101,34 @@ export async function POST(request: NextRequest) {
     );
   }
 }
+
+/**
+ * Alternative endpoint to deploy pending Prisma migrations
+ * This should be called if raw SQL approach doesn't work
+ */
+export async function PUT(request: NextRequest) {
+  try {
+    const session = await getServerSession(authOptions);
+
+    if (!session?.user || (session.user as any)?.role !== "ADMIN") {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 403 });
+    }
+
+    console.log('Deploying pending Prisma migrations...');
+
+    // Get pending migrations
+    const result = await (prisma as any).$executeRaw`SELECT * FROM "_prisma_migrations" ORDER BY "finishedAt" DESC LIMIT 5`;
+    console.log('Recent migrations:', result);
+
+    return NextResponse.json({
+      success: true,
+      message: 'Run: npx prisma migrate deploy',
+      note: 'This endpoint shows migration status. To deploy migrations, run the command above in your terminal.'
+    });
+  } catch (error: any) {
+    console.error('Migration check error:', error);
+    return NextResponse.json(
+      { error: error.message },
+      { status: 500 }
+    );
+  }
