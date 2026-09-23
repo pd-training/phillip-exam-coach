@@ -89,7 +89,7 @@ export default function FullExamMode() {
             console.log('=== EXAM PART STRUCTURE ===');
             partsWithQuestions.forEach((part: any, idx: number) => {
               console.log(`Part ${idx + 1}: "${part.partName}" (Chapters ${part.chapterStart}–${part.chapterEnd})`);
-              const chapters = [...new Set(part.questions?.map((q: any) => q.chapter) || [])].sort((a, b) => a - b);
+              const chapters = [...new Set(part.questions?.map((q: any) => q.chapter) || [])].sort((a, b) => Number(a) - Number(b));
               console.log(`  Questions: ${part.questionCount} | Actual chapters: [${chapters.join(', ')}]`);
               if (part.questions && part.questions.length > 0) {
                 console.log(`  Sample Qs: ${part.questions.slice(0, 3).map((q: any) => `Ch${q.chapter}`).join(', ')}`);
