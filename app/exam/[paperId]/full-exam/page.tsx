@@ -15,6 +15,7 @@ interface Question {
 }
 
 interface ExamConfig {
+  title: string;
   totalTime: number;
   passingScore: number;
 }
@@ -277,9 +278,12 @@ export default function FullExamMode() {
       <StudentNav />
 
       {/* Exam Header */}
-      <div className="bg-white border-b border-gray-200 px-6 py-4 sticky top-16 z-40">
+      <div className="fixed top-16 left-0 right-0 bg-white border-b border-gray-200 px-6 py-4 z-40">
         <div className="max-w-7xl mx-auto flex justify-between items-center">
-          <h1 className="text-xl font-bold text-gray-900">Full Exam Mode</h1>
+          <div>
+            <h1 className="text-xl font-bold text-gray-900">{examConfig?.title || "Full Exam Mode"}</h1>
+            <p className="text-sm text-gray-500 mt-1">Full Exam Mode</p>
+          </div>
           <div className="flex items-center gap-8">
             <div className="text-sm text-gray-600">
               Question <span className="font-semibold text-gray-900">{currentQIndex + 1}</span> of <span className="font-semibold text-gray-900">{questions.length}</span>
@@ -292,7 +296,7 @@ export default function FullExamMode() {
       </div>
 
       {/* Main Content & Sidebar */}
-      <div className="flex-1 overflow-hidden bg-white">
+      <div className="flex-1 overflow-hidden bg-white pt-24">
         <div className="max-w-7xl mx-auto px-6 h-full flex overflow-hidden">
           {/* Left Main Content */}
           <div className="flex-1 flex flex-col py-8 pr-6 overflow-y-auto">
@@ -514,20 +518,6 @@ export default function FullExamMode() {
 
           {/* Action Buttons */}
           <div style={{ marginTop: "auto", display: "flex", flexDirection: "column", gap: "10px" }}>
-            <button
-              style={{
-                padding: "12px",
-                backgroundColor: "#e5e7eb",
-                color: "#374151",
-                border: "none",
-                borderRadius: "6px",
-                cursor: "pointer",
-                fontWeight: "600",
-                fontSize: "14px",
-              }}
-            >
-              💾 Save Progress
-            </button>
             <button
               onClick={handleSubmit}
               disabled={submitting}

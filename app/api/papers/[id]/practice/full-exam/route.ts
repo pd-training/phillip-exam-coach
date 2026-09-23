@@ -17,6 +17,7 @@ export async function GET(
       where: { id: paperId },
       select: {
         id: true,
+        title: true,
         durationMinutes: true,
         passingScore: true,
         totalQuestions: true,
@@ -60,6 +61,7 @@ export async function GET(
     // Return in exam format
     return NextResponse.json({
       examConfig: {
+        title: paper.title,
         totalTime: paper.durationMinutes,
         passingScore: paper.passingScore,
         totalQuestions: paper.totalQuestions > 0 ? paper.totalQuestions : undefined,
