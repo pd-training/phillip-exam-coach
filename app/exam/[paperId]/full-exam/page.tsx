@@ -8,6 +8,10 @@ import StudentNav from "@/components/StudentNav";
 interface Question {
   id: string;
   text: string;
+  optionA: string;
+  optionB: string;
+  optionC: string;
+  optionD: string;
 }
 
 interface ExamConfig {
@@ -196,14 +200,24 @@ export default function FullExamMode() {
                   {answer.questionText}
                 </p>
               )}
-              <p style={{ margin: "0 0 8px 0", fontSize: "14px" }}>
-                Your answer: {answer.studentAnswer}
-              </p>
-              {!answer.isCorrect && (
-                <p style={{ margin: "0 0 8px 0", fontSize: "14px", color: "#059669" }}>
-                  Correct answer: {answer.correctAnswer}
+              <div style={{ margin: "0 0 12px 0", fontSize: "14px" }}>
+                <p style={{ margin: "0 0 6px 0" }}>
+                  Your answer: <strong>{answer.studentAnswer}.</strong> {
+                    answer.studentAnswer === "A" ? answer.optionA :
+                    answer.studentAnswer === "B" ? answer.optionB :
+                    answer.studentAnswer === "C" ? answer.optionC :
+                    answer.optionD
+                  }
                 </p>
-              )}
+                <p style={{ margin: "0", fontSize: "14px", color: "#059669" }}>
+                  Correct answer: <strong>{answer.correctAnswer}.</strong> {
+                    answer.correctAnswer === "A" ? answer.optionA :
+                    answer.correctAnswer === "B" ? answer.optionB :
+                    answer.correctAnswer === "C" ? answer.optionC :
+                    answer.optionD
+                  }
+                </p>
+              </div>
               {answer.explanation && (
                 <div style={{
                   marginTop: "12px",
@@ -302,18 +316,23 @@ export default function FullExamMode() {
 
             {/* Answer Options */}
             <div style={{ marginTop: "25px" }}>
-              {["A", "B", "C", "D"].map((option) => (
+              {[
+                { key: "A", text: currentQuestion.optionA },
+                { key: "B", text: currentQuestion.optionB },
+                { key: "C", text: currentQuestion.optionC },
+                { key: "D", text: currentQuestion.optionD },
+              ].map((option) => (
                 <label
-                  key={option}
+                  key={option.key}
                   style={{
                     display: "flex",
                     alignItems: "center",
                     padding: "15px",
                     marginBottom: "12px",
                     backgroundColor:
-                      answers[currentQuestion.id] === option ? "#dbeafe" : "white",
+                      answers[currentQuestion.id] === option.key ? "#dbeafe" : "white",
                     border:
-                      answers[currentQuestion.id] === option
+                      answers[currentQuestion.id] === option.key
                         ? "2px solid #3b82f6"
                         : "1px solid #e5e7eb",
                     borderRadius: "6px",
@@ -324,12 +343,15 @@ export default function FullExamMode() {
                   <input
                     type="radio"
                     name="answer"
-                    value={option}
-                    checked={answers[currentQuestion.id] === option}
-                    onChange={() => handleAnswerChange(option)}
+                    value={option.key}
+                    checked={answers[currentQuestion.id] === option.key}
+                    onChange={() => handleAnswerChange(option.key)}
                     style={{ marginRight: "12px", cursor: "pointer" }}
                   />
-                  <span style={{ fontWeight: "500", fontSize: "16px" }}>{option}</span>
+                  <div style={{ flex: 1 }}>
+                    <span style={{ fontWeight: "500", fontSize: "16px", marginRight: "8px" }}>{option.key}.</span>
+                    <span style={{ fontSize: "15px" }}>{option.text}</span>
+                  </div>
                 </label>
               ))}
             </div>

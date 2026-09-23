@@ -36,6 +36,10 @@ export async function GET(
         questionText: true,
         correctAnswer: true,
         explanation: true,
+        optionA: true,
+        optionB: true,
+        optionC: true,
+        optionD: true,
       },
       orderBy: { chapterNumber: 'asc' }
     });
@@ -64,6 +68,10 @@ export async function GET(
         id: q.id,
         text: q.questionText,
         chapter: q.chapterNumber,
+        optionA: q.optionA,
+        optionB: q.optionB,
+        optionC: q.optionC,
+        optionD: q.optionD,
       })),
       totalQuestions: selectedQuestions.length,
     });
@@ -123,6 +131,10 @@ export async function POST(
         questionText: true,
         correctAnswer: true,
         explanation: true,
+        optionA: true,
+        optionB: true,
+        optionC: true,
+        optionD: true,
       }
     });
 
@@ -155,6 +167,10 @@ export async function POST(
         correctAnswer: q.correctAnswer,
         isCorrect,
         explanation: q.explanation,
+        optionA: q.optionA,
+        optionB: q.optionB,
+        optionC: q.optionC,
+        optionD: q.optionD,
       });
     }
 
