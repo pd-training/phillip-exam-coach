@@ -178,84 +178,38 @@ export default function AttemptReviewPage() {
         </div>
       </div>
 
-      {/* Areas to Improve Section */}
+      {/* Summary & Feedback Section */}
       <div className="bg-white border-b border-gray-200">
         <div className="max-w-7xl mx-auto px-6 py-8">
-          <h2 className="text-2xl font-bold text-gray-900 mb-6">Areas to Improve</h2>
+          <h2 className="text-2xl font-bold text-gray-900 mb-6">Summary & Feedback</h2>
           
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-            {/* Strengths */}
-            <div>
-              <div className="flex items-center gap-2 mb-4">
-                <div className="w-5 h-5 rounded-full bg-green-500" />
-                <h3 className="text-lg font-semibold text-gray-900">Chapters You Excelled In</h3>
-              </div>
-              {strongChapters.length > 0 ? (
-                <div className="space-y-3">
-                  {strongChapters.map(ch => (
-                    <div key={ch.chapter} className="p-4 bg-green-50 rounded-lg border border-green-200">
-                      <div className="flex justify-between items-center mb-2">
-                        <p className="font-medium text-gray-900">Chapter {ch.chapter}</p>
-                        <span className="text-green-700 font-bold text-lg">{ch.percentage}%</span>
-                      </div>
-                      <div className="w-full bg-green-200 rounded-full h-2">
-                        <div 
-                          className="bg-green-600 h-2 rounded-full" 
-                          style={{ width: `${ch.percentage}%` }}
-                        />
-                      </div>
-                      <p className="text-sm text-gray-600 mt-2">{ch.correct} out of {ch.total} questions correct</p>
-                    </div>
-                  ))}
-                </div>
+          <div className="max-w-3xl">
+            {/* Performance Summary */}
+            <div className="p-6 bg-blue-50 rounded-lg border border-blue-200">
+              {weakChapters.length === 0 ? (
+                <>
+                  <h3 className="text-lg font-semibold text-gray-900 mb-3">🎉 Excellent Work!</h3>
+                  <p className="text-gray-700 leading-relaxed">
+                    You've demonstrated strong understanding across all chapters. Your score of <strong>{attempt.score}%</strong> shows solid mastery of the material. Keep up the excellent effort and continue practicing to maintain your high performance.
+                  </p>
+                </>
+              ) : strongChapters.length === 0 ? (
+                <>
+                  <h3 className="text-lg font-semibold text-gray-900 mb-3">📚 Keep Practicing</h3>
+                  <p className="text-gray-700 leading-relaxed mb-4">
+                    Your score of <strong>{attempt.score}%</strong> shows there's room for improvement. All chapters need more focus right now. Don't get discouraged—consistent practice and review of the explanations will help you improve. Start with the practice-by-chapter mode to strengthen your understanding.
+                  </p>
+                </>
               ) : (
-                <p className="text-gray-600 text-sm">No chapters with 80%+ accuracy yet. Keep practicing!</p>
+                <>
+                  <h3 className="text-lg font-semibold text-gray-900 mb-3">💪 Good Effort, More to Go</h3>
+                  <p className="text-gray-700 leading-relaxed mb-4">
+                    Your score of <strong>{attempt.score}%</strong> shows you have a solid foundation. You performed well in some areas, but chapters <strong>{weakChapters.map(c => c.chapter).join(', ')}</strong> need more attention. Focus your practice on these areas and review the explanations for questions you missed to improve.
+                  </p>
+                </>
               )}
+              <p className="text-sm text-blue-700 font-medium mt-4">💡 Tip: Use the practice-by-chapter mode to target weak areas and reinforce your strengths.</p>
             </div>
-
-            {/* Weaknesses */}
-            <div>
-              <div className="flex items-center gap-2 mb-4">
-                <div className="w-5 h-5 rounded-full bg-red-500" />
-                <h3 className="text-lg font-semibold text-gray-900">Chapters to Focus On</h3>
-              </div>
-              {weakChapters.length > 0 ? (
-                <div className="space-y-3">
-                  {weakChapters.map(ch => (
-                    <div key={ch.chapter} className="p-4 bg-red-50 rounded-lg border border-red-200">
-                      <div className="flex justify-between items-center mb-2">
-                        <p className="font-medium text-gray-900">Chapter {ch.chapter}</p>
-                        <span className="text-red-700 font-bold text-lg">{ch.percentage}%</span>
-                      </div>
-                      <div className="w-full bg-red-200 rounded-full h-2">
-                        <div 
-                          className="bg-red-600 h-2 rounded-full" 
-                          style={{ width: `${ch.percentage}%` }}
-                        />
-                      </div>
-                      <p className="text-sm text-gray-600 mt-2">{ch.correct} out of {ch.total} questions correct</p>
-                      <p className="text-sm text-red-700 font-medium mt-3">⚠️ Consider practicing this chapter more</p>
-                    </div>
-                  ))}
-                </div>
-              ) : (
-                <p className="text-gray-600 text-sm">Great work! You performed well across all chapters.</p>
-              )}
-            </div>
-          </div>
-
-          {/* Overall Recommendation */}
-          <div className="mt-8 p-6 bg-blue-50 rounded-lg border border-blue-200">
-            <h4 className="font-semibold text-gray-900 mb-2">📚 Recommended Next Steps</h4>
-            {weakChapters.length > 0 ? (
-              <p className="text-gray-700">
-                Focus on practicing Chapter{weakChapters.length > 1 ? 's' : ''} <strong>{weakChapters.map(c => c.chapter).join(', ')}</strong> where you scored below 60%. Review the explanations and try similar questions from the practice mode.
-              </p>
-            ) : (
-              <p className="text-gray-700">
-                Excellent performance! You've mastered the content. Consider reviewing the explanations for the questions you missed to strengthen your understanding even further.
-              </p>
-            )}
           </div>
         </div>
       </div>
