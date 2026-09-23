@@ -158,39 +158,41 @@ export default function PracticeChapterMode() {
         </div>
 
         {/* Chapters List */}
-        <div className="max-w-5xl mx-auto px-6 py-12 flex-1 w-full">
-          <div className="space-y-3">
-            {chapters.map((ch) => (
-              <button
-                key={ch.number}
-                onClick={() => handleSelectChapter(ch.number)}
-                className="w-full bg-white rounded-lg px-6 py-5 border border-gray-200 hover:border-blue-500 hover:bg-blue-50 transition duration-200 text-left flex items-center justify-between group"
-              >
-                <div className="flex items-center gap-4 flex-1">
-                  <div className="w-10 h-10 bg-gray-100 rounded flex items-center justify-center group-hover:bg-blue-600 group-hover:text-white transition font-semibold text-gray-900">
-                    {ch.number}
-                  </div>
-                  <div className="flex-1">
-                    <h3 className="font-semibold text-gray-900 group-hover:text-blue-600 transition">
-                      {ch.title}
-                    </h3>
-                  </div>
-                </div>
-                <svg
-                  className="w-5 h-5 text-gray-400 group-hover:text-blue-600 transition flex-shrink-0"
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
+        <div className="bg-white flex-1 w-full">
+          <div className="max-w-5xl mx-auto px-6 py-12">
+            <div className="space-y-3">
+              {chapters.map((ch) => (
+                <button
+                  key={ch.number}
+                  onClick={() => handleSelectChapter(ch.number)}
+                  className="w-full bg-gray-50 rounded-lg px-6 py-6 border border-gray-200 hover:border-blue-500 hover:bg-blue-50 transition duration-200 text-left flex items-center justify-between group"
                 >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M9 5l7 7-7 7"
-                  />
-                </svg>
-              </button>
-            ))}
+                  <div className="flex items-center gap-4 flex-1">
+                    <div className="w-12 h-12 bg-blue-600 text-white rounded-lg flex items-center justify-center group-hover:bg-blue-700 transition font-semibold text-lg">
+                      {ch.number}
+                    </div>
+                    <div className="flex-1">
+                      <h3 className="font-semibold text-gray-900 group-hover:text-blue-600 transition text-lg">
+                        {ch.title}
+                      </h3>
+                    </div>
+                  </div>
+                  <svg
+                    className="w-5 h-5 text-gray-400 group-hover:text-blue-600 transition flex-shrink-0 ml-4"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M9 5l7 7-7 7"
+                    />
+                  </svg>
+                </button>
+              ))}
+            </div>
           </div>
         </div>
       </div>
