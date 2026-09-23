@@ -19,6 +19,12 @@ export async function POST(request: NextRequest) {
     const addColumnsSQL = `
       DO $$ BEGIN
         BEGIN
+          ALTER TABLE "Question" ADD COLUMN "optionA" TEXT NOT NULL DEFAULT '';
+          RAISE NOTICE 'Added column optionA';
+        EXCEPTION WHEN duplicate_column THEN
+          RAISE NOTICE 'Column optionA already exists';
+        END;
+        BEGIN
           ALTER TABLE "Question" ADD COLUMN "optionB" TEXT NOT NULL DEFAULT '';
           RAISE NOTICE 'Added column optionB';
         EXCEPTION WHEN duplicate_column THEN
