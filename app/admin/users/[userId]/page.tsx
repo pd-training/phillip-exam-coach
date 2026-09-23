@@ -140,14 +140,15 @@ export default function UserDetailPage() {
 
   return (
     <div style={{ minHeight: "100vh", backgroundColor: "#f9fafb" }}>
-      {/* Header */}
-      <div style={{
-        backgroundColor: "white",
-        borderBottom: "1px solid #e5e7eb",
-        padding: "20px",
-        display: "flex",
-        justifyContent: "space-between",
-        alignItems: "center",
+      <div style={{ maxWidth: "88rem", margin: "0 auto", paddingLeft: "24px", paddingRight: "24px" }}>
+        {/* Header */}
+        <div style={{
+          backgroundColor: "white",
+          borderBottom: "1px solid #e5e7eb",
+          padding: "20px 0",
+          display: "flex",
+          justifyContent: "space-between",
+          alignItems: "center",
       }}>
         <Link href="/admin/users">
           <a style={{ color: "#3b82f6", fontSize: "14px", textDecoration: "none", fontWeight: "500" }}>

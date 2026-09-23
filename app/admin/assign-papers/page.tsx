@@ -105,7 +105,7 @@ export default function AssignPapersPage() {
         <h1 className="text-4xl font-bold text-gray-900 mb-2">Assign Papers</h1>
         <p className="text-gray-600 mb-8">Grant students access to exam papers</p>
         
-        <div className="bg-white rounded-2xl border border-gray-200 p-8 max-w-2xl">
+        <div className="bg-white rounded-2xl border border-gray-200 p-8">
           <div className="mb-6">
             <label className="block text-sm font-semibold text-gray-900 mb-2">
               Student:

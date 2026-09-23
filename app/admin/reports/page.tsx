@@ -19,24 +19,19 @@ export default function Reports() {
   }
 
   return (
-    <div style={{ maxWidth: "1200px", margin: "0 auto", padding: "20px" }}>
-      <h1 style={{ margin: "0 0 8px 0" }}>📊 Reports & Analytics</h1>
-      <p style={{ color: "#666", margin: "0 0 30px 0" }}>View exam statistics and performance data</p>
+    <div className="min-h-screen bg-gray-50">
+      <div className="max-w-7xl mx-auto px-6 py-12">
+        <h1 className="text-4xl font-bold text-gray-900 mb-2">📊 Reports & Analytics</h1>
+        <p className="text-gray-600 mb-8 text-sm">View exam statistics and performance data</p>
 
-      <div style={{
-        backgroundColor: "white",
-        padding: "40px",
-        borderRadius: "12px",
-        border: "1px solid #e5e7eb",
-        textAlign: "center",
-        color: "#666",
-      }}>
-        <p style={{ margin: "0", fontSize: "16px" }}>
-          📈 Reports coming soon...
-        </p>
-        <p style={{ margin: "10px 0 0 0", fontSize: "14px" }}>
-          Analytics dashboard will show exam performance, pass rates, and student progress.
-        </p>
+        <div className="bg-white rounded-lg border border-gray-200 p-10 text-center text-gray-600">
+          <p className="text-base m-0">
+            📈 Reports coming soon...
+          </p>
+          <p className="text-sm mt-2">
+            Analytics dashboard will show exam performance, pass rates, and student progress.
+          </p>
+        </div>
       </div>
     </div>
   );

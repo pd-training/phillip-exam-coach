@@ -79,7 +79,7 @@ export default function AllAttemptsPage() {
       </div>
 
       {/* Main Content */}
-      <div className="max-w-4xl mx-auto px-6 py-12 flex-1 w-full">
+      <div className="max-w-7xl mx-auto px-6 py-12 flex-1 w-full">
         {attempts.length === 0 ? (
           <div className="bg-white rounded-xl p-12 border border-gray-200 text-center">
             <div className="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
