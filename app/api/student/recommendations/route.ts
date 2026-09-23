@@ -61,6 +61,7 @@ export async function GET(request: Request) {
 
     // Build recommendations from underperforming papers
     const recommendations = [];
+    const seenChapters = new Set<string>(); // Track unique chapters (paperId + chapterNumber)
 
     for (const paper of underperformingPapers.slice(0, 3)) {
       console.log("Processing paper:", paper.paperId, paper.paperTitle);
@@ -74,7 +75,7 @@ export async function GET(request: Request) {
 
         console.log("Found chapters:", chapters.length);
 
-        // Suggest 3-5 chapters from papers where they underperformed
+        // Suggest chapters from papers where they underperformed
         const suggestedChapters = chapters.length > 0 
           ? [
               chapters[0], // First chapter
@@ -84,7 +85,12 @@ export async function GET(request: Request) {
           : [];
 
         for (const chapter of suggestedChapters) {
-          if (recommendations.length < 5) {
+          // Check if we've already recommended this chapter
+          const chapterKey = `${paper.paperId}-${chapter.number}`;
+          
+          if (recommendations.length < 3 && !seenChapters.has(chapterKey)) {
+            seenChapters.add(chapterKey);
+            
             // Calculate weakness score (inverse of their paper score)
             const weaknessScore = 100 - paper.score;
             
@@ -111,7 +117,7 @@ export async function GET(request: Request) {
     console.log("Generated recommendations:", recommendations.length);
 
     return Response.json({ 
-      recommendations: recommendations.slice(0, 5),
+      recommendations: recommendations.slice(0, 3),
       averageScore: avgScore,
       totalAttempts: attempts.length,
     });
