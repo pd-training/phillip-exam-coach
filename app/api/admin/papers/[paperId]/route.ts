@@ -60,6 +60,15 @@ async function updatePaper(paperId: string, body: any) {
     const paper = await (prisma as any).paper.update({
       where: { id: paperId },
       data: updateData,
+      select: {
+        id: true,
+        title: true,
+        durationMinutes: true,
+        totalQuestions: true,
+        passingScore: true,
+        isAvailable: true,
+        // description intentionally excluded
+      }
     });
     return { error: null, status: 200, paper };
   } catch (updateError: any) {

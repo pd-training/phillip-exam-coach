@@ -99,16 +99,26 @@ export async function PUT(
     // Verify paper exists
     const existingPaper = await (prisma as any).paper.findUnique({
       where: { id: paperId },
+      select: {
+        id: true,
+        title: true,
+        isAvailable: true,
+      }
     });
 
     if (!existingPaper) {
       return Response.json({ error: "Paper not found" }, { status: 404 });
     }
 
-    // Update isAvailable field
+    // Update isAvailable field - select only safe fields
     const paper = await (prisma as any).paper.update({
       where: { id: paperId },
-      data: { isAvailable: isAvailable }
+      data: { isAvailable: isAvailable },
+      select: {
+        id: true,
+        title: true,
+        isAvailable: true,
+      }
     });
 
     console.log('Paper availability updated:', paper.id, 'to', paper.isAvailable);
@@ -158,16 +168,26 @@ export async function PATCH(
     // Verify paper exists
     const existingPaper = await (prisma as any).paper.findUnique({
       where: { id: paperId },
+      select: {
+        id: true,
+        title: true,
+        isAvailable: true,
+      }
     });
 
     if (!existingPaper) {
       return Response.json({ error: "Paper not found" }, { status: 404 });
     }
 
-    // Update isAvailable field
+    // Update isAvailable field - select only safe fields
     const paper = await (prisma as any).paper.update({
       where: { id: paperId },
-      data: { isAvailable: isAvailable }
+      data: { isAvailable: isAvailable },
+      select: {
+        id: true,
+        title: true,
+        isAvailable: true,
+      }
     });
 
     console.log('Paper availability updated:', paper.id, 'to', paper.isAvailable);
