@@ -18,6 +18,7 @@ export async function GET(request: Request) {
         ea.userid,
         ea.paperid,
         ea.score,
+        ea.passed,
         ea.startedat,
         ea.submittedat,
         u.name as student_name,
@@ -29,7 +30,15 @@ export async function GET(request: Request) {
       LIMIT 10
     ` as any[];
 
-    return Response.json({ attempts });
+    // Add timeTaken calculation to each attempt
+    const attemptsWithTime = attempts.map(attempt => ({
+      ...attempt,
+      timeTaken: Math.round(
+        (new Date(attempt.submittedat).getTime() - new Date(attempt.startedat).getTime()) / 1000
+      ),
+    }));
+
+    return Response.json({ attempts: attemptsWithTime });
   } catch (error: any) {
     console.error("Recent attempts error:", error);
     return Response.json(

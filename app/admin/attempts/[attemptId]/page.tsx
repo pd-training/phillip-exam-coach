@@ -32,6 +32,7 @@ interface AttemptDetail {
   paper_name: string;
   totalQuestions: number;
   passingScore: number;
+  timeTaken?: number;
 }
 
 export default function AttemptDetailsPage() {
@@ -107,9 +108,11 @@ export default function AttemptDetailsPage() {
   }
 
   const currentQuestion = questions[currentQIndex];
-  const timeTaken = Math.round(
-    (new Date(attempt.submittedat).getTime() - new Date(attempt.startedat).getTime()) / 60000
-  );
+  const timeTaken = attempt?.timeTaken 
+    ? Math.round(attempt.timeTaken / 60)  // Convert seconds to minutes
+    : Math.round(
+        (new Date(attempt?.submittedat || 0).getTime() - new Date(attempt?.startedat || 0).getTime()) / 60000
+      );
   const correctCount = questions.filter(q => q.isCorrect).length;
 
   return (

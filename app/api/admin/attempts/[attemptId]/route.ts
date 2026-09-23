@@ -22,26 +22,56 @@ export async function GET(
 
     console.log("Fetching attempt with ID:", attemptId);
 
-    // Get attempt details
-    const attemptRes = await prisma.$queryRaw`
-      SELECT 
-        ea.id,
-        ea.userid,
-        ea.paperid,
-        ea.score,
-        ea.passed,
-        ea.startedat,
-        ea.submittedat,
-        u.name as student_name,
-        u.email as student_email,
-        p.title as paper_name,
-        p."totalQuestions",
-        p."passingScore"
-      FROM examattempt ea
-      JOIN "User" u ON ea.userid = u.id
-      JOIN "Paper" p ON ea.paperid = p.id
-      WHERE ea.id = ${attemptId}
-    ` as any[];
+    // Get attempt details - try with answers column first
+    let attemptRes: any[] = [];
+    try {
+      attemptRes = await prisma.$queryRaw`
+        SELECT 
+          ea.id,
+          ea.userid,
+          ea.paperid,
+          ea.score,
+          ea.passed,
+          ea.startedat,
+          ea.submittedat,
+          ea.answers,
+          u.name as student_name,
+          u.email as student_email,
+          p.title as paper_name,
+          p."totalQuestions",
+          p."passingScore"
+        FROM examattempt ea
+        JOIN "User" u ON ea.userid = u.id
+        JOIN "Paper" p ON ea.paperid = p.id
+        WHERE ea.id = ${attemptId}
+      ` as any[];
+    } catch (err: any) {
+      // If answers column doesn't exist, fetch without it
+      if (err.message && err.message.includes('column') && err.message.includes('answers')) {
+        console.log('⚠️ answers column does not exist yet, fetching without it');
+        attemptRes = await prisma.$queryRaw`
+          SELECT 
+            ea.id,
+            ea.userid,
+            ea.paperid,
+            ea.score,
+            ea.passed,
+            ea.startedat,
+            ea.submittedat,
+            u.name as student_name,
+            u.email as student_email,
+            p.title as paper_name,
+            p."totalQuestions",
+            p."passingScore"
+          FROM examattempt ea
+          JOIN "User" u ON ea.userid = u.id
+          JOIN "Paper" p ON ea.paperid = p.id
+          WHERE ea.id = ${attemptId}
+        ` as any[];
+      } else {
+        throw err;
+      }
+    }
 
     console.log("Attempt query result:", attemptRes);
 
@@ -99,31 +129,33 @@ export async function GET(
       console.warn("WARNING: No questions found for paper", attempt.paperid);
     }
 
-    // Get student answers if stored (check if answers table exists)
-    let studentAnswers: any = {};
-    try {
-      const studentAnswersRes = await prisma.$queryRaw`
-        SELECT 
-          "questionId",
-          "selectedAnswer"
-        FROM "StudentAnswer"
-        WHERE "attemptId" = ${attemptId}
-      ` as any[];
-
-      console.log("StudentAnswers query returned:", studentAnswersRes?.length, "answers");
-
-      studentAnswersRes.forEach((ans: any) => {
-        studentAnswers[ans.questionId] = ans.selectedAnswer;
-      });
-    } catch (e: any) {
-      // Table might not exist, continue without it
-      console.log("StudentAnswer table query failed (table may not exist):", e.message);
+    // Get student answers from examattempt.answers (JSONB column)
+    let studentAnswers: Record<string, string> = {};
+    if (attempt.answers) {
+      try {
+        studentAnswers = typeof attempt.answers === 'string' 
+          ? JSON.parse(attempt.answers)
+          : attempt.answers;
+        console.log("✅ Loaded student answers from examattempt.answers:", Object.keys(studentAnswers).length, "questions answered");
+      } catch (e: any) {
+        console.log("⚠️ Could not parse answers from examattempt:", e.message);
+      }
+    } else {
+      console.log("⚠️ No answers found in examattempt table - add answers column: GET /api/admin/add-answers-column");
     }
 
-    console.log("Returning attempt details with", answersRes.length, "questions");
+    // Calculate time taken
+    const timeTaken = Math.round(
+      (new Date(attempt.submittedat).getTime() - new Date(attempt.startedat).getTime()) / 1000
+    );
+
+    console.log("Returning attempt details with", answersRes.length, "questions, time taken:", timeTaken, "seconds");
     
     return Response.json({
-      attempt,
+      attempt: {
+        ...attempt,
+        timeTaken, // Add time taken in seconds
+      },
       questions: answersRes.map((q: any) => ({
         ...q,
         studentAnswer: studentAnswers[q.id] || null,
