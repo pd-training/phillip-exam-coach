@@ -158,13 +158,13 @@ export default function PracticeChapterMode() {
         </div>
 
         {/* Chapters List */}
-        <div className="max-w-5xl mx-auto px-6 py-12 flex-1">
-          <div className="space-y-2">
+        <div className="max-w-5xl mx-auto px-6 py-12 flex-1 w-full">
+          <div className="space-y-3">
             {chapters.map((ch) => (
               <button
                 key={ch.number}
                 onClick={() => handleSelectChapter(ch.number)}
-                className="w-full bg-white rounded-lg p-4 border border-gray-200 hover:border-blue-500 hover:bg-blue-50 transition duration-200 text-left flex items-center justify-between group"
+                className="w-full bg-white rounded-lg px-6 py-5 border border-gray-200 hover:border-blue-500 hover:bg-blue-50 transition duration-200 text-left flex items-center justify-between group"
               >
                 <div className="flex items-center gap-4 flex-1">
                   <div className="w-10 h-10 bg-gray-100 rounded flex items-center justify-center group-hover:bg-blue-600 group-hover:text-white transition font-semibold text-gray-900">
