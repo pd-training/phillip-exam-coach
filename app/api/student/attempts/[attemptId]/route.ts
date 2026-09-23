@@ -67,7 +67,11 @@ export async function GET(
           q."questionText",
           q."correctAnswer",
           q."explanation",
-          q."chapterNumber"
+          q."chapterNumber",
+          q."optionA",
+          q."optionB",
+          q."optionC",
+          q."optionD"
         FROM "Question" q
         WHERE q."paperId"::text = ${attempt.paperid}::text
         ORDER BY q.id ASC
@@ -141,6 +145,7 @@ export async function GET(
         paper_name: attempt.paper_name,
         totalQuestions: attempt.totalQuestions,
         passingScore: attempt.passingScore,
+        timeTaken: Math.round((new Date(attempt.submittedat).getTime() - new Date(attempt.startedat).getTime()) / 1000),
       },
       questions: questionsWithAnswers,
     });

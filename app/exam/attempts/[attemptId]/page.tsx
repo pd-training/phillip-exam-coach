@@ -33,6 +33,7 @@ interface AttemptDetail {
   paper_name: string;
   totalQuestions: number;
   passingScore: number;
+  timeTaken?: number;
 }
 
 export default function AttemptReviewPage() {

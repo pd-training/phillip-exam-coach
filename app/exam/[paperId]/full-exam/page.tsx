@@ -121,12 +121,16 @@ export default function FullExamMode() {
   const handleSubmit = async () => {
     setSubmitting(true);
     try {
+      // Calculate time taken (in seconds)
+      const timeTaken = (examConfig?.totalTime || 0) * 60 - timeLeft;
+      
       const res = await fetch(`/api/papers/${paperId}/practice/full-exam`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           userId: (session?.user as any)?.id,
           answers,
+          timeTaken,
         }),
       });
 

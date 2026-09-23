@@ -98,10 +98,10 @@ export async function POST(
       return NextResponse.json({ error: 'Invalid JSON' }, { status: 400 });
     }
 
-    const { userId, answers } = body; // answers = { [questionId]: 'A' }
+    const { userId, answers, timeTaken } = body; // answers = { [questionId]: 'A' }, timeTaken in seconds
     const paperId = params.id;
 
-    console.log('Submitting exam - userId:', userId, 'paperId:', paperId, 'answers:', Object.keys(answers || {}).length);
+    console.log('Submitting exam - userId:', userId, 'paperId:', paperId, 'answers:', Object.keys(answers || {}).length, 'timeTaken:', timeTaken);
 
     if (!userId || !answers || Object.keys(answers).length === 0) {
       return NextResponse.json(
@@ -186,16 +186,19 @@ export async function POST(
     // Save exam attempt using raw SQL (examattempt is lowercase)
     let attemptId = '';
     try {
-      console.log('Saving attempt - userId:', userId, 'paperId:', paperId, 'score:', score);
+      console.log('Saving attempt - userId:', userId, 'paperId:', paperId, 'score:', score, 'timeTaken:', timeTaken);
       attemptId = crypto.randomUUID();
+      const now = new Date();
+      const startTime = new Date(now.getTime() - (timeTaken || 0) * 1000); // Subtract timeTaken seconds
+      
       await prisma.$queryRaw`
         INSERT INTO examattempt (id, paperid, userid, startedat, submittedat, score, passed, createdat)
         VALUES (
           ${attemptId},
           ${paperId}::uuid,
           ${userId},
-          NOW(),
-          NOW(),
+          ${startTime},
+          ${now},
           ${score},
           ${passed},
           NOW()
