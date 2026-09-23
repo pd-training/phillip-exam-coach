@@ -378,7 +378,7 @@ export default function FullExamMode() {
             <h1 className="text-xl font-bold text-gray-900">{examConfig?.title || "Full Exam Mode"}</h1>
             <p className="text-sm text-gray-500 mt-1">
               {currentPart 
-                ? `${currentPart.partName} (Q${currentPart.questionInPart}/${currentPart.totalInPart})`
+                ? `${currentPart.partName} (Q${currentPart.questionInPart}/${currentPart.totalInPart}) – Chapters ${currentPart.chapterStart}–${currentPart.chapterEnd}`
                 : "Full Exam Mode"
               }
             </p>
@@ -555,6 +555,11 @@ export default function FullExamMode() {
                 {currentPart.partName}
               </div>
               <div style={{ fontSize: "12px", color: "#0c4a6e", lineHeight: "1.6" }}>
+                {currentPart.chapterStart && currentPart.chapterEnd && (
+                  <div style={{ marginBottom: "4px", padding: "6px", backgroundColor: "#dbeafe", borderRadius: "4px", fontWeight: "500" }}>
+                    Chapters {currentPart.chapterStart}–{currentPart.chapterEnd}
+                  </div>
+                )}
                 <div>Progress: Q{currentPart.questionInPart}/{currentPart.totalInPart}</div>
                 <div>Passing: {currentPart.passingScore}%</div>
               </div>

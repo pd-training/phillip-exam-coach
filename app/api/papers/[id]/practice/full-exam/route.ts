@@ -62,6 +62,14 @@ export async function GET(
 
     console.log('Found total questions in bank:', allQuestions.length, 'Paper configured for:', paper.totalQuestions);
     console.log('Exam parts found:', examParts.length);
+    
+    // Log part configuration
+    if (examParts.length > 0) {
+      console.log('Part configurations:');
+      examParts.forEach((part, idx) => {
+        console.log(`  Part ${idx + 1}: ${part.partName} - Chapters ${part.chapterStart}-${part.chapterEnd}, ${part.questionCount} questions, passing score ${part.passingScore}%`);
+      });
+    }
 
     let selectedQuestions: any[] = [];
     let questionsByPart: any[] = [];
@@ -76,11 +84,16 @@ export async function GET(
           q => q.chapterNumber >= part.chapterStart && q.chapterNumber <= part.chapterEnd
         );
 
+        // Get unique chapters in this part's questions
+        const chaptersInPart = [...new Set(questionsInPartRange.map(q => q.chapterNumber))].sort((a, b) => a - b);
+
         // Randomly select the configured number of questions for this part
         const numToSelect = Math.min(part.questionCount, questionsInPartRange.length);
         const partQuestions = questionsInPartRange
           .sort(() => Math.random() - 0.5)
           .slice(0, numToSelect);
+
+        console.log(`Part "${part.partName}": Expected chapters ${part.chapterStart}-${part.chapterEnd}, found chapters [${chaptersInPart.join(', ')}], selecting ${numToSelect} from ${questionsInPartRange.length} available`);
 
         selectedQuestions.push(...partQuestions);
         
@@ -88,6 +101,8 @@ export async function GET(
           part: part.partName,
           partId: part.id,
           passingScore: part.passingScore,
+          chapterStart: part.chapterStart,
+          chapterEnd: part.chapterEnd,
           questions: partQuestions.map((q: any) => ({
             id: q.id,
             text: q.questionText,
@@ -133,7 +148,15 @@ export async function GET(
         optionD: q.optionD,
       })),
       questionsByPart: questionsByPart,
-      parts: examParts,
+      parts: examParts.map((part: any) => ({
+        id: part.id,
+        partName: part.partName,
+        chapterStart: part.chapterStart,
+        chapterEnd: part.chapterEnd,
+        questionCount: part.questionCount,
+        passingScore: part.passingScore,
+        orderIndex: part.orderIndex,
+      })),
       totalQuestions: selectedQuestions.length,
     });
   } catch (error: any) {
