@@ -78,11 +78,23 @@ export default function FullExamMode() {
               partName: part.part,
               partId: part.partId,
               passingScore: part.passingScore,
+              chapterStart: part.chapterStart,
+              chapterEnd: part.chapterEnd,
               questions: part.questions,
               questionCount: part.questions?.length || 0,
             }));
             setParts(partsWithQuestions);
-            console.log('Exam parts loaded:', partsWithQuestions);
+            
+            // Log part structure and questions for debugging
+            console.log('=== EXAM PART STRUCTURE ===');
+            partsWithQuestions.forEach((part: any, idx: number) => {
+              console.log(`Part ${idx + 1}: "${part.partName}" (Chapters ${part.chapterStart}–${part.chapterEnd})`);
+              const chapters = [...new Set(part.questions?.map((q: any) => q.chapter) || [])].sort((a, b) => a - b);
+              console.log(`  Questions: ${part.questionCount} | Actual chapters: [${chapters.join(', ')}]`);
+              if (part.questions && part.questions.length > 0) {
+                console.log(`  Sample Qs: ${part.questions.slice(0, 3).map((q: any) => `Ch${q.chapter}`).join(', ')}`);
+              }
+            });
           }
         } else {
           alert('No questions found for this exam');
@@ -378,7 +390,7 @@ export default function FullExamMode() {
             <h1 className="text-xl font-bold text-gray-900">{examConfig?.title || "Full Exam Mode"}</h1>
             <p className="text-sm text-gray-500 mt-1">
               {currentPart 
-                ? `${currentPart.partName} (Q${currentPart.questionInPart}/${currentPart.totalInPart}) – Chapters ${currentPart.chapterStart}–${currentPart.chapterEnd}`
+                ? `${currentPart.partName} (Q${currentPart.questionInPart}/${currentPart.totalInPart})`
                 : "Full Exam Mode"
               }
             </p>
@@ -555,11 +567,6 @@ export default function FullExamMode() {
                 {currentPart.partName}
               </div>
               <div style={{ fontSize: "12px", color: "#0c4a6e", lineHeight: "1.6" }}>
-                {currentPart.chapterStart && currentPart.chapterEnd && (
-                  <div style={{ marginBottom: "4px", padding: "6px", backgroundColor: "#dbeafe", borderRadius: "4px", fontWeight: "500" }}>
-                    Chapters {currentPart.chapterStart}–{currentPart.chapterEnd}
-                  </div>
-                )}
                 <div>Progress: Q{currentPart.questionInPart}/{currentPart.totalInPart}</div>
                 <div>Passing: {currentPart.passingScore}%</div>
               </div>

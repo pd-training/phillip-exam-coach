@@ -116,6 +116,22 @@ export async function GET(
       }
       
       console.log('Selected questions for exam with parts:', selectedQuestions.length);
+      
+      // Validate: log any questions that don't match their part's chapter range
+      console.log('=== VALIDATION: Checking question-part chapter alignment ===');
+      for (let i = 0; i < questionsByPart.length; i++) {
+        const part = examParts[i];
+        const partData = questionsByPart[i];
+        const misaligned = partData.questions.filter((q: any) => 
+          q.chapter < part.chapterStart || q.chapter > part.chapterEnd
+        );
+        if (misaligned.length > 0) {
+          console.error(`❌ Part "${part.partName}" has ${misaligned.length} questions outside range ${part.chapterStart}-${part.chapterEnd}:`, 
+            misaligned.map((q: any) => `Ch${q.chapter}`));
+        } else {
+          console.log(`✓ Part "${part.partName}" (Ch${part.chapterStart}-${part.chapterEnd}): All ${partData.questions.length} questions correctly aligned`);
+        }
+      }
     } else {
       // No parts defined - use standard selection
       console.log('No exam parts defined, using standard selection');
