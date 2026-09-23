@@ -181,7 +181,7 @@ export default function AttemptReviewPage() {
       {/* Summary & Feedback Section */}
       <div className="bg-white border-b border-gray-200">
         <div className="max-w-7xl mx-auto px-6 py-8">
-          <h2 className="text-2xl font-bold text-gray-900 mb-6">Summary & Feedback</h2>
+          <h2 className="text-2xl font-bold text-gray-900 mb-6">Attempt Summary</h2>
           
           <div className="max-w-3xl">
             {/* Performance Summary */}
@@ -215,11 +215,12 @@ export default function AttemptReviewPage() {
       </div>
 
       {/* Main Content */}
-      <div className="flex flex-1 overflow-hidden" style={{ height: 'calc(100vh - 200px)' }}>
-        {/* Left Content - Question */}
-        <div className="flex-1 overflow-y-auto p-8 bg-white">
-          {currentQuestion ? (
-            <div className="max-w-3xl">
+      <div className="flex-1 overflow-hidden bg-white">
+        <div className="max-w-7xl mx-auto px-6 h-full flex overflow-hidden">
+          {/* Left Content - Question */}
+          <div className="flex-1 overflow-y-auto py-8 pr-6">
+            {currentQuestion ? (
+              <div className="max-w-2xl">
               {/* Question Header */}
               <div className="mb-8">
                 <div className="flex items-center gap-3 mb-4">
@@ -307,7 +308,7 @@ export default function AttemptReviewPage() {
         </div>
 
         {/* Right Sidebar - Navigation */}
-        <div className="w-80 bg-white border-l border-gray-200 overflow-y-auto flex flex-col">
+        <div className="w-72 bg-gray-50 border-l border-gray-200 overflow-y-auto flex flex-col flex-shrink-0">
           {/* Performance Summary */}
           <div className="p-6 border-b border-gray-200">
             <p className="text-sm font-semibold text-gray-600 mb-2">PERFORMANCE</p>
