@@ -40,6 +40,7 @@ export async function PATCH(
     // Verify paper exists
     const paper = await (prisma as any).paper.findUnique({
       where: { id: paperId },
+      select: { id: true }
     });
 
     if (!paper) {
@@ -53,7 +54,8 @@ export async function PATCH(
           number: chapterNumber,
         }
       },
-      data: { title: title.trim() }
+      data: { title: title.trim() },
+      select: { id: true, number: true, title: true }
     });
 
     console.log('Chapter updated successfully:', chapter.id);
@@ -63,7 +65,9 @@ export async function PATCH(
       message: "Chapter updated successfully"
     });
   } catch (error: any) {
-    console.error('Update chapter error:', error);
+    console.error('Update chapter error:', error.message);
+    console.error('Error code:', error.code);
+    console.error('Error meta:', error.meta);
     
     if (error.code === 'P2025') {
       return NextResponse.json(
@@ -74,7 +78,7 @@ export async function PATCH(
 
     const errorMessage = error.message || 'Failed to update chapter';
     return NextResponse.json(
-      { error: errorMessage },
+      { error: errorMessage, code: error.code },
       { status: 500 }
     );
   }
