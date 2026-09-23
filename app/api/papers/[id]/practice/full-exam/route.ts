@@ -171,7 +171,7 @@ export async function POST(
       );
     }
 
-    // Get paper config to know totalQuestions
+    // Get paper config and exam parts
     const paper = await (prisma as any).paper.findUnique({
       where: { id: paperId },
       select: { 
@@ -184,11 +184,27 @@ export async function POST(
       return NextResponse.json({ error: 'Paper not found' }, { status: 404 });
     }
 
-    // Get all questions to check answers
+    // Fetch exam parts if they exist
+    const examParts = await (prisma as any).examPart.findMany({
+      where: { paperId: paperId },
+      orderBy: { orderIndex: 'asc' },
+      select: {
+        id: true,
+        partName: true,
+        chapterStart: true,
+        chapterEnd: true,
+        questionCount: true,
+        passingScore: true,
+        orderIndex: true,
+      }
+    });
+
+    // Get all questions with chapter info to check answers
     const allQuestions = await (prisma as any).question.findMany({
       where: { paperId: paperId },
       select: {
         id: true,
+        chapterNumber: true,
         questionText: true,
         correctAnswer: true,
         explanation: true,
@@ -235,14 +251,62 @@ export async function POST(
       });
     }
 
+    // Calculate part-wise scores if parts exist
+    let partScores: any[] = [];
+    if (examParts && examParts.length > 0) {
+      console.log('Calculating scores for', examParts.length, 'parts');
+      for (const part of examParts) {
+        // Get questions in this part's chapter range
+        const partQuestions = answeredQuestions.filter(
+          q => q.chapterNumber >= part.chapterStart && q.chapterNumber <= part.chapterEnd
+        );
+
+        // Calculate correct count for this part
+        let partCorrectCount = 0;
+        for (const q of partQuestions) {
+          const studentAnswer = answers[q.id];
+          if (studentAnswer === q.correctAnswer) {
+            partCorrectCount++;
+          }
+        }
+
+        const partScore = partQuestions.length > 0 
+          ? Math.round((partCorrectCount / partQuestions.length) * 100)
+          : 0;
+        const partPassed = partScore >= part.passingScore;
+
+        partScores.push({
+          partName: part.partName,
+          partId: part.partId || part.id,
+          score: partScore,
+          passed: partPassed,
+          passingScore: part.passingScore,
+          correct: partCorrectCount,
+          total: partQuestions.length,
+        });
+
+        console.log(`Part ${part.partName}: ${partCorrectCount}/${partQuestions.length} = ${partScore}%`);
+      }
+    }
+
     // Score is based on the number of questions answered (limited by paper's totalQuestions setting)
     const numAnswered = answeredQuestions.length;
     const totalQuestions = Math.min(numAnswered, paper.totalQuestions || numAnswered);
     const score = totalQuestions > 0 ? Math.round((correctCount / totalQuestions) * 100) : 0;
     const passingScore = paper.passingScore || 75;
-    const passed = score >= passingScore;
+    
+    // If parts exist, overall pass is based on passing all parts. Otherwise use overall score.
+    let passed = false;
+    if (examParts && examParts.length > 0) {
+      // Must pass ALL parts
+      passed = partScores.length > 0 && partScores.every(p => p.passed);
+      console.log('Part-based passing:', passed, 'All parts passed:', partScores.every(p => p.passed));
+    } else {
+      // Use overall score
+      passed = score >= passingScore;
+    }
 
-    console.log('Exam result - score:', score, 'passed:', passed);
+    console.log('Exam result - overall score:', score, 'passed:', passed);
 
     // Save exam attempt using raw SQL (examattempt is lowercase)
     let attemptId = '';
@@ -306,6 +370,7 @@ export async function POST(
       correctCount,
       totalQuestions,
       passingScore,
+      partScores: partScores.length > 0 ? partScores : null,
       answers: answerDetails,
     });
   } catch (error: any) {

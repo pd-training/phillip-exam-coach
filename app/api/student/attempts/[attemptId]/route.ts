@@ -89,6 +89,21 @@ export async function GET(
     const attempt = attemptRes[0];
     console.log("Attempt found:", attempt.id, "Paper:", attempt.paper_name);
 
+    // Fetch exam parts if they exist
+    let examParts: any[] = [];
+    try {
+      examParts = await prisma.$queryRaw`
+        SELECT id, "partName", "chapterStart", "chapterEnd", "questionCount", "passingScore", "orderIndex"
+        FROM "ExamPart"
+        WHERE "paperId" = ${attempt.paperid}::uuid
+        ORDER BY "orderIndex" ASC
+      ` as any[];
+      console.log('Exam parts found:', examParts.length);
+    } catch (partsError) {
+      console.log('Could not fetch exam parts:', partsError);
+      examParts = [];
+    }
+
     // Get questions for this paper
     console.log("Fetching questions for paperId:", attempt.paperid);
     let questions: any[] = [];
@@ -168,6 +183,33 @@ export async function GET(
 
     console.log("Returning attempt details with", questionsWithAnswers.length, "questions");
 
+    // Calculate part scores if parts exist
+    let partScores: any[] = [];
+    if (examParts && examParts.length > 0) {
+      for (const part of examParts) {
+        // Get questions in this part's chapter range
+        const partQuestions = questionsWithAnswers.filter(
+          q => q.chapterNumber >= part.chapterStart && q.chapterNumber <= part.chapterEnd
+        );
+
+        // Count correct in this part
+        const partCorrect = partQuestions.filter(q => q.isCorrect).length;
+        const partScore = partQuestions.length > 0
+          ? Math.round((partCorrect / partQuestions.length) * 100)
+          : 0;
+        const partPassed = partScore >= part.passingScore;
+
+        partScores.push({
+          partName: part.partName,
+          score: partScore,
+          passed: partPassed,
+          passingScore: part.passingScore,
+          correct: partCorrect,
+          total: partQuestions.length,
+        });
+      }
+    }
+
     return Response.json({
       attempt: {
         id: attempt.id,
@@ -183,6 +225,7 @@ export async function GET(
         totalQuestions: attempt.totalQuestions,
         passingScore: attempt.passingScore,
         timeTaken: Math.round((new Date(attempt.submittedat).getTime() - new Date(attempt.startedat).getTime()) / 1000),
+        partScores: partScores.length > 0 ? partScores : null,
       },
       questions: questionsWithAnswers,
     });

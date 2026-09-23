@@ -34,6 +34,14 @@ interface AttemptDetail {
   totalQuestions: number;
   passingScore: number;
   timeTaken?: number;
+  partScores?: Array<{
+    partName: string;
+    score: number;
+    passed: boolean;
+    passingScore: number;
+    correct: number;
+    total: number;
+  }> | null;
 }
 
 export default function AttemptReviewPage() {
@@ -169,7 +177,22 @@ export default function AttemptReviewPage() {
               </button>
             </Link>
             <h1 className="text-3xl font-bold">{attempt.paper_name} - Exam Review</h1>
-            <p className="text-blue-100 mt-1">Score: {attempt.score}% | {attempt.passed ? '✓ PASSED' : '✗ FAILED'}</p>
+            {attempt.partScores && attempt.partScores.length > 0 ? (
+              // Show part-wise results if parts exist
+              <div className="mt-3 space-y-1">
+                {attempt.partScores.map((part, idx) => (
+                  <p key={idx} className="text-blue-100">
+                    {part.partName}: <span className={part.passed ? 'text-green-200 font-bold' : 'text-red-200 font-bold'}>{part.score}%</span> ({part.correct}/{part.total}) {part.passed ? '✓ PASSED' : '✗ FAILED'}
+                  </p>
+                ))}
+                <p className="text-blue-200 font-semibold mt-2 border-t border-blue-500 pt-2">
+                  Overall: {attempt.passed ? '✓ PASSED' : '✗ FAILED'}
+                </p>
+              </div>
+            ) : (
+              // Show overall result if no parts
+              <p className="text-blue-100 mt-1">Score: {attempt.score}% | {attempt.passed ? '✓ PASSED' : '✗ FAILED'}</p>
+            )}
           </div>
           <div className="text-right">
             <p className="text-blue-100 text-sm">Time Taken</p>
@@ -177,6 +200,46 @@ export default function AttemptReviewPage() {
           </div>
         </div>
       </div>
+
+      {/* Part Scores Summary Card - If parts exist */}
+      {attempt.partScores && attempt.partScores.length > 0 && (
+        <div className="bg-white border-b border-gray-200">
+          <div className="max-w-7xl mx-auto px-6 py-6">
+            <h2 className="text-lg font-bold text-gray-900 mb-4">📊 Part-Wise Breakdown</h2>
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+              {attempt.partScores.map((part, idx) => (
+                <div
+                  key={idx}
+                  className={`p-4 rounded-lg border ${
+                    part.passed
+                      ? 'bg-green-50 border-green-200'
+                      : 'bg-red-50 border-red-200'
+                  }`}
+                >
+                  <div className="flex items-start justify-between mb-2">
+                    <h3 className={`font-semibold ${part.passed ? 'text-green-900' : 'text-red-900'}`}>
+                      {part.partName}
+                    </h3>
+                    <span className={`text-2xl font-bold ${part.passed ? 'text-green-600' : 'text-red-600'}`}>
+                      {part.score}%
+                    </span>
+                  </div>
+                  <div className={`text-sm ${part.passed ? 'text-green-800' : 'text-red-800'}`}>
+                    <div>{part.correct} out of {part.total} correct</div>
+                    <div>Passing Score: {part.passingScore}%</div>
+                  </div>
+                  <div className="mt-3 w-full bg-gray-200 rounded-full h-2">
+                    <div
+                      className={`h-2 rounded-full ${part.passed ? 'bg-green-600' : 'bg-red-600'}`}
+                      style={{ width: `${Math.min(part.score, 100)}%` }}
+                    ></div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Summary & Feedback Section */}
       <div className="bg-white border-b border-gray-200">
