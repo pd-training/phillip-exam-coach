@@ -152,13 +152,15 @@ export async function GET(
           ? JSON.parse(attempt.answers) 
           : attempt.answers;
         console.log("✅ Loaded student answers from attempt:", Object.keys(studentAnswersMap).length, "questions answered");
+        console.log("   Sample answer keys:", Object.keys(studentAnswersMap).slice(0, 3));
+        console.log("   Sample answer values:", Object.values(studentAnswersMap).slice(0, 3));
       } catch (err) {
-        console.log("⚠️ Could not parse answers from attempt (column might not exist yet):", err);
+        console.log("⚠️ Could not parse answers from attempt:", err);
+        console.log("   Raw answers value:", typeof attempt.answers, attempt.answers);
         studentAnswersMap = {};
       }
     } else {
-      console.log("⚠️ No answers found in attempt - add answers column to database:");
-      console.log("   GET /api/admin/add-answers-column");
+      console.log("⚠️ No answers found in attempt - answers column may not exist or is NULL");
     }
 
     // Map student answers to questions
@@ -181,7 +183,9 @@ export async function GET(
       };
     });
 
-    console.log("Returning attempt details with", questionsWithAnswers.length, "questions");
+    const questionsAnswered = questionsWithAnswers.filter(q => q.studentAnswer).length;
+    const questionsNotAnswered = questionsWithAnswers.filter(q => !q.studentAnswer).length;
+    console.log(`Questions with answers: ${questionsAnswered}, without answers: ${questionsNotAnswered}`);
 
     // Calculate part scores if parts exist
     let partScores: any[] = [];

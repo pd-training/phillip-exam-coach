@@ -422,9 +422,18 @@ export default function AttemptReviewPage() {
               <p className={`font-semibold ${currentQuestion.isCorrect ? 'text-green-600' : 'text-red-600'}`}>
                 {currentQuestion.isCorrect ? '✓ Correct' : '✗ Incorrect'}
               </p>
-              {currentQuestion.studentAnswer && (
+              {currentQuestion.studentAnswer ? (
                 <p className="text-gray-700 mt-2">
-                  <span className="font-semibold">Your Answer:</span> {currentQuestion.studentAnswer}
+                  <span className="font-semibold">Your Answer:</span> <span className="text-blue-600 font-bold">{currentQuestion.studentAnswer}</span> - {
+                    currentQuestion.studentAnswer === "A" ? currentQuestion.optionA :
+                    currentQuestion.studentAnswer === "B" ? currentQuestion.optionB :
+                    currentQuestion.studentAnswer === "C" ? currentQuestion.optionC :
+                    currentQuestion.optionD
+                  }
+                </p>
+              ) : (
+                <p className="text-gray-500 mt-2 italic">
+                  <span className="font-semibold">Your Answer:</span> Not answered
                 </p>
               )}
             </div>
