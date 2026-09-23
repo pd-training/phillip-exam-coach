@@ -13,6 +13,10 @@ interface Chapter {
 interface Question {
   id: string;
   text: string;
+  optionA: string;
+  optionB: string;
+  optionC: string;
+  optionD: string;
 }
 
 interface Feedback {
@@ -20,6 +24,10 @@ interface Feedback {
   correctAnswer: string;
   explanation: string;
   studentAnswer: string;
+  optionA: string;
+  optionB: string;
+  optionC: string;
+  optionD: string;
 }
 
 export default function PracticeChapterMode() {
@@ -245,25 +253,33 @@ export default function PracticeChapterMode() {
 
           {/* Answer options */}
           <div className="space-y-3 mb-8">
-            {["A", "B", "C", "D"].map((option) => (
+            {[
+              { key: "A", text: currentQuestion.optionA },
+              { key: "B", text: currentQuestion.optionB },
+              { key: "C", text: currentQuestion.optionC },
+              { key: "D", text: currentQuestion.optionD },
+            ].map((option) => (
               <label
-                key={option}
+                key={option.key}
                 className={`flex items-center p-4 rounded-lg border-2 cursor-pointer transition ${
-                  selectedAnswer === option
+                  selectedAnswer === option.key
                     ? "bg-blue-50 border-blue-600"
                     : "bg-white border-gray-200 hover:border-gray-300"
-                } ${showingFeedback && selectedAnswer !== option ? "opacity-50" : "opacity-100"}`}
+                } ${showingFeedback && selectedAnswer !== option.key ? "opacity-50" : "opacity-100"}`}
               >
                 <input
                   type="radio"
                   name="answer"
-                  value={option}
-                  checked={selectedAnswer === option}
+                  value={option.key}
+                  checked={selectedAnswer === option.key}
                   onChange={(e) => setSelectedAnswer(e.target.value)}
                   disabled={showingFeedback}
                   className="mr-4 w-4 h-4"
                 />
-                <span className="font-medium text-gray-900">{option}</span>
+                <div className="flex-1">
+                  <span className="font-medium text-gray-900 mr-3">{option.key}.</span>
+                  <span className="text-gray-700">{option.text}</span>
+                </div>
               </label>
             ))}
           </div>
@@ -275,19 +291,44 @@ export default function PracticeChapterMode() {
                 ? "bg-green-50 border-green-500"
                 : "bg-red-50 border-red-500"
             }`}>
-              <p className={`m-0 mb-3 font-bold ${
+              <p className={`m-0 mb-4 font-bold text-lg ${
                 feedback.isCorrect ? "text-green-700" : "text-red-700"
               }`}>
                 {feedback.isCorrect ? "✓ Correct!" : "✗ Incorrect"}
               </p>
-              {!feedback.isCorrect && (
-                <p className="m-0 mb-3 text-sm text-gray-700">
-                  Correct answer: <strong>{feedback.correctAnswer}</strong>
+              
+              {/* Your answer */}
+              <div className="mb-4">
+                <p className="m-0 text-sm font-semibold text-gray-700 mb-2">Your answer:</p>
+                <p className="m-0 text-sm text-gray-700">
+                  <strong>{feedback.studentAnswer}.</strong> {
+                    feedback.studentAnswer === "A" ? feedback.optionA :
+                    feedback.studentAnswer === "B" ? feedback.optionB :
+                    feedback.studentAnswer === "C" ? feedback.optionC :
+                    feedback.optionD
+                  }
                 </p>
-              )}
-              <p className="m-0 text-sm leading-relaxed text-gray-700">
-                {feedback.explanation}
-              </p>
+              </div>
+              
+              {/* Correct answer - always show */}
+              <div className="mb-4">
+                <p className="m-0 text-sm font-semibold text-gray-700 mb-2">Correct answer:</p>
+                <p className="m-0 text-sm text-gray-700">
+                  <strong>{feedback.correctAnswer}.</strong> {
+                    feedback.correctAnswer === "A" ? feedback.optionA :
+                    feedback.correctAnswer === "B" ? feedback.optionB :
+                    feedback.correctAnswer === "C" ? feedback.optionC :
+                    feedback.optionD
+                  }
+                </p>
+              </div>
+              
+              {/* Explanation */}
+              <div className="pt-4 border-t border-gray-300">
+                <p className="m-0 text-sm text-gray-700 leading-relaxed">
+                  {feedback.explanation}
+                </p>
+              </div>
             </div>
           )}
 

@@ -34,6 +34,10 @@ export async function GET(
         questionText: true,
         correctAnswer: true,
         explanation: true,
+        optionA: true,
+        optionB: true,
+        optionC: true,
+        optionD: true,
       },
     });
 
@@ -55,6 +59,10 @@ export async function GET(
       questions: selectedQuestions.map((q: any) => ({
         id: q.id,
         text: q.questionText,
+        optionA: q.optionA,
+        optionB: q.optionB,
+        optionC: q.optionC,
+        optionD: q.optionD,
         // Don't send correctAnswer/explanation until answered
       })),
       totalQuestionsInChapter: allQuestions.length,
@@ -87,6 +95,10 @@ export async function POST(
         questionText: true,
         correctAnswer: true,
         explanation: true,
+        optionA: true,
+        optionB: true,
+        optionC: true,
+        optionD: true,
       }
     });
 
@@ -104,6 +116,11 @@ export async function POST(
       isCorrect,
       correctAnswer: question.correctAnswer,
       explanation: question.explanation,
+      studentAnswer: answer,
+      optionA: question.optionA,
+      optionB: question.optionB,
+      optionC: question.optionC,
+      optionD: question.optionD,
     });
   } catch (error: any) {
     console.error('Submit chapter answer error:', error.message);

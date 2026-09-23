@@ -9,6 +9,10 @@ interface Question {
   id: string;
   text: string;
   chapter: number;
+  optionA: string;
+  optionB: string;
+  optionC: string;
+  optionD: string;
 }
 
 interface Feedback {
@@ -16,6 +20,10 @@ interface Feedback {
   correctAnswer: string;
   explanation: string;
   studentAnswer: string;
+  optionA: string;
+  optionB: string;
+  optionC: string;
+  optionD: string;
 }
 
 export default function QuickQuizMode() {
@@ -182,38 +190,46 @@ export default function QuickQuizMode() {
 
           {/* Answer options */}
           <div style={{ marginBottom: "20px" }}>
-            {["A", "B", "C", "D"].map((option) => (
+            {[
+              { key: "A", text: currentQuestion.optionA },
+              { key: "B", text: currentQuestion.optionB },
+              { key: "C", text: currentQuestion.optionC },
+              { key: "D", text: currentQuestion.optionD },
+            ].map((option) => (
               <label
-                key={option}
+                key={option.key}
                 style={{
                   display: "flex",
                   alignItems: "center",
                   padding: "12px",
                   marginBottom: "10px",
                   backgroundColor:
-                    selectedAnswer === option ? "#dbeafe" : "white",
+                    selectedAnswer === option.key ? "#dbeafe" : "white",
                   border:
-                    selectedAnswer === option
+                    selectedAnswer === option.key
                       ? "2px solid #3b82f6"
                       : "1px solid #e5e7eb",
                   borderRadius: "6px",
                   cursor: showingFeedback ? "not-allowed" : "pointer",
-                  opacity: showingFeedback && selectedAnswer !== option ? 0.6 : 1,
+                  opacity: showingFeedback && selectedAnswer !== option.key ? 0.6 : 1,
                 }}
               >
                 <input
                   type="radio"
                   name="answer"
-                  value={option}
-                  checked={selectedAnswer === option}
+                  value={option.key}
+                  checked={selectedAnswer === option.key}
                   onChange={(e) => setSelectedAnswer(e.target.value)}
                   disabled={showingFeedback}
                   style={{ marginRight: "12px" }}
                 />
-                <span style={{ fontWeight: "500" }}>{option}</span>
+                <div style={{ flex: 1 }}>
+                  <span style={{ fontWeight: "500", marginRight: "8px" }}>{option.key}.</span>
+                  <span>{option.text}</span>
+                </div>
               </label>
             ))}
-              </div>
+          </div>
 
           {/* Feedback */}
           {showingFeedback && feedback && (
@@ -230,17 +246,45 @@ export default function QuickQuizMode() {
                 style={{
                   margin: "0 0 10px 0",
                   fontWeight: "600",
+                  fontSize: "16px",
                   color: feedback.isCorrect ? "#166534" : "#991b1b",
                 }}
               >
                 {feedback.isCorrect ? "✓ Correct!" : "✗ Incorrect"}
               </p>
-              {!feedback.isCorrect && (
-                <p style={{ margin: "0 0 10px 0", fontSize: "14px" }}>
-                  Correct answer: <strong>{feedback.correctAnswer}</strong>
+              
+              {/* Your answer */}
+              <div style={{ marginBottom: "10px" }}>
+                <p style={{ margin: "0 0 5px 0", fontSize: "13px", fontWeight: "600", color: "#374151" }}>
+                  Your answer:
                 </p>
-              )}
-              <p style={{ margin: "0", fontSize: "14px", lineHeight: "1.5" }}>
+                <p style={{ margin: "0 0 10px 0", fontSize: "14px" }}>
+                  <strong>{feedback.studentAnswer}.</strong> {
+                    feedback.studentAnswer === "A" ? feedback.optionA :
+                    feedback.studentAnswer === "B" ? feedback.optionB :
+                    feedback.studentAnswer === "C" ? feedback.optionC :
+                    feedback.optionD
+                  }
+                </p>
+              </div>
+              
+              {/* Correct answer */}
+              <div style={{ marginBottom: "10px", paddingBottom: "10px", borderBottom: "1px solid rgba(0,0,0,0.1)" }}>
+                <p style={{ margin: "0 0 5px 0", fontSize: "13px", fontWeight: "600", color: "#374151" }}>
+                  Correct answer:
+                </p>
+                <p style={{ margin: "0", fontSize: "14px" }}>
+                  <strong>{feedback.correctAnswer}.</strong> {
+                    feedback.correctAnswer === "A" ? feedback.optionA :
+                    feedback.correctAnswer === "B" ? feedback.optionB :
+                    feedback.correctAnswer === "C" ? feedback.optionC :
+                    feedback.optionD
+                  }
+                </p>
+              </div>
+              
+              {/* Explanation */}
+              <p style={{ margin: "10px 0 0 0", fontSize: "14px", lineHeight: "1.5", color: "#374151" }}>
                 {feedback.explanation}
               </p>
             </div>

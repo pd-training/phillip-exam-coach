@@ -21,6 +21,10 @@ export async function GET(
         questionText: true,
         correctAnswer: true,
         explanation: true,
+        optionA: true,
+        optionB: true,
+        optionC: true,
+        optionD: true,
       }
     });
 
@@ -42,6 +46,10 @@ export async function GET(
         id: q.id,
         text: q.questionText,
         chapter: q.chapterNumber,
+        optionA: q.optionA,
+        optionB: q.optionB,
+        optionC: q.optionC,
+        optionD: q.optionD,
       })),
       totalQuestions: questions.length,
       timeLimitMinutes: 15,
@@ -87,6 +95,10 @@ export async function POST(request: NextRequest) {
           correctAnswer: true,
           explanation: true,
           questionText: true,
+          optionA: true,
+          optionB: true,
+          optionC: true,
+          optionD: true,
         }
       });
 
@@ -106,6 +118,11 @@ export async function POST(request: NextRequest) {
         isCorrect,
         correctAnswer: question.correctAnswer,
         explanation: question.explanation,
+        studentAnswer: answer,
+        optionA: question.optionA,
+        optionB: question.optionB,
+        optionC: question.optionC,
+        optionD: question.optionD,
       });
     } catch (qError: any) {
       console.error('Error fetching question:', qError.message);
