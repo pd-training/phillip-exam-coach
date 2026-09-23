@@ -268,7 +268,14 @@ export default function PapersManagement() {
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({
             totalTime: parseInt(editPaperDuration) || 120,
-            parts: parts,
+            parts: parts.map((p, i) => ({
+              partName: p.partName,
+              chapterStart: p.chapterStart,
+              chapterEnd: p.chapterEnd,
+              questionCount: p.questionCount,
+              passingScore: p.passingScore,
+              orderIndex: i + 1,
+            })),
           }),
         });
 
