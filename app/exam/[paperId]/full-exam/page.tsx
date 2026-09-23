@@ -233,64 +233,89 @@ export default function FullExamMode() {
 
         <div>
           <h3>Review Answers</h3>
-          {result.answers.map((answer: any, idx: number) => (
-            <div
-              key={answer.questionId}
-              style={{
-                padding: "15px",
-                marginBottom: "10px",
-                backgroundColor: answer.isCorrect ? "#f0fdf4" : "#fef2f2",
-                borderLeft: `4px solid ${answer.isCorrect ? "#22c55e" : "#ef4444"}`,
-                borderRadius: "4px",
-              }}
-            >
-              <p style={{ margin: "0 0 8px 0", fontWeight: "600" }}>
-                Q{idx + 1}: {answer.isCorrect ? "✓ Correct" : "✗ Incorrect"}
-              </p>
-              {answer.questionText && (
-                <p style={{ margin: "0 0 12px 0", fontSize: "14px", lineHeight: "1.5", color: "#1f2937" }}>
-                  {answer.questionText}
-                </p>
-              )}
-              <div style={{ margin: "0 0 12px 0", fontSize: "14px" }}>
-                <p style={{ margin: "0 0 6px 0" }}>
-                  Your answer: <strong>{answer.studentAnswer}.</strong> {
-                    answer.studentAnswer === "A" ? answer.optionA :
-                    answer.studentAnswer === "B" ? answer.optionB :
-                    answer.studentAnswer === "C" ? answer.optionC :
-                    answer.optionD
-                  }
-                </p>
-                <p style={{ margin: "0", fontSize: "14px", color: "#059669" }}>
-                  Correct answer: <strong>{answer.correctAnswer}.</strong> {
-                    answer.correctAnswer === "A" ? answer.optionA :
-                    answer.correctAnswer === "B" ? answer.optionB :
-                    answer.correctAnswer === "C" ? answer.optionC :
-                    answer.optionD
-                  }
-                </p>
-              </div>
-              {answer.explanation && (
-                <div style={{
-                  marginTop: "12px",
-                  padding: "12px",
-                  backgroundColor: answer.isCorrect ? "#ecfdf5" : "#fef3c7",
-                  border: `1px solid ${answer.isCorrect ? "#d1fae5" : "#fde68a"}`,
+          {questions.map((question: Question, idx: number) => {
+            // Find if this question was answered
+            const answerData = result.answers.find((a: any) => a.questionId === question.id);
+            
+            return (
+              <div
+                key={question.id}
+                style={{
+                  padding: "15px",
+                  marginBottom: "10px",
+                  backgroundColor: answerData 
+                    ? (answerData.isCorrect ? "#f0fdf4" : "#fef2f2")
+                    : "#f3f4f6",
+                  borderLeft: `4px solid ${
+                    answerData 
+                      ? (answerData.isCorrect ? "#22c55e" : "#ef4444")
+                      : "#9ca3af"
+                  }`,
                   borderRadius: "4px",
-                  fontSize: "13px",
-                  lineHeight: "1.5",
-                  color: "#374151",
-                }}>
-                  <p style={{ margin: "0 0 6px 0", fontWeight: "600", color: "#1f2937" }}>
-                    📝 Explanation
+                  opacity: answerData ? 1 : 0.7,
+                }}
+              >
+                <p style={{ margin: "0 0 8px 0", fontWeight: "600" }}>
+                  Q{idx + 1}: {
+                    answerData 
+                      ? (answerData.isCorrect ? "✓ Correct" : "✗ Incorrect")
+                      : "⭕ Not Answered"
+                  }
+                </p>
+                {question.questionText && (
+                  <p style={{ margin: "0 0 12px 0", fontSize: "14px", lineHeight: "1.5", color: "#1f2937" }}>
+                    {question.questionText}
                   </p>
-                  <p style={{ margin: "0" }}>
-                    {answer.explanation}
+                )}
+                
+                {answerData ? (
+                  <>
+                    <div style={{ margin: "0 0 12px 0", fontSize: "14px" }}>
+                      <p style={{ margin: "0 0 6px 0" }}>
+                        Your answer: <strong>{answerData.studentAnswer}.</strong> {
+                          answerData.studentAnswer === "A" ? answerData.optionA :
+                          answerData.studentAnswer === "B" ? answerData.optionB :
+                          answerData.studentAnswer === "C" ? answerData.optionC :
+                          answerData.optionD
+                        }
+                      </p>
+                      <p style={{ margin: "0", fontSize: "14px", color: "#059669" }}>
+                        Correct answer: <strong>{answerData.correctAnswer}.</strong> {
+                          answerData.correctAnswer === "A" ? answerData.optionA :
+                          answerData.correctAnswer === "B" ? answerData.optionB :
+                          answerData.correctAnswer === "C" ? answerData.optionC :
+                          answerData.optionD
+                        }
+                      </p>
+                    </div>
+                    {answerData.explanation && (
+                      <div style={{
+                        marginTop: "12px",
+                        padding: "12px",
+                        backgroundColor: answerData.isCorrect ? "#ecfdf5" : "#fef3c7",
+                        border: `1px solid ${answerData.isCorrect ? "#d1fae5" : "#fde68a"}`,
+                        borderRadius: "4px",
+                        fontSize: "13px",
+                        lineHeight: "1.5",
+                        color: "#374151",
+                      }}>
+                        <p style={{ margin: "0 0 6px 0", fontWeight: "600", color: "#1f2937" }}>
+                          📝 Explanation
+                        </p>
+                        <p style={{ margin: "0" }}>
+                          {answerData.explanation}
+                        </p>
+                      </div>
+                    )}
+                  </>
+                ) : (
+                  <p style={{ margin: "0", fontSize: "13px", color: "#6b7280", fontStyle: "italic" }}>
+                    No answer submitted for this question.
                   </p>
-                </div>
-              )}
-            </div>
-          ))}
+                )}
+              </div>
+            );
+          })}
         </div>
 
         <button
