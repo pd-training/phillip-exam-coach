@@ -7,7 +7,6 @@ import StudentNav from "@/components/StudentNav";
 
 interface Chapter {
   number: number;
-  questionCount: number;
   title: string;
 }
 
@@ -175,7 +174,6 @@ export default function PracticeChapterMode() {
                     <h3 className="font-semibold text-gray-900 group-hover:text-blue-600 transition">
                       {ch.title}
                     </h3>
-                    <p className="text-xs text-gray-500">{ch.questionCount} questions</p>
                   </div>
                 </div>
                 <svg

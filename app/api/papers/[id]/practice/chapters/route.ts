@@ -12,27 +12,15 @@ export async function GET(
 
     console.log('Fetching chapters for paper:', paperId);
 
-    // Get all questions grouped by chapter
-    const allQuestions = await (prisma as any).question.findMany({
+    // Get all chapters with their titles
+    const chapters = await (prisma as any).chapter.findMany({
       where: { paperId: paperId },
       select: {
-        chapterNumber: true,
+        number: true,
+        title: true,
       },
-      orderBy: { chapterNumber: 'asc' }
+      orderBy: { number: 'asc' }
     });
-
-    // Group by chapter and count
-    const chapterMap = new Map<number, number>();
-    for (const q of allQuestions) {
-      const count = (chapterMap.get(q.chapterNumber) || 0) + 1;
-      chapterMap.set(q.chapterNumber, count);
-    }
-
-    const chapters = Array.from(chapterMap.entries()).map(([number, count]) => ({
-      number,
-      questionCount: count,
-      title: `Chapter ${number}`,
-    }));
 
     console.log('Found chapters:', chapters.length);
 
