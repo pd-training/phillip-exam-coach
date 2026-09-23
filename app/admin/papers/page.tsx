@@ -167,24 +167,47 @@ export default function PapersManagement() {
   // Fetch exam format for paper settings
   const fetchPaperSettings = async (paperId: string) => {
     try {
-      const res = await fetch(`/api/papers/${paperId}/exam-format`);
-      const data = await res.json();
+      console.log('Fetching paper settings for:', paperId);
       
-      if (data.examConfig) {
-        setEditPaperDuration(data.examConfig.durationMinutes?.toString() || "120");
-        setEditPaperTotalQuestions(data.examConfig.totalQuestions?.toString() || "0");
-        setEditPaperPassingScore(data.examConfig.passingScore?.toString() || "75");
+      // Fetch exam config
+      try {
+        const res = await fetch(`/api/papers/${paperId}/exam-format`);
+        const data = await res.json();
+        console.log('Exam format response:', data);
+        
+        if (data.examConfig) {
+          setEditPaperDuration(data.examConfig.durationMinutes?.toString() || "120");
+          setEditPaperTotalQuestions(data.examConfig.totalQuestions?.toString() || "0");
+          setEditPaperPassingScore(data.examConfig.passingScore?.toString() || "75");
+        }
+      } catch (examErr) {
+        console.warn('Exam format fetch error (non-fatal):', examErr);
       }
       
       // Fetch chapters
+      console.log('Fetching chapters from /api/admin/papers/' + paperId + '/chapters');
       const chapRes = await fetch(`/api/admin/papers/${paperId}/chapters`);
+      console.log('Chapters response status:', chapRes.status);
+      
+      if (!chapRes.ok) {
+        console.error('Chapters fetch failed with status:', chapRes.status);
+        const errorText = await chapRes.text();
+        console.error('Error response:', errorText);
+        return;
+      }
+      
       const chapData = await chapRes.json();
-      if (Array.isArray(chapData)) {
+      console.log('Chapters data:', chapData);
+      
+      if (Array.isArray(chapData) && chapData.length > 0) {
+        console.log('Setting chapters:', chapData.length);
         setChapters(chapData.map((ch: any) => ({ 
           id: ch.id, 
           number: ch.number, 
           title: ch.title 
         })));
+      } else {
+        console.log('No chapters found or data is not an array');
       }
     } catch (error) {
       console.error('Error fetching paper settings:', error);
