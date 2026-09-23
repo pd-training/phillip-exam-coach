@@ -64,6 +64,7 @@ export default function PapersManagement() {
   // Upload form
   const [uploadFile, setUploadFile] = useState<File | null>(null);
   const [uploadProgress, setUploadProgress] = useState("");
+  const [uploadMode, setUploadMode] = useState<"APPEND" | "REPLACE">("APPEND");
 
   // Question edit form
   const [selectedQuestion, setSelectedQuestion] = useState<Question | null>(null);
@@ -361,6 +362,7 @@ export default function PapersManagement() {
     try {
       const formData = new FormData();
       formData.append("file", uploadFile);
+      formData.append("mode", uploadMode);
 
       const res = await fetch(`/api/papers/${selectedPaperId}/questions/upload`, {
         method: "POST",
@@ -370,13 +372,15 @@ export default function PapersManagement() {
       const data = await res.json();
 
       if (res.ok) {
-        setUploadProgress(`✅ ${data.count} questions imported successfully!`);
+        const modeText = uploadMode === 'APPEND' ? 'appended' : 'replaced all questions and added';
+        setUploadProgress(`✅ ${data.count} questions ${modeText} successfully!`);
         await fetchPapers();
         await fetchQuestions(selectedPaperId);
         setTimeout(() => {
           setActiveModal(null);
           setUploadFile(null);
           setUploadProgress("");
+          setUploadMode("APPEND");
         }, 2000);
       } else {
         setUploadProgress(`❌ Error: ${data.error}`);
@@ -926,7 +930,52 @@ export default function PapersManagement() {
             />
           </div>
 
-          {uploadProgress && (
+          <div style={{ marginBottom: "16px" }}>
+            <label style={{ display: "block", fontSize: "14px", fontWeight: "500", marginBottom: "12px" }}>
+              Upload Mode *
+            </label>
+            <div style={{ display: "flex", gap: "16px" }}>
+              <label style={{ display: "flex", alignItems: "center", cursor: "pointer", gap: "8px" }}>
+                <input
+                  type="radio"
+                  name="uploadMode"
+                  value="APPEND"
+                  checked={uploadMode === "APPEND"}
+                  onChange={(e) => setUploadMode(e.target.value as "APPEND" | "REPLACE")}
+                  style={{ cursor: "pointer" }}
+                />
+                <span style={{ fontSize: "13px" }}>
+                  ⭕ <strong>APPEND</strong> - Keep existing questions, add new ones
+                </span>
+              </label>
+              <label style={{ display: "flex", alignItems: "center", cursor: "pointer", gap: "8px" }}>
+                <input
+                  type="radio"
+                  name="uploadMode"
+                  value="REPLACE"
+                  checked={uploadMode === "REPLACE"}
+                  onChange={(e) => setUploadMode(e.target.value as "APPEND" | "REPLACE")}
+                  style={{ cursor: "pointer" }}
+                />
+                <span style={{ fontSize: "13px" }}>
+                  ⭕ <strong>REPLACE</strong> - Delete all old questions, add new ones
+                </span>
+              </label>
+            </div>
+            {uploadMode === "REPLACE" && (
+              <div style={{
+                marginTop: "12px",
+                padding: "12px",
+                backgroundColor: "#fef3c7",
+                border: "1px solid #fcd34d",
+                borderRadius: "6px",
+                fontSize: "12px",
+                color: "#92400e"
+              }}>
+                ⚠️ <strong>WARNING:</strong> REPLACE mode will delete all existing questions. Students will not be able to properly review past exam attempts if questions are deleted!
+              </div>
+            )}
+          </div>
             <div style={{ padding: "12px", backgroundColor: uploadProgress.startsWith("✅") ? "#dcfce7" : "#fee2e2", borderRadius: "6px", marginBottom: "16px", fontSize: "13px", color: uploadProgress.startsWith("✅") ? "#166534" : "#991b1b" }}>
               {uploadProgress}
             </div>
@@ -935,7 +984,7 @@ export default function PapersManagement() {
           <div style={{ display: "flex", gap: "12px", justifyContent: "flex-end" }}>
             <button
               type="button"
-              onClick={() => { setActiveModal(null); setUploadFile(null); setUploadProgress(""); setSelectedPaperId(""); }}
+              onClick={() => { setActiveModal(null); setUploadFile(null); setUploadProgress(""); setSelectedPaperId(""); setUploadMode("APPEND"); }}
               style={{
                 padding: "10px 20px",
                 backgroundColor: "#e5e7eb",

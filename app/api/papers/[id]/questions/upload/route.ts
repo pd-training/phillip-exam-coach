@@ -21,13 +21,14 @@ export async function POST(
 
     const formData = await request.formData();
     const file = formData.get('file') as File;
+    const uploadMode = (formData.get('mode') as string) || 'APPEND'; // Default to APPEND
 
     if (!file) {
       return NextResponse.json({ error: 'No file provided' }, { status: 400 });
     }
 
     const paperId = params.id;
-    console.log('Uploading questions for paper:', paperId);
+    console.log('Uploading questions for paper:', paperId, 'Mode:', uploadMode);
 
     // Verify paper exists
     const paper = await (prisma as any).paper.findUnique({
@@ -161,12 +162,18 @@ export async function POST(
       }
     }
 
-    // Delete existing questions for this paper
-    console.log('Deleting existing questions for paper:', paperId);
-    const deleteResult = await (prisma as any).question.deleteMany({
-      where: { paperId: paperId }
-    });
-    console.log('Deleted questions:', deleteResult.count);
+    // Delete existing questions for this paper (only if REPLACE mode)
+    let deletedCount = 0;
+    if (uploadMode === 'REPLACE') {
+      console.log('REPLACE mode: Deleting existing questions for paper:', paperId);
+      const deleteResult = await (prisma as any).question.deleteMany({
+        where: { paperId: paperId }
+      });
+      deletedCount = deleteResult.count;
+      console.log('Deleted questions:', deletedCount);
+    } else {
+      console.log('APPEND mode: Keeping existing questions for paper:', paperId);
+    }
 
     // Bulk insert new questions WITH option columns (required by schema)
     let insertedCount = 0;
@@ -296,12 +303,18 @@ export async function POST(
       );
     }
 
-    console.log('✅ Upload succeeded - inserted:', insertedCount, 'questions');
+    console.log('✅ Upload succeeded - inserted:', insertedCount, 'questions (mode:', uploadMode + ')');
+    
+    const modeMessage = uploadMode === 'APPEND' 
+      ? 'appended to existing questions'
+      : `replaced all questions (deleted ${deletedCount})`;
     
     return NextResponse.json({
       success: true,
       count: insertedCount,
-      message: `${insertedCount} questions imported successfully`,
+      mode: uploadMode,
+      deleted: deletedCount,
+      message: `${insertedCount} questions ${modeMessage}`,
       encoding_note: 'CSV file should be saved as UTF-8 encoding (not UTF-8 with BOM). Special characters like apostrophes and dashes will be preserved correctly.',
     });
   } catch (error: any) {
