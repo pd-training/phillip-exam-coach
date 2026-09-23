@@ -42,7 +42,7 @@ interface ExamPart {
 }
 
 type ActiveTab = "availability" | "questions" | "format";
-type ActiveModal = null | "uploadQuestions" | "viewQuestions" | "editQuestion" | "configureFormat" | "createPaper" | "editPaper" | "editChapter";
+type ActiveModal = null | "uploadQuestions" | "viewQuestions" | "editQuestion" | "createPaper" | "paperSettings";
 
 export default function PapersManagement() {
   const router = useRouter();
@@ -79,8 +79,17 @@ export default function PapersManagement() {
   // Paper edit form
   const [editPaperTitle, setEditPaperTitle] = useState("");
   const [editPaperDescription, setEditPaperDescription] = useState("");
+  const [editPaperDuration, setEditPaperDuration] = useState("120");
+  const [editPaperTotalQuestions, setEditPaperTotalQuestions] = useState("0");
+  const [editPaperPassingScore, setEditPaperPassingScore] = useState("75");
+  const [editPaperAvailability, setEditPaperAvailability] = useState(false);
+  
+  // Chapter management
+  const [chapters, setChapters] = useState<Array<{ id: string; number: number; title: string }>>([]);
+  const [editingChapterId, setEditingChapterId] = useState<string | null>(null);
+  const [editingChapterTitle, setEditingChapterTitle] = useState("");
 
-  // Chapter edit form
+  // Chapter edit form (legacy - will be replaced)
   const [editChapterNumber, setEditChapterNumber] = useState("1");
   const [editChapterTitle, setEditChapterTitle] = useState("");
 
@@ -155,7 +164,107 @@ export default function PapersManagement() {
   };
 
   // Fetch exam format for selected paper
-  const fetchExamFormat = async (paperId: string) => {
+  // Fetch exam format for paper settings
+  const fetchPaperSettings = async (paperId: string) => {
+    try {
+      const res = await fetch(`/api/papers/${paperId}/exam-format`);
+      const data = await res.json();
+      
+      if (data.examConfig) {
+        setEditPaperDuration(data.examConfig.durationMinutes?.toString() || "120");
+        setEditPaperTotalQuestions(data.examConfig.totalQuestions?.toString() || "0");
+        setEditPaperPassingScore(data.examConfig.passingScore?.toString() || "75");
+      }
+      
+      // Fetch chapters
+      const chapRes = await fetch(`/api/admin/papers/${paperId}/chapters`);
+      const chapData = await chapRes.json();
+      if (Array.isArray(chapData)) {
+        setChapters(chapData.map((ch: any) => ({ 
+          id: ch.id, 
+          number: ch.number, 
+          title: ch.title 
+        })));
+      }
+    } catch (error) {
+      console.error('Error fetching paper settings:', error);
+    }
+  };
+  
+  // Save consolidated paper settings
+  const handleSavePaperSettings = async () => {
+    if (!selectedPaperId || !editPaperTitle.trim()) {
+      alert("Paper title is required");
+      return;
+    }
+
+    setSubmitting(true);
+    try {
+      const res = await fetch(`/api/admin/papers/${selectedPaperId}`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          title: editPaperTitle.trim(),
+          durationMinutes: parseInt(editPaperDuration) || 120,
+          totalQuestions: parseInt(editPaperTotalQuestions) || 0,
+          passingScore: parseInt(editPaperPassingScore) || 75,
+          isAvailable: editPaperAvailability,
+        }),
+      });
+
+      const data = await res.json();
+
+      if (res.ok) {
+        alert("Paper settings updated successfully!");
+        await fetchPapers();
+        setActiveModal(null);
+      } else {
+        console.error("Save failed:", data);
+        alert(`Error: ${data.error || 'Failed to save paper settings'}`);
+      }
+    } catch (error) {
+      console.error("Save error:", error);
+      alert("Error saving paper settings");
+    } finally {
+      setSubmitting(false);
+    }
+  };
+  
+  // Update chapter title
+  const handleUpdateChapterTitle = async (chapterId: string, chapterNumber: number) => {
+    if (!editingChapterTitle.trim()) {
+      alert("Chapter title cannot be empty");
+      return;
+    }
+
+    if (!selectedPaperId) return;
+
+    try {
+      const res = await fetch(`/api/admin/papers/${selectedPaperId}/chapters/${chapterNumber}`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          title: editingChapterTitle.trim(),
+        }),
+      });
+
+      if (res.ok) {
+        const updated = chapters.map(ch => 
+          ch.id === chapterId 
+            ? { ...ch, title: editingChapterTitle.trim() }
+            : ch
+        );
+        setChapters(updated);
+        setEditingChapterId(null);
+        setEditingChapterTitle("");
+      } else {
+        alert("Error updating chapter title");
+      }
+    } catch (error) {
+      console.error("Error updating chapter:", error);
+      alert("Error updating chapter title");
+    }
+  };
     try {
       const res = await fetch(`/api/papers/${paperId}/exam-format`);
       if (res.ok) {
@@ -595,7 +704,9 @@ export default function PapersManagement() {
                           setSelectedPaperId(paper.id);
                           setEditPaperTitle(paper.title);
                           setEditPaperDescription(paper.description || "");
-                          setActiveModal("editPaper");
+                          setEditPaperAvailability(paper.isAvailable);
+                          fetchPaperSettings(paper.id);
+                          setActiveModal("paperSettings");
                         }}
                         style={{
                           padding: "6px 16px",
@@ -608,7 +719,7 @@ export default function PapersManagement() {
                           cursor: "pointer",
                         }}
                       >
-                        ✏️ Edit
+                        ⚙️ Settings
                       </button>
                       <button
                         onClick={() => togglePaperAvailability(paper.id, paper.isAvailable)}
