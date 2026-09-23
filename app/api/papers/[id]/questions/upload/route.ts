@@ -24,7 +24,6 @@ export async function POST(
     }
 
     const paperId = params.id;
-
     console.log('Uploading questions for paper:', paperId);
 
     // Verify paper exists
@@ -65,7 +64,7 @@ export async function POST(
       }
       parts.push(current.trim().replace(/^"(.*)"$/, '$1'));
 
-      if (parts.length < 4) continue;
+      if (parts.length < 3) continue;
 
       // Expected CSV format: chapter, question, optionA, optionB, optionC, optionD, answer, explanation
       const chapter = parts[0];
@@ -93,8 +92,9 @@ export async function POST(
     }
 
     if (questions.length === 0) {
+      console.error('No questions parsed from CSV');
       return NextResponse.json(
-        { error: 'No valid questions found in CSV' },
+        { error: 'No valid questions found in CSV. Expected format: chapter,question,optionA,optionB,optionC,optionD,answer,explanation' },
         { status: 400 }
       );
     }
@@ -154,10 +154,11 @@ export async function POST(
       }
     }
 
-    // Update paper's total questions count
+    // Update paper's total questions count (with select to avoid description field)
     await (prisma as any).paper.update({
       where: { id: paperId },
-      data: { totalQuestions: insertedCount }
+      data: { totalQuestions: insertedCount },
+      select: { id: true }
     });
 
     console.log('Upload complete - inserted:', insertedCount);
@@ -175,7 +176,7 @@ export async function POST(
       message: `${insertedCount} questions imported successfully`,
     });
   } catch (error: any) {
-    console.error('Upload error:', error.message);
+    console.error('Upload error:', error.message, error.stack);
     return NextResponse.json(
       { error: `Upload failed: ${error.message}` },
       { status: 500 }
