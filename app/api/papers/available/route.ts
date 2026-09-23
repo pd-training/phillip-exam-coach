@@ -4,13 +4,14 @@ export const dynamic = 'force-dynamic';
 
 export async function GET(request: Request) {
   try {
-    // Get all papers
+    // Get only available papers (where admin has not turned off availability)
     const papers = await prisma.$queryRaw`
       SELECT 
         id,
         title,
         "totalTime"
       FROM "Paper"
+      WHERE "isAvailable" = true
       ORDER BY title ASC
     ` as any[];
 

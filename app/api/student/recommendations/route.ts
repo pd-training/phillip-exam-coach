@@ -15,7 +15,7 @@ export async function GET(request: Request) {
     const userId = (session.user as any).id;
     console.log("Fetching recommendations for userId:", userId);
 
-    // Get student's past attempts
+    // Get student's past attempts (only from available papers)
     const attempts = await prisma.$queryRaw`
       SELECT 
         ea.id,
@@ -27,6 +27,7 @@ export async function GET(request: Request) {
       FROM examattempt ea
       LEFT JOIN "Paper" p ON ea.paperid = p.id
       WHERE ea.userid = ${userId}
+      AND p."isAvailable" = true
       ORDER BY ea.submittedat DESC
       LIMIT 20
     ` as any[];
