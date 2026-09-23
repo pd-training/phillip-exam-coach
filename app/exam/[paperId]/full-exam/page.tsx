@@ -347,8 +347,8 @@ export default function FullExamMode() {
       <StudentNav />
 
       {/* Exam Header */}
-      <div className="bg-white border-b border-gray-200 px-6 py-4">
-        <div className="max-w-7xl mx-auto flex justify-between items-center">
+      <div className="bg-white border-b border-gray-200 px-0 py-4">
+        <div className="max-w-7xl mx-auto px-6 flex justify-between items-center">
           <div>
             <h1 className="text-xl font-bold text-gray-900">{examConfig?.title || "Full Exam Mode"}</h1>
             <p className="text-sm text-gray-500 mt-1">
