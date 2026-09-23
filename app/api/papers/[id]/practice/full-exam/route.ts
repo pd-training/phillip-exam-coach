@@ -194,21 +194,45 @@ export async function POST(
       // Store answers as JSON
       const answersJson = JSON.stringify(answers);
       
-      await prisma.$queryRaw`
-        INSERT INTO examattempt (id, paperid, userid, startedat, submittedat, score, passed, answers, createdat)
-        VALUES (
-          ${attemptId},
-          ${paperId}::uuid,
-          ${userId},
-          ${startTime},
-          ${now},
-          ${score},
-          ${passed},
-          ${answersJson}::jsonb,
-          NOW()
-        )
-      `;
-      console.log('Exam attempt saved with ID:', attemptId);
+      // Try to insert with answers column - if it fails, insert without it
+      try {
+        await prisma.$queryRaw`
+          INSERT INTO examattempt (id, paperid, userid, startedat, submittedat, score, passed, answers, createdat)
+          VALUES (
+            ${attemptId},
+            ${paperId}::uuid,
+            ${userId},
+            ${startTime},
+            ${now},
+            ${score},
+            ${passed},
+            ${answersJson}::jsonb,
+            NOW()
+          )
+        `;
+        console.log('Exam attempt saved with ID:', attemptId, '(with answers)');
+      } catch (insertWithAnswersError: any) {
+        // If answers column doesn't exist, try without it
+        if (insertWithAnswersError.message && insertWithAnswersError.message.includes('column "answers"')) {
+          console.log('answers column does not exist, saving without it');
+          await prisma.$queryRaw`
+            INSERT INTO examattempt (id, paperid, userid, startedat, submittedat, score, passed, createdat)
+            VALUES (
+              ${attemptId},
+              ${paperId}::uuid,
+              ${userId},
+              ${startTime},
+              ${now},
+              ${score},
+              ${passed},
+              NOW()
+            )
+          `;
+          console.log('Exam attempt saved with ID:', attemptId, '(without answers - run migration)');
+        } else {
+          throw insertWithAnswersError;
+        }
+      }
     } catch (insertError: any) {
       console.error('Error saving exam attempt:', insertError.message, insertError.code);
     }

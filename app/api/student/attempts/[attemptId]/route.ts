@@ -25,27 +25,58 @@ export async function GET(
     }
 
     // Get attempt details - only if it belongs to the current user
-    const attemptRes = await prisma.$queryRaw`
-      SELECT 
-        ea.id,
-        ea.userid,
-        ea.paperid,
-        ea.score,
-        ea.passed,
-        ea.startedat,
-        ea.submittedat,
-        ea.answers,
-        u.name as student_name,
-        u.email as student_email,
-        p.title as paper_name,
-        p."totalQuestions",
-        p."passingScore"
-      FROM examattempt ea
-      JOIN "User" u ON ea.userid = u.id
-      JOIN "Paper" p ON ea.paperid = p.id
-      WHERE ea.id = ${attemptId}
-      AND ea.userid = ${userId}
-    ` as any[];
+    // Try with answers column first, fall back if it doesn't exist
+    let attemptRes: any[] = [];
+    try {
+      attemptRes = await prisma.$queryRaw`
+        SELECT 
+          ea.id,
+          ea.userid,
+          ea.paperid,
+          ea.score,
+          ea.passed,
+          ea.startedat,
+          ea.submittedat,
+          ea.answers,
+          u.name as student_name,
+          u.email as student_email,
+          p.title as paper_name,
+          p."totalQuestions",
+          p."passingScore"
+        FROM examattempt ea
+        JOIN "User" u ON ea.userid = u.id
+        JOIN "Paper" p ON ea.paperid = p.id
+        WHERE ea.id = ${attemptId}
+        AND ea.userid = ${userId}
+      ` as any[];
+    } catch (err: any) {
+      // If answers column doesn't exist, fetch without it
+      if (err.message && err.message.includes('column ea.answers does not exist')) {
+        console.log('answers column does not exist yet, fetching without it');
+        attemptRes = await prisma.$queryRaw`
+          SELECT 
+            ea.id,
+            ea.userid,
+            ea.paperid,
+            ea.score,
+            ea.passed,
+            ea.startedat,
+            ea.submittedat,
+            u.name as student_name,
+            u.email as student_email,
+            p.title as paper_name,
+            p."totalQuestions",
+            p."passingScore"
+          FROM examattempt ea
+          JOIN "User" u ON ea.userid = u.id
+          JOIN "Paper" p ON ea.paperid = p.id
+          WHERE ea.id = ${attemptId}
+          AND ea.userid = ${userId}
+        ` as any[];
+      } else {
+        throw err;
+      }
+    }
 
     console.log("Attempt query result:", attemptRes?.length);
 
@@ -107,7 +138,10 @@ export async function GET(
         console.log("Loaded student answers from attempt:", Object.keys(studentAnswersMap).length);
       } catch (err) {
         console.log("Could not parse answers from attempt:", err);
+        studentAnswersMap = {};
       }
+    } else {
+      console.log("No answers found in attempt - column may not exist yet or exam is old");
     }
 
     // Map student answers to questions
