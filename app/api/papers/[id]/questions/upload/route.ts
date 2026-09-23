@@ -151,6 +151,7 @@ export async function POST(
 
     // Bulk insert new questions WITH option columns (required by schema)
     let insertedCount = 0;
+    let lastBulkError: any = null;
     
     console.log('Attempting bulk insert with', questions.length, 'questions...');
     console.log('Sample question:', JSON.stringify(questions[0], null, 2));
@@ -163,6 +164,7 @@ export async function POST(
       insertedCount = result.count;
       console.log('✅ Bulk inserted questions:', insertedCount);
     } catch (bulkError: any) {
+      lastBulkError = bulkError;
       console.error('❌ Bulk insert error:', bulkError.message);
       console.error('Error code:', bulkError.code);
       console.error('Full error:', JSON.stringify(bulkError, null, 2));
@@ -210,6 +212,24 @@ export async function POST(
 
     if (insertedCount === 0) {
       console.error('❌ CRITICAL: No questions were inserted despite', questions.length, 'valid questions in CSV');
+      
+      // Return the actual database error if we have it
+      if (lastBulkError) {
+        console.error('Bulk error details:', {
+          message: lastBulkError.message,
+          code: lastBulkError.code,
+          meta: lastBulkError.meta
+        });
+        return NextResponse.json(
+          { 
+            error: `Database error: ${lastBulkError.message}`,
+            code: lastBulkError.code || 'UNKNOWN',
+            details: lastBulkError.meta?.cause || lastBulkError.meta || 'No additional details'
+          },
+          { status: 500 }
+        );
+      }
+      
       return NextResponse.json(
         { 
           error: 'Failed to insert any questions. The CSV format may be incorrect or there is a database error. Supported formats: (1) 8-column with explicit options or (2) 4-column with auto-generated placeholder options. Check server logs for details.' 
