@@ -1207,40 +1207,60 @@ export default function PapersManagement() {
             <div style={{ marginBottom: "24px", paddingBottom: "20px", borderBottom: "1px solid #e5e7eb" }}>
               <h4 style={{ margin: "0 0 12px 0", color: "#374151" }}>Exam Settings</h4>
               
-              <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "12px", marginBottom: "16px" }}>
-                <div>
-                  <label style={{ display: "block", fontSize: "14px", fontWeight: "500", marginBottom: "6px" }}>Duration (min)</label>
-                  <input
-                    type="number"
-                    value={editPaperDuration}
-                    onChange={(e) => setEditPaperDuration(e.target.value)}
-                    min="1"
-                    style={{ width: "100%", padding: "10px", border: "1px solid #d1d5db", borderRadius: "6px", fontSize: "14px", boxSizing: "border-box" }}
-                  />
-                </div>
-                <div>
-                  <label style={{ display: "block", fontSize: "14px", fontWeight: "500", marginBottom: "6px" }}>Total Questions</label>
-                  <input
-                    type="number"
-                    value={editPaperTotalQuestions}
-                    onChange={(e) => setEditPaperTotalQuestions(e.target.value)}
-                    min="0"
-                    style={{ width: "100%", padding: "10px", border: "1px solid #d1d5db", borderRadius: "6px", fontSize: "14px", boxSizing: "border-box" }}
-                  />
-                </div>
-              </div>
-
-              <div>
-                <label style={{ display: "block", fontSize: "14px", fontWeight: "500", marginBottom: "6px" }}>Passing Score (%)</label>
+              <div style={{ marginBottom: "16px" }}>
+                <label style={{ display: "block", fontSize: "14px", fontWeight: "500", marginBottom: "6px" }}>Duration (min) *</label>
                 <input
                   type="number"
-                  value={editPaperPassingScore}
-                  onChange={(e) => setEditPaperPassingScore(e.target.value)}
-                  min="0"
-                  max="100"
+                  value={editPaperDuration}
+                  onChange={(e) => setEditPaperDuration(e.target.value)}
+                  min="1"
                   style={{ width: "100%", padding: "10px", border: "1px solid #d1d5db", borderRadius: "6px", fontSize: "14px", boxSizing: "border-box" }}
                 />
               </div>
+
+              {/* Show Total Questions and Passing Score only if NO parts are defined */}
+              {parts.length === 0 && (
+                <>
+                  <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "12px", marginBottom: "16px" }}>
+                    <div>
+                      <label style={{ display: "block", fontSize: "14px", fontWeight: "500", marginBottom: "6px" }}>Total Questions</label>
+                      <input
+                        type="number"
+                        value={editPaperTotalQuestions}
+                        onChange={(e) => setEditPaperTotalQuestions(e.target.value)}
+                        min="0"
+                        style={{ width: "100%", padding: "10px", border: "1px solid #d1d5db", borderRadius: "6px", fontSize: "14px", boxSizing: "border-box" }}
+                      />
+                    </div>
+                    <div>
+                      <label style={{ display: "block", fontSize: "14px", fontWeight: "500", marginBottom: "6px" }}>Passing Score (%)</label>
+                      <input
+                        type="number"
+                        value={editPaperPassingScore}
+                        onChange={(e) => setEditPaperPassingScore(e.target.value)}
+                        min="0"
+                        max="100"
+                        style={{ width: "100%", padding: "10px", border: "1px solid #d1d5db", borderRadius: "6px", fontSize: "14px", boxSizing: "border-box" }}
+                      />
+                    </div>
+                  </div>
+                </>
+              )}
+
+              {/* Show note when parts are defined */}
+              {parts.length > 0 && (
+                <div style={{
+                  backgroundColor: "#eff6ff",
+                  border: "1px solid #bfdbfe",
+                  borderRadius: "6px",
+                  padding: "12px",
+                  marginTop: "12px",
+                }}>
+                  <p style={{ margin: "0", fontSize: "13px", color: "#1e40af" }}>
+                    ℹ️ With exam parts defined, Total Questions and Passing Score are configured per part. Only timer is needed at exam level.
+                  </p>
+                </div>
+              )}
             </div>
 
             {/* Exam Parts Section */}
