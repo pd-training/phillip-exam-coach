@@ -22,7 +22,8 @@ export async function GET(request: Request) {
         ea.startedat,
         ea.submittedat,
         u.name as student_name,
-        p.title as paper_name
+        p.title as paper_name,
+        p."passingScore"
       FROM examattempt ea
       JOIN "User" u ON ea.userid = u.id
       JOIN "Paper" p ON ea.paperid = p.id

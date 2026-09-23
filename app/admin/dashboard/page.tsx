@@ -273,7 +273,7 @@ export default function AdminDashboard() {
                           <td className="px-6 py-4 text-gray-700">{attempt.paper_name}</td>
                           <td className="px-6 py-4">
                             <span className={`inline-flex items-center px-3 py-1 rounded-full text-sm font-medium ${
-                              parseInt(String(attempt.score)) >= 50
+                              parseInt(String(attempt.score)) >= (attempt.passingScore || 50)
                                 ? 'bg-green-100 text-green-800'
                                 : 'bg-red-100 text-red-800'
                             }`}>
