@@ -497,7 +497,7 @@ export default function UserDetailPage() {
                       <td style={{ padding: "8px 0", color: "#6b7280" }}>{formatTime(att.timeTaken)}</td>
                       <td style={{ padding: "8px 0", color: "#6b7280" }}>{formatDate(att.submittedAt || att.createdAt)}</td>
                       <td style={{ padding: "8px 0" }}>
-                        <a href="#" style={{ color: "#3b82f6", fontSize: "12px", textDecoration: "none", fontWeight: "600" }}>
+                        <a href={`/admin/attempts/${att.id}`} style={{ color: "#3b82f6", fontSize: "12px", textDecoration: "none", fontWeight: "600", cursor: "pointer" }}>
                           Review
                         </a>
                       </td>
