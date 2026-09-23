@@ -22,10 +22,11 @@ interface ExamConfig {
 }
 
 interface ExamPart {
-  id: string;
   partName: string;
+  partId?: string;
   passingScore: number;
   questions?: Question[];
+  questionCount?: number;
 }
 
 export default function FullExamMode() {
@@ -71,9 +72,17 @@ export default function FullExamMode() {
           setTimeLeft(data.examConfig.totalTime * 60);
           
           // Set exam parts if they exist
-          if (data.parts && Array.isArray(data.parts) && data.parts.length > 0) {
-            setParts(data.parts);
-            console.log('Exam parts loaded:', data.parts);
+          if (data.questionsByPart && Array.isArray(data.questionsByPart) && data.questionsByPart.length > 0) {
+            // Store parts with proper question counts from questionsByPart
+            const partsWithQuestions = data.questionsByPart.map((part: any) => ({
+              partName: part.part,
+              partId: part.partId,
+              passingScore: part.passingScore,
+              questions: part.questions,
+              questionCount: part.questions?.length || 0,
+            }));
+            setParts(partsWithQuestions);
+            console.log('Exam parts loaded:', partsWithQuestions);
           }
         } else {
           alert('No questions found for this exam');
@@ -365,6 +374,44 @@ export default function FullExamMode() {
         <div className="max-w-7xl mx-auto px-6 h-full flex overflow-hidden">
           {/* Left Main Content */}
           <div className="flex-1 flex flex-col py-8 pr-6 overflow-y-auto">
+            {/* Exam Structure Info - Show at the beginning */}
+            {currentQIndex === 0 && parts.length > 0 && (
+              <div
+                style={{
+                  padding: "20px",
+                  backgroundColor: "#f0f9ff",
+                  border: "2px solid #0284c7",
+                  borderRadius: "8px",
+                  marginBottom: "24px",
+                }}
+              >
+                <div style={{ fontSize: "16px", fontWeight: "700", color: "#0c4a6e", marginBottom: "12px" }}>
+                  📋 Exam Structure
+                </div>
+                <div style={{ display: "grid", gridTemplateColumns: parts.length <= 2 ? "repeat(" + parts.length + ", 1fr)" : "repeat(auto-fit, minmax(250px, 1fr))", gap: "12px" }}>
+                  {parts.map((part, idx) => (
+                    <div key={idx} style={{
+                      backgroundColor: "white",
+                      padding: "12px",
+                      borderRadius: "6px",
+                      border: "1px solid #bfdbfe",
+                    }}>
+                      <div style={{ fontWeight: "600", color: "#1e40af", marginBottom: "6px" }}>
+                        {part.partName}
+                      </div>
+                      <div style={{ fontSize: "13px", color: "#0c4a6e", lineHeight: "1.5" }}>
+                        <div>📊 {part.questionCount} questions</div>
+                        <div>✓ Passing: {part.passingScore}%</div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+                <div style={{ fontSize: "12px", color: "#0c4a6e", marginTop: "12px", fontStyle: "italic" }}>
+                  Total: {questions.length} questions • Time: {examConfig?.totalTime} minutes
+                </div>
+              </div>
+            )}
+
             {/* Part Separator */}
             {currentPart && currentPart.questionInPart === 1 && (
               <div
@@ -528,6 +575,22 @@ export default function FullExamMode() {
             flexShrink: 0,
           }}
         >
+          {/* Part Info - If parts exist */}
+          {parts.length > 0 && currentPart && (
+            <div style={{ marginBottom: "20px", padding: "12px", backgroundColor: "#eff6ff", border: "1px solid #bfdbfe", borderRadius: "6px" }}>
+              <p style={{ margin: "0 0 8px 0", fontSize: "12px", color: "#0c4a6e", fontWeight: "600" }}>
+                CURRENT PART
+              </p>
+              <div style={{ fontSize: "14px", fontWeight: "600", color: "#1e40af", marginBottom: "6px" }}>
+                {currentPart.partName}
+              </div>
+              <div style={{ fontSize: "12px", color: "#0c4a6e", lineHeight: "1.6" }}>
+                <div>Progress: Q{currentPart.questionInPart}/{currentPart.totalInPart}</div>
+                <div>Passing: {currentPart.passingScore}%</div>
+              </div>
+            </div>
+          )}
+
           {/* Progress Counter */}
           <div style={{ marginBottom: "20px", paddingBottom: "15px", borderBottom: "1px solid #e5e7eb" }}>
             <p style={{ margin: "0 0 8px 0", fontSize: "13px", color: "#666", fontWeight: "500" }}>
@@ -553,10 +616,26 @@ export default function FullExamMode() {
                 paddingRight: "5px",
               }}
             >
-              {questions.map((q, idx) => {
+              {questions.map((q, idx, arr) => {
                 const qAnswered = q.id in answers;
                 const qFlagged = flagged.has(q.id);
                 const isCurrent = idx === currentQIndex;
+                
+                // Find which part this question belongs to
+                let questionPartIndex = 0;
+                let isPartStart = false;
+                if (parts.length > 0) {
+                  let cumIndex = 0;
+                  for (let i = 0; i < parts.length; i++) {
+                    const partQuestionCount = parts[i].questionCount || 0;
+                    if (idx < cumIndex + partQuestionCount) {
+                      questionPartIndex = i;
+                      isPartStart = idx === cumIndex;
+                      break;
+                    }
+                    cumIndex += partQuestionCount;
+                  }
+                }
 
                 return (
                   <button
@@ -572,16 +651,20 @@ export default function FullExamMode() {
                       color: isCurrent ? "white" : "#1f2937",
                       border: isCurrent
                         ? "2px solid #3b82f6"
+                        : isPartStart && parts.length > 0
+                        ? "2px solid #1e40af"
                         : qAnswered
                         ? "1px solid #c7d2fe"
                         : "1px solid #d1d5db",
                       borderRadius: "4px",
                       cursor: "pointer",
-                      fontWeight: "500",
+                      fontWeight: isPartStart ? "700" : "500",
                       fontSize: "12px",
                       transition: "all 0.2s",
                       position: "relative",
+                      boxShadow: isPartStart && parts.length > 0 ? "0 0 4px #1e40af" : "none",
                     }}
+                    title={isPartStart && parts.length > 0 ? `Start of ${parts[questionPartIndex]?.partName}` : ""}
                   >
                     {idx + 1}
                     {qFlagged && (
@@ -595,8 +678,8 @@ export default function FullExamMode() {
                       >
                         🚩
                       </span>
-                    )}
-                  </button>
+                      )}
+                    </button>
                 );
               })}
             </div>
