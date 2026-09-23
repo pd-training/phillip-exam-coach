@@ -292,20 +292,21 @@ export default function FullExamMode() {
       </div>
 
       {/* Main Content & Sidebar */}
-      <div className="flex flex-1 overflow-hidden">
-        {/* Left Main Content */}
-        <div className="flex-1 flex flex-col p-8 overflow-y-auto bg-white">
-          {/* Question */}
-          <div
-            style={{
-              padding: "25px",
-              backgroundColor: "white",
-              borderRadius: "8px",
-              marginBottom: "25px",
-              border: "1px solid #e5e7eb",
-              flex: 1,
-            }}
-          >
+      <div className="flex-1 overflow-hidden bg-white">
+        <div className="max-w-7xl mx-auto px-6 h-full flex overflow-hidden">
+          {/* Left Main Content */}
+          <div className="flex-1 flex flex-col py-8 pr-6 overflow-y-auto">
+            {/* Question */}
+            <div
+              style={{
+                padding: "25px",
+                backgroundColor: "white",
+                borderRadius: "8px",
+                marginBottom: "25px",
+                border: "1px solid #e5e7eb",
+                flex: 1,
+              }}
+            >
             <p
               style={{
                 margin: "0 0 20px 0",
@@ -427,13 +428,14 @@ export default function FullExamMode() {
         {/* Right Sidebar */}
         <div
           style={{
-            width: "300px",
-            backgroundColor: "white",
+            width: "280px",
+            backgroundColor: "#f9fafb",
             borderLeft: "1px solid #e5e7eb",
             padding: "20px",
             display: "flex",
             flexDirection: "column",
             overflowY: "auto",
+            flexShrink: 0,
           }}
         >
           {/* Progress Counter */}
@@ -542,6 +544,7 @@ export default function FullExamMode() {
             >
               {submitting ? "Submitting..." : "✓ Submit Exam"}
             </button>
+          </div>
           </div>
         </div>
       </div>
