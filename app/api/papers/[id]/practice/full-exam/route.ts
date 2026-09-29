@@ -198,10 +198,10 @@ export async function POST(
       return NextResponse.json({ error: 'Invalid JSON' }, { status: 400 });
     }
 
-    const { userId, answers, timeTaken } = body; // answers = { [questionId]: 'A' }, timeTaken in seconds
+    const { userId, answers, questionIds, timeTaken } = body; // questionIds = all question IDs presented in the exam
     const paperId = params.id;
 
-    console.log('Submitting exam - userId:', userId, 'paperId:', paperId, 'answers:', Object.keys(answers || {}).length, 'timeTaken:', timeTaken);
+    console.log('Submitting exam - userId:', userId, 'paperId:', paperId, 'answers:', Object.keys(answers || {}).length, 'questions presented:', questionIds?.length, 'timeTaken:', timeTaken);
 
     if (!userId || !answers || Object.keys(answers).length === 0) {
       return NextResponse.json(
@@ -359,14 +359,15 @@ export async function POST(
       const now = new Date();
       const startTime = new Date(now.getTime() - (timeTaken || 0) * 1000); // Subtract timeTaken seconds
       
-      // Store answers as JSON
+      // Store answers and questionIds as JSON
       const answersJson = JSON.stringify(answers);
+      const questionIdsJson = JSON.stringify(questionIds || []);
       const partScoresJson = partScores.length > 0 ? JSON.stringify(partScores) : null;
       
-      // Try to insert with answers and partScores columns
+      // Try to insert with answers, partScores, and questionIds columns
       try {
         await prisma.$queryRaw`
-          INSERT INTO examattempt (id, paperid, userid, startedat, submittedat, score, passed, answers, "partScores", createdat)
+          INSERT INTO examattempt (id, paperid, userid, startedat, submittedat, score, passed, answers, "questionIds", "partScores", createdat)
           VALUES (
             ${attemptId},
             ${paperId}::uuid,
@@ -376,19 +377,20 @@ export async function POST(
             ${score},
             ${passed},
             ${answersJson}::jsonb,
+            ${questionIdsJson}::jsonb,
             ${partScoresJson}::jsonb,
             NOW()
           )
         `;
-        console.log('Exam attempt saved with ID:', attemptId, '(with answers and partScores)');
+        console.log('Exam attempt saved with ID:', attemptId, '(with answers, questionIds, and partScores)');
       } catch (insertWithScoresError: any) {
-        // If partScores column doesn't exist, try without it
+        // If questionIds column doesn't exist, try without it
         const errorMsg = insertWithScoresError.message || '';
-        if (errorMsg.includes('partScores') || errorMsg.includes('part')) {
-          console.log('partScores column does not exist, saving without it');
+        if (errorMsg.includes('questionIds') || (errorMsg.includes('column') && errorMsg.includes('does not exist'))) {
+          console.log('questionIds column does not exist, saving without it');
           try {
             await prisma.$queryRaw`
-              INSERT INTO examattempt (id, paperid, userid, startedat, submittedat, score, passed, answers, createdat)
+              INSERT INTO examattempt (id, paperid, userid, startedat, submittedat, score, passed, answers, "partScores", createdat)
               VALUES (
                 ${attemptId},
                 ${paperId}::uuid,
@@ -398,31 +400,57 @@ export async function POST(
                 ${score},
                 ${passed},
                 ${answersJson}::jsonb,
+                ${partScoresJson}::jsonb,
                 NOW()
               )
             `;
-            console.log('Exam attempt saved with ID:', attemptId, '(with answers only)');
-          } catch (insertWithAnswersError: any) {
-            // If answers column doesn't exist either, save without it
-            const answerErrorMsg = insertWithAnswersError.message || '';
-            if (answerErrorMsg.includes('column') && answerErrorMsg.includes('answers')) {
-              console.log('Neither answers nor partScores columns exist, saving without them');
-              await prisma.$queryRaw`
-                INSERT INTO examattempt (id, paperid, userid, startedat, submittedat, score, passed, createdat)
-                VALUES (
-                  ${attemptId},
-                  ${paperId}::uuid,
-                  ${userId},
-                  ${startTime},
-                  ${now},
-                  ${score},
-                  ${passed},
-                  NOW()
-                )
-              `;
-              console.log('Exam attempt saved with ID:', attemptId, '(without answers or partScores)');
+            console.log('Exam attempt saved with ID:', attemptId, '(with answers and partScores)');
+          } catch (insertWithPartScoresError: any) {
+            // Try without partScores
+            const partScoresErrorMsg = insertWithPartScoresError.message || '';
+            if (partScoresErrorMsg.includes('partScores')) {
+              console.log('partScores column does not exist, saving without it');
+              try {
+                await prisma.$queryRaw`
+                  INSERT INTO examattempt (id, paperid, userid, startedat, submittedat, score, passed, answers, createdat)
+                  VALUES (
+                    ${attemptId},
+                    ${paperId}::uuid,
+                    ${userId},
+                    ${startTime},
+                    ${now},
+                    ${score},
+                    ${passed},
+                    ${answersJson}::jsonb,
+                    NOW()
+                  )
+                `;
+                console.log('Exam attempt saved with ID:', attemptId, '(with answers only)');
+              } catch (insertWithAnswersError: any) {
+                // If answers column doesn't exist either, save without it
+                const answerErrorMsg = insertWithAnswersError.message || '';
+                if (answerErrorMsg.includes('column') && answerErrorMsg.includes('answers')) {
+                  console.log('No optional columns exist, saving without them');
+                  await prisma.$queryRaw`
+                    INSERT INTO examattempt (id, paperid, userid, startedat, submittedat, score, passed, createdat)
+                    VALUES (
+                      ${attemptId},
+                      ${paperId}::uuid,
+                      ${userId},
+                      ${startTime},
+                      ${now},
+                      ${score},
+                      ${passed},
+                      NOW()
+                    )
+                  `;
+                  console.log('Exam attempt saved with ID:', attemptId, '(without optional columns)');
+                } else {
+                  throw insertWithAnswersError;
+                }
+              }
             } else {
-              throw insertWithAnswersError;
+              throw insertWithPartScoresError;
             }
           }
         } else {

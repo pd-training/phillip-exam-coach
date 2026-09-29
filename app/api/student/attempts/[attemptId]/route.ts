@@ -38,6 +38,7 @@ export async function GET(
           ea.startedat,
           ea.submittedat,
           ea.answers,
+          ea."questionIds",
           ea."partScores",
           u.name as student_name,
           u.email as student_email,
@@ -51,10 +52,10 @@ export async function GET(
         AND ea.userid = ${userId}
       ` as any[];
     } catch (err: any) {
-      // If partScores column doesn't exist, fetch without it
+      // If questionIds or partScores columns don't exist, fetch without them
       const errorMsg = err.message || '';
-      if (errorMsg.includes('partScores') || errorMsg.includes('column') && errorMsg.includes('does not exist')) {
-        console.log('partScores column does not exist yet, fetching without it');
+      if (errorMsg.includes('questionIds') || errorMsg.includes('partScores')) {
+        console.log('questionIds or partScores columns do not exist, fetching without them');
         attemptRes = await prisma.$queryRaw`
           SELECT 
             ea.id,
@@ -65,28 +66,6 @@ export async function GET(
             ea.startedat,
             ea.submittedat,
             ea.answers,
-            u.name as student_name,
-            u.email as student_email,
-            p.title as paper_name,
-            p."totalQuestions",
-            p."passingScore"
-          FROM examattempt ea
-          JOIN "User" u ON ea.userid = u.id
-          JOIN "Paper" p ON ea.paperid = p.id
-          WHERE ea.id = ${attemptId}
-          AND ea.userid = ${userId}
-        ` as any[];
-      } else if (errorMsg.includes('column') && errorMsg.includes('answers') && errorMsg.includes('does not exist')) {
-        console.log('Neither partScores nor answers columns exist yet, fetching without them');
-        attemptRes = await prisma.$queryRaw`
-          SELECT 
-            ea.id,
-            ea.userid,
-            ea.paperid,
-            ea.score,
-            ea.passed,
-            ea.startedat,
-            ea.submittedat,
             u.name as student_name,
             u.email as student_email,
             p.title as paper_name,
@@ -188,8 +167,24 @@ export async function GET(
     }
 
     // Map student answers to questions - ONLY questions from this specific attempt
-    // (not the entire question bank, but not filtering out unanswered questions)
-    const attemptQuestionIds = new Set(Object.keys(studentAnswersMap));
+    // Use questionIds if available (from DB), otherwise fall back to answered question IDs
+    let attemptQuestionIds: Set<string>;
+    if (attempt.questionIds) {
+      try {
+        const qIds = typeof attempt.questionIds === 'string' 
+          ? JSON.parse(attempt.questionIds) 
+          : attempt.questionIds;
+        attemptQuestionIds = new Set(qIds || []);
+        console.log(`✅ Loaded ${attemptQuestionIds.size} question IDs from attempt`);
+      } catch (err) {
+        console.log('⚠️ Could not parse questionIds, using answered questions:', err);
+        attemptQuestionIds = new Set(Object.keys(studentAnswersMap));
+      }
+    } else {
+      console.log(`⚠️ No questionIds in attempt - using answered questions as fallback`);
+      attemptQuestionIds = new Set(Object.keys(studentAnswersMap));
+    }
+
     const questionsWithAnswers = questions
       .filter(q => attemptQuestionIds.has(q.id))  // Only questions that appeared in this attempt
       .map((q: any) => {
@@ -213,7 +208,7 @@ export async function GET(
 
     const questionsAnswered = questionsWithAnswers.filter(q => q.studentAnswer).length;
     const questionsNotAnswered = questionsWithAnswers.filter(q => !q.studentAnswer).length;
-    console.log(`Questions with answers: ${questionsAnswered}, without answers: ${questionsNotAnswered}`);
+    console.log(`Questions in attempt: ${questionsAnswered} answered, ${questionsNotAnswered} not answered, total ${questionsWithAnswers.length}`);
 
     // Calculate part scores if parts exist
     let partScores: any[] = [];

@@ -170,6 +170,7 @@ export default function FullExamMode() {
         body: JSON.stringify({
           userId: (session?.user as any)?.id,
           answers,
+          questionIds: questions.map(q => q.id),  // Send all question IDs from this attempt
           timeTaken,
         }),
       });
