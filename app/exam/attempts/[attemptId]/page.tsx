@@ -162,6 +162,12 @@ export default function AttemptReviewPage() {
 
   const strongChapters = chapterStats.filter(c => c.percentage >= 80);
   const weakChapters = chapterStats.filter(c => c.percentage < 60);
+  
+  // Get top 3 worst-performing chapters for feedback
+  const topWeakChapters = chapterStats
+    .filter(c => c.percentage < 60)
+    .sort((a, b) => a.percentage - b.percentage)  // Sort by percentage (worst first)
+    .slice(0, 3);  // Take only top 3
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -230,7 +236,7 @@ export default function AttemptReviewPage() {
                 <>
                   <h3 className="text-lg font-semibold text-gray-900 mb-3">💪 Good Effort, More to Go</h3>
                   <p className="text-gray-700 leading-relaxed mb-4">
-                    Your score of <strong>{attempt.score}%</strong> shows you have a solid foundation. You performed well in some areas, but chapters <strong>{weakChapters.map(c => c.chapter).join(', ')}</strong> need more attention. Focus your practice on these areas and review the explanations for questions you missed to improve.
+                    Your score of <strong>{attempt.score}%</strong> shows you have a solid foundation. You performed well in some areas, but chapters <strong>{topWeakChapters.map(c => c.chapter).join(', ')}</strong> need more attention. Focus your practice on these areas and review the explanations for questions you missed to improve.
                   </p>
                 </>
               )}

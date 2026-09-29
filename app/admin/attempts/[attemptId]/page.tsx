@@ -140,6 +140,12 @@ export default function AttemptDetailsPage() {
 
   const strongChapters = chapterStats.filter(c => c.percentage >= 80);
   const weakChapters = chapterStats.filter(c => c.percentage < 60);
+  
+  // Get top 3 worst-performing chapters for feedback
+  const topWeakChapters = chapterStats
+    .filter(c => c.percentage < 60)
+    .sort((a, b) => a.percentage - b.percentage)  // Sort by percentage (worst first)
+    .slice(0, 3);  // Take only top 3
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -207,7 +213,7 @@ export default function AttemptDetailsPage() {
               </div>
               {weakChapters.length > 0 ? (
                 <div className="space-y-3">
-                  {weakChapters.map(ch => (
+                  {topWeakChapters.map(ch => (
                     <div key={ch.chapter} className="p-4 bg-red-50 rounded-lg border border-red-200">
                       <div className="flex justify-between items-center mb-2">
                         <p className="font-medium text-gray-900">Chapter {ch.chapter}</p>
@@ -235,7 +241,7 @@ export default function AttemptDetailsPage() {
             <h4 className="font-semibold text-gray-900 mb-2">📊 Assessment Summary</h4>
             {weakChapters.length > 0 ? (
               <p className="text-gray-700">
-                Student should focus on Chapter{weakChapters.length > 1 ? 's' : ''} <strong>{weakChapters.map(c => c.chapter).join(', ')}</strong> where performance was below 60%. Recommend targeted practice in these areas.
+                Student should focus on Chapter{topWeakChapters.length > 1 ? 's' : ''} <strong>{topWeakChapters.map(c => c.chapter).join(', ')}</strong> where performance was below 60%. Recommend targeted practice in these areas.
               </p>
             ) : (
               <p className="text-gray-700">
