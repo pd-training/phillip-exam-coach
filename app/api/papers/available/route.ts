@@ -4,17 +4,21 @@ export const dynamic = 'force-dynamic';
 
 export async function GET(request: Request) {
   try {
-    // Get only available papers (where admin has not turned off availability)
-    const papers = await prisma.$queryRaw`
-      SELECT 
-        id,
-        title,
-        description,
-        "totalTime"
-      FROM "Paper"
-      WHERE "isAvailable" = true
-      ORDER BY title ASC
-    ` as any[];
+    // Get only available papers (where admin has turned on availability)
+    const papers = await prisma.paper.findMany({
+      where: {
+        isAvailable: true,
+      },
+      select: {
+        id: true,
+        title: true,
+        description: true,
+        totalTime: true,
+      },
+      orderBy: {
+        title: 'asc',
+      },
+    });
 
     return Response.json({ papers: papers || [] });
   } catch (error: any) {

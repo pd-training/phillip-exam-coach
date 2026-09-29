@@ -151,16 +151,6 @@ export default function PracticePage() {
     }
   }, []);
 
-  const formatTime = (seconds: number) => {
-    if (!seconds) return '-';
-    const hours = Math.floor(seconds / 60);
-    const minutes = seconds % 60;
-    if (hours > 0) {
-      return `${hours}h ${minutes}m`;
-    }
-    return `${minutes}m`;
-  };
-
   if (status === 'loading' || loading) {
     return (
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
@@ -281,11 +271,10 @@ export default function PracticePage() {
                           Available for practice
                         </p>
                         <div className="flex gap-4 mt-3 text-sm text-gray-600">
-                          {paper.description && (
+                          {paper.description && paper.description.trim() ? (
                             <p className="line-clamp-2">{paper.description}</p>
-                          )}
-                          {!paper.description && (
-                            <p className="text-gray-500">No description available</p>
+                          ) : (
+                            <p className="text-gray-500 italic">No description available</p>
                           )}
                         </div>
                       </div>
