@@ -227,7 +227,7 @@ export default function PracticePage() {
               <button className="group w-full bg-white rounded-2xl p-8 border-2 border-gray-200 hover:border-purple-600 hover:shadow-lg transition duration-300 text-left">
                 <div className="w-14 h-14 bg-purple-100 rounded-lg flex items-center justify-center mb-6 group-hover:bg-purple-600 transition">
                   <svg className="w-7 h-7 text-purple-600 group-hover:text-white transition" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6.253v13m0-13C6.5 6.253 2 10.998 2 17.001c0 5.591 3.824 10.29 9 11.622m0-13c5.5 0 10-4.745 10-10.999C22 5.254 17.493.545 12 .545m0 13v-13m0 0C6.477 6.416 2 11.033 2 16.5c0 4.978 3.645 9.131 8.39 9.88M12 .545c5.289 0 9.882 4.033 10.236 9.099" />
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 4H5a2 2 0 00-2 2v14a2 2 0 002 2h10a2 2 0 002-2V8.5L9 4z" />
                   </svg>
                 </div>
                 <h3 className="text-xl font-bold text-gray-900 mb-2">Practice by Chapter</h3>
