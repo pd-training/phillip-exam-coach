@@ -258,38 +258,17 @@ export default function PracticePage() {
 
           {recommendedChapters.length > 0 ? (
             <>
-              <p className="text-gray-600 mb-6">Based on your exam attempts in {paper?.title}, focus on these chapters:</p>
-              <div className="space-y-3">
-                {recommendedChapters.map((chapter, idx) => (
+              <p className="text-gray-600 mb-6">Focus on these chapters based on your exam performance:</p>
+              <div className="space-y-2">
+                {recommendedChapters.map((chapter) => (
                   <Link key={chapter.id} href={`/exam/${paperId}/practice-chapter/${chapter.chapterNumber}`}>
-                    <div className="bg-white rounded-lg p-4 border border-gray-200 hover:border-orange-300 hover:shadow-md transition duration-300 cursor-pointer group">
-                      <div className="flex items-center justify-between">
-                        <div className="flex items-center gap-4 flex-1">
-                          <div className="w-8 h-8 bg-orange-100 rounded flex items-center justify-center font-bold text-orange-600 group-hover:bg-orange-600 group-hover:text-white transition">
-                            {idx + 1}
-                          </div>
-                          <div>
-                            <p className="font-semibold text-gray-900">{chapter.chapterTitle}</p>
-                            <p className="text-xs text-gray-600">Chapter {chapter.chapterNumber}</p>
-                          </div>
-                        </div>
-                        <div className="flex items-center gap-3">
-                          <div className="text-right">
-                            <div className="text-sm font-bold text-orange-600">
-                              {chapter.percentage}% correct
-                            </div>
-                            <div className="w-20 h-1.5 bg-gray-200 rounded-full overflow-hidden">
-                              <div
-                                className="h-full bg-orange-500"
-                                style={{ width: `${chapter.percentage}%` }}
-                              />
-                            </div>
-                          </div>
-                          <svg className="w-4 h-4 text-gray-400 group-hover:text-orange-600 transition flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-                          </svg>
-                        </div>
+                    <div className="bg-white rounded-lg p-4 border border-gray-200 hover:border-blue-500 hover:bg-blue-50 transition duration-200 cursor-pointer group flex items-center justify-between">
+                      <div>
+                        <p className="font-semibold text-gray-900">Chapter {chapter.chapterNumber}: {chapter.chapterTitle}</p>
                       </div>
+                      <svg className="w-5 h-5 text-gray-400 group-hover:text-blue-600 transition flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                      </svg>
                     </div>
                   </Link>
                 ))}
