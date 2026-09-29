@@ -97,8 +97,10 @@ export async function GET(
 
     console.log("Found questions:", questions.length);
 
-    // Calculate chapter performance across all attempts
-    const chapterStats: Record<number, { correct: number; total: number; ids: string[] }> = {};
+    // Calculate chapter performance aggregated across ALL attempts
+    const chapterStats: Record<number, { correct: number; total: number }> = {};
+
+    console.log(`Aggregating performance from ${attemptsRes.length} attempt(s) on this paper`);
 
     // Aggregate performance across all attempts
     for (const attempt of attemptsRes) {
@@ -129,7 +131,8 @@ export async function GET(
         attemptQuestionIds = new Set(Object.keys(studentAnswers));
       }
 
-      // Score each question and track by chapter
+      // Score each question and aggregate by chapter
+      // Same question can appear in multiple attempts - each counts separately
       for (const q of questions) {
         // Only count questions that were in this attempt
         if (!attemptQuestionIds.has(q.id)) {
@@ -137,12 +140,13 @@ export async function GET(
         }
 
         if (!chapterStats[q.chapterNumber]) {
-          chapterStats[q.chapterNumber] = { correct: 0, total: 0, ids: [] };
+          chapterStats[q.chapterNumber] = { correct: 0, total: 0 };
         }
 
-        chapterStats[q.chapterNumber].ids.push(q.id);
+        // Increment total questions attempted (across all attempts)
         chapterStats[q.chapterNumber].total += 1;
 
+        // Increment correct count if answer was right
         const studentAnswer = studentAnswers[q.id];
         if (studentAnswer === q.correctAnswer) {
           chapterStats[q.chapterNumber].correct += 1;
@@ -157,6 +161,11 @@ export async function GET(
       total: stats.total,
       percentage: stats.total > 0 ? Math.round((stats.correct / stats.total) * 100) : 0,
     }));
+
+    console.log("Aggregated chapter performance:");
+    chapterPerformance.forEach(c => {
+      console.log(`  Chapter ${c.chapterNumber}: ${c.correct}/${c.total} = ${c.percentage}%`);
+    });
 
     console.log("Chapter performance:", chapterPerformance.length, "chapters");
 
@@ -186,7 +195,7 @@ export async function GET(
         paperId: paperId,
       }));
 
-    console.log("Focus areas (weak chapters):", weakChapters.length);
+    console.log("Focus areas (weak chapters from aggregated attempts):", weakChapters.length);
 
     return Response.json({
       focusAreas: weakChapters,
@@ -194,6 +203,8 @@ export async function GET(
       totalAttempts: attemptsRes.length,
       allChaptersCount: chapterPerformance.length,
       weakChaptersCount: chapterPerformance.filter(c => c.percentage < 60).length,
+      aggregatedData: true,  // Clearly indicates this is aggregated across all attempts
+      message: `Based on analysis of ${attemptsRes.length} full exam attempt(s) on this paper`,
     });
   } catch (error: any) {
     console.error("Error fetching focus areas:", error);
