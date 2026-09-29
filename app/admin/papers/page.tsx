@@ -79,7 +79,7 @@ export default function PapersManagement() {
 
   // Paper edit form
   const [editPaperTitle, setEditPaperTitle] = useState("");
-
+  const [editPaperDescription, setEditPaperDescription] = useState("");
   const [editPaperDuration, setEditPaperDuration] = useState("120");
   const [editPaperTotalQuestions, setEditPaperTotalQuestions] = useState("0");
   const [editPaperPassingScore, setEditPaperPassingScore] = useState("75");
@@ -245,6 +245,7 @@ export default function PapersManagement() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           title: editPaperTitle.trim(),
+          description: editPaperDescription.trim(),
           durationMinutes: parseInt(editPaperDuration) || 120,
           totalQuestions: parseInt(editPaperTotalQuestions) || 0,
           passingScore: parseInt(editPaperPassingScore) || 75,
@@ -764,6 +765,7 @@ export default function PapersManagement() {
                         onClick={() => {
                           setSelectedPaperId(paper.id);
                           setEditPaperTitle(paper.title);
+                          setEditPaperDescription(paper.description || "");
                           setEditPaperAvailability(paper.isAvailable);
                           fetchPaperSettings(paper.id);
                           setActiveModal("paperSettings");
@@ -1246,6 +1248,17 @@ export default function PapersManagement() {
                   onChange={(e) => setEditPaperTitle(e.target.value)}
                   style={{ width: "100%", padding: "10px", border: "1px solid #d1d5db", borderRadius: "6px", fontSize: "14px", boxSizing: "border-box" }}
                 />
+              </div>
+
+              <div style={{ marginBottom: "16px" }}>
+                <label style={{ display: "block", fontSize: "14px", fontWeight: "500", marginBottom: "6px" }}>Description</label>
+                <textarea
+                  value={editPaperDescription}
+                  onChange={(e) => setEditPaperDescription(e.target.value)}
+                  placeholder="e.g., Life Insurance & Investment-Linked Policies exam for Financial Advisors. Required for Partnership Dept."
+                  style={{ width: "100%", padding: "10px", border: "1px solid #d1d5db", borderRadius: "6px", fontSize: "14px", boxSizing: "border-box", minHeight: "80px", fontFamily: "inherit", resize: "vertical" }}
+                />
+                <p style={{ fontSize: "12px", color: "#6b7280", marginTop: "4px" }}>Explain what this paper is about and who needs it. Students will see this when browsing papers.</p>
               </div>
 
               <div style={{ marginBottom: "16px" }}>

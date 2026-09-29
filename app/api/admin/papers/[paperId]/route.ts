@@ -13,11 +13,11 @@ async function updatePaper(paperId: string, body: any) {
     select: {
       id: true,
       title: true,
+      description: true,
       durationMinutes: true,
       totalQuestions: true,
       passingScore: true,
       isAvailable: true,
-      // description intentionally excluded to avoid DB schema mismatch
     }
   });
 
@@ -37,7 +37,9 @@ async function updatePaper(paperId: string, body: any) {
   if (title !== undefined) {
     updateData.title = title.trim();
   }
-  // Note: description field excluded to avoid database schema mismatch
+  if (description !== undefined) {
+    updateData.description = description.trim();
+  }
   if (totalQuestions !== undefined && totalQuestions > 0) {
     updateData.totalQuestions = totalQuestions;
   }
@@ -63,11 +65,11 @@ async function updatePaper(paperId: string, body: any) {
       select: {
         id: true,
         title: true,
+        description: true,
         durationMinutes: true,
         totalQuestions: true,
         passingScore: true,
         isAvailable: true,
-        // description intentionally excluded
       }
     });
     return { error: null, status: 200, paper };
