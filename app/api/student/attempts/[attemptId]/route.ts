@@ -38,6 +38,7 @@ export async function GET(
           ea.startedat,
           ea.submittedat,
           ea.answers,
+          ea."partScores",
           u.name as student_name,
           u.email as student_email,
           p.title as paper_name,
@@ -163,9 +164,11 @@ export async function GET(
       console.log("⚠️ No answers found in attempt - answers column may not exist or is NULL");
     }
 
-    // Map student answers to questions - ONLY questions that were answered
+    // Map student answers to questions - ONLY questions from this specific attempt
+    // (not the entire question bank, but not filtering out unanswered questions)
+    const attemptQuestionIds = new Set(Object.keys(studentAnswersMap));
     const questionsWithAnswers = questions
-      .filter(q => studentAnswersMap[q.id])  // Only questions that have answers
+      .filter(q => attemptQuestionIds.has(q.id))  // Only questions that appeared in this attempt
       .map((q: any) => {
         const studentAnswerValue = studentAnswersMap[q.id];
         const isCorrect = studentAnswerValue === q.correctAnswer;
@@ -181,7 +184,7 @@ export async function GET(
           explanation: q.explanation,
           chapterNumber: q.chapterNumber,
           studentAnswer: studentAnswerValue || null,
-          isCorrect: isCorrect || false,
+          isCorrect: studentAnswerValue ? (isCorrect || false) : null,  // null if not answered
         };
       });
 
@@ -216,6 +219,23 @@ export async function GET(
       }
     }
 
+    // Use partScores from database if available, otherwise use empty array
+    let finalPartScores: any[] = [];
+    if (attempt.partScores) {
+      try {
+        finalPartScores = typeof attempt.partScores === 'string' 
+          ? JSON.parse(attempt.partScores) 
+          : attempt.partScores;
+        console.log(`✅ Loaded ${finalPartScores.length} part scores from database`);
+      } catch (err) {
+        console.log('⚠️ Could not parse partScores from database:', err);
+        finalPartScores = [];
+      }
+    } else {
+      console.log('⚠️ No partScores found in database - partScores column may not exist or is NULL');
+      console.log('   Run: GET /api/admin/add-partscores-column to add the column');
+    }
+
     return Response.json({
       attempt: {
         id: attempt.id,
@@ -231,7 +251,7 @@ export async function GET(
         totalQuestions: attempt.totalQuestions,
         passingScore: attempt.passingScore,
         timeTaken: Math.round((new Date(attempt.submittedat).getTime() - new Date(attempt.startedat).getTime()) / 1000),
-        partScores: partScores.length > 0 ? partScores : null,
+        partScores: finalPartScores.length > 0 ? finalPartScores : null,
       },
       questions: questionsWithAnswers,
     });
