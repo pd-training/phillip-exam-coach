@@ -185,13 +185,14 @@ export async function GET(
       attemptQuestionIds = new Set(Object.keys(studentAnswersMap));
     }
 
-    const questionsWithAnswers = questions
-      .filter(q => attemptQuestionIds.has(q.id))  // Only questions that appeared in this attempt
-      .map((q: any) => {
+    // First map questions to enriched format
+    const questionsWithAnswersMap = new Map();
+    questions.forEach((q: any) => {
+      if (attemptQuestionIds.has(q.id)) {  // Only questions that appeared in this attempt
         const studentAnswerValue = studentAnswersMap[q.id];
         const isCorrect = studentAnswerValue === q.correctAnswer;
 
-        return {
+        questionsWithAnswersMap.set(q.id, {
           id: q.id,
           questionText: q.questionText,
           correctAnswer: q.correctAnswer,
@@ -203,8 +204,30 @@ export async function GET(
           chapterNumber: q.chapterNumber,
           studentAnswer: studentAnswerValue || null,
           isCorrect: studentAnswerValue ? (isCorrect || false) : null,  // null if not answered
-        };
-      });
+        });
+      }
+    });
+
+    // Reorder questions to match the sequence they were presented in the exam
+    // Use questionIds if available (stores presentation order), otherwise fallback to ID order
+    let questionsWithAnswers: any[] = [];
+    if (attempt.questionIds) {
+      try {
+        const orderedIds = typeof attempt.questionIds === 'string' 
+          ? JSON.parse(attempt.questionIds) 
+          : attempt.questionIds;
+        questionsWithAnswers = orderedIds
+          .map((id: string) => questionsWithAnswersMap.get(id))
+          .filter((q: any) => q !== undefined);  // Filter out any missing questions
+        console.log(`✅ Reordered ${questionsWithAnswers.length} questions to match exam presentation order`);
+      } catch (err) {
+        console.log('⚠️ Could not reorder by questionIds, using ID order:', err);
+        questionsWithAnswers = Array.from(questionsWithAnswersMap.values());
+      }
+    } else {
+      console.log(`⚠️ No questionIds available - using ID order (may not match presentation)`);
+      questionsWithAnswers = Array.from(questionsWithAnswersMap.values());
+    }
 
     const questionsAnswered = questionsWithAnswers.filter(q => q.studentAnswer).length;
     const questionsNotAnswered = questionsWithAnswers.filter(q => !q.studentAnswer).length;
