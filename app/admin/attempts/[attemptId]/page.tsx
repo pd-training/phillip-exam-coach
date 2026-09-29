@@ -341,7 +341,7 @@ export default function AttemptDetailsPage() {
           </div>
 
             {/* Right Sidebar - Navigation */}
-            <div className="w-80 bg-white border-l border-gray-200 overflow-y-auto flex flex-col">
+            <div className="w-56 bg-white border-l border-gray-200 overflow-y-auto flex flex-col">
               {/* Student & Performance Summary */}
               <div className="p-6 border-b border-gray-200">
                 <p className="text-sm font-semibold text-gray-600 mb-3">STUDENT INFO</p>
@@ -366,21 +366,22 @@ export default function AttemptDetailsPage() {
                 </div>
               </div>
 
-              {/* Question Navigator */}
-              <div className="flex-1 p-6 overflow-y-auto">
-                <p className="text-sm font-semibold text-gray-600 mb-4">QUESTIONS</p>
-                <div className="grid grid-cols-4 gap-2">
+              {/* Question Navigator - Compact Scrollable */}
+              <div className="flex-1 p-3 overflow-y-auto" style={{ maxHeight: '400px' }}>
+                <p className="text-xs font-semibold text-gray-600 mb-3">QUESTIONS</p>
+                <div className="grid grid-cols-6 gap-1">
                   {questions.map((q, idx) => (
                     <button
                       key={q.id}
                       onClick={() => setCurrentQIndex(idx)}
-                      className={`w-full aspect-square rounded-lg font-semibold text-sm transition ${
+                      className={`w-full aspect-square rounded font-semibold text-xs transition ${
                         currentQIndex === idx
                           ? 'bg-blue-600 text-white border-2 border-blue-700'
                           : q.isCorrect
                           ? 'bg-green-100 text-green-700 border border-green-300 hover:bg-green-200'
                           : 'bg-red-100 text-red-700 border border-red-300 hover:bg-red-200'
                       }`}
+                      title={`Q${idx + 1}: ${q.isCorrect ? 'Correct' : 'Incorrect'}`}
                     >
                       {idx + 1}
                     </button>
@@ -388,27 +389,7 @@ export default function AttemptDetailsPage() {
                 </div>
               </div>
 
-              {/* Question Details */}
-              {currentQuestion && (
-                <div className="p-6 border-t border-gray-200 text-sm">
-                  <p className="text-gray-600 mb-1">
-                    <span className="font-semibold">Chapter:</span> {currentQuestion.chapterNumber}
-                  </p>
-                  <p className={`font-semibold ${currentQuestion.isCorrect ? 'text-green-600' : 'text-red-600'}`}>
-                    {currentQuestion.isCorrect ? '✓ Correct' : '✗ Incorrect'}
-                  </p>
-                  {currentQuestion.studentAnswer && (
-                    <p className="text-gray-700 mt-2">
-                      <span className="font-semibold">Student's Answer:</span> {currentQuestion.studentAnswer}
-                    </p>
-                  )}
-                  {!currentQuestion.studentAnswer && (
-                    <p className="text-gray-500 mt-2">
-                      <span className="font-semibold">Student's Answer:</span> Not answered
-                    </p>
-                  )}
-                </div>
-              )}
+              {/* Question Details section removed - info already displayed on the left */}
             </div>
           </div>
         </div>

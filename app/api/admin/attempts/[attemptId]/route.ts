@@ -22,7 +22,7 @@ export async function GET(
 
     console.log("Fetching attempt with ID:", attemptId);
 
-    // Get attempt details - try with answers column first
+    // Get attempt details - try with questionIds, partScores columns
     let attemptRes: any[] = [];
     try {
       attemptRes = await prisma.$queryRaw`
@@ -35,6 +35,7 @@ export async function GET(
           ea.startedat,
           ea.submittedat,
           ea.answers,
+          ea."questionIds",
           u.name as student_name,
           u.email as student_email,
           p.title as paper_name,
@@ -46,8 +47,31 @@ export async function GET(
         WHERE ea.id = ${attemptId}
       ` as any[];
     } catch (err: any) {
-      // If answers column doesn't exist, fetch without it
-      if (err.message && err.message.includes('column') && err.message.includes('answers')) {
+      // If questionIds doesn't exist, fetch without it
+      const errorMsg = err.message || '';
+      if (errorMsg.includes('questionIds') || errorMsg.includes('partScores')) {
+        console.log('⚠️ questionIds or partScores column does not exist yet, fetching without it');
+        attemptRes = await prisma.$queryRaw`
+          SELECT 
+            ea.id,
+            ea.userid,
+            ea.paperid,
+            ea.score,
+            ea.passed,
+            ea.startedat,
+            ea.submittedat,
+            ea.answers,
+            u.name as student_name,
+            u.email as student_email,
+            p.title as paper_name,
+            p."totalQuestions",
+            p."passingScore"
+          FROM examattempt ea
+          JOIN "User" u ON ea.userid = u.id
+          JOIN "Paper" p ON ea.paperid = p.id
+          WHERE ea.id = ${attemptId}
+        ` as any[];
+      } else if (errorMsg.includes('column') && errorMsg.includes('answers')) {
         console.log('⚠️ answers column does not exist yet, fetching without it');
         attemptRes = await prisma.$queryRaw`
           SELECT 
@@ -144,23 +168,69 @@ export async function GET(
       console.log("⚠️ No answers found in examattempt table - add answers column: GET /api/admin/add-answers-column");
     }
 
+    // Determine which questions were presented in this attempt
+    let attemptQuestionIds: Set<string>;
+    if (attempt.questionIds) {
+      try {
+        const qIds = typeof attempt.questionIds === 'string' 
+          ? JSON.parse(attempt.questionIds) 
+          : attempt.questionIds;
+        attemptQuestionIds = new Set(qIds || []);
+        console.log(`✅ Loaded ${attemptQuestionIds.size} question IDs from attempt`);
+      } catch (err) {
+        console.log('⚠️ Could not parse questionIds, using answered questions:', err);
+        attemptQuestionIds = new Set(Object.keys(studentAnswers));
+      }
+    } else {
+      console.log(`⚠️ No questionIds in attempt - using answered questions as fallback`);
+      attemptQuestionIds = new Set(Object.keys(studentAnswers));
+    }
+
+    // Build a map of question ID to question data
+    const questionsMap = new Map();
+    answersRes.forEach((q: any) => {
+      if (attemptQuestionIds.has(q.id)) {
+        questionsMap.set(q.id, {
+          ...q,
+          studentAnswer: studentAnswers[q.id] || null,
+          isCorrect: studentAnswers[q.id] === q.correctAnswer,
+        });
+      }
+    });
+
+    // Reorder questions to match the sequence they were presented in the exam
+    let orderedQuestions: any[] = [];
+    if (attempt.questionIds) {
+      try {
+        const presentationOrder = typeof attempt.questionIds === 'string' 
+          ? JSON.parse(attempt.questionIds) 
+          : attempt.questionIds;
+        orderedQuestions = presentationOrder
+          .map((id: string) => questionsMap.get(id))
+          .filter((q: any) => q !== undefined);
+        console.log(`✅ Reordered ${orderedQuestions.length} questions to match exam presentation order`);
+      } catch (err) {
+        console.log('⚠️ Could not reorder by questionIds, using chapter order:', err);
+        orderedQuestions = Array.from(questionsMap.values());
+      }
+    } else {
+      console.log(`⚠️ No questionIds available - using chapter/ID order (may not match presentation)`);
+      orderedQuestions = Array.from(questionsMap.values());
+    }
+
     // Calculate time taken
     const timeTaken = Math.round(
       (new Date(attempt.submittedat).getTime() - new Date(attempt.startedat).getTime()) / 1000
     );
 
-    console.log("Returning attempt details with", answersRes.length, "questions, time taken:", timeTaken, "seconds");
+    console.log("Returning attempt details with", orderedQuestions.length, "questions, time taken:", timeTaken, "seconds");
     
     return Response.json({
       attempt: {
         ...attempt,
         timeTaken, // Add time taken in seconds
       },
-      questions: answersRes.map((q: any) => ({
-        ...q,
-        studentAnswer: studentAnswers[q.id] || null,
-        isCorrect: studentAnswers[q.id] === q.correctAnswer,
-      })),
+      questions: orderedQuestions,
     });
   } catch (error: any) {
     console.error("Get attempt error:", error);
