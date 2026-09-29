@@ -294,25 +294,33 @@ export async function POST(
     let partScores: any[] = [];
     if (examParts && examParts.length > 0) {
       console.log('Calculating scores for', examParts.length, 'parts');
-      for (let i = 0; i < examParts.length; i++) {
-        const part = examParts[i];
-        const partData = questionsByPart[i];  // Get the questions that were presented in this part
+      
+      // For each part, filter questions by chapter range
+      for (const part of examParts) {
+        // Find all questions presented in this part's chapter range
+        const questionsInPart = questionIds && questionIds.length > 0
+          ? allQuestions.filter(q => 
+              questionIds.includes(q.id) &&
+              q.chapterNumber >= part.chapterStart && 
+              q.chapterNumber <= part.chapterEnd
+            )
+          : allQuestions.filter(q => 
+              q.chapterNumber >= part.chapterStart && 
+              q.chapterNumber <= part.chapterEnd
+            );
+
+        const totalQuestionsInPart = questionsInPart.length;
         
-        // Total questions in this part = how many were presented/selected for this part
-        const totalQuestionsInPart = partData?.questions?.length || 0;
-        
-        // Count correct answers from the questions presented in this part
+        // Count correct answers from questions in this part
         let partCorrectCount = 0;
-        for (const presentedQ of partData.questions || []) {
-          const studentAnswer = answers[presentedQ.id];
-          // Find the full question data to get correctAnswer
-          const fullQuestion = allQuestions.find(q => q.id === presentedQ.id);
-          if (studentAnswer && fullQuestion && studentAnswer === fullQuestion.correctAnswer) {
+        for (const q of questionsInPart) {
+          const studentAnswer = answers[q.id];
+          if (studentAnswer && studentAnswer === q.correctAnswer) {
             partCorrectCount++;
           }
         }
 
-        // Score is based on ALL questions in this part (not just answered ones)
+        // Score based on ALL questions in this part (not just answered)
         const partScore = totalQuestionsInPart > 0 
           ? Math.round((partCorrectCount / totalQuestionsInPart) * 100)
           : 0;
@@ -320,7 +328,7 @@ export async function POST(
 
         partScores.push({
           partName: part.partName,
-          partId: part.partId || part.id,
+          partId: part.id,
           score: partScore,
           passed: partPassed,
           passingScore: part.passingScore,
