@@ -13,16 +13,6 @@ interface AttemptStats {
   passCount: number;
 }
 
-interface RecommendedChapter {
-  id: string;
-  paperTitle: string;
-  paperId: string;
-  chapterNumber: number;
-  chapterTitle: string;
-  weaknessScore: number;
-  scoreOnPaper: number;
-}
-
 interface Attempt {
   id: string;
   paperid: string;
@@ -42,7 +32,6 @@ export default function StudentDashboard() {
     averageScore: 0,
     passCount: 0,
   });
-  const [recommendedChapters, setRecommendedChapters] = useState<RecommendedChapter[]>([]);
   const [loading, setLoading] = useState(true);
 
   // Handle auth redirects
@@ -80,15 +69,9 @@ export default function StudentDashboard() {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const [attemptsRes, recommendationsRes] = await Promise.all([
-          fetch("/api/student/attempts"),
-          fetch("/api/student/recommendations"),
-        ]);
+        const attemptsRes = await fetch("/api/student/attempts");
 
-        console.log("API Responses:", {
-          attempts: attemptsRes.status,
-          recommendations: recommendationsRes.status,
-        });
+        console.log("API Response - attempts:", attemptsRes.status);
 
         if (attemptsRes.ok) {
           const data = await attemptsRes.json();
@@ -100,14 +83,6 @@ export default function StudentDashboard() {
           setAttempts(data.attempts || []);
         } else {
           console.error("Failed to fetch attempts:", attemptsRes.status);
-        }
-
-        if (recommendationsRes.ok) {
-          const data = await recommendationsRes.json();
-          setRecommendedChapters(data.recommendations || []);
-        } else {
-          console.error("Failed to fetch recommendations:", recommendationsRes.status);
-          // Don't break the page if recommendations fail
         }
       } catch (error) {
         console.error("Error fetching data:", error);
@@ -290,88 +265,8 @@ export default function StudentDashboard() {
           )}
         </div>
 
-        {/* AI Recommendations Section */}
-        <div className="bg-white rounded-2xl p-8 border border-gray-200 shadow-sm mb-12">
-          <div className="flex items-center justify-between mb-8">
-            <div>
-              <div className="flex items-center gap-3 mb-2">
-                <div className="w-10 h-10 bg-gradient-to-br from-yellow-300 to-orange-400 rounded-lg flex items-center justify-center">
-                  <svg
-                    className="w-6 h-6 text-white"
-                    fill="currentColor"
-                    viewBox="0 0 24 24"
-                  >
-                    <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z" />
-                  </svg>
-                </div>
-                <h2 className="text-2xl font-bold text-gray-900">
-                  Focus Areas for Improvement
-                </h2>
-              </div>
-              <p className="text-gray-600">
-                Based on your exam performance, focus on these chapters
-              </p>
-            </div>
-          </div>
-
-          {loading ? (
-            <div className="text-center py-12">
-              <p className="text-gray-600">Loading recommendations...</p>
-            </div>
-          ) : stats.completedCount === 0 ? (
-            <div className="text-center py-12 bg-gray-50 rounded-xl">
-              <div className="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                <svg
-                  className="w-8 h-8 text-blue-600"
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M12 6v6m0 0v6m0-6h6m-6 0H6"
-                  />
-                </svg>
-              </div>
-              <p className="text-gray-600 font-medium">No recommendations yet</p>
-              <p className="text-gray-500 text-sm">
-                Complete your first practice exam to get AI-powered recommendations
-              </p>
-            </div>
-          ) : (
-            <div className="space-y-3">
-              {recommendedChapters.map((chapter, idx) => (
-                <div
-                  key={chapter.id}
-                  className="flex items-center justify-between p-4 bg-gray-50 rounded-xl border border-gray-200 hover:border-blue-300 hover:bg-blue-50 transition duration-200 group"
-                >
-                  <div className="flex items-center gap-4 flex-1">
-                    <div className="w-10 h-10 bg-white border-2 border-gray-300 rounded-lg flex items-center justify-center font-bold text-gray-600 group-hover:border-blue-500 group-hover:text-blue-600 transition">
-                      {idx + 1}
-                    </div>
-                    <div className="flex-1">
-                      <p className="font-semibold text-gray-900">
-                        {chapter.paperTitle} - {chapter.chapterTitle}
-                      </p>
-                      <p className="text-sm text-gray-600">
-                        Chapter {chapter.chapterNumber}
-                      </p>
-                    </div>
-                  </div>
-                  <div className="flex items-center gap-4">
-                    <Link href={`/exam/${chapter.paperId}/practice-chapter/${chapter.chapterNumber}`}>
-                      <button className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-medium text-sm transition">
-                        Practice
-                      </button>
-                    </Link>
-                  </div>
-                </div>
-              ))}
-            </div>
-          )}
-        </div>
+        {/* Focus Areas moved to individual paper pages */}
+        {/* Students can view per-paper focus areas after completing their first full exam attempt on each paper */}
 
       </div>
     </div>

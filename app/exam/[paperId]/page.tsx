@@ -20,8 +20,9 @@ interface RecommendedChapter {
   paperId: string;
   chapterNumber: number;
   chapterTitle: string;
-  weaknessScore: number;
-  scoreOnPaper: number;
+  percentage: number;
+  correct: number;
+  total: number;
 }
 
 export default function PracticePage() {
@@ -74,10 +75,10 @@ export default function PracticePage() {
         return;
       }
 
-      // Now fetch full paper details
-      const [paperRes, recommendationsRes] = await Promise.all([
+      // Now fetch full paper details and focus areas for this paper
+      const [paperRes, focusAreasRes] = await Promise.all([
         fetch(`/api/papers/${paperId}`),
-        fetch(`/api/student/recommendations`),
+        fetch(`/api/student/papers/${paperId}/focus-areas`),
       ]);
 
       if (paperRes.ok) {
@@ -94,13 +95,12 @@ export default function PracticePage() {
         setPaper(null);
       }
 
-      if (recommendationsRes.ok) {
-        const data = await recommendationsRes.json();
-        // Filter recommendations to only show those for this paper (limit to 3)
-        const filtered = (data.recommendations || [])
-          .filter((rec: RecommendedChapter) => rec.paperId === paperId)
-          .slice(0, 3);
-        setRecommendedChapters(filtered);
+      if (focusAreasRes.ok) {
+        const data = await focusAreasRes.json();
+        // Only show focus areas if student has attempted full exam on this paper
+        const focusAreas = data.hasAttempt ? (data.focusAreas || []) : [];
+        setRecommendedChapters(focusAreas);
+        console.log("Focus areas loaded:", focusAreas.length, "hasAttempt:", data.hasAttempt);
       }
     } catch (error) {
       console.error("Failed to fetch data:", error);
@@ -245,56 +245,74 @@ export default function PracticePage() {
           </div>
         </div>
 
-        {/* AI Recommended Chapters */}
-        {recommendedChapters.length > 0 && (
-          <div className="mb-12">
-            <div className="flex items-center gap-3 mb-6">
-              <div className="w-8 h-8 bg-gradient-to-br from-yellow-300 to-orange-400 rounded flex items-center justify-center">
-                <svg className="w-5 h-5 text-white" fill="currentColor" viewBox="0 0 24 24">
-                  <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z" />
-                </svg>
-              </div>
-              <h2 className="text-2xl font-bold text-gray-900">Recommended Focus Areas</h2>
+        {/* Focus Areas for This Paper */}
+        <div className="mb-12">
+          <div className="flex items-center gap-3 mb-6">
+            <div className="w-8 h-8 bg-gradient-to-br from-yellow-300 to-orange-400 rounded flex items-center justify-center">
+              <svg className="w-5 h-5 text-white" fill="currentColor" viewBox="0 0 24 24">
+                <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z" />
+              </svg>
             </div>
-            <p className="text-gray-600 mb-6">Based on your past exam performance, focus on these chapters:</p>
+            <h2 className="text-2xl font-bold text-gray-900">Focus Areas for Improvement</h2>
+          </div>
 
-            <div className="space-y-3">
-              {recommendedChapters.map((chapter, idx) => (
-                <Link key={chapter.id} href={`/exam/${paperId}/practice-chapter/${chapter.chapterNumber}`}>
-                  <div className="bg-white rounded-lg p-4 border border-gray-200 hover:border-orange-300 hover:shadow-md transition duration-300 cursor-pointer group">
-                    <div className="flex items-center justify-between">
-                      <div className="flex items-center gap-4 flex-1">
-                        <div className="w-8 h-8 bg-orange-100 rounded flex items-center justify-center font-bold text-orange-600 group-hover:bg-orange-600 group-hover:text-white transition">
-                          {idx + 1}
-                        </div>
-                        <div>
-                          <p className="font-semibold text-gray-900">{chapter.chapterTitle}</p>
-                          <p className="text-xs text-gray-600">Chapter {chapter.chapterNumber}</p>
-                        </div>
-                      </div>
-                      <div className="flex items-center gap-3">
-                        <div className="text-right">
-                          <div className="text-sm font-bold text-red-600">
-                            {Math.round(100 - chapter.weaknessScore)}% correct
+          {recommendedChapters.length > 0 ? (
+            <>
+              <p className="text-gray-600 mb-6">Based on your exam attempts in {paper?.title}, focus on these chapters:</p>
+              <div className="space-y-3">
+                {recommendedChapters.map((chapter, idx) => (
+                  <Link key={chapter.id} href={`/exam/${paperId}/practice-chapter/${chapter.chapterNumber}`}>
+                    <div className="bg-white rounded-lg p-4 border border-gray-200 hover:border-orange-300 hover:shadow-md transition duration-300 cursor-pointer group">
+                      <div className="flex items-center justify-between">
+                        <div className="flex items-center gap-4 flex-1">
+                          <div className="w-8 h-8 bg-orange-100 rounded flex items-center justify-center font-bold text-orange-600 group-hover:bg-orange-600 group-hover:text-white transition">
+                            {idx + 1}
                           </div>
-                          <div className="w-20 h-1.5 bg-gray-200 rounded-full overflow-hidden">
-                            <div
-                              className="h-full bg-orange-500"
-                              style={{ width: `${Math.round(100 - chapter.weaknessScore)}%` }}
-                            />
+                          <div>
+                            <p className="font-semibold text-gray-900">{chapter.chapterTitle}</p>
+                            <p className="text-xs text-gray-600">Chapter {chapter.chapterNumber}</p>
                           </div>
                         </div>
-                        <svg className="w-4 h-4 text-gray-400 group-hover:text-orange-600 transition flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-                        </svg>
+                        <div className="flex items-center gap-3">
+                          <div className="text-right">
+                            <div className="text-sm font-bold text-orange-600">
+                              {chapter.percentage}% correct
+                            </div>
+                            <div className="w-20 h-1.5 bg-gray-200 rounded-full overflow-hidden">
+                              <div
+                                className="h-full bg-orange-500"
+                                style={{ width: `${chapter.percentage}%` }}
+                              />
+                            </div>
+                          </div>
+                          <svg className="w-4 h-4 text-gray-400 group-hover:text-orange-600 transition flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                          </svg>
+                        </div>
                       </div>
                     </div>
-                  </div>
-                </Link>
-              ))}
+                  </Link>
+                ))}
+              </div>
+            </>
+          ) : (
+            <div className="bg-blue-50 border border-blue-200 rounded-lg p-6">
+              <div className="flex items-start gap-4">
+                <div className="w-10 h-10 bg-blue-100 rounded-full flex items-center justify-center flex-shrink-0">
+                  <svg className="w-5 h-5 text-blue-600" fill="currentColor" viewBox="0 0 24 24">
+                    <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8zm3.5-9c.83 0 1.5-.67 1.5-1.5S16.33 8 15.5 8 14 8.67 14 9.5s.67 1.5 1.5 1.5zm-7 0c.83 0 1.5-.67 1.5-1.5S9.33 8 8.5 8 7 8.67 7 9.5 7.67 11 8.5 11zm3.5 6.5c2.33 0 4.31-1.46 5.11-3.5H6.89c.8 2.04 2.78 3.5 5.11 3.5z" />
+                  </svg>
+                </div>
+                <div>
+                  <p className="font-semibold text-blue-900 mb-1">Focus Areas Locked</p>
+                  <p className="text-sm text-blue-800">
+                    Complete your first full exam mode attempt on this paper to unlock personalized focus areas based on your performance.
+                  </p>
+                </div>
+              </div>
             </div>
-          </div>
-        )}
+          )}
+        </div>
 
         {/* Tips */}
         <div className="bg-blue-50 border border-blue-200 rounded-2xl p-8">
