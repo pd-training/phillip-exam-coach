@@ -202,44 +202,7 @@ export default function AttemptReviewPage() {
       </div>
 
       {/* Part Scores Summary Card - If parts exist */}
-      {attempt.partScores && attempt.partScores.length > 0 && (
-        <div className="bg-white border-b border-gray-200">
-          <div className="max-w-7xl mx-auto px-6 py-6">
-            <h2 className="text-lg font-bold text-gray-900 mb-4">📊 Part-Wise Breakdown</h2>
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-              {attempt.partScores.map((part, idx) => (
-                <div
-                  key={idx}
-                  className={`p-4 rounded-lg border ${
-                    part.passed
-                      ? 'bg-green-50 border-green-200'
-                      : 'bg-red-50 border-red-200'
-                  }`}
-                >
-                  <div className="flex items-start justify-between mb-2">
-                    <h3 className={`font-semibold ${part.passed ? 'text-green-900' : 'text-red-900'}`}>
-                      {part.partName}
-                    </h3>
-                    <span className={`text-2xl font-bold ${part.passed ? 'text-green-600' : 'text-red-600'}`}>
-                      {part.score}%
-                    </span>
-                  </div>
-                  <div className={`text-sm ${part.passed ? 'text-green-800' : 'text-red-800'}`}>
-                    <div>{part.correct} out of {part.total} correct</div>
-                    <div>Passing Score: {part.passingScore}%</div>
-                  </div>
-                  <div className="mt-3 w-full bg-gray-200 rounded-full h-2">
-                    <div
-                      className={`h-2 rounded-full ${part.passed ? 'bg-green-600' : 'bg-red-600'}`}
-                      style={{ width: `${Math.min(part.score, 100)}%` }}
-                    ></div>
-                  </div>
-                </div>
-              ))}
-            </div>
-          </div>
-        </div>
-      )}
+      {/* Part-Wise breakdown removed - already shown in header summary */}
 
       {/* Summary & Feedback Section */}
       <div className="bg-white border-b border-gray-200">
@@ -371,7 +334,7 @@ export default function AttemptReviewPage() {
         </div>
 
         {/* Right Sidebar - Navigation */}
-        <div className="w-72 bg-gray-50 border-l border-gray-200 overflow-y-auto flex flex-col flex-shrink-0">
+        <div className="w-56 bg-gray-50 border-l border-gray-200 overflow-y-auto flex flex-col flex-shrink-0">
           {/* Performance Summary */}
           <div className="p-6 border-b border-gray-200">
             <p className="text-sm font-semibold text-gray-600 mb-2">PERFORMANCE</p>
@@ -391,21 +354,22 @@ export default function AttemptReviewPage() {
             </div>
           </div>
 
-          {/* Question Navigator */}
-          <div className="flex-1 p-6 overflow-y-auto">
-            <p className="text-sm font-semibold text-gray-600 mb-4">QUESTIONS</p>
-            <div className="grid grid-cols-4 gap-2">
+          {/* Question Navigator - Compact Scrollable */}
+          <div className="flex-1 p-3 overflow-y-auto" style={{ maxHeight: '400px' }}>
+            <p className="text-xs font-semibold text-gray-600 mb-3">QUESTIONS</p>
+            <div className="grid grid-cols-6 gap-1">
               {questions.map((q, idx) => (
                 <button
                   key={q.id}
                   onClick={() => setCurrentQIndex(idx)}
-                  className={`w-full aspect-square rounded-lg font-semibold text-sm transition ${
+                  className={`w-full aspect-square rounded font-semibold text-xs transition ${
                     currentQIndex === idx
                       ? 'bg-blue-600 text-white border-2 border-blue-700'
                       : q.isCorrect
                       ? 'bg-green-100 text-green-700 border border-green-300 hover:bg-green-200'
                       : 'bg-red-100 text-red-700 border border-red-300 hover:bg-red-200'
                   }`}
+                  title={`Q${idx + 1}: ${q.isCorrect ? 'Correct' : 'Incorrect'}`}
                 >
                   {idx + 1}
                 </button>
@@ -413,31 +377,7 @@ export default function AttemptReviewPage() {
             </div>
           </div>
 
-          {/* Question Details */}
-          {currentQuestion && (
-            <div className="p-6 border-t border-gray-200 text-sm">
-              <p className="text-gray-600 mb-1">
-                <span className="font-semibold">Chapter:</span> {currentQuestion.chapterNumber}
-              </p>
-              <p className={`font-semibold ${currentQuestion.isCorrect ? 'text-green-600' : 'text-red-600'}`}>
-                {currentQuestion.isCorrect ? '✓ Correct' : '✗ Incorrect'}
-              </p>
-              {currentQuestion.studentAnswer ? (
-                <p className="text-gray-700 mt-2">
-                  <span className="font-semibold">Your Answer:</span> <span className="text-blue-600 font-bold">{currentQuestion.studentAnswer}</span> - {
-                    currentQuestion.studentAnswer === "A" ? currentQuestion.optionA :
-                    currentQuestion.studentAnswer === "B" ? currentQuestion.optionB :
-                    currentQuestion.studentAnswer === "C" ? currentQuestion.optionC :
-                    currentQuestion.optionD
-                  }
-                </p>
-              ) : (
-                <p className="text-gray-500 mt-2 italic">
-                  <span className="font-semibold">Your Answer:</span> Not answered
-                </p>
-              )}
-            </div>
-          )}
+          {/* Question Details section removed - info already displayed on the left */}
         </div>
       </div>
     </div>
