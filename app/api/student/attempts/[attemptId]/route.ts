@@ -51,10 +51,33 @@ export async function GET(
         AND ea.userid = ${userId}
       ` as any[];
     } catch (err: any) {
-      // If answers column doesn't exist, fetch without it
+      // If partScores column doesn't exist, fetch without it
       const errorMsg = err.message || '';
-      if (errorMsg.includes('column') && errorMsg.includes('answers') && errorMsg.includes('does not exist')) {
-        console.log('answers column does not exist yet, fetching without it:', errorMsg);
+      if (errorMsg.includes('partScores') || errorMsg.includes('column') && errorMsg.includes('does not exist')) {
+        console.log('partScores column does not exist yet, fetching without it');
+        attemptRes = await prisma.$queryRaw`
+          SELECT 
+            ea.id,
+            ea.userid,
+            ea.paperid,
+            ea.score,
+            ea.passed,
+            ea.startedat,
+            ea.submittedat,
+            ea.answers,
+            u.name as student_name,
+            u.email as student_email,
+            p.title as paper_name,
+            p."totalQuestions",
+            p."passingScore"
+          FROM examattempt ea
+          JOIN "User" u ON ea.userid = u.id
+          JOIN "Paper" p ON ea.paperid = p.id
+          WHERE ea.id = ${attemptId}
+          AND ea.userid = ${userId}
+        ` as any[];
+      } else if (errorMsg.includes('column') && errorMsg.includes('answers') && errorMsg.includes('does not exist')) {
+        console.log('Neither partScores nor answers columns exist yet, fetching without them');
         attemptRes = await prisma.$queryRaw`
           SELECT 
             ea.id,
