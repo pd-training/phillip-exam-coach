@@ -16,6 +16,7 @@ interface StudentPaper {
 interface Paper {
   id: string;
   title: string;
+  description: string;
   totalTime: number;
 }
 
@@ -279,9 +280,12 @@ export default function PracticePage() {
                         <p className="text-sm text-gray-600 mt-1">
                           Available for practice
                         </p>
-                        <div className="flex gap-4 mt-3 text-sm text-gray-500">
-                          {paper.totalTime && (
-                            <span>⏱️ {formatTime(paper.totalTime)}</span>
+                        <div className="flex gap-4 mt-3 text-sm text-gray-600">
+                          {paper.description && (
+                            <p className="line-clamp-2">{paper.description}</p>
+                          )}
+                          {!paper.description && (
+                            <p className="text-gray-500">No description available</p>
                           )}
                         </div>
                       </div>
@@ -289,7 +293,7 @@ export default function PracticePage() {
                       <div className="ml-6 flex flex-col items-end gap-2">
                         {status === 'owned' && (
                           <Link
-                            href={`/exam/${paper.id}`}
+                            href={`/exam/${paper.id}/practice-chapter`}
                             className="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 font-medium whitespace-nowrap"
                           >
                             Start →

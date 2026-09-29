@@ -9,6 +9,7 @@ export async function GET(request: Request) {
       SELECT 
         id,
         title,
+        description,
         "totalTime"
       FROM "Paper"
       WHERE "isAvailable" = true
