@@ -265,7 +265,7 @@ export default function StudentDashboard() {
           )}
         </div>
 
-        {/* Focus Areas moved to individual paper pages */}
+        {/* AI Recommended Focus Areas moved to individual paper pages */}
         {/* Students can view per-paper focus areas after completing their first full exam attempt on each paper */}
 
       </div>
