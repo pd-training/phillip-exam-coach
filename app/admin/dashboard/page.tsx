@@ -158,76 +158,41 @@ export default function AdminDashboard() {
         <div className="grid md:grid-cols-5 gap-6 mb-12">
           {/* Total Users */}
           <div className="bg-white rounded-2xl p-6 border border-gray-200 hover:border-blue-300 transition">
-            <div className="flex items-start justify-between">
-              <div>
-                <p className="text-gray-600 text-sm font-medium mb-2">Total Users</p>
-                <p className="text-3xl font-bold text-gray-900">{stats?.totalUsers || 0}</p>
-              </div>
-              <div className="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center">
-                <svg className="w-6 h-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 20h5v-2a3 3 0 00-5.856-1.487M15 10a3 3 0 11-6 0 3 3 0 016 0zM6 20a9 9 0 0118 0v2h2v-2a11 11 0 10-20 0v2h2z" />
-                </svg>
-              </div>
+            <div>
+              <p className="text-gray-600 text-sm font-medium mb-2">Total Users</p>
+              <p className="text-3xl font-bold text-gray-900">{stats?.totalUsers || 0}</p>
             </div>
           </div>
 
           {/* Active Users */}
           <div className="bg-white rounded-2xl p-6 border border-gray-200 hover:border-green-300 transition">
-            <div className="flex items-start justify-between">
-              <div>
-                <p className="text-gray-600 text-sm font-medium mb-2">Active Today</p>
-                <p className="text-3xl font-bold text-gray-900">{stats?.activeUsers || 0}</p>
-              </div>
-              <div className="w-12 h-12 bg-green-100 rounded-lg flex items-center justify-center">
-                <svg className="w-6 h-6 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
-                </svg>
-              </div>
+            <div>
+              <p className="text-gray-600 text-sm font-medium mb-2">Active Today</p>
+              <p className="text-3xl font-bold text-gray-900">{stats?.activeUsers || 0}</p>
             </div>
           </div>
 
           {/* Attempts Today */}
           <div className="bg-white rounded-2xl p-6 border border-gray-200 hover:border-purple-300 transition">
-            <div className="flex items-start justify-between">
-              <div>
-                <p className="text-gray-600 text-sm font-medium mb-2">Attempts Today</p>
-                <p className="text-3xl font-bold text-gray-900">{stats?.attemptsToday || 0}</p>
-              </div>
-              <div className="w-12 h-12 bg-purple-100 rounded-lg flex items-center justify-center">
-                <svg className="w-6 h-6 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
-                </svg>
-              </div>
+            <div>
+              <p className="text-gray-600 text-sm font-medium mb-2">Attempts Today</p>
+              <p className="text-3xl font-bold text-gray-900">{stats?.attemptsToday || 0}</p>
             </div>
           </div>
 
           {/* Average Score */}
           <div className="bg-white rounded-2xl p-6 border border-gray-200 hover:border-yellow-300 transition">
-            <div className="flex items-start justify-between">
-              <div>
-                <p className="text-gray-600 text-sm font-medium mb-2">Avg Score</p>
-                <p className="text-3xl font-bold text-gray-900">{stats?.avgScore || '0'}%</p>
-              </div>
-              <div className="w-12 h-12 bg-yellow-100 rounded-lg flex items-center justify-center">
-                <svg className="w-6 h-6 text-yellow-600" fill="currentColor" viewBox="0 0 24 24">
-                  <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z" />
-                </svg>
-              </div>
+            <div>
+              <p className="text-gray-600 text-sm font-medium mb-2">Avg Score</p>
+              <p className="text-3xl font-bold text-gray-900">{stats?.avgScore || '0'}%</p>
             </div>
           </div>
 
           {/* Pass Rate */}
           <div className="bg-white rounded-2xl p-6 border border-gray-200 hover:border-emerald-300 transition">
-            <div className="flex items-start justify-between">
-              <div>
-                <p className="text-gray-600 text-sm font-medium mb-2">Pass Rate</p>
-                <p className="text-3xl font-bold text-gray-900">{stats?.passRate || 0}%</p>
-              </div>
-              <div className="w-12 h-12 bg-emerald-100 rounded-lg flex items-center justify-center">
-                <svg className="w-6 h-6 text-emerald-600" fill="currentColor" viewBox="0 0 24 24">
-                  <path d="M10 15.172l9.192-9.193a1 1 0 111.415 1.415l-10.606 10.606a1 1 0 01-1.415 0l-5.656-5.657a1 1 0 111.415-1.415l4.243 4.242z" />
-                </svg>
-              </div>
+            <div>
+              <p className="text-gray-600 text-sm font-medium mb-2">Pass Rate</p>
+              <p className="text-3xl font-bold text-gray-900">{stats?.passRate || 0}%</p>
             </div>
           </div>
         </div>
@@ -384,11 +349,6 @@ export default function AdminDashboard() {
         <div className="mt-12 grid md:grid-cols-3 gap-6">
           <Link href="/admin/papers">
             <div className="bg-white rounded-2xl p-8 border border-gray-200 hover:border-blue-300 hover:shadow-md transition cursor-pointer text-center group">
-              <div className="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center mx-auto mb-4 group-hover:bg-blue-600 transition">
-                <svg className="w-6 h-6 text-blue-600 group-hover:text-white transition" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6.253v13m0-13C6.5 6.253 2 10.998 2 17s4.5 10.747 10 10.747c5.5 0 10-4.996 10-11.253S17.5 6.253 12 6.253z" />
-                </svg>
-              </div>
               <h3 className="font-bold text-lg text-gray-900 mb-2">Manage Papers</h3>
               <p className="text-gray-600 text-sm">Edit exam papers and questions</p>
             </div>
@@ -396,11 +356,6 @@ export default function AdminDashboard() {
 
           <Link href="/admin/users">
             <div className="bg-white rounded-2xl p-8 border border-gray-200 hover:border-blue-300 hover:shadow-md transition cursor-pointer text-center group">
-              <div className="w-12 h-12 bg-purple-100 rounded-lg flex items-center justify-center mx-auto mb-4 group-hover:bg-purple-600 transition">
-                <svg className="w-6 h-6 text-purple-600 group-hover:text-white transition" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4.354a4 4 0 110 5.292M15 21H3v-2a6 6 0 0112 0v2zm0 0h6v-2a6 6 0 00-9-5.656v2a4 4 0 014 4v2z" />
-                </svg>
-              </div>
               <h3 className="font-bold text-lg text-gray-900 mb-2">Manage Users</h3>
               <p className="text-gray-600 text-sm">View and manage student accounts</p>
             </div>
@@ -408,11 +363,6 @@ export default function AdminDashboard() {
 
           <Link href="/admin/assign-papers">
             <div className="bg-white rounded-2xl p-8 border border-gray-200 hover:border-blue-300 hover:shadow-md transition cursor-pointer text-center group">
-              <div className="w-12 h-12 bg-green-100 rounded-lg flex items-center justify-center mx-auto mb-4 group-hover:bg-green-600 transition">
-                <svg className="w-6 h-6 text-green-600 group-hover:text-white transition" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4M7.835 4.697a3.42 3.42 0 001.946-.806 3.42 3.42 0 014.438 0 3.42 3.42 0 001.946.806 3.42 3.42 0 013.138 3.138 3.42 3.42 0 00.806 1.946 3.42 3.42 0 010 4.438 3.42 3.42 0 00-.806 1.946 3.42 3.42 0 01-3.138 3.138 3.42 3.42 0 00-1.946.806 3.42 3.42 0 01-4.438 0 3.42 3.42 0 00-1.946-.806 3.42 3.42 0 01-3.138-3.138 3.42 3.42 0 00-.806-1.946 3.42 3.42 0 010-4.438 3.42 3.42 0 00.806-1.946 3.42 3.42 0 013.138-3.138z" />
-                </svg>
-              </div>
               <h3 className="font-bold text-lg text-gray-900 mb-2">Assign Papers</h3>
               <p className="text-gray-600 text-sm">Assign papers to students</p>
             </div>
