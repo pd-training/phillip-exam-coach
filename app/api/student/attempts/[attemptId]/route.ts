@@ -163,25 +163,27 @@ export async function GET(
       console.log("⚠️ No answers found in attempt - answers column may not exist or is NULL");
     }
 
-    // Map student answers to questions
-    const questionsWithAnswers = questions.map((q: any) => {
-      const studentAnswerValue = studentAnswersMap[q.id];
-      const isCorrect = studentAnswerValue === q.correctAnswer;
+    // Map student answers to questions - ONLY questions that were answered
+    const questionsWithAnswers = questions
+      .filter(q => studentAnswersMap[q.id])  // Only questions that have answers
+      .map((q: any) => {
+        const studentAnswerValue = studentAnswersMap[q.id];
+        const isCorrect = studentAnswerValue === q.correctAnswer;
 
-      return {
-        id: q.id,
-        questionText: q.questionText,
-        correctAnswer: q.correctAnswer,
-        optionA: q.optionA,
-        optionB: q.optionB,
-        optionC: q.optionC,
-        optionD: q.optionD,
-        explanation: q.explanation,
-        chapterNumber: q.chapterNumber,
-        studentAnswer: studentAnswerValue || null,
-        isCorrect: isCorrect || false,
-      };
-    });
+        return {
+          id: q.id,
+          questionText: q.questionText,
+          correctAnswer: q.correctAnswer,
+          optionA: q.optionA,
+          optionB: q.optionB,
+          optionC: q.optionC,
+          optionD: q.optionD,
+          explanation: q.explanation,
+          chapterNumber: q.chapterNumber,
+          studentAnswer: studentAnswerValue || null,
+          isCorrect: isCorrect || false,
+        };
+      });
 
     const questionsAnswered = questionsWithAnswers.filter(q => q.studentAnswer).length;
     const questionsNotAnswered = questionsWithAnswers.filter(q => !q.studentAnswer).length;

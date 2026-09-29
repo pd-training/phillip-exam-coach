@@ -295,22 +295,24 @@ export async function POST(
     if (examParts && examParts.length > 0) {
       console.log('Calculating scores for', examParts.length, 'parts');
       for (const part of examParts) {
-        // Get questions in this part's chapter range
-        const partQuestions = answeredQuestions.filter(
+        // ONLY count questions that were actually answered in this part's chapter range
+        // Don't count all questions in the chapter range - only the ones the student attempted
+        const partAnsweredQuestions = answeredQuestions.filter(
           q => q.chapterNumber >= part.chapterStart && q.chapterNumber <= part.chapterEnd
         );
 
         // Calculate correct count for this part
         let partCorrectCount = 0;
-        for (const q of partQuestions) {
+        for (const q of partAnsweredQuestions) {
           const studentAnswer = answers[q.id];
-          if (studentAnswer === q.correctAnswer) {
+          if (studentAnswer && studentAnswer === q.correctAnswer) {
             partCorrectCount++;
           }
         }
 
-        const partScore = partQuestions.length > 0 
-          ? Math.round((partCorrectCount / partQuestions.length) * 100)
+        // Score is based on answered questions in this part, not total questions in chapter range
+        const partScore = partAnsweredQuestions.length > 0 
+          ? Math.round((partCorrectCount / partAnsweredQuestions.length) * 100)
           : 0;
         const partPassed = partScore >= part.passingScore;
 
@@ -321,10 +323,10 @@ export async function POST(
           passed: partPassed,
           passingScore: part.passingScore,
           correct: partCorrectCount,
-          total: partQuestions.length,
+          total: partAnsweredQuestions.length,  // Only answered questions in this part
         });
 
-        console.log(`Part ${part.partName}: ${partCorrectCount}/${partQuestions.length} = ${partScore}%`);
+        console.log(`Part ${part.partName}: ${partCorrectCount}/${partAnsweredQuestions.length} = ${partScore}%`);
       }
     }
 
