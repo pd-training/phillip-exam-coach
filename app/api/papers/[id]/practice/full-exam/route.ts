@@ -429,14 +429,6 @@ export async function POST(
           throw insertWithScoresError;
         }
       }
-              NOW()
-            )
-          `;
-          console.log('Exam attempt saved with ID:', attemptId, '(without answers - migration pending)');
-        } else {
-          throw insertWithAnswersError;
-        }
-      }
     } catch (insertError: any) {
       console.error('Error saving exam attempt:', insertError.message, insertError.code);
     }
