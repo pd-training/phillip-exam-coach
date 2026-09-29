@@ -33,7 +33,6 @@ export default function PracticePage() {
 
   const [paper, setPaper] = useState<PaperInfo | null>(null);
   const [recommendedChapters, setRecommendedChapters] = useState<RecommendedChapter[]>([]);
-  const [focusAreasMessage, setFocusAreasMessage] = useState<string>("");
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
@@ -101,10 +100,7 @@ export default function PracticePage() {
         // Only show focus areas if student has attempted full exam on this paper
         const focusAreas = data.hasAttempt ? (data.focusAreas || []) : [];
         setRecommendedChapters(focusAreas);
-        if (data.message) {
-          setFocusAreasMessage(data.message);
-        }
-        console.log("Focus areas loaded:", focusAreas.length, "hasAttempt:", data.hasAttempt, "message:", data.message);
+        console.log("Focus areas loaded:", focusAreas.length, "hasAttempt:", data.hasAttempt);
       }
     } catch (error) {
       console.error("Failed to fetch data:", error);
@@ -262,9 +258,7 @@ export default function PracticePage() {
 
           {recommendedChapters.length > 0 ? (
             <>
-              <p className="text-gray-600 mb-6">
-                {focusAreasMessage || "Focus on these chapters based on your exam performance:"}
-              </p>
+              <p className="text-gray-600 mb-6">Focus on these chapters based on your exam performance:</p>
               <div className="space-y-2">
                 {recommendedChapters.map((chapter) => (
                   <Link key={chapter.id} href={`/exam/${paperId}/practice-chapter/${chapter.chapterNumber}`}>
