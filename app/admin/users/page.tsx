@@ -33,6 +33,8 @@ export default function UserManagement() {
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState<string | null>(null);
+  const [deleteUserId, setDeleteUserId] = useState<string | null>(null);
+  const [confirmDeleteName, setConfirmDeleteName] = useState("");
 
   // Auth check
   useEffect(() => {
@@ -115,6 +117,46 @@ export default function UserManagement() {
     }
   };
 
+  const handleDeleteUser = async () => {
+    if (!deleteUserId || !confirmDeleteName.trim()) {
+      setError("Please type the user name to confirm deletion");
+      return;
+    }
+
+    // Find the user to get their actual name
+    const userToDelete = users.find(u => u.id === deleteUserId);
+    if (!userToDelete || confirmDeleteName !== userToDelete.name) {
+      setError("User name does not match. Please type the exact name.");
+      return;
+    }
+
+    setSubmitting(true);
+    try {
+      const res = await fetch("/api/admin/delete-user", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ userId: deleteUserId }),
+      });
+
+      if (res.ok) {
+        const data = await res.json();
+        setSuccess(data.message || "User deleted successfully");
+        setDeleteUserId(null);
+        setConfirmDeleteName("");
+        await fetchUsers();
+        setTimeout(() => setSuccess(null), 4000);
+      } else {
+        const data = await res.json();
+        setError(data.error || "Failed to delete user");
+      }
+    } catch (error) {
+      setError("An error occurred while deleting the user");
+      console.error("Delete error:", error);
+    } finally {
+      setSubmitting(false);
+    }
+  };
+
   if (status === "loading" || !session?.user) return null;
 
   return (
@@ -167,18 +209,21 @@ export default function UserManagement() {
                   <th style={{ padding: "16px", textAlign: "left", fontSize: "12px", fontWeight: "600", color: "#6b7280", textTransform: "uppercase" }}>
                     CREATED VIA
                   </th>
+                  <th style={{ padding: "16px", textAlign: "center", fontSize: "12px", fontWeight: "600", color: "#6b7280", textTransform: "uppercase" }}>
+                    ACTION
+                  </th>
                 </tr>
               </thead>
               <tbody>
                 {loading ? (
                   <tr>
-                    <td colSpan={5} style={{ padding: "40px", textAlign: "center", color: "#666" }}>
+                    <td colSpan={6} style={{ padding: "40px", textAlign: "center", color: "#666" }}>
                       Loading...
                     </td>
                   </tr>
                 ) : filteredUsers.length === 0 ? (
                   <tr>
-                    <td colSpan={5} style={{ padding: "40px", textAlign: "center", color: "#666" }}>
+                    <td colSpan={6} style={{ padding: "40px", textAlign: "center", color: "#666" }}>
                       No users found
                     </td>
                   </tr>
@@ -242,6 +287,30 @@ export default function UserManagement() {
                       </td>
                       <td style={{ padding: "16px", fontSize: "14px", color: "#6b7280" }}>
                         Admin created
+                      </td>
+                      <td style={{ padding: "16px", textAlign: "center" }}>
+                        <button
+                          onClick={() => setDeleteUserId(user.id)}
+                          style={{
+                            padding: "6px 12px",
+                            backgroundColor: "#ef4444",
+                            color: "white",
+                            border: "none",
+                            borderRadius: "4px",
+                            fontSize: "12px",
+                            fontWeight: "600",
+                            cursor: "pointer",
+                            transition: "background-color 0.2s",
+                          }}
+                          onMouseEnter={(e) => {
+                            e.currentTarget.style.backgroundColor = "#dc2626";
+                          }}
+                          onMouseLeave={(e) => {
+                            e.currentTarget.style.backgroundColor = "#ef4444";
+                          }}
+                        >
+                          Delete
+                        </button>
                       </td>
                     </tr>
                   ))
@@ -433,6 +502,151 @@ export default function UserManagement() {
             </button>
           </form>
         </div>
+
+        {/* Delete Confirmation Modal */}
+        {deleteUserId && (
+          <div style={{
+            position: "fixed",
+            top: 0,
+            left: 0,
+            right: 0,
+            bottom: 0,
+            backgroundColor: "rgba(0, 0, 0, 0.5)",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            zIndex: 1000,
+          }}>
+            <div style={{
+              backgroundColor: "white",
+              borderRadius: "12px",
+              padding: "32px",
+              maxWidth: "500px",
+              width: "90%",
+              boxShadow: "0 20px 60px rgba(0, 0, 0, 0.3)",
+            }}>
+              <h3 style={{
+                fontSize: "20px",
+                fontWeight: "600",
+                color: "#1f2937",
+                margin: "0 0 16px 0",
+              }}>
+                Delete User Account
+              </h3>
+              <p style={{
+                color: "#6b7280",
+                fontSize: "14px",
+                margin: "0 0 16px 0",
+                lineHeight: "1.5",
+              }}>
+                This action cannot be undone. All data associated with this user will be permanently deleted.
+              </p>
+              <p style={{
+                color: "#991b1b",
+                fontSize: "13px",
+                backgroundColor: "#fee2e2",
+                padding: "12px",
+                borderRadius: "6px",
+                margin: "0 0 16px 0",
+              }}>
+                User: <strong>{users.find(u => u.id === deleteUserId)?.name}</strong> ({users.find(u => u.id === deleteUserId)?.email})
+              </p>
+              <p style={{
+                color: "#374151",
+                fontSize: "14px",
+                margin: "0 0 12px 0",
+                fontWeight: "500",
+              }}>
+                To confirm, type the user's name below:
+              </p>
+              <input
+                type="text"
+                value={confirmDeleteName}
+                onChange={(e) => setConfirmDeleteName(e.target.value)}
+                placeholder={users.find(u => u.id === deleteUserId)?.name || ""}
+                style={{
+                  width: "100%",
+                  padding: "10px 12px",
+                  border: "1px solid #d1d5db",
+                  borderRadius: "6px",
+                  fontSize: "14px",
+                  boxSizing: "border-box",
+                  marginBottom: "20px",
+                }}
+              />
+              <div style={{
+                display: "flex",
+                gap: "12px",
+                justifyContent: "flex-end",
+              }}>
+                <button
+                  onClick={() => {
+                    setDeleteUserId(null);
+                    setConfirmDeleteName("");
+                    setError(null);
+                  }}
+                  disabled={submitting}
+                  style={{
+                    padding: "10px 20px",
+                    backgroundColor: "#e5e7eb",
+                    color: "#1f2937",
+                    border: "none",
+                    borderRadius: "6px",
+                    fontSize: "14px",
+                    fontWeight: "600",
+                    cursor: submitting ? "not-allowed" : "pointer",
+                    transition: "background-color 0.2s",
+                  }}
+                  onMouseEnter={(e) => {
+                    if (!submitting) e.currentTarget.style.backgroundColor = "#d1d5db";
+                  }}
+                  onMouseLeave={(e) => {
+                    e.currentTarget.style.backgroundColor = "#e5e7eb";
+                  }}
+                >
+                  Cancel
+                </button>
+                <button
+                  onClick={handleDeleteUser}
+                  disabled={submitting || !confirmDeleteName.trim()}
+                  style={{
+                    padding: "10px 20px",
+                    backgroundColor: "#ef4444",
+                    color: "white",
+                    border: "none",
+                    borderRadius: "6px",
+                    fontSize: "14px",
+                    fontWeight: "600",
+                    cursor: submitting || !confirmDeleteName.trim() ? "not-allowed" : "pointer",
+                    opacity: submitting || !confirmDeleteName.trim() ? 0.6 : 1,
+                    transition: "background-color 0.2s",
+                  }}
+                  onMouseEnter={(e) => {
+                    if (!submitting && confirmDeleteName.trim()) e.currentTarget.style.backgroundColor = "#dc2626";
+                  }}
+                  onMouseLeave={(e) => {
+                    e.currentTarget.style.backgroundColor = "#ef4444";
+                  }}
+                >
+                  {submitting ? "Deleting..." : "Delete Account"}
+                </button>
+              </div>
+              {error && (
+                <div style={{
+                  marginTop: "16px",
+                  padding: "12px",
+                  backgroundColor: "#fee2e2",
+                  border: "1px solid #fecaca",
+                  color: "#991b1b",
+                  borderRadius: "6px",
+                  fontSize: "13px",
+                }}>
+                  {error}
+                </div>
+              )}
+            </div>
+          </div>
+        )}
       </div>
     </div>
   );
