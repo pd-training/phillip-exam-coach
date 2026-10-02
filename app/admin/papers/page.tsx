@@ -293,10 +293,13 @@ export default function PapersManagement() {
       }
 
       alert("Paper settings updated successfully!");
-      await fetchPapers();
+      setActiveModal(null);
       setParts([]);
       setNewPart({ partName: "", chapterStart: 1, chapterEnd: 13, questionCount: 110, passingScore: 75 });
-      setActiveModal(null);
+      // Refresh papers list in background after modal closes
+      setTimeout(() => {
+        fetchPapers();
+      }, 100);
     } catch (error) {
       console.error("Save error:", error);
       alert("Error saving paper settings");
