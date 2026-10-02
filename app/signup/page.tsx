@@ -90,20 +90,25 @@ export default function SignupPage() {
     }
 
     try {
+      const payloadData = {
+        name: formData.name,
+        email: formData.email,
+        password: formData.password,
+        role: "STUDENT",
+        paperId: selectedPaper,
+      };
+      console.log("Signup payload:", payloadData);
+
       const res = await fetch("/api/users", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          name: formData.name,
-          email: formData.email,
-          password: formData.password,
-          role: "STUDENT",
-          paperId: selectedPaper,
-        }),
+        body: JSON.stringify(payloadData),
       });
 
+      const data = await res.json();
+      console.log("Signup response:", data);
+
       if (!res.ok) {
-        const data = await res.json();
         setError(data.error || "Failed to create account");
         setLoading(false);
         return;

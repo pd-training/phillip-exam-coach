@@ -68,14 +68,19 @@ export async function POST(req: Request) {
     const userId = result?.[0]?.id;
 
     // If paperId provided, auto-approve paper assignment for student
+    let paperAssignmentSuccess = false;
     if (paperId && userId) {
       try {
-        await prisma.$queryRaw`
+        console.log("Attempting to assign paper:", { paperId, userId });
+        const paperAssignResult = await prisma.$queryRaw`
           INSERT INTO "PaperRequest" (id, "userId", "paperId", status, "reviewedAt", "createdAt")
           VALUES (gen_random_uuid(), ${userId}, ${paperId}, 'approved', NOW(), NOW())
+          RETURNING id
         `;
-      } catch (paperError) {
-        console.error("Error assigning paper:", paperError);
+        console.log("Paper assigned successfully:", paperAssignResult);
+        paperAssignmentSuccess = true;
+      } catch (paperError: any) {
+        console.error("Error assigning paper:", paperError?.message || paperError);
         // Continue anyway - user is created
       }
     }
@@ -86,6 +91,7 @@ export async function POST(req: Request) {
       success: true,
       user: result?.[0] || null,
       paperId: paperId || null,
+      paperAssignmentSuccess: paperAssignmentSuccess,
     });
   } catch (error) {
     console.error("Error creating user:", error);
