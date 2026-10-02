@@ -10,6 +10,7 @@ interface Paper {
   id: string;
   title: string;
   description?: string;
+  externalLink?: string;
   durationMinutes: number;
   totalQuestions: number;
   isAvailable: boolean;
