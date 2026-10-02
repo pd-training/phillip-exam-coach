@@ -5,6 +5,7 @@ import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import Link from "next/link";
+import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from "recharts";
 
 
 interface AttemptStats {
@@ -163,6 +164,50 @@ export default function StudentDashboard() {
             </div>
           </div>
         </div>
+
+        {/* Score Trend Chart */}
+        {attempts.length > 0 && (
+          <div className="bg-white rounded-lg border border-gray-200 p-6 mb-12">
+            <h2 className="text-2xl font-bold text-gray-900 mb-1">Score Trend</h2>
+            <p className="text-gray-600 text-sm mb-6">Your exam performance over time</p>
+            <div style={{ width: "100%", height: 300 }}>
+              <ResponsiveContainer width="100%" height="100%">
+                <LineChart data={attempts.map((attempt, index) => ({
+                  name: `Exam ${index + 1}`,
+                  date: new Date(attempt.submittedat).toLocaleDateString("en-US", { month: "short", day: "numeric" }),
+                  score: Math.round(attempt.score),
+                  passed: attempt.result === "passed" ? "✓" : "✗"
+                }))}>
+                  <CartesianGrid strokeDasharray="3 3" />
+                  <XAxis 
+                    dataKey="date" 
+                    tick={{ fontSize: 12 }}
+                    angle={-45}
+                    textAnchor="end"
+                    height={80}
+                  />
+                  <YAxis 
+                    domain={[0, 100]}
+                    tick={{ fontSize: 12 }}
+                    label={{ value: "Score (%)", angle: -90, position: "insideLeft" }}
+                  />
+                  <Tooltip 
+                    formatter={(value: any) => [`${value}%`, "Score"]}
+                    contentStyle={{ backgroundColor: "#f3f4f6", border: "1px solid #d1d5db" }}
+                  />
+                  <Line 
+                    type="monotone" 
+                    dataKey="score" 
+                    stroke="#3b82f6" 
+                    strokeWidth={2}
+                    dot={{ fill: "#3b82f6", r: 4 }}
+                    activeDot={{ r: 6 }}
+                  />
+                </LineChart>
+              </ResponsiveContainer>
+            </div>
+          </div>
+        )}
 
         {/* Recent Exam Attempts Section */}
         <div className="mb-12">
