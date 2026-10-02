@@ -11,7 +11,8 @@ export default function StudentNav() {
 
   const navItems = [
     { label: 'Dashboard', href: '/dashboard' },
-    { label: 'Practice', href: '/practice' },
+    { label: 'Your Papers', href: '/practice' },
+    { label: 'Browse Papers', href: '/practice/browse' },
     { label: 'Help', href: '/help' },
   ];
 
@@ -25,19 +26,25 @@ export default function StudentNav() {
       <div className="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between">
         {/* Navigation Links */}
         <div className="flex gap-8">
-          {navItems.map((item) => (
-            <Link
-              key={item.href}
-              href={item.href}
-              className={`text-sm font-medium transition ${
-                pathname === item.href
-                  ? 'text-blue-600'
-                  : 'text-gray-600 hover:text-gray-900'
-              }`}
-            >
-              {item.label}
-            </Link>
-          ))}
+          {navItems.map((item) => {
+            const isActive = item.href === '/practice'
+              ? pathname === '/practice'
+              : pathname === item.href || pathname.startsWith(item.href + '/');
+            
+            return (
+              <Link
+                key={item.href}
+                href={item.href}
+                className={`text-sm font-medium transition ${
+                  isActive
+                    ? 'text-blue-600'
+                    : 'text-gray-600 hover:text-gray-900'
+                }`}
+              >
+                {item.label}
+              </Link>
+            );
+          })}
         </div>
 
         {/* Right side - Account, Name & Logout */}
