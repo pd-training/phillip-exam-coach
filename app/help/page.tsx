@@ -27,8 +27,14 @@ export default function HelpPage() {
     <div className="min-h-screen bg-gray-50">
       <StudentNav />
 
+      <div className="bg-gradient-to-r from-blue-600 to-blue-700 text-white py-12 px-0">
+        <div className="max-w-7xl mx-auto px-6">
+          <h1 className="text-3xl font-bold">Help & Support</h1>
+          <p className="text-blue-100 mt-2">Learn how to use Phillip Exam Coach</p>
+        </div>
+      </div>
+
       <div className="max-w-4xl mx-auto px-6 py-12">
-        <h1 className="text-4xl font-bold text-gray-900 mb-8">Help & Support</h1>
 
         <div className="space-y-8">
           {/* Getting Started */}
@@ -36,13 +42,16 @@ export default function HelpPage() {
             <h2 className="text-2xl font-semibold text-gray-900 mb-4">Getting Started</h2>
             <div className="space-y-3 text-gray-700">
               <p>
-                <strong>1. Dashboard:</strong> Your starting point. View your assigned papers, exam performance stats, recent attempts, and AI-recommended focus areas.
+                <strong>Dashboard:</strong> Your starting point. View your exam performance, recent attempts, and AI-recommended focus areas to help you study smarter.
               </p>
               <p>
-                <strong>2. Practice:</strong> Select from your assigned papers and choose a practice mode. Get AI-recommended chapters to focus on based on your past performance.
+                <strong>Your Papers:</strong> Practice papers that have been assigned to you. Select a paper and choose from three practice modes: Full Exam, Quick Quiz, or Practice by Chapter.
               </p>
               <p>
-                <strong>3. Account:</strong> Manage your profile and password settings.
+                <strong>Browse Papers:</strong> Explore all available papers. View descriptions and external resources, or request access to papers you need. Your admin will review and approve your request.
+              </p>
+              <p>
+                <strong>Account:</strong> Manage your profile and password settings.
               </p>
             </div>
           </section>
@@ -61,8 +70,45 @@ export default function HelpPage() {
                 <strong>AI-Recommended Focus Areas:</strong> Based on your exam performance, the system recommends specific chapters where you need to improve. Click "Practice" to start working on those chapters.
               </p>
               <p>
-                <strong>Your Papers:</strong> Shows all papers approved by your admin for you to practice with.
+                <strong>Your Papers:</strong> Shows all papers that have been assigned to you by your admin.
               </p>
+            </div>
+          </section>
+
+          {/* Your Papers */}
+          <section className="bg-white rounded-lg border border-gray-200 p-6">
+            <h2 className="text-2xl font-semibold text-gray-900 mb-4">Your Papers</h2>
+            <div className="space-y-3 text-gray-700">
+              <p>View all papers that your admin has assigned to you. These are ready to practice immediately.</p>
+              <p><strong>Steps:</strong></p>
+              <ol className="list-decimal list-inside space-y-2 text-sm">
+                <li>Click on a paper to view available practice modes</li>
+                <li>Choose Full Exam, Quick Quiz, or Practice by Chapter</li>
+                <li>Complete your practice and review your results</li>
+                <li>Your scores are tracked for progress monitoring</li>
+              </ol>
+            </div>
+          </section>
+
+          {/* Browse Papers */}
+          <section className="bg-white rounded-lg border border-gray-200 p-6">
+            <h2 className="text-2xl font-semibold text-gray-900 mb-4">Browse Papers</h2>
+            <div className="space-y-3 text-gray-700">
+              <p>Discover all available exam papers. Each paper shows a description and relevant resources to help you decide if you need access.</p>
+              <p><strong>Status Indicators:</strong></p>
+              <ul className="list-disc list-inside space-y-1 text-sm">
+                <li><span className="text-green-700 font-semibold">✓ Assigned</span> - You already have access to this paper</li>
+                <li><span className="text-yellow-700 font-semibold">⧗ Pending</span> - Your request is under review by admin</li>
+                <li><span className="text-red-700 font-semibold">✕ Rejected</span> - Your request was not approved</li>
+                <li><span className="text-blue-700 font-semibold">Request →</span> - Click to request access to this paper</li>
+              </ul>
+              <p className="mt-3"><strong>Requesting a Paper:</strong></p>
+              <ol className="list-decimal list-inside space-y-1 text-sm">
+                <li>Browse papers and click "Request" on any paper you need</li>
+                <li>Your admin will review your request</li>
+                <li>Once approved, the paper appears in your "Your Papers" section</li>
+                <li>Check back here to see request status</li>
+              </ol>
             </div>
           </section>
 
@@ -85,15 +131,6 @@ export default function HelpPage() {
             </div>
           </section>
 
-          {/* Requesting Papers */}
-          <section className="bg-white rounded-lg border border-gray-200 p-6">
-            <h2 className="text-2xl font-semibold text-gray-900 mb-4">Getting Additional Papers</h2>
-            <div className="space-y-3 text-gray-700">
-              <p>If you need additional exam papers to practice with, contact your admin to request access.</p>
-              <p>Your admin will review and approve your request, then you'll see the new papers in your <strong>Practice</strong> section.</p>
-            </div>
-          </section>
-
           {/* Account Settings */}
           <section className="bg-white rounded-lg border border-gray-200 p-6">
             <h2 className="text-2xl font-semibold text-gray-900 mb-4">Account Settings</h2>
@@ -109,24 +146,28 @@ export default function HelpPage() {
             <h2 className="text-2xl font-semibold text-gray-900 mb-4">Common Questions</h2>
             <div className="space-y-6">
               <div>
+                <p className="font-semibold text-gray-900 mb-2">What's the difference between "Your Papers" and "Browse Papers"?</p>
+                <p className="text-gray-700"><strong>Your Papers</strong> shows papers your admin has already assigned to you—you can start practicing immediately. <strong>Browse Papers</strong> shows all available papers with descriptions. You can request access to papers you need, and your admin will review and approve.</p>
+              </div>
+              <div>
+                <p className="font-semibold text-gray-900 mb-2">How do I request a new paper?</p>
+                <p className="text-gray-700">Go to <strong>Browse Papers</strong>, find the paper you want, and click the "Request" button. Your admin will review your request and approve it if appropriate. Once approved, it will appear in your <strong>Your Papers</strong> section.</p>
+              </div>
+              <div>
                 <p className="font-semibold text-gray-900 mb-2">What are AI-Recommended Focus Areas?</p>
-                <p className="text-gray-700">After you complete full exam attempts, our AI system analyzes your performance and recommends specific chapters where you scored below your average. This helps you focus your study time efficiently on areas that need improvement.</p>
+                <p className="text-gray-700">After you complete full exam attempts, our AI system analyzes your performance and recommends specific chapters where you need improvement. Use these to focus your study time efficiently.</p>
               </div>
               <div>
                 <p className="font-semibold text-gray-900 mb-2">How can I review my past exams?</p>
-                <p className="text-gray-700">On your dashboard, click any of your recent exam attempts to see a detailed review. You'll see which questions you answered correctly, which ones you got wrong, and the explanations for all answers.</p>
-              </div>
-              <div>
-                <p className="font-semibold text-gray-900 mb-2">How is my performance tracked?</p>
-                <p className="text-gray-700">Full exam attempts are recorded with your score and performance breakdown. Your admin can view this data in the admin dashboard.</p>
+                <p className="text-gray-700">On your dashboard, click any of your recent exam attempts to see detailed review. You'll see which questions you got right/wrong and explanations for all answers.</p>
               </div>
               <div>
                 <p className="font-semibold text-gray-900 mb-2">Can I retake exams?</p>
                 <p className="text-gray-700">Yes! You can practice as many times as you want. Each attempt is recorded separately so you can track your progress over time.</p>
               </div>
               <div>
-                <p className="font-semibold text-gray-900 mb-2">How long do I have to complete an exam?</p>
-                <p className="text-gray-700">Full exams have a timer based on the paper duration. Quick quiz and chapter modes have no time limit so you can study at your own pace.</p>
+                <p className="font-semibold text-gray-900 mb-2">How long do I have to complete a full exam?</p>
+                <p className="text-gray-700">Full exams have a timer based on the paper duration. Quick quiz and chapter practice modes have no time limit, so you can study at your own pace.</p>
               </div>
             </div>
           </section>
