@@ -5,7 +5,7 @@ import prisma from "@/lib/prisma";
 export async function GET() {
   try {
     const papers = await prisma.$queryRaw`
-      SELECT id, title, "durationMinutes", "totalQuestions", "isAvailable", "createdAt"
+      SELECT id, title, description, "externalLink", "durationMinutes", "totalQuestions", "isAvailable", "createdAt"
       FROM "Paper"
       ORDER BY "createdAt" DESC
     `;
@@ -36,9 +36,9 @@ export async function POST(req: Request) {
 
     // Use raw SQL to bypass Prisma enum validation
     const result = await prisma.$queryRaw`
-      INSERT INTO "Paper" (id, title, "durationMinutes", "totalQuestions", "createdAt", "updatedAt")
-      VALUES (gen_random_uuid(), ${title}, ${durationMinutes || 180}, ${totalQuestions || 150}, NOW(), NOW())
-      RETURNING id, title, "durationMinutes", "totalQuestions", "isAvailable", "createdAt"
+      INSERT INTO "Paper" (id, title, description, "externalLink", "durationMinutes", "totalQuestions", "createdAt", "updatedAt")
+      VALUES (gen_random_uuid(), ${title}, '', NULL, ${durationMinutes || 180}, ${totalQuestions || 150}, NOW(), NOW())
+      RETURNING id, title, description, "externalLink", "durationMinutes", "totalQuestions", "isAvailable", "createdAt"
     `;
 
     return Response.json({
