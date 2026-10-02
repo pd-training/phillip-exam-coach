@@ -22,11 +22,11 @@ export default function SignupPage() {
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
 
-  // Fetch papers on mount
+  // Fetch available papers (papers with questions) on mount
   useEffect(() => {
     const fetchPapers = async () => {
       try {
-        const res = await fetch("/api/papers");
+        const res = await fetch("/api/papers/available");
         if (res.ok) {
           const data = await res.json();
           setPapers(data.papers || []);
@@ -399,6 +399,14 @@ export default function SignupPage() {
                   color: "#1f2937",
                 }}>
                   Select Exam Paper
+                  <span style={{
+                    marginLeft: "8px",
+                    fontSize: "12px",
+                    fontWeight: "400",
+                    color: "#10b981",
+                  }}>
+                    (Auto-approved)
+                  </span>
                 </label>
                 <select
                   value={selectedPaper}

@@ -67,12 +67,12 @@ export async function POST(req: Request) {
 
     const userId = result?.[0]?.id;
 
-    // If paperId provided, assign paper to student
+    // If paperId provided, auto-approve paper assignment for student
     if (paperId && userId) {
       try {
         await prisma.$queryRaw`
-          INSERT INTO "StudentPaper" (id, "userId", "paperId", status, "createdAt")
-          VALUES (gen_random_uuid(), ${userId}, ${paperId}, 'active', NOW())
+          INSERT INTO "PaperRequest" (id, "userId", "paperId", status, "reviewedAt", "createdAt")
+          VALUES (gen_random_uuid(), ${userId}, ${paperId}, 'approved', NOW(), NOW())
         `;
       } catch (paperError) {
         console.error("Error assigning paper:", paperError);
