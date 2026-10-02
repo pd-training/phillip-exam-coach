@@ -107,6 +107,9 @@ export default function SignupPage() {
 
       const data = await res.json();
       console.log("Signup response:", data);
+      if (!data.paperAssignmentSuccess && data.paperAssignmentError) {
+        console.error("Paper assignment error:", data.paperAssignmentError);
+      }
 
       if (!res.ok) {
         setError(data.error || "Failed to create account");

@@ -69,6 +69,7 @@ export async function POST(req: Request) {
 
     // If paperId provided, auto-approve paper assignment for student
     let paperAssignmentSuccess = false;
+    let paperAssignmentError = null;
     if (paperId && userId) {
       try {
         console.log("Attempting to assign paper:", { paperId, userId });
@@ -80,7 +81,8 @@ export async function POST(req: Request) {
         console.log("Paper assigned successfully:", paperAssignResult);
         paperAssignmentSuccess = true;
       } catch (paperError: any) {
-        console.error("Error assigning paper:", paperError?.message || paperError);
+        paperAssignmentError = paperError?.message || String(paperError);
+        console.error("Error assigning paper:", paperAssignmentError);
         // Continue anyway - user is created
       }
     }
@@ -92,6 +94,7 @@ export async function POST(req: Request) {
       user: result?.[0] || null,
       paperId: paperId || null,
       paperAssignmentSuccess: paperAssignmentSuccess,
+      paperAssignmentError: paperAssignmentError,
     });
   } catch (error) {
     console.error("Error creating user:", error);
