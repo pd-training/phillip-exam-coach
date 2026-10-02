@@ -366,6 +366,29 @@ export default function PapersManagement() {
     }
   };
 
+  // Delete paper
+  const handleDeletePaper = async (paperId: string) => {
+    try {
+      const res = await fetch("/api/admin/delete-paper", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ paperId }),
+      });
+
+      const data = await res.json();
+
+      if (res.ok) {
+        alert(data.message || "Paper deleted successfully");
+        await fetchPapers();
+      } else {
+        alert(data.error || "Failed to delete paper");
+      }
+    } catch (error) {
+      console.error("Delete error:", error);
+      alert("Error deleting paper");
+    }
+  };
+
   // Upload questions
   const handleUploadQuestions = async () => {
     if (!uploadFile || !selectedPaperId) return;
@@ -806,6 +829,31 @@ export default function PapersManagement() {
                         }}
                       >
                         {togglingId === paper.id ? "Updating..." : (paper.isAvailable ? "Turn off" : "Turn on")}
+                      </button>
+                      <button
+                        onClick={() => {
+                          if (confirm(`Are you sure you want to delete "${paper.title}"?`)) {
+                            handleDeletePaper(paper.id);
+                          }
+                        }}
+                        style={{
+                          padding: "6px 16px",
+                          backgroundColor: "#ef4444",
+                          color: "white",
+                          border: "none",
+                          borderRadius: "6px",
+                          fontSize: "12px",
+                          fontWeight: "600",
+                          cursor: "pointer",
+                        }}
+                        onMouseEnter={(e) => {
+                          e.currentTarget.style.backgroundColor = "#dc2626";
+                        }}
+                        onMouseLeave={(e) => {
+                          e.currentTarget.style.backgroundColor = "#ef4444";
+                        }}
+                      >
+                        🗑️ Delete
                       </button>
                     </div>
                   </div>
