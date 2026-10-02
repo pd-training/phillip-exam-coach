@@ -118,6 +118,8 @@ export default function UserManagement() {
   };
 
   const handleDeleteUser = async () => {
+    setError(null);
+    
     if (!deleteUserId || !confirmDeleteName.trim()) {
       setError("Please type the user name to confirm deletion");
       return;
@@ -138,19 +140,19 @@ export default function UserManagement() {
         body: JSON.stringify({ userId: deleteUserId }),
       });
 
+      const data = await res.json();
+
       if (res.ok) {
-        const data = await res.json();
         setSuccess(data.message || "User deleted successfully");
         setDeleteUserId(null);
         setConfirmDeleteName("");
         await fetchUsers();
         setTimeout(() => setSuccess(null), 4000);
       } else {
-        const data = await res.json();
         setError(data.error || "Failed to delete user");
       }
-    } catch (error) {
-      setError("An error occurred while deleting the user");
+    } catch (error: any) {
+      setError(error?.message || "An error occurred while deleting the user");
       console.error("Delete error:", error);
     } finally {
       setSubmitting(false);
@@ -290,7 +292,10 @@ export default function UserManagement() {
                       </td>
                       <td style={{ padding: "16px", textAlign: "center" }}>
                         <button
-                          onClick={() => setDeleteUserId(user.id)}
+                          onClick={() => {
+                            setDeleteUserId(user.id);
+                            setError(null);
+                          }}
                           style={{
                             padding: "6px 12px",
                             backgroundColor: "#ef4444",

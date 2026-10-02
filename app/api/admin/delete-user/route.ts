@@ -26,26 +26,28 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Check if user exists
-    const user = await (prisma as any).user.findUnique({
-      where: { id: userId }
-    });
+    // Check if user exists and get their info
+    const user = await prisma.$queryRaw`
+      SELECT id, name, email FROM "User" WHERE id = ${userId}
+    ` as any[];
 
-    if (!user) {
+    if (!user || user.length === 0) {
       return NextResponse.json(
         { error: 'User not found' },
         { status: 404 }
       );
     }
 
-    // Delete user (cascading delete will handle related records)
-    await (prisma as any).user.delete({
-      where: { id: userId }
-    });
+    const userData = user[0];
+
+    // Delete user (cascade will handle related records)
+    await prisma.$queryRaw`
+      DELETE FROM "User" WHERE id = ${userId}
+    `;
 
     return NextResponse.json({ 
       success: true, 
-      message: `User "${user.name}" (${user.email}) has been deleted successfully` 
+      message: `User "${userData.name}" (${userData.email}) has been deleted successfully` 
     });
   } catch (error: any) {
     console.error('Delete user error:', error);
