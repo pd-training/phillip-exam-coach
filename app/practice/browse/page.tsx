@@ -40,7 +40,6 @@ export default function BrowsePapersPage() {
   const [error, setError] = useState('');
   const [submitting, setSubmitting] = useState<string | null>(null);
   const [submitMessages, setSubmitMessages] = useState<{ [key: string]: string }>({});
-  const [expandedPaperId, setExpandedPaperId] = useState<string | null>(null);
 
   useEffect(() => {
     if (status === 'unauthenticated') {
@@ -203,28 +202,11 @@ export default function BrowsePapersPage() {
                     <p className="text-sm text-gray-600 mt-1">
                       Available for practice
                     </p>
-                    <div className="mt-3 flex flex-col gap-2">
-                      {paper.description && paper.description.trim() ? (
-                        <>
-                          <button
-                            onClick={() => setExpandedPaperId(expandedPaperId === paper.id ? null : paper.id)}
-                            className="text-left text-sm text-gray-600 hover:text-blue-600 transition cursor-pointer"
-                          >
-                            <p className="line-clamp-2">{paper.description}</p>
-                            <span className="text-xs text-blue-600 font-medium mt-1 inline-block">
-                              {expandedPaperId === paper.id ? '▼ Show less' : '▶ Read more'}
-                            </span>
-                          </button>
-                          {expandedPaperId === paper.id && (
-                            <div className="bg-blue-50 p-3 rounded border border-blue-200 text-sm text-gray-700">
-                              {paper.description}
-                            </div>
-                          )}
-                        </>
-                      ) : (
-                        <p className="text-gray-500 italic text-sm">No description available</p>
-                      )}
-                    </div>
+                    {paper.description && paper.description.trim() ? (
+                      <p className="text-sm text-gray-600 mt-3">{paper.description}</p>
+                    ) : (
+                      <p className="text-sm text-gray-500 italic mt-3">No description available</p>
+                    )}
                   </div>
 
                   <div className="ml-6 flex flex-col items-end gap-2">
