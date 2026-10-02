@@ -292,7 +292,8 @@ export default function UserManagement() {
                       </td>
                       <td style={{ padding: "16px", textAlign: "center" }}>
                         <button
-                          onClick={() => {
+                          onClick={(e) => {
+                            e.stopPropagation();
                             setDeleteUserId(user.id);
                             setError(null);
                           }}
