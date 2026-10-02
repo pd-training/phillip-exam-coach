@@ -10,6 +10,7 @@ export async function GET(request: NextRequest) {
         id,
         title,
         description,
+        "externalLink",
         "totalTime"
       FROM "Paper"
       WHERE "isAvailable" = true

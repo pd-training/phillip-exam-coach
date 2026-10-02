@@ -18,6 +18,7 @@ interface Paper {
   title: string;
   description: string;
   totalTime: number;
+  externalLink?: string;
 }
 
 interface PaperRequest {
@@ -39,6 +40,7 @@ export default function BrowsePapersPage() {
   const [error, setError] = useState('');
   const [submitting, setSubmitting] = useState<string | null>(null);
   const [submitMessages, setSubmitMessages] = useState<{ [key: string]: string }>({});
+  const [expandedPaperId, setExpandedPaperId] = useState<string | null>(null);
 
   useEffect(() => {
     if (status === 'unauthenticated') {
@@ -201,25 +203,31 @@ export default function BrowsePapersPage() {
                     <p className="text-sm text-gray-600 mt-1">
                       Available for practice
                     </p>
-                    <div className="flex gap-4 mt-3 text-sm text-gray-600">
+                    <div className="mt-3 flex flex-col gap-2">
                       {paper.description && paper.description.trim() ? (
-                        <p className="line-clamp-2">{paper.description}</p>
+                        <>
+                          <button
+                            onClick={() => setExpandedPaperId(expandedPaperId === paper.id ? null : paper.id)}
+                            className="text-left text-sm text-gray-600 hover:text-blue-600 transition cursor-pointer"
+                          >
+                            <p className="line-clamp-2">{paper.description}</p>
+                            <span className="text-xs text-blue-600 font-medium mt-1 inline-block">
+                              {expandedPaperId === paper.id ? '▼ Show less' : '▶ Read more'}
+                            </span>
+                          </button>
+                          {expandedPaperId === paper.id && (
+                            <div className="bg-blue-50 p-3 rounded border border-blue-200 text-sm text-gray-700">
+                              {paper.description}
+                            </div>
+                          )}
+                        </>
                       ) : (
-                        <p className="text-gray-500 italic">No description available</p>
+                        <p className="text-gray-500 italic text-sm">No description available</p>
                       )}
                     </div>
                   </div>
 
                   <div className="ml-6 flex flex-col items-end gap-2">
-                    {status === 'owned' && (
-                      <Link
-                        href={`/exam/${paper.id}/practice-chapter`}
-                        className="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 font-medium whitespace-nowrap"
-                      >
-                        Start →
-                      </Link>
-                    )}
-
                     {status === 'available' && (
                       <>
                         <button
@@ -255,6 +263,17 @@ export default function BrowsePapersPage() {
                       <span className="px-3 py-2 bg-red-100 text-red-800 rounded-lg text-sm font-medium whitespace-nowrap">
                         ✗ Rejected
                       </span>
+                    )}
+
+                    {paper.externalLink && (
+                      <a
+                        href={paper.externalLink}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="px-3 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 text-sm font-medium whitespace-nowrap transition"
+                      >
+                        Learn more →
+                      </a>
                     )}
                   </div>
                 </div>

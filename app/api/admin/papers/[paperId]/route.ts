@@ -14,6 +14,7 @@ async function updatePaper(paperId: string, body: any) {
       id: true,
       title: true,
       description: true,
+      externalLink: true,
       durationMinutes: true,
       totalQuestions: true,
       passingScore: true,
@@ -25,7 +26,7 @@ async function updatePaper(paperId: string, body: any) {
     return { error: "Paper not found", status: 404, paper: null };
   }
 
-  const { title, description, totalQuestions, durationMinutes, passingScore, isAvailable } = body;
+  const { title, description, externalLink, totalQuestions, durationMinutes, passingScore, isAvailable } = body;
 
   // For PUT requests, title is required. For PATCH, it's optional.
   if (title !== undefined && (!title || !title.trim())) {
@@ -39,6 +40,9 @@ async function updatePaper(paperId: string, body: any) {
   }
   if (description !== undefined) {
     updateData.description = description.trim();
+  }
+  if (externalLink !== undefined) {
+    updateData.externalLink = externalLink.trim() || null;
   }
   if (totalQuestions !== undefined && totalQuestions > 0) {
     updateData.totalQuestions = totalQuestions;
@@ -66,6 +70,7 @@ async function updatePaper(paperId: string, body: any) {
         id: true,
         title: true,
         description: true,
+        externalLink: true,
         durationMinutes: true,
         totalQuestions: true,
         passingScore: true,
