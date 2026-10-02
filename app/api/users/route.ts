@@ -75,7 +75,7 @@ export async function POST(req: Request) {
         console.log("Attempting to assign paper:", { paperId, userId });
         const paperAssignResult = await prisma.$queryRaw`
           INSERT INTO "PaperRequest" (id, "userId", "paperId", status, "reviewedAt", "createdAt")
-          VALUES (gen_random_uuid(), ${userId}, ${paperId}, 'approved', NOW(), NOW())
+          VALUES (gen_random_uuid(), ${userId}, ${paperId}::uuid, 'approved', NOW(), NOW())
           RETURNING id
         `;
         console.log("Paper assigned successfully:", paperAssignResult);
