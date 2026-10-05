@@ -272,7 +272,7 @@ export default function AdminDashboard() {
               <p className="text-sm text-gray-600">{Math.min(5, attempts.length)} of {attempts.length} attempts</p>
               <div className="flex gap-3">
                 {attempts.length > 5 && (
-                  <Link href="/admin/users?tab=attempts">
+                  <Link href="/admin/attempts">
                     <button className="text-blue-600 hover:text-blue-700 font-medium text-sm">
                       View all {attempts.length} attempts →
                     </button>
