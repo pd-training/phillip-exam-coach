@@ -175,13 +175,14 @@ export default function StudentDashboard() {
               <ResponsiveContainer width="100%" height="100%">
                 <LineChart data={[...attempts].reverse().map((attempt, index) => {
                   const attemptDate = new Date(attempt.submittedat);
+                  const score = attempt.score ? Math.max(0, Math.min(100, Math.round(attempt.score))) : 0;
                   return {
                     id: attempt.id,
                     attemptNumber: index + 1,
                     paper: attempt.paperTitle || "Unknown Paper",
                     date: attemptDate.toLocaleDateString("en-US", { month: "short", day: "numeric" }),
                     time: attemptDate.toLocaleTimeString("en-US", { hour: "2-digit", minute: "2-digit" }),
-                    score: Math.round(attempt.score || 0),
+                    score: score,
                     passed: attempt.result === "Pass" ? "✓" : "✗",
                     displayLabel: `${attemptDate.toLocaleDateString("en-US", { month: "short", day: "numeric" })} - ${attempt.paperTitle}`
                   };
@@ -198,12 +199,10 @@ export default function StudentDashboard() {
                     label={{ value: "Score (%)", angle: -90, position: "insideLeft" }}
                   />
                   <Tooltip 
-                    contentStyle={{ backgroundColor: "#f3f4f6", border: "1px solid #d1d5db", borderRadius: "6px" }}
-                    formatter={(value: any) => [`${value}%`, "Score"]}
-                    labelFormatter={(label: any) => label}
                     content={({ active, payload }: any) => {
                       if (active && payload && payload.length) {
                         const data = payload[0].payload;
+                        const score = data.score;
                         return (
                           <div style={{ padding: "10px 12px", backgroundColor: "#ffffff", border: "1px solid #d1d5db", borderRadius: "6px", boxShadow: "0 2px 4px rgba(0,0,0,0.1)" }}>
                             <p style={{ margin: "0 0 6px 0", fontSize: "13px", fontWeight: "700", color: "#1f2937" }}>
@@ -213,7 +212,7 @@ export default function StudentDashboard() {
                               <strong>Attempt #{data.attemptNumber}</strong>
                             </p>
                             <p style={{ margin: "0 0 3px 0", fontSize: "12px", color: "#374151" }}>
-                              Score: <strong className="text-lg">{payload[0].value}%</strong> {data.passed}
+                              Score: <strong style={{ fontSize: "14px" }}>{score}%</strong> {data.passed}
                             </p>
                             <p style={{ margin: "0", fontSize: "11px", color: "#6b7280" }}>
                               {data.date} at {data.time}
