@@ -862,7 +862,7 @@ export default function PapersManagement() {
                           e.currentTarget.style.backgroundColor = "#ef4444";
                         }}
                       >
-                        🗑️ Delete
+                        Delete
                       </button>
                     </div>
                   </div>

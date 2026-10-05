@@ -85,7 +85,7 @@ export default function AttemptsPage() {
       <AdminNav />
       <div className="bg-gradient-to-r from-blue-600 to-blue-700 text-white py-12 px-0">
         <div className="max-w-7xl mx-auto px-6">
-          <h1 className="text-4xl font-bold mb-2">📋 Exam Attempts</h1>
+          <h1 className="text-4xl font-bold mb-2">Exam Attempts</h1>
           <p className="text-blue-100">All student exam submissions</p>
         </div>
       </div>
@@ -223,7 +223,7 @@ export default function AttemptsPage() {
                             }}
                             className="text-red-600 hover:text-red-700 font-medium"
                           >
-                            🗑️ Delete
+                            Delete
                           </button>
                         </td>
                       </tr>
