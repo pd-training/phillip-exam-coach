@@ -49,9 +49,11 @@ export default function AttemptsPage() {
     return <div style={{ padding: "20px" }}>Loading...</div>;
   }
 
-  const filteredAttempts = selectedPaperId
-    ? attempts.filter((a) => a.paperid === selectedPaperId)
-    : attempts;
+  const filteredAttempts = Array.isArray(attempts)
+    ? selectedPaperId
+      ? attempts.filter((a) => a.paperid === selectedPaperId)
+      : attempts
+    : [];
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -75,7 +77,7 @@ export default function AttemptsPage() {
             className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
           >
             <option value="">All Papers</option>
-            {papers.map((paper) => (
+            {Array.isArray(papers) && papers.map((paper) => (
               <option key={paper.id} value={paper.id}>
                 {paper.title}
               </option>
@@ -115,7 +117,7 @@ export default function AttemptsPage() {
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-gray-200">
-                  {filteredAttempts.map((attempt, idx) => {
+                  {Array.isArray(filteredAttempts) ? filteredAttempts.map((attempt, idx) => {
                     const paper = papers.find((p) => p.id === attempt.paperid);
                     const passStatus =
                       attempt.passed !== null
@@ -185,12 +187,19 @@ export default function AttemptsPage() {
                         </td>
                       </tr>
                     );
-                  })}
+                  })
+                  : (
+                    <tr>
+                      <td colSpan={6} className="px-6 py-4 text-center text-gray-600">
+                        No attempts found
+                      </td>
+                    </tr>
+                  )}
                 </tbody>
               </table>
             </div>
             <div className="bg-gray-50 px-6 py-4 border-t border-gray-200 text-sm text-gray-600">
-              Showing {filteredAttempts.length} of {attempts.length} attempts
+              Showing {Array.isArray(filteredAttempts) ? filteredAttempts.length : 0} of {Array.isArray(attempts) ? attempts.length : 0} attempts
             </div>
           </div>
         )}
