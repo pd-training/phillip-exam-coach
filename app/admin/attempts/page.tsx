@@ -27,14 +27,16 @@ export default function AttemptsPage() {
         // Fetch papers
         const papersRes = await fetch("/api/papers");
         const papersData = await papersRes.json();
-        setPapers(papersData);
+        setPapers(papersData?.papers || []);
 
         // Fetch all attempts
         const attemptsRes = await fetch("/api/admin/exam-attempts");
         const attemptsData = await attemptsRes.json();
-        setAttempts(attemptsData);
+        setAttempts(Array.isArray(attemptsData) ? attemptsData : []);
       } catch (error) {
         console.error("Error fetching data:", error);
+        setPapers([]);
+        setAttempts([]);
       } finally {
         setLoading(false);
       }
