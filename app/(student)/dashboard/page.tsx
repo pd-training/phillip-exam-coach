@@ -169,24 +169,28 @@ export default function StudentDashboard() {
         {attempts.length > 0 && (
           <div className="bg-white rounded-lg border border-gray-200 p-6 mb-12">
             <h2 className="text-2xl font-bold text-gray-900 mb-1">Score Trend</h2>
-            <p className="text-gray-600 text-sm mb-1">Your exam performance over time</p>
-            <p className="text-gray-500 text-xs mb-6">Includes attempts from all papers. Hover over points to see which paper each attempt was for.</p>
+            <p className="text-gray-600 text-sm mb-1">Your exam performance across all papers</p>
+            <p className="text-gray-500 text-xs mb-6">Attempts are numbered chronologically (1 = oldest, N = newest). Hover over each point to see paper name and timestamp.</p>
             <div style={{ width: "100%", height: 300 }}>
               <ResponsiveContainer width="100%" height="100%">
-                <LineChart data={[...attempts].reverse().map((attempt, index) => ({
-                  name: `Exam ${index + 1}`,
-                  paper: attempt.paperTitle,
-                  date: new Date(attempt.submittedat).toLocaleDateString("en-US", { month: "short", day: "numeric" }),
-                  score: Math.round(attempt.score),
-                  passed: attempt.result === "Pass" ? "✓" : "✗"
-                }))}>
+                <LineChart data={[...attempts].reverse().map((attempt, index) => {
+                  const attemptDate = new Date(attempt.submittedat);
+                  return {
+                    id: attempt.id,
+                    attemptNumber: index + 1,
+                    paper: attempt.paperTitle || "Unknown Paper",
+                    date: attemptDate.toLocaleDateString("en-US", { month: "short", day: "numeric" }),
+                    time: attemptDate.toLocaleTimeString("en-US", { hour: "2-digit", minute: "2-digit" }),
+                    score: Math.round(attempt.score || 0),
+                    passed: attempt.result === "Pass" ? "✓" : "✗",
+                    displayLabel: `${attemptDate.toLocaleDateString("en-US", { month: "short", day: "numeric" })} - ${attempt.paperTitle}`
+                  };
+                })}>
                   <CartesianGrid strokeDasharray="3 3" />
                   <XAxis 
-                    dataKey="date" 
+                    dataKey="attemptNumber"
+                    label={{ value: "Attempt #", position: "insideBottomRight", offset: -5, fontSize: 12 }}
                     tick={{ fontSize: 12 }}
-                    angle={-45}
-                    textAnchor="end"
-                    height={80}
                   />
                   <YAxis 
                     domain={[0, 100]}
@@ -201,15 +205,18 @@ export default function StudentDashboard() {
                       if (active && payload && payload.length) {
                         const data = payload[0].payload;
                         return (
-                          <div style={{ padding: "8px 12px", backgroundColor: "#ffffff", border: "1px solid #d1d5db", borderRadius: "6px" }}>
-                            <p style={{ margin: "0 0 4px 0", fontSize: "12px", fontWeight: "600", color: "#1f2937" }}>
+                          <div style={{ padding: "10px 12px", backgroundColor: "#ffffff", border: "1px solid #d1d5db", borderRadius: "6px", boxShadow: "0 2px 4px rgba(0,0,0,0.1)" }}>
+                            <p style={{ margin: "0 0 6px 0", fontSize: "13px", fontWeight: "700", color: "#1f2937" }}>
                               {data.paper}
                             </p>
-                            <p style={{ margin: "0 0 2px 0", fontSize: "12px", color: "#374151" }}>
-                              Score: <strong>{payload[0].value}%</strong>
+                            <p style={{ margin: "0 0 3px 0", fontSize: "12px", color: "#374151" }}>
+                              <strong>Attempt #{data.attemptNumber}</strong>
                             </p>
-                            <p style={{ margin: "0", fontSize: "12px", color: "#374151" }}>
-                              Date: {data.date}
+                            <p style={{ margin: "0 0 3px 0", fontSize: "12px", color: "#374151" }}>
+                              Score: <strong className="text-lg">{payload[0].value}%</strong> {data.passed}
+                            </p>
+                            <p style={{ margin: "0", fontSize: "11px", color: "#6b7280" }}>
+                              {data.date} at {data.time}
                             </p>
                           </div>
                         );
