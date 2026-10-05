@@ -35,13 +35,14 @@ export async function GET(request: Request) {
       LIMIT 50
     ` as any[];
 
-    // Calculate stats
+    // Calculate stats (only count completed attempts with scores)
     const fullExamAttempts = attempts || [];
-    const completedCount = fullExamAttempts.length;
+    const completedAttempts = fullExamAttempts.filter((a: any) => a.score !== null);
+    const completedCount = completedAttempts.length;
     const averageScore = completedCount > 0
-      ? Math.round(fullExamAttempts.reduce((sum: number, a: any) => sum + (a.score || 0), 0) / completedCount)
+      ? Math.round(completedAttempts.reduce((sum: number, a: any) => sum + a.score, 0) / completedCount)
       : 0;
-    const passCount = fullExamAttempts.filter((a: any) => a.result === 'Pass').length;
+    const passCount = completedAttempts.filter((a: any) => a.result === 'Pass').length;
 
     return Response.json({ 
       attempts: fullExamAttempts,

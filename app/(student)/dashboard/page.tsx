@@ -172,11 +172,11 @@ export default function StudentDashboard() {
             <p className="text-gray-600 text-sm mb-6">Your exam performance over time</p>
             <div style={{ width: "100%", height: 300 }}>
               <ResponsiveContainer width="100%" height="100%">
-                <LineChart data={attempts.map((attempt, index) => ({
+                <LineChart data={[...attempts].reverse().map((attempt, index) => ({
                   name: `Exam ${index + 1}`,
                   date: new Date(attempt.submittedat).toLocaleDateString("en-US", { month: "short", day: "numeric" }),
                   score: Math.round(attempt.score),
-                  passed: attempt.result === "passed" ? "✓" : "✗"
+                  passed: attempt.result === "Pass" ? "✓" : "✗"
                 }))}>
                   <CartesianGrid strokeDasharray="3 3" />
                   <XAxis 
