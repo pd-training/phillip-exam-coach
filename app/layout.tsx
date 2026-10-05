@@ -3,7 +3,7 @@ import { Providers } from "./providers";
 import "./globals.css";
 
 export const metadata: Metadata = {
-  title: "Phillip Exam Coach",
+  title: "Finance Ready",
   description: "CMFAS exam preparation platform",
 };
 

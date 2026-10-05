@@ -151,9 +151,9 @@ export default function LandingPage() {
         <nav className="max-w-7xl mx-auto px-6 py-4 flex justify-between items-center">
           <div className="flex items-center gap-3">
             <div className="w-10 h-10 bg-gradient-to-br from-blue-600 to-blue-700 rounded-lg flex items-center justify-center">
-              <span className="text-white font-bold text-lg">P</span>
+              <span className="text-white font-bold text-lg">📚</span>
             </div>
-            <span className="text-xl font-semibold text-gray-900">Phillip Exam Coach</span>
+            <span className="text-xl font-semibold text-gray-900">Finance Ready</span>
           </div>
           <div className="hidden md:flex gap-8 items-center">
             <a href="#features" className="text-gray-600 hover:text-gray-900 font-medium transition">Features</a>
@@ -353,7 +353,7 @@ export default function LandingPage() {
             Ready to ace your CMFAS exam?
           </h2>
           <p className="text-xl text-gray-600 mb-10">
-            Join hundreds of exam candidates who have successfully passed their CMFAS exams using Phillip Exam Coach.
+            Join hundreds of financial advisors who passed their CMFAS exams with Finance Ready.
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Link href="/signup">
@@ -377,9 +377,9 @@ export default function LandingPage() {
             <div>
               <div className="flex items-center gap-2 mb-4">
                 <div className="w-8 h-8 bg-blue-600 rounded-lg flex items-center justify-center">
-                  <span className="text-white font-bold text-sm">P</span>
+                  <span className="text-white font-bold text-sm">📚</span>
                 </div>
-                <span className="font-semibold text-white">Phillip</span>
+                <span className="font-semibold text-white">Finance Ready</span>
               </div>
               <p className="text-sm">Master your CMFAS exams with confidence.</p>
             </div>
@@ -407,7 +407,7 @@ export default function LandingPage() {
           </div>
           <div className="border-t border-gray-800 pt-8">
             <p className="text-center text-sm">
-              © 2024 Phillip Exam Coach. All rights reserved.
+              © 2024 Finance Ready. All rights reserved.
             </p>
           </div>
         </div>
