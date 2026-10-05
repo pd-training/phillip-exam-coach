@@ -27,22 +27,21 @@ export async function POST(request: NextRequest) {
     }
 
     // Check if paper exists and get its info
-    const paper = await prisma.$queryRaw`
-      SELECT id, title FROM "Paper" WHERE id = ${paperId}
-    ` as any[];
+    const paper = await prisma.paper.findUnique({
+      where: { id: paperId },
+      select: { id: true, title: true }
+    });
 
-    if (!paper || paper.length === 0) {
+    if (!paper) {
       return NextResponse.json(
         { error: 'Paper not found' },
         { status: 404 }
       );
     }
 
-    const paperData = paper[0];
-
     // Check how many exam attempts exist for this paper
     const attemptCount = await prisma.$queryRaw`
-      SELECT COUNT(*) as count FROM "examattempt" WHERE paperid = ${paperId}
+      SELECT COUNT(*) as count FROM "examattempt" WHERE paperid = ${paperId}::uuid
     ` as any[];
 
     const hasAttempts = Number(attemptCount[0]?.count) > 0;
@@ -57,14 +56,14 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Delete paper (cascade will handle related records)
-    await prisma.$queryRaw`
-      DELETE FROM "Paper" WHERE id = ${paperId}
-    `;
+    // Delete paper (cascade will handle related records via Prisma ORM)
+    await prisma.paper.delete({
+      where: { id: paperId }
+    });
 
     return NextResponse.json({ 
       success: true, 
-      message: `Paper "${paperData.title}" has been deleted successfully` 
+      message: `Paper "${paper.title}" has been deleted successfully` 
     });
   } catch (error: any) {
     console.error('Delete paper error:', error);
