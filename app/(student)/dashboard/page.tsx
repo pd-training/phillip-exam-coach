@@ -169,11 +169,13 @@ export default function StudentDashboard() {
         {attempts.length > 0 && (
           <div className="bg-white rounded-lg border border-gray-200 p-6 mb-12">
             <h2 className="text-2xl font-bold text-gray-900 mb-1">Score Trend</h2>
-            <p className="text-gray-600 text-sm mb-6">Your exam performance over time</p>
+            <p className="text-gray-600 text-sm mb-1">Your exam performance over time</p>
+            <p className="text-gray-500 text-xs mb-6">Includes attempts from all papers. Hover over points to see which paper each attempt was for.</p>
             <div style={{ width: "100%", height: 300 }}>
               <ResponsiveContainer width="100%" height="100%">
                 <LineChart data={[...attempts].reverse().map((attempt, index) => ({
                   name: `Exam ${index + 1}`,
+                  paper: attempt.paperTitle,
                   date: new Date(attempt.submittedat).toLocaleDateString("en-US", { month: "short", day: "numeric" }),
                   score: Math.round(attempt.score),
                   passed: attempt.result === "Pass" ? "✓" : "✗"
@@ -192,8 +194,28 @@ export default function StudentDashboard() {
                     label={{ value: "Score (%)", angle: -90, position: "insideLeft" }}
                   />
                   <Tooltip 
+                    contentStyle={{ backgroundColor: "#f3f4f6", border: "1px solid #d1d5db", borderRadius: "6px" }}
                     formatter={(value: any) => [`${value}%`, "Score"]}
-                    contentStyle={{ backgroundColor: "#f3f4f6", border: "1px solid #d1d5db" }}
+                    labelFormatter={(label: any) => label}
+                    content={({ active, payload }: any) => {
+                      if (active && payload && payload.length) {
+                        const data = payload[0].payload;
+                        return (
+                          <div style={{ padding: "8px 12px", backgroundColor: "#ffffff", border: "1px solid #d1d5db", borderRadius: "6px" }}>
+                            <p style={{ margin: "0 0 4px 0", fontSize: "12px", fontWeight: "600", color: "#1f2937" }}>
+                              {data.paper}
+                            </p>
+                            <p style={{ margin: "0 0 2px 0", fontSize: "12px", color: "#374151" }}>
+                              Score: <strong>{payload[0].value}%</strong>
+                            </p>
+                            <p style={{ margin: "0", fontSize: "12px", color: "#374151" }}>
+                              Date: {data.date}
+                            </p>
+                          </div>
+                        );
+                      }
+                      return null;
+                    }}
                   />
                   <Line 
                     type="monotone" 
