@@ -32,9 +32,9 @@ export async function GET(request: NextRequest) {
       FROM "examattempt" ea
       LEFT JOIN "User" u ON ea.userid = u.id
       ORDER BY ea.submittedat DESC NULLS LAST, ea.startedat DESC
-    `;
+    ` as any[];
 
-    return NextResponse.json(attempts);
+    return NextResponse.json(attempts || []);
   } catch (error: any) {
     console.error('Fetch exam attempts error:', error);
     return NextResponse.json(
