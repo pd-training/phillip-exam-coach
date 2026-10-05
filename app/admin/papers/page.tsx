@@ -381,7 +381,16 @@ export default function PapersManagement() {
         alert(data.message || "Paper deleted successfully");
         await fetchPapers();
       } else {
-        alert(data.error || "Failed to delete paper");
+        if (data.hasAttempts) {
+          const goToAttempts = confirm(
+            `${data.error}\n\nClick OK to go to Exam Attempts page to delete them.`
+          );
+          if (goToAttempts) {
+            window.location.href = `/admin/attempts`;
+          }
+        } else {
+          alert(data.error || "Failed to delete paper");
+        }
       }
     } catch (error) {
       console.error("Delete error:", error);

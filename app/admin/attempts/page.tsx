@@ -55,6 +55,31 @@ export default function AttemptsPage() {
       : attempts
     : [];
 
+  const handleDeleteAttempt = async (attemptId: string) => {
+    try {
+      const res = await fetch("/api/admin/delete-attempt", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ attemptId }),
+      });
+
+      const data = await res.json();
+
+      if (res.ok) {
+        alert("Exam attempt deleted successfully");
+        // Refresh the list
+        const attemptsRes = await fetch("/api/admin/exam-attempts");
+        const attemptsData = await attemptsRes.json();
+        setAttempts(Array.isArray(attemptsData) ? attemptsData : []);
+      } else {
+        alert(data.error || "Failed to delete attempt");
+      }
+    } catch (error) {
+      console.error("Delete error:", error);
+      alert("Error deleting attempt");
+    }
+  };
+
   return (
     <div className="min-h-screen bg-gray-50">
       <AdminNav />
@@ -113,6 +138,9 @@ export default function AttemptsPage() {
                     </th>
                     <th className="px-6 py-3 text-left text-sm font-semibold text-gray-900">
                       Action
+                    </th>
+                    <th className="px-6 py-3 text-left text-sm font-semibold text-gray-900">
+                      Delete
                     </th>
                   </tr>
                 </thead>
@@ -185,12 +213,25 @@ export default function AttemptsPage() {
                             </button>
                           </Link>
                         </td>
+                        <td className="px-6 py-4 text-sm">
+                          <button
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              if (confirm("Are you sure you want to delete this exam attempt?")) {
+                                handleDeleteAttempt(attempt.id);
+                              }
+                            }}
+                            className="text-red-600 hover:text-red-700 font-medium"
+                          >
+                            🗑️ Delete
+                          </button>
+                        </td>
                       </tr>
                     );
                   })
                   : (
                     <tr>
-                      <td colSpan={6} className="px-6 py-4 text-center text-gray-600">
+                      <td colSpan={7} className="px-6 py-4 text-center text-gray-600">
                         No attempts found
                       </td>
                     </tr>
