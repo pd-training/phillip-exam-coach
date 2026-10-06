@@ -264,8 +264,8 @@ export async function GET(
     let finalPartScores: any[] = [];
     if (attempt.partScores) {
       try {
-        finalPartScores = typeof attempt.partScores === 'string' 
-          ? JSON.parse(attempt.partScores) 
+        finalPartScores = typeof attempt.partScores === 'string'
+          ? JSON.parse(attempt.partScores)
           : attempt.partScores;
         console.log(`✅ Loaded ${finalPartScores.length} part scores from database`);
       } catch (err) {
@@ -277,13 +277,26 @@ export async function GET(
       console.log('   Run: GET /api/admin/add-partscores-column to add the column');
     }
 
+    // Recalculate passed status based on current score and passing score (not stored value)
+    // This fixes inconsistencies where stored passed value may have been calculated with incorrect score
+    let recalculatedPassed = attempt.passed;
+    if (finalPartScores.length > 0) {
+      // If parts exist, must pass ALL parts
+      recalculatedPassed = finalPartScores.every(p => p.passed);
+      console.log(`Recalculated passed (part-based): ${recalculatedPassed}`);
+    } else {
+      // Use overall score
+      recalculatedPassed = attempt.score >= (attempt.passingScore || 75);
+      console.log(`Recalculated passed (score-based): ${recalculatedPassed} (${attempt.score}% >= ${attempt.passingScore || 75}%)`);
+    }
+
     return Response.json({
       attempt: {
         id: attempt.id,
         userid: attempt.userid,
         paperid: attempt.paperid,
         score: attempt.score,
-        passed: attempt.passed,
+        passed: recalculatedPassed,
         startedat: attempt.startedat,
         submittedat: attempt.submittedat,
         student_name: attempt.student_name,
