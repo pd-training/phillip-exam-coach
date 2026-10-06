@@ -414,6 +414,7 @@ export default function AttemptReviewPage() {
           {/* Question Details section removed - info already displayed on the left */}
         </div>
       </div>
+      </div>
       )}
 
       {/* Performance Analysis Tab */}
