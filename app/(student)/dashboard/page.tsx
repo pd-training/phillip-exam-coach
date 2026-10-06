@@ -3,7 +3,7 @@
 import StudentNav from "@/components/StudentNav";
 import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
 import Link from "next/link";
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from "recharts";
 
@@ -31,6 +31,21 @@ interface Paper {
   totalTime: number;
 }
 
+interface StudentPaper {
+  id: string;
+  paperId: string;
+  paper_name: string;
+  status: string;
+}
+
+interface PaperRequest {
+  id: string;
+  paperId: string;
+  paper_name: string;
+  status: string;
+  requestedAt: string;
+}
+
 export default function StudentDashboard() {
   const router = useRouter();
   const { data: session, status } = useSession();
@@ -44,6 +59,10 @@ export default function StudentDashboard() {
   const [selectedPaper, setSelectedPaper] = useState<string>("all");
   const [selectedTrendPaper, setSelectedTrendPaper] = useState<string>("");
   const [availablePapers, setAvailablePapers] = useState<Paper[]>([]);
+  const [studentPapers, setStudentPapers] = useState<StudentPaper[]>([]);
+  const [requests, setRequests] = useState<PaperRequest[]>([]);
+  const [submitting, setSubmitting] = useState<string | null>(null);
+  const [submitMessages, setSubmitMessages] = useState<{ [key: string]: string }>({});
 
   // Handle auth redirects
   useEffect(() => {
@@ -80,9 +99,11 @@ export default function StudentDashboard() {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const [attemptsRes, papersRes] = await Promise.all([
+        const [attemptsRes, papersRes, studentPapersRes, requestsRes] = await Promise.all([
           fetch("/api/student/attempts"),
-          fetch("/api/papers/available")
+          fetch("/api/papers/available"),
+          fetch("/api/student/papers"),
+          fetch("/api/student/paper-requests")
         ]);
 
         console.log("API Response - attempts:", attemptsRes.status);
@@ -105,6 +126,20 @@ export default function StudentDashboard() {
         } else {
           console.error("Failed to fetch papers:", papersRes.status);
         }
+
+        if (studentPapersRes.ok) {
+          const studentPapersData = await studentPapersRes.json();
+          setStudentPapers(studentPapersData.papers || []);
+        } else {
+          console.error("Failed to fetch student papers:", studentPapersRes.status);
+        }
+
+        if (requestsRes.ok) {
+          const requestsData = await requestsRes.json();
+          setRequests(requestsData.requests || []);
+        } else {
+          console.error("Failed to fetch requests:", requestsRes.status);
+        }
       } catch (error) {
         console.error("Error fetching data:", error);
       } finally {
@@ -122,6 +157,69 @@ export default function StudentDashboard() {
       setSelectedTrendPaper(firstPaper);
     }
   }, [attempts, selectedTrendPaper]);
+
+  const getStatusForPaper = (paperId: string) => {
+    const ownsPaper = studentPapers.some((p) => p.paperId === paperId);
+    if (ownsPaper) return 'owned';
+
+    const hasRequest = requests.find((r) => r.paperId === paperId);
+    if (hasRequest) return hasRequest.status; // 'pending', 'approved', 'rejected'
+
+    return 'available';
+  };
+
+  const handleRequestPaper = useCallback(async (paperId: string, paperName: string) => {
+    try {
+      setSubmitting(paperId);
+
+      const res = await fetch('/api/student/paper-requests', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ paperId }),
+      });
+
+      if (!res.ok) {
+        const errData = await res.json();
+        setSubmitMessages((prev) => ({
+          ...prev,
+          [paperId]: errData.error || 'Failed to submit request',
+        }));
+        return;
+      }
+
+      setSubmitMessages((prev) => ({
+        ...prev,
+        [paperId]: 'Request submitted!',
+      }));
+
+      // Refresh data after 1 second
+      setTimeout(async () => {
+        try {
+          const [studentPapersRes, requestsRes] = await Promise.all([
+            fetch("/api/student/papers"),
+            fetch("/api/student/paper-requests")
+          ]);
+
+          if (studentPapersRes.ok && requestsRes.ok) {
+            const studentPapersData = await studentPapersRes.json();
+            const requestsData = await requestsRes.json();
+
+            setStudentPapers(studentPapersData.papers || []);
+            setRequests(requestsData.requests || []);
+          }
+        } catch (err) {
+          console.error('Error refreshing data:', err);
+        }
+      }, 1000);
+    } catch (err: any) {
+      setSubmitMessages((prev) => ({
+        ...prev,
+        [paperId]: err.message || 'Failed to submit request',
+      }));
+    } finally {
+      setSubmitting(null);
+    }
+  }, []);
 
   const passRate =
     stats.completedCount > 0
@@ -321,23 +419,84 @@ export default function StudentDashboard() {
               <p className="text-gray-600 text-sm">Browse available exam papers and take your first practice test</p>
             </div>
             <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
-              {availablePapers.slice(0, 6).map((paper) => (
-                <Link key={paper.id} href={`/exam/${paper.id}/full-exam`}>
-                  <div className="bg-white rounded-lg p-5 border border-gray-200 hover:border-amber-400 hover:shadow-md transition duration-300 cursor-pointer group">
-                    <h3 className="font-semibold text-gray-900 group-hover:text-amber-600 transition mb-4">
+              {availablePapers.slice(0, 6).map((paper) => {
+                const status = getStatusForPaper(paper.id);
+                const msg = submitMessages[paper.id];
+
+                return (
+                  <div
+                    key={paper.id}
+                    className="bg-white rounded-lg p-5 border border-gray-200 hover:border-amber-400 hover:shadow-md transition duration-300"
+                  >
+                    <h3 className="font-semibold text-gray-900 mb-4">
                       {paper.title}
                     </h3>
-                    <div className="flex items-center justify-between">
-                      <span className="text-xs text-gray-500 font-medium">
-                        ⏱️ {paper.totalTime} min
-                      </span>
-                      <span className="text-amber-600 group-hover:text-amber-700 text-sm font-medium">
-                        Learn more →
-                      </span>
+                    <div className="flex flex-col gap-3">
+                      <div className="flex items-center justify-between">
+                        <span className="text-xs text-gray-500 font-medium">
+                          ⏱️ {paper.totalTime} min
+                        </span>
+                      </div>
+
+                      {status === 'owned' && (
+                        <Link href={`/exam/${paper.id}/full-exam`}>
+                          <button className="w-full px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 font-medium text-center text-sm">
+                            Practice →
+                          </button>
+                        </Link>
+                      )}
+
+                      {status === 'available' && (
+                        <>
+                          <button
+                            onClick={() =>
+                              handleRequestPaper(paper.id, paper.title)
+                            }
+                            disabled={submitting === paper.id}
+                            className="w-full px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 font-medium text-sm disabled:bg-gray-300"
+                          >
+                            {submitting === paper.id ? 'Requesting...' : 'Request Access'}
+                          </button>
+                          {msg && (
+                            <p className="text-xs text-green-600 font-medium text-center">
+                              {msg}
+                            </p>
+                          )}
+                        </>
+                      )}
+
+                      {status === 'pending' && (
+                        <span className="w-full px-3 py-2 bg-yellow-100 text-yellow-800 rounded-lg text-sm font-medium text-center">
+                          ⏳ Pending
+                        </span>
+                      )}
+
+                      {status === 'approved' && (
+                        <span className="w-full px-3 py-2 bg-green-100 text-green-800 rounded-lg text-sm font-medium text-center">
+                          ✓ Approved
+                        </span>
+                      )}
+
+                      {status === 'rejected' && (
+                        <span className="w-full px-3 py-2 bg-red-100 text-red-800 rounded-lg text-sm font-medium text-center">
+                          ✗ Rejected
+                        </span>
+                      )}
+
+                      {paper.externalLink && (
+                        <a
+                          href={paper.externalLink}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="w-full px-3 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 text-sm font-medium text-center transition"
+                        >
+                          Learn more →
+                        </a>
+                      )}
                     </div>
                   </div>
-                </Link>
-              ))}
+                );
+              })}
             </div>
           </div>
         )}
