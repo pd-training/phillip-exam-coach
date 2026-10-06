@@ -432,12 +432,6 @@ export default function StudentDashboard() {
                       {paper.title}
                     </h3>
                     <div className="flex flex-col gap-3">
-                      <div className="flex items-center justify-between">
-                        <span className="text-xs text-gray-500 font-medium">
-                          ⏱️ {paper.totalTime} min
-                        </span>
-                      </div>
-
                       {status === 'owned' && (
                         <Link href={`/exam/${paper.id}/full-exam`}>
                           <button className="w-full px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 font-medium text-center text-sm">

@@ -153,7 +153,7 @@ export default function BrowsePapersPage() {
     return (
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
         <div className="text-center">
-          <div className="inline-block h-8 w-8 animate-spin rounded-full border-4 border-blue-500 border-t-transparent"></div>
+          <div className="inline-block h-8 w-8 animate-spin rounded-full border-4 border-amber-500 border-t-transparent"></div>
           <p className="mt-4 text-gray-600">Loading...</p>
         </div>
       </div>
@@ -165,7 +165,7 @@ export default function BrowsePapersPage() {
       <StudentNav />
 
       {/* Hero Section */}
-      <div className="bg-gradient-to-r from-blue-600 to-blue-700 text-white py-12 px-0">
+      <div className="bg-gradient-to-r from-blue-900 to-blue-800 text-white py-12 px-0">
         <div className="max-w-7xl mx-auto px-6">
           <h1 className="text-4xl font-bold mb-2">Browse Papers</h1>
           <p className="text-blue-100">Request access to practice papers</p>
@@ -189,7 +189,7 @@ export default function BrowsePapersPage() {
             <select
               value={filterStatus}
               onChange={(e) => setFilterStatus(e.target.value as any)}
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-amber-500"
             >
               <option value="all">All papers ({allPapers.length})</option>
               <option value="owned">You have access ({papers.length})</option>
@@ -230,7 +230,7 @@ export default function BrowsePapersPage() {
               return (
                 <div
                   key={paper.id}
-                  className="bg-white rounded-lg border border-gray-200 p-6 hover:shadow-lg hover:border-blue-300 transition flex flex-col"
+                  className="bg-white rounded-lg border border-gray-200 p-6 hover:shadow-lg hover:border-amber-400 transition flex flex-col"
                 >
                   <div className="flex-1 mb-4">
                     <div className="flex items-start gap-2">
@@ -262,7 +262,7 @@ export default function BrowsePapersPage() {
                             handleRequestPaper(paper.id, paper.title)
                           }
                           disabled={submitting === paper.id}
-                          className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 font-medium whitespace-nowrap disabled:bg-gray-300"
+                          className="px-4 py-2 bg-amber-500 text-blue-900 rounded-lg hover:bg-amber-600 font-medium whitespace-nowrap disabled:bg-gray-300"
                         >
                           {submitting === paper.id ? 'Requesting...' : 'Request'}
                         </button>

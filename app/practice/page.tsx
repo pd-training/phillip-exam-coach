@@ -73,7 +73,7 @@ export default function PracticePage() {
     return (
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
         <div className="text-center">
-          <div className="inline-block h-8 w-8 animate-spin rounded-full border-4 border-blue-500 border-t-transparent"></div>
+          <div className="inline-block h-8 w-8 animate-spin rounded-full border-4 border-amber-500 border-t-transparent"></div>
           <p className="mt-4 text-gray-600">Loading...</p>
         </div>
       </div>
@@ -85,7 +85,7 @@ export default function PracticePage() {
       <StudentNav />
 
       {/* Hero Section */}
-      <div className="bg-gradient-to-r from-blue-600 to-blue-700 text-white py-12 px-0">
+      <div className="bg-gradient-to-r from-blue-900 to-blue-800 text-white py-12 px-0">
         <div className="max-w-7xl mx-auto px-6">
           <h1 className="text-4xl font-bold mb-2">Your Papers</h1>
           <p className="text-blue-100">Prepare for your CMFAS exams</p>
@@ -109,7 +109,7 @@ export default function PracticePage() {
                 </p>
                 <Link
                   href="/practice/browse"
-                  className="inline-block px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 font-medium"
+                  className="inline-block px-6 py-2 bg-amber-500 text-blue-900 rounded-lg hover:bg-amber-600 font-medium"
                 >
                   Browse papers
                 </Link>
@@ -130,7 +130,7 @@ export default function PracticePage() {
                     <Link
                       key={paper.id}
                       href={`/exam/${paper.paperId}`}
-                      className="bg-white rounded-lg border border-gray-200 p-6 hover:shadow-lg hover:border-blue-300 transition flex flex-col"
+                      className="bg-white rounded-lg border border-gray-200 p-6 hover:shadow-lg hover:border-amber-400 transition flex flex-col"
                     >
                       <div className="flex items-start justify-between gap-3 mb-3">
                         <h3 className="text-lg font-semibold text-gray-900 flex-1">
@@ -146,7 +146,7 @@ export default function PracticePage() {
                           </div>
                         )}
                         {!latestAttempt && (
-                          <div className="px-2 py-1 rounded text-xs font-semibold whitespace-nowrap bg-blue-100 text-blue-700">
+                          <div className="px-2 py-1 rounded text-xs font-semibold whitespace-nowrap bg-amber-100 text-amber-700">
                             Not started
                           </div>
                         )}
@@ -161,7 +161,7 @@ export default function PracticePage() {
                             <div className="w-full bg-gray-200 rounded-full h-2">
                               <div
                                 className={`h-2 rounded-full transition-all ${
-                                  isPassed ? 'bg-green-500' : 'bg-blue-500'
+                                  isPassed ? 'bg-green-500' : 'bg-amber-500'
                                 }`}
                                 style={{ width: `${progressPercent}%` }}
                               />
@@ -169,7 +169,7 @@ export default function PracticePage() {
                           </div>
                         </>
                       )}
-                      <div className="mt-auto flex items-center text-blue-600 font-medium">
+                      <div className="mt-auto flex items-center text-amber-600 font-medium">
                         {latestAttempt ? 'Practice again' : 'Start practicing'} →
                       </div>
                     </Link>

@@ -55,7 +55,7 @@ export default function AllAttemptsPage() {
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
         <div className="text-center">
           <div className="inline-block">
-            <div className="w-12 h-12 border-4 border-gray-300 border-t-blue-600 rounded-full animate-spin" />
+            <div className="w-12 h-12 border-4 border-gray-300 border-t-amber-500 rounded-full animate-spin" />
           </div>
           <p className="mt-4 text-gray-600">Loading attempts...</p>
         </div>
@@ -68,10 +68,10 @@ export default function AllAttemptsPage() {
       <StudentNav />
 
       {/* Hero Section */}
-      <div className="bg-gradient-to-r from-blue-600 to-blue-700 text-white py-12 px-0">
+      <div className="bg-gradient-to-r from-blue-900 to-blue-800 text-white py-12 px-0">
         <div className="max-w-7xl mx-auto px-6">
           <Link href="/dashboard">
-            <button className="mb-4 text-blue-100 hover:text-white font-medium text-sm flex items-center gap-2">
+            <button className="mb-4 text-blue-100 hover:text-amber-400 font-medium text-sm flex items-center gap-2">
               ← Back to Dashboard
             </button>
           </Link>
@@ -92,7 +92,7 @@ export default function AllAttemptsPage() {
               <select
                 value={selectedPaper}
                 onChange={(e) => setSelectedPaper(e.target.value)}
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-amber-500"
               >
                 <option value="">All Papers ({attempts.length})</option>
                 {Array.from(
@@ -119,7 +119,7 @@ export default function AllAttemptsPage() {
               <select
                 value={sortBy}
                 onChange={(e) => setSortBy(e.target.value as any)}
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-amber-500"
               >
                 <option value="newest">Newest first</option>
                 <option value="oldest">Oldest first</option>
@@ -152,7 +152,7 @@ export default function AllAttemptsPage() {
               Start practicing to see your attempts here
             </p>
             <Link href="/practice">
-              <button className="inline-block px-6 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-medium transition">
+              <button className="inline-block px-6 py-2 bg-amber-500 hover:bg-amber-600 text-blue-900 rounded-lg font-medium transition">
                 Go to Practice
               </button>
             </Link>
@@ -189,10 +189,10 @@ export default function AllAttemptsPage() {
                     ) : (
                       filteredAttempts.map((attempt) => (
               <Link key={attempt.id} href={`/exam/attempts/${attempt.id}`}>
-                <div className="bg-white rounded-lg p-4 border border-gray-200 hover:border-blue-300 hover:shadow-md transition duration-300 cursor-pointer group">
+                <div className="bg-white rounded-lg p-4 border border-gray-200 hover:border-amber-400 hover:shadow-md transition duration-300 cursor-pointer group">
                   <div className="flex items-center justify-between">
                     <div className="flex-1 min-w-0">
-                      <h3 className="font-semibold text-gray-900 group-hover:text-blue-600 transition mb-1">
+                      <h3 className="font-semibold text-gray-900 group-hover:text-amber-600 transition mb-1">
                         {attempt.paperTitle}
                       </h3>
                       <div className="flex items-center gap-4 text-xs text-gray-600">
@@ -233,7 +233,7 @@ export default function AllAttemptsPage() {
                         </div>
                       </div>
                       <svg
-                        className="w-4 h-4 text-gray-400 group-hover:text-blue-600 transition"
+                        className="w-4 h-4 text-gray-400 group-hover:text-amber-600 transition"
                         fill="none"
                         stroke="currentColor"
                         viewBox="0 0 24 24"
