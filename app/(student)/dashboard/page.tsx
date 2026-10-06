@@ -24,6 +24,14 @@ interface Attempt {
   submittedat: string;
 }
 
+interface Paper {
+  id: string;
+  title: string;
+  description: string;
+  externalLink?: string;
+  totalTime: number;
+}
+
 export default function StudentDashboard() {
   const router = useRouter();
   const { data: session, status } = useSession();
@@ -36,6 +44,7 @@ export default function StudentDashboard() {
   const [loading, setLoading] = useState(true);
   const [selectedPaper, setSelectedPaper] = useState<string>("all");
   const [selectedTrendPaper, setSelectedTrendPaper] = useState<string>("");
+  const [availablePapers, setAvailablePapers] = useState<Paper[]>([]);
 
   // Handle auth redirects
   useEffect(() => {
@@ -72,7 +81,10 @@ export default function StudentDashboard() {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const attemptsRes = await fetch("/api/student/attempts");
+        const [attemptsRes, papersRes] = await Promise.all([
+          fetch("/api/student/attempts"),
+          fetch("/api/papers/available")
+        ]);
 
         console.log("API Response - attempts:", attemptsRes.status);
 
@@ -86,6 +98,13 @@ export default function StudentDashboard() {
           setAttempts(data.attempts || []);
         } else {
           console.error("Failed to fetch attempts:", attemptsRes.status);
+        }
+
+        if (papersRes.ok) {
+          const papersData = await papersRes.json();
+          setAvailablePapers(papersData.papers || []);
+        } else {
+          console.error("Failed to fetch papers:", papersRes.status);
         }
       } catch (error) {
         console.error("Error fetching data:", error);
@@ -315,6 +334,38 @@ export default function StudentDashboard() {
             </>
           );
         })()}
+
+        {/* Get Started Section for New Users */}
+        {attempts.length === 0 && availablePapers.length > 0 && (
+          <div className="mb-12">
+            <div className="mb-6">
+              <h2 className="text-2xl font-bold text-gray-900 mb-1">Get Started</h2>
+              <p className="text-gray-600 text-sm">Browse available exam papers and take your first practice test</p>
+            </div>
+            <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
+              {availablePapers.slice(0, 6).map((paper) => (
+                <Link key={paper.id} href={`/exam/${paper.id}/full-exam`}>
+                  <div className="bg-white rounded-lg p-5 border border-gray-200 hover:border-blue-400 hover:shadow-md transition duration-300 cursor-pointer group h-full flex flex-col">
+                    <h3 className="font-semibold text-gray-900 group-hover:text-blue-600 transition mb-2">
+                      {paper.title}
+                    </h3>
+                    <p className="text-gray-600 text-sm mb-4 flex-grow">
+                      {paper.description || "Practice exam"}
+                    </p>
+                    <div className="flex items-center justify-between pt-4 border-t border-gray-100">
+                      <span className="text-xs text-gray-500 font-medium">
+                        ⏱️ {paper.totalTime} min
+                      </span>
+                      <span className="text-blue-600 group-hover:text-blue-700 text-sm font-medium">
+                        Start →
+                      </span>
+                    </div>
+                  </div>
+                </Link>
+              ))}
+            </div>
+          </div>
+        )}
 
         {/* Recent Exam Attempts Section */}
         <div className="mb-12">
