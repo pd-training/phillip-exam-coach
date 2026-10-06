@@ -39,10 +39,17 @@ export default function PaperDetailPage() {
   const [loading, setLoading] = useState(true);
   const [submitting, setSubmitting] = useState(false);
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
+  const [showUploadModal, setShowUploadModal] = useState(false);
 
   // Paper data
   const [paper, setPaper] = useState<Paper | null>(null);
   const [parts, setParts] = useState<ExamPart[]>([]);
+  const [questions, setQuestions] = useState<any[]>([]);
+
+  // Upload state
+  const [uploadFile, setUploadFile] = useState<File | null>(null);
+  const [uploadMode, setUploadMode] = useState<"APPEND" | "REPLACE">("APPEND");
+  const [uploadProgress, setUploadProgress] = useState("");
 
   // Form fields
   const [title, setTitle] = useState("");
@@ -79,6 +86,9 @@ export default function PaperDetailPage() {
       setDuration(paperInfo.durationMinutes?.toString() || "120");
       setPassingScore(paperInfo.passingScore?.toString() || "70");
       setIsAvailable(paperInfo.isAvailable || false);
+
+      // Fetch questions from paper data
+      setQuestions(paperInfo.questions || []);
 
       // Fetch exam format
       const formatRes = await fetch(`/api/papers/${paperId}/exam-format`);
@@ -140,6 +150,47 @@ export default function PaperDetailPage() {
     }
   };
 
+  const handleUploadQuestions = async () => {
+    if (!uploadFile || !paperId) {
+      alert("Please select a file");
+      return;
+    }
+
+    try {
+      setSubmitting(true);
+      setUploadProgress("Uploading...");
+
+      const formData = new FormData();
+      formData.append("file", uploadFile);
+      formData.append("mode", uploadMode);
+
+      const res = await fetch(`/api/papers/${paperId}/questions/upload`, {
+        method: "POST",
+        body: formData,
+      });
+
+      const data = await res.json();
+
+      if (res.ok) {
+        const modeText = uploadMode === "APPEND" ? "appended" : "replaced";
+        setUploadProgress(`${data.count} questions ${modeText} successfully!`);
+        await fetchPaperData();
+        setTimeout(() => {
+          setShowUploadModal(false);
+          setUploadFile(null);
+          setUploadProgress("");
+          setUploadMode("APPEND");
+        }, 2000);
+      } else {
+        setUploadProgress(`Error: ${data.error}`);
+      }
+    } catch (error) {
+      setUploadProgress(`Upload failed: ${(error as Error).message}`);
+    } finally {
+      setSubmitting(false);
+    }
+  };
+
   if (status === "loading" || loading) {
     return (
       <div className="min-h-screen bg-gray-50">
@@ -183,7 +234,10 @@ export default function PaperDetailPage() {
               <p className="text-gray-600 mt-1">{totalQuestions} questions • {paper.durationMinutes} min</p>
             </div>
             <div className="flex gap-2">
-              <button className="px-4 py-2 bg-white text-gray-900 border border-gray-300 rounded-lg hover:bg-gray-50 text-sm font-medium">
+              <button
+                onClick={() => setShowUploadModal(true)}
+                className="px-4 py-2 bg-white text-gray-900 border border-gray-300 rounded-lg hover:bg-gray-50 text-sm font-medium"
+              >
                 Upload Questions
               </button>
               <button
@@ -355,10 +409,42 @@ export default function PaperDetailPage() {
         {/* Questions Tab */}
         {activeTab === "questions" && (
           <div className="bg-white rounded-lg shadow p-6">
-            <div className="text-center py-12">
-              <p className="text-4xl mb-4">📄</p>
-              <p className="text-gray-600">View and manage all questions for this paper. Upload new questions, search, edit, and delete as needed.</p>
-            </div>
+            <h2 className="text-lg font-semibold mb-6 uppercase text-gray-600 text-xs tracking-wider">
+              Question Bank ({questions.length})
+            </h2>
+
+            {questions.length === 0 ? (
+              <div className="text-center py-12">
+                <p className="text-gray-500">No questions uploaded yet. Use the "Upload Questions" button to get started.</p>
+              </div>
+            ) : (
+              <div className="overflow-x-auto">
+                <table className="w-full text-sm">
+                  <thead className="bg-gray-100 border-b border-gray-300">
+                    <tr>
+                      <th className="px-4 py-3 text-left font-semibold">Chapter</th>
+                      <th className="px-4 py-3 text-left font-semibold">Question</th>
+                      <th className="px-4 py-3 text-left font-semibold">Answer</th>
+                      <th className="px-4 py-3 text-left font-semibold">Actions</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {questions.map((q) => (
+                      <tr key={q.id} className="border-b border-gray-200 hover:bg-gray-50">
+                        <td className="px-4 py-3 font-semibold text-gray-900">{q.chapterNumber}</td>
+                        <td className="px-4 py-3 text-gray-700 truncate max-w-xs">{q.questionText?.substring(0, 50)}...</td>
+                        <td className="px-4 py-3 font-semibold text-gray-900">{q.correctAnswer}</td>
+                        <td className="px-4 py-3">
+                          <button className="px-3 py-1 bg-gray-200 text-gray-900 text-xs rounded hover:bg-gray-300">
+                            Edit
+                          </button>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            )}
           </div>
         )}
 
@@ -419,6 +505,84 @@ export default function PaperDetailPage() {
                 className="px-4 py-2 bg-red-600 text-white font-medium rounded-lg hover:bg-red-700 disabled:opacity-50"
               >
                 {submitting ? "Deleting..." : "Delete Paper"}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Upload Questions Modal */}
+      {showUploadModal && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+          <div className="bg-white rounded-lg shadow-lg p-6 max-w-md w-full mx-4">
+            <h3 className="text-lg font-bold text-gray-900 mb-4">Upload Questions</h3>
+
+            <p className="text-sm text-gray-600 mb-4">
+              <strong>CSV Formats Supported:</strong><br/>
+              • <strong>8-column:</strong> Chapter, Question, Option A, Option B, Option C, Option D, Answer (A-D), Explanation<br/>
+              • <strong>4-column:</strong> Chapter, Question, Answer (A-D), Explanation
+            </p>
+
+            <div className="mb-4">
+              <label className="block text-sm font-medium text-gray-700 mb-2">Upload Mode</label>
+              <div className="flex gap-4">
+                <label className="flex items-center">
+                  <input
+                    type="radio"
+                    value="APPEND"
+                    checked={uploadMode === "APPEND"}
+                    onChange={(e) => setUploadMode(e.target.value as "APPEND" | "REPLACE")}
+                    className="mr-2"
+                  />
+                  <span className="text-sm text-gray-700">Append to existing</span>
+                </label>
+                <label className="flex items-center">
+                  <input
+                    type="radio"
+                    value="REPLACE"
+                    checked={uploadMode === "REPLACE"}
+                    onChange={(e) => setUploadMode(e.target.value as "APPEND" | "REPLACE")}
+                    className="mr-2"
+                  />
+                  <span className="text-sm text-gray-700">Replace all</span>
+                </label>
+              </div>
+            </div>
+
+            <div className="mb-6">
+              <label className="block text-sm font-medium text-gray-700 mb-2">Select CSV File</label>
+              <input
+                type="file"
+                accept=".csv"
+                onChange={(e) => setUploadFile(e.target.files?.[0] || null)}
+                className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-amber-500"
+              />
+            </div>
+
+            {uploadProgress && (
+              <div className="mb-4 p-3 bg-blue-50 text-blue-700 text-sm rounded-lg">
+                {uploadProgress}
+              </div>
+            )}
+
+            <div className="flex gap-3 justify-end">
+              <button
+                onClick={() => {
+                  setShowUploadModal(false);
+                  setUploadFile(null);
+                  setUploadProgress("");
+                }}
+                disabled={submitting}
+                className="px-4 py-2 bg-gray-200 text-gray-900 font-medium rounded-lg hover:bg-gray-300 disabled:opacity-50"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={handleUploadQuestions}
+                disabled={!uploadFile || submitting}
+                className="px-4 py-2 bg-amber-500 text-gray-900 font-medium rounded-lg hover:bg-amber-600 disabled:opacity-50"
+              >
+                {submitting ? "Uploading..." : "Upload"}
               </button>
             </div>
           </div>
