@@ -48,7 +48,6 @@ model User {
   emailVerified DateTime?
   password      String?
   role          String    @default("STUDENT") // ADMIN | STUDENT
-  active        Boolean   @default(true)
   createdAt     DateTime  @default(now())
   updatedAt     DateTime  @updatedAt
 
