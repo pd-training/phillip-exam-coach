@@ -179,18 +179,30 @@ export default function PapersManagement() {
   const fetchPaperSettings = async (paperId: string) => {
     try {
       console.log('Fetching paper settings for:', paperId);
-      
+
+      // First fetch the paper details (title, duration, etc.)
+      try {
+        const paperRes = await fetch(`/api/papers/${paperId}`);
+        const paperData = await paperRes.json();
+        console.log('Paper data:', paperData);
+
+        const paper = paperData.paper || paperData;
+        setEditPaperTitle(paper.title || "");
+        setEditPaperDescription(paper.description || "");
+        setEditPaperExternalLink(paper.externalLink || "");
+        setEditPaperDuration(paper.durationMinutes?.toString() || "120");
+        setEditPaperTotalQuestions(paper.totalQuestions?.toString() || "0");
+        setEditPaperPassingScore(paper.passingScore?.toString() || "75");
+        setEditPaperAvailability(paper.isAvailable || false);
+      } catch (paperErr) {
+        console.warn('Paper data fetch error:', paperErr);
+      }
+
       // Fetch exam config and parts
       try {
         const res = await fetch(`/api/papers/${paperId}/exam-format`);
         const data = await res.json();
         console.log('Exam format response:', data);
-        
-        if (data.examConfig) {
-          setEditPaperDuration(data.examConfig.durationMinutes?.toString() || "120");
-          setEditPaperTotalQuestions(data.examConfig.totalQuestions?.toString() || "0");
-          setEditPaperPassingScore(data.examConfig.passingScore?.toString() || "75");
-        }
 
         // Load exam parts if they exist
         if (data.examFormat?.parts && Array.isArray(data.examFormat.parts) && data.examFormat.parts.length > 0) {
