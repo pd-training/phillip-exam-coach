@@ -172,3 +172,59 @@ export async function PUT(
     );
   }
 }
+
+export async function DELETE(
+  request: NextRequest,
+  { params }: { params: { paperId: string } }
+) {
+  try {
+    const session = await getServerSession(authOptions);
+
+    if (!session?.user || (session.user as any)?.role !== "ADMIN") {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 403 });
+    }
+
+    const paperId = params.paperId;
+    if (!paperId) {
+      return NextResponse.json({ error: "Paper ID is required" }, { status: 400 });
+    }
+
+    // Verify paper exists
+    const existingPaper = await (prisma as any).paper.findUnique({
+      where: { id: paperId },
+    });
+
+    if (!existingPaper) {
+      return NextResponse.json({ error: "Paper not found" }, { status: 404 });
+    }
+
+    // Delete associated exam parts (cascade)
+    await (prisma as any).examPart.deleteMany({
+      where: { paperId },
+    });
+
+    // Delete associated questions (cascade)
+    await (prisma as any).question.deleteMany({
+      where: { paperId },
+    });
+
+    // Delete the paper
+    await (prisma as any).paper.delete({
+      where: { id: paperId },
+    });
+
+    console.log('Paper deleted successfully:', paperId);
+
+    return NextResponse.json({
+      success: true,
+      message: "Paper deleted successfully",
+    });
+  } catch (error: any) {
+    console.error('DELETE paper error:', error);
+    const errorMessage = error.message || 'Failed to delete paper';
+    return NextResponse.json(
+      { error: errorMessage },
+      { status: 500 }
+    );
+  }
+}

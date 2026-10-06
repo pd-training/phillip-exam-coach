@@ -20,11 +20,14 @@ export async function GET(
       select: {
         id: true,
         title: true,
+        description: true,
+        externalLink: true,
         durationMinutes: true,
         totalQuestions: true,
         isAvailable: true,
         passingScore: true,
         totalTime: true,
+        createdAt: true,
       }
     });
 
