@@ -78,6 +78,7 @@ export default function PaperDetailPage() {
   const [partName, setPartName] = useState("");
   const [partChapterStart, setPartChapterStart] = useState("");
   const [partChapterEnd, setPartChapterEnd] = useState("");
+  const [partQuestionCount, setPartQuestionCount] = useState("");
   const [partPassingScore, setPartPassingScore] = useState("70");
 
   useEffect(() => {
@@ -309,7 +310,7 @@ export default function PaperDetailPage() {
   };
 
   const handleAddPart = async () => {
-    if (!partName.trim() || !partChapterStart || !partChapterEnd) {
+    if (!partName.trim() || !partChapterStart || !partChapterEnd || !partQuestionCount) {
       alert("Please fill in all part details");
       return;
     }
@@ -324,6 +325,7 @@ export default function PaperDetailPage() {
           partName: partName.trim(),
           chapterStart: parseInt(partChapterStart),
           chapterEnd: parseInt(partChapterEnd),
+          questionCount: parseInt(partQuestionCount),
           passingScore: parseInt(partPassingScore),
         }),
       });
@@ -335,6 +337,7 @@ export default function PaperDetailPage() {
       setPartName("");
       setPartChapterStart("");
       setPartChapterEnd("");
+      setPartQuestionCount("");
       setPartPassingScore("70");
       await fetchPaperData();
     } catch (error) {
@@ -912,6 +915,17 @@ export default function PaperDetailPage() {
               </div>
 
               <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">No. of Questions</label>
+                <input
+                  type="number"
+                  value={partQuestionCount}
+                  onChange={(e) => setPartQuestionCount(e.target.value)}
+                  min="1"
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-amber-500"
+                />
+              </div>
+
+              <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">Passing Score (%)</label>
                 <input
                   type="number"
@@ -931,6 +945,7 @@ export default function PaperDetailPage() {
                   setPartName("");
                   setPartChapterStart("");
                   setPartChapterEnd("");
+                  setPartQuestionCount("");
                   setPartPassingScore("70");
                 }}
                 disabled={submitting}
@@ -940,7 +955,7 @@ export default function PaperDetailPage() {
               </button>
               <button
                 onClick={handleAddPart}
-                disabled={submitting || !partName}
+                disabled={submitting || !partName || !partQuestionCount}
                 className="px-4 py-2 bg-amber-500 text-gray-900 font-medium rounded-lg hover:bg-amber-600 disabled:opacity-50"
               >
                 {submitting ? "Adding..." : "Add Part"}

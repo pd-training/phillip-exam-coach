@@ -9,10 +9,10 @@ export async function POST(
 ) {
   try {
     const body = await request.json();
-    const { partName, chapterStart, chapterEnd, passingScore } = body;
+    const { partName, chapterStart, chapterEnd, questionCount, passingScore } = body;
     const paperId = params.id;
 
-    if (!partName || !chapterStart || !chapterEnd || passingScore === undefined) {
+    if (!partName || !chapterStart || !chapterEnd || questionCount === undefined || passingScore === undefined) {
       return NextResponse.json(
         { error: 'Missing required fields' },
         { status: 400 }
@@ -32,7 +32,7 @@ export async function POST(
     // Create new part
     await prisma.$queryRaw`
       INSERT INTO "ExamPart" (id, "paperId", "partName", "chapterStart", "chapterEnd", "questionCount", "passingScore", "orderIndex", "createdAt", "updatedAt")
-      VALUES (gen_random_uuid(), ${paperId}::uuid, ${partName}, ${chapterStart}, ${chapterEnd}, 0, ${passingScore}, ${newOrderIndex}, NOW(), NOW())
+      VALUES (gen_random_uuid(), ${paperId}::uuid, ${partName}, ${chapterStart}, ${chapterEnd}, ${questionCount}, ${passingScore}, ${newOrderIndex}, NOW(), NOW())
     `;
 
     return NextResponse.json({
