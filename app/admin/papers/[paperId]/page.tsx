@@ -81,6 +81,15 @@ export default function PaperDetailPage() {
   const [partQuestionCount, setPartQuestionCount] = useState("");
   const [partPassingScore, setPartPassingScore] = useState("70");
 
+  // Edit exam part
+  const [showEditPartModal, setShowEditPartModal] = useState(false);
+  const [selectedPart, setSelectedPart] = useState<ExamPart | null>(null);
+  const [editPartName, setEditPartName] = useState("");
+  const [editPartChapterStart, setEditPartChapterStart] = useState("");
+  const [editPartChapterEnd, setEditPartChapterEnd] = useState("");
+  const [editPartQuestionCount, setEditPartQuestionCount] = useState("");
+  const [editPartPassingScore, setEditPartPassingScore] = useState("70");
+
   useEffect(() => {
     if (status === "unauthenticated") {
       router.push("/login");
@@ -347,6 +356,52 @@ export default function PaperDetailPage() {
     }
   };
 
+  const handleEditPart = (part: ExamPart) => {
+    setSelectedPart(part);
+    setEditPartName(part.partName);
+    setEditPartChapterStart(part.chapterStart.toString());
+    setEditPartChapterEnd(part.chapterEnd.toString());
+    setEditPartQuestionCount(part.questionCount.toString());
+    setEditPartPassingScore(part.passingScore.toString());
+    setShowEditPartModal(true);
+  };
+
+  const handleUpdatePart = async () => {
+    if (!editPartName.trim() || !editPartChapterStart || !editPartChapterEnd || !editPartQuestionCount) {
+      alert("Please fill in all part details");
+      return;
+    }
+
+    if (!selectedPart) return;
+
+    try {
+      setSubmitting(true);
+
+      const res = await fetch(`/api/papers/${paperId}/exam-format/parts/${selectedPart.id}`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          partName: editPartName.trim(),
+          chapterStart: parseInt(editPartChapterStart),
+          chapterEnd: parseInt(editPartChapterEnd),
+          questionCount: parseInt(editPartQuestionCount),
+          passingScore: parseInt(editPartPassingScore),
+        }),
+      });
+
+      if (!res.ok) throw new Error("Failed to update part");
+
+      alert("Exam part updated successfully");
+      setShowEditPartModal(false);
+      setSelectedPart(null);
+      await fetchPaperData();
+    } catch (error) {
+      alert("Error updating part: " + (error as Error).message);
+    } finally {
+      setSubmitting(false);
+    }
+  };
+
   if (status === "loading" || loading) {
     return (
       <div className="min-h-screen bg-gray-50">
@@ -516,7 +571,10 @@ export default function PaperDetailPage() {
                           Chapters {part.chapterStart}–{part.chapterEnd} • {part.questionCount} questions • {part.passingScore}% pass score
                         </p>
                       </div>
-                      <button className="px-3 py-1 bg-white text-gray-900 border border-gray-300 rounded text-sm hover:bg-gray-50">
+                      <button
+                        onClick={() => handleEditPart(part)}
+                        className="px-3 py-1 bg-white text-gray-900 border border-gray-300 rounded text-sm hover:bg-gray-50"
+                      >
                         Edit
                       </button>
                     </div>
@@ -965,6 +1023,98 @@ export default function PaperDetailPage() {
                 className="px-4 py-2 bg-amber-500 text-gray-900 font-medium rounded-lg hover:bg-amber-600 disabled:opacity-50"
               >
                 {submitting ? "Adding..." : "Add Part"}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Edit Exam Part Modal */}
+      {showEditPartModal && selectedPart && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+          <div className="bg-white rounded-lg shadow-lg p-6 max-w-md w-full mx-4">
+            <h3 className="text-lg font-bold text-gray-900 mb-6">Edit Exam Part</h3>
+
+            <div className="space-y-4 mb-6">
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">Part Name</label>
+                <input
+                  type="text"
+                  value={editPartName}
+                  onChange={(e) => setEditPartName(e.target.value)}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-amber-500"
+                />
+              </div>
+
+              <div className="grid grid-cols-2 gap-3">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">Chapter Start</label>
+                  <input
+                    type="number"
+                    value={editPartChapterStart}
+                    onChange={(e) => setEditPartChapterStart(e.target.value)}
+                    min="1"
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-amber-500"
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">Chapter End</label>
+                  <input
+                    type="number"
+                    value={editPartChapterEnd}
+                    onChange={(e) => setEditPartChapterEnd(e.target.value)}
+                    min="1"
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-amber-500"
+                  />
+                </div>
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">No. of Questions</label>
+                <input
+                  type="number"
+                  value={editPartQuestionCount}
+                  onChange={(e) => setEditPartQuestionCount(e.target.value)}
+                  min="1"
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-amber-500"
+                />
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">Passing Score (%)</label>
+                <input
+                  type="number"
+                  value={editPartPassingScore}
+                  onChange={(e) => setEditPartPassingScore(e.target.value)}
+                  min="1"
+                  max="100"
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-amber-500"
+                />
+              </div>
+            </div>
+
+            <div className="flex gap-3 justify-end">
+              <button
+                onClick={() => {
+                  setShowEditPartModal(false);
+                  setSelectedPart(null);
+                  setEditPartName("");
+                  setEditPartChapterStart("");
+                  setEditPartChapterEnd("");
+                  setEditPartQuestionCount("");
+                  setEditPartPassingScore("70");
+                }}
+                disabled={submitting}
+                className="px-4 py-2 bg-gray-200 text-gray-900 font-medium rounded-lg hover:bg-gray-300 disabled:opacity-50"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={handleUpdatePart}
+                disabled={submitting || !editPartName || !editPartQuestionCount}
+                className="px-4 py-2 bg-amber-500 text-gray-900 font-medium rounded-lg hover:bg-amber-600 disabled:opacity-50"
+              >
+                {submitting ? "Saving..." : "Save Changes"}
               </button>
             </div>
           </div>
