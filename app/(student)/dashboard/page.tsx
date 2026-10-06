@@ -66,7 +66,7 @@ export default function StudentDashboard() {
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
         <div className="text-center">
           <div className="inline-block">
-            <div className="w-12 h-12 border-4 border-gray-300 border-t-blue-600 rounded-full animate-spin" />
+            <div className="w-12 h-12 border-4 border-gray-300 border-t-amber-500 rounded-full animate-spin" />
           </div>
           <p className="mt-4 text-gray-600">Loading...</p>
         </div>
@@ -134,7 +134,7 @@ export default function StudentDashboard() {
       <StudentNav />
 
       {/* Hero Section */}
-      <div className="bg-gradient-to-r from-blue-600 to-blue-700 text-white py-12 px-0">
+      <div className="bg-gradient-to-r from-blue-900 to-blue-800 text-white py-12 px-0">
         <div className="max-w-7xl mx-auto px-6">
           <h1 className="text-4xl font-bold mb-2">Your Practice Dashboard</h1>
           <p className="text-blue-100">Track your progress and prepare for certification exams</p>
@@ -230,7 +230,7 @@ export default function StudentDashboard() {
                         onClick={() => setSelectedTrendPaper(paper.title)}
                         className={`p-4 rounded-lg border-2 transition-all text-left ${
                           selectedTrendPaper === paper.title
-                            ? "border-blue-500 bg-blue-50"
+                            ? "border-amber-500 bg-amber-50"
                             : "border-gray-200 bg-white hover:border-gray-300"
                         }`}
                       >
@@ -301,9 +301,9 @@ export default function StudentDashboard() {
                       <Line
                         type="monotone"
                         dataKey="score"
-                        stroke="#3b82f6"
+                        stroke="#f59e0b"
                         strokeWidth={2.5}
-                        dot={{ fill: "#3b82f6", r: 4 }}
+                        dot={{ fill: "#f59e0b", r: 4 }}
                         activeDot={{ r: 6 }}
                       />
                     </LineChart>
@@ -324,8 +324,8 @@ export default function StudentDashboard() {
             <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
               {availablePapers.slice(0, 6).map((paper) => (
                 <Link key={paper.id} href={`/exam/${paper.id}/full-exam`}>
-                  <div className="bg-white rounded-lg p-5 border border-gray-200 hover:border-blue-400 hover:shadow-md transition duration-300 cursor-pointer group h-full flex flex-col">
-                    <h3 className="font-semibold text-gray-900 group-hover:text-blue-600 transition mb-2">
+                  <div className="bg-white rounded-lg p-5 border border-gray-200 hover:border-amber-400 hover:shadow-md transition duration-300 cursor-pointer group h-full flex flex-col">
+                    <h3 className="font-semibold text-gray-900 group-hover:text-amber-600 transition mb-2">
                       {paper.title}
                     </h3>
                     <p className="text-gray-600 text-sm mb-4 flex-grow">
@@ -335,7 +335,7 @@ export default function StudentDashboard() {
                       <span className="text-xs text-gray-500 font-medium">
                         ⏱️ {paper.totalTime} min
                       </span>
-                      <span className="text-blue-600 group-hover:text-blue-700 text-sm font-medium">
+                      <span className="text-amber-600 group-hover:text-amber-700 text-sm font-medium">
                         Start →
                       </span>
                     </div>
@@ -384,10 +384,10 @@ export default function StudentDashboard() {
               <div className="space-y-3">
                 {attempts.slice(0, 5).map((attempt) => (
                   <Link key={attempt.id} href={`/exam/attempts/${attempt.id}`}>
-                    <div className="bg-white rounded-lg p-4 border border-gray-200 hover:border-blue-300 hover:shadow-md transition duration-300 cursor-pointer group">
+                    <div className="bg-white rounded-lg p-4 border border-gray-200 hover:border-amber-300 hover:shadow-md transition duration-300 cursor-pointer group">
                       <div className="flex items-center justify-between">
                         <div className="flex-1 min-w-0">
-                          <h3 className="font-semibold text-gray-900 group-hover:text-blue-600 transition mb-1">
+                          <h3 className="font-semibold text-gray-900 group-hover:text-amber-600 transition mb-1">
                             {attempt.paperTitle}
                           </h3>
                           <div className="flex items-center gap-4 text-xs text-gray-600">
@@ -415,7 +415,7 @@ export default function StudentDashboard() {
                             </div>
                           </div>
                           <svg
-                            className="w-4 h-4 text-gray-400 group-hover:text-blue-600 transition"
+                            className="w-4 h-4 text-gray-400 group-hover:text-amber-600 transition"
                             fill="none"
                             stroke="currentColor"
                             viewBox="0 0 24 24"
@@ -437,7 +437,7 @@ export default function StudentDashboard() {
               {attempts.length > 5 && (
                 <div className="mt-4 text-center">
                   <Link href="/dashboard/attempts">
-                    <button className="text-blue-600 hover:text-blue-700 font-medium text-sm">
+                    <button className="text-amber-600 hover:text-amber-700 font-medium text-sm">
                       View all attempts →
                     </button>
                   </Link>

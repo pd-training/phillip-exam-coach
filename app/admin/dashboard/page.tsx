@@ -125,7 +125,7 @@ export default function AdminDashboard() {
         <div className="flex items-center justify-center h-[calc(100vh-64px)]">
           <div className="text-center">
             <div className="inline-block mb-4">
-              <div className="w-12 h-12 border-4 border-gray-300 border-t-blue-600 rounded-full animate-spin" />
+              <div className="w-12 h-12 border-4 border-gray-300 border-t-amber-500 rounded-full animate-spin" />
             </div>
             <p className="text-gray-600">Loading dashboard...</p>
           </div>
@@ -139,7 +139,7 @@ export default function AdminDashboard() {
       <AdminNav />
 
       {/* Hero Section */}
-      <div className="bg-gradient-to-r from-blue-600 to-blue-700 text-white py-12 px-0 border-b border-blue-800">
+      <div className="bg-gradient-to-r from-blue-900 to-blue-800 text-white py-12 px-0 border-b border-blue-900">
         <div className="max-w-7xl mx-auto px-6">
           <h1 className="text-4xl font-bold mb-2">Admin Dashboard</h1>
           <p className="text-blue-100">Monitor system activity and manage exam papers</p>
@@ -157,7 +157,7 @@ export default function AdminDashboard() {
         {/* Stats Grid */}
         <div className="grid md:grid-cols-5 gap-6 mb-12">
           {/* Total Users */}
-          <div className="bg-white rounded-2xl p-6 border border-gray-200 hover:border-blue-300 transition">
+          <div className="bg-white rounded-2xl p-6 border border-gray-200 hover:border-amber-300 transition">
             <div>
               <p className="text-gray-600 text-sm font-medium mb-2">Total Users</p>
               <p className="text-3xl font-bold text-gray-900">{stats?.totalUsers || 0}</p>
@@ -165,7 +165,7 @@ export default function AdminDashboard() {
           </div>
 
           {/* Active Users */}
-          <div className="bg-white rounded-2xl p-6 border border-gray-200 hover:border-green-300 transition">
+          <div className="bg-white rounded-2xl p-6 border border-gray-200 hover:border-amber-300 transition">
             <div>
               <p className="text-gray-600 text-sm font-medium mb-2">Active Today</p>
               <p className="text-3xl font-bold text-gray-900">{stats?.activeUsers || 0}</p>
@@ -173,7 +173,7 @@ export default function AdminDashboard() {
           </div>
 
           {/* Attempts Today */}
-          <div className="bg-white rounded-2xl p-6 border border-gray-200 hover:border-purple-300 transition">
+          <div className="bg-white rounded-2xl p-6 border border-gray-200 hover:border-amber-300 transition">
             <div>
               <p className="text-gray-600 text-sm font-medium mb-2">Attempts Today</p>
               <p className="text-3xl font-bold text-gray-900">{stats?.attemptsToday || 0}</p>
@@ -181,7 +181,7 @@ export default function AdminDashboard() {
           </div>
 
           {/* Average Score */}
-          <div className="bg-white rounded-2xl p-6 border border-gray-200 hover:border-yellow-300 transition">
+          <div className="bg-white rounded-2xl p-6 border border-gray-200 hover:border-amber-300 transition">
             <div>
               <p className="text-gray-600 text-sm font-medium mb-2">Avg Score</p>
               <p className="text-3xl font-bold text-gray-900">{stats?.avgScore || '0'}%</p>
@@ -189,7 +189,7 @@ export default function AdminDashboard() {
           </div>
 
           {/* Pass Rate */}
-          <div className="bg-white rounded-2xl p-6 border border-gray-200 hover:border-emerald-300 transition">
+          <div className="bg-white rounded-2xl p-6 border border-gray-200 hover:border-amber-300 transition">
             <div>
               <p className="text-gray-600 text-sm font-medium mb-2">Pass Rate</p>
               <p className="text-3xl font-bold text-gray-900">{stats?.passRate || 0}%</p>
@@ -255,7 +255,7 @@ export default function AdminDashboard() {
                           </td>
                           <td className="px-6 py-4 text-sm">
                             <Link href={`/admin/attempts/${attempt.id}`}>
-                              <button className="px-3 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg text-xs font-medium transition">
+                              <button className="px-3 py-2 bg-amber-500 hover:bg-amber-600 text-blue-900 rounded-lg text-xs font-medium transition">
                                 View Answers
                               </button>
                             </Link>
@@ -273,7 +273,7 @@ export default function AdminDashboard() {
               <div className="flex gap-3">
                 {attempts.length > 5 && (
                   <Link href="/admin/attempts">
-                    <button className="text-blue-600 hover:text-blue-700 font-medium text-sm">
+                    <button className="text-amber-600 hover:text-amber-700 font-medium text-sm">
                       View all attempts →
                     </button>
                   </Link>
@@ -337,7 +337,7 @@ export default function AdminDashboard() {
             <div className="p-4 border-t border-gray-200 flex justify-between items-center">
               <p className="text-sm text-gray-600">{requests.length} total requests</p>
               <Link href="/admin/assign-papers">
-                <button className="text-blue-600 hover:text-blue-700 font-medium text-sm">
+                <button className="text-amber-600 hover:text-amber-700 font-medium text-sm">
                   View All →
                 </button>
               </Link>
@@ -348,21 +348,21 @@ export default function AdminDashboard() {
         {/* Quick Actions */}
         <div className="mt-12 grid md:grid-cols-3 gap-6">
           <Link href="/admin/papers">
-            <div className="bg-white rounded-2xl p-8 border border-gray-200 hover:border-blue-300 hover:shadow-md transition cursor-pointer text-center group">
+            <div className="bg-white rounded-2xl p-8 border border-gray-200 hover:border-amber-300 hover:shadow-md transition cursor-pointer text-center group">
               <h3 className="font-bold text-lg text-gray-900 mb-2">Manage Papers</h3>
               <p className="text-gray-600 text-sm">Edit exam papers and questions</p>
             </div>
           </Link>
 
           <Link href="/admin/users">
-            <div className="bg-white rounded-2xl p-8 border border-gray-200 hover:border-blue-300 hover:shadow-md transition cursor-pointer text-center group">
+            <div className="bg-white rounded-2xl p-8 border border-gray-200 hover:border-amber-300 hover:shadow-md transition cursor-pointer text-center group">
               <h3 className="font-bold text-lg text-gray-900 mb-2">Manage Users</h3>
               <p className="text-gray-600 text-sm">View and manage student accounts</p>
             </div>
           </Link>
 
           <Link href="/admin/assign-papers">
-            <div className="bg-white rounded-2xl p-8 border border-gray-200 hover:border-blue-300 hover:shadow-md transition cursor-pointer text-center group">
+            <div className="bg-white rounded-2xl p-8 border border-gray-200 hover:border-amber-300 hover:shadow-md transition cursor-pointer text-center group">
               <h3 className="font-bold text-lg text-gray-900 mb-2">Assign Papers</h3>
               <p className="text-gray-600 text-sm">Assign papers to students</p>
             </div>
