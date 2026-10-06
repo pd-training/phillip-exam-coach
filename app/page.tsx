@@ -128,6 +128,73 @@ export default function LandingPage() {
         </div>
       </section>
 
+      {/* What is CMFAS Section */}
+      <section className="py-16 px-6 bg-white">
+        <div className="max-w-7xl mx-auto">
+          <div className="text-center mb-12">
+            <h2 className="text-4xl font-bold text-gray-900 mb-4">What is the CMFAS Exam?</h2>
+            <p className="text-xl text-gray-600">Everything you need to know about Capital Markets and Financial Advisory Services certification</p>
+          </div>
+
+          <div className="grid md:grid-cols-3 gap-8">
+            {/* Card 1: What is CMFAS */}
+            <div className="bg-gradient-to-br from-blue-50 to-blue-100 rounded-xl p-8 border border-blue-200 hover:shadow-lg transition-all duration-300">
+              <div className="w-12 h-12 bg-blue-600 rounded-lg flex items-center justify-center mb-6">
+                <span className="text-white text-xl">📖</span>
+              </div>
+              <h3 className="font-bold text-xl text-gray-900 mb-3">What is CMFAS?</h3>
+              <p className="text-gray-700 leading-relaxed">
+                CMFAS stands for <strong>Capital Markets and Financial Advisory Services</strong>. It's a comprehensive certification exam that assesses knowledge of financial products, investment strategies, regulatory compliance, and professional conduct in the financial services industry.
+              </p>
+            </div>
+
+            {/* Card 2: Who Needs It */}
+            <div className="bg-gradient-to-br from-emerald-50 to-emerald-100 rounded-xl p-8 border border-emerald-200 hover:shadow-lg transition-all duration-300">
+              <div className="w-12 h-12 bg-emerald-600 rounded-lg flex items-center justify-center mb-6">
+                <span className="text-white text-xl">👥</span>
+              </div>
+              <h3 className="font-bold text-xl text-gray-900 mb-3">Who Needs to Take It?</h3>
+              <p className="text-gray-700 leading-relaxed">
+                <strong>Financial Advisors</strong> and professionals working in capital markets and investment advisory services. Required for those advising clients on stocks, bonds, investment products, derivatives, and structured products in Singapore and the region.
+              </p>
+            </div>
+
+            {/* Card 3: Why It Matters */}
+            <div className="bg-gradient-to-br from-amber-50 to-amber-100 rounded-xl p-8 border border-amber-200 hover:shadow-lg transition-all duration-300">
+              <div className="w-12 h-12 bg-amber-600 rounded-lg flex items-center justify-center mb-6">
+                <span className="text-white text-xl">🎯</span>
+              </div>
+              <h3 className="font-bold text-xl text-gray-900 mb-3">Why It Matters</h3>
+              <p className="text-gray-700 leading-relaxed">
+                CMFAS certification demonstrates <strong>professional competency</strong> and ensures advisors meet regulatory requirements. Passing these exams enhances credibility, protects clients, and unlocks career advancement opportunities in financial services.
+              </p>
+            </div>
+          </div>
+
+          {/* Papers Overview */}
+          <div className="mt-12 bg-gray-50 rounded-xl p-8 border border-gray-200">
+            <h3 className="font-bold text-2xl text-gray-900 mb-6 text-center">CMFAS Exam Papers</h3>
+            <p className="text-gray-700 text-center mb-8">Finance Ready covers all official CMFAS papers with comprehensive practice materials:</p>
+            <div className="grid md:grid-cols-3 gap-6">
+              {[
+                { code: 'RES 1A', name: 'Rules, Ethics and Skills', questions: '80 Questions' },
+                { code: 'RES 5', name: 'Rules, Ethics and Skills (Advisory)', questions: '150 Questions' },
+                { code: 'CM-SIP', name: 'Capital Markets - Specified Investment Products', questions: '80 Questions' },
+                { code: 'CM-LIP', name: 'Capital Markets - Life Insurance & ILP', questions: '150 Questions' },
+                { code: 'HI', name: 'Health Insurance', questions: '172 Questions' },
+                { code: 'GI', name: 'General Insurance', questions: 'Full Coverage' },
+              ].map((paper, idx) => (
+                <div key={idx} className="bg-white rounded-lg p-4 border border-gray-200 hover:border-blue-400 transition">
+                  <p className="font-bold text-blue-600 text-sm mb-1">{paper.code}</p>
+                  <p className="text-gray-900 font-semibold mb-2">{paper.name}</p>
+                  <p className="text-gray-600 text-sm">{paper.questions}</p>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+      </section>
+
       {/* Features Section */}
       <section id="features" className="py-16 px-6 bg-white border-t border-b border-gray-200">
         <div className="max-w-7xl mx-auto">
