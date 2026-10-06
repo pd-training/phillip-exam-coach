@@ -35,6 +35,7 @@ export default function StudentDashboard() {
   });
   const [loading, setLoading] = useState(true);
   const [selectedPaper, setSelectedPaper] = useState<string>("all");
+  const [selectedTrendPaper, setSelectedTrendPaper] = useState<string>("");
 
   // Handle auth redirects
   useEffect(() => {
@@ -95,6 +96,14 @@ export default function StudentDashboard() {
 
     fetchData();
   }, []);
+
+  // Initialize selectedTrendPaper to the first paper attempted
+  useEffect(() => {
+    if (attempts.length > 0 && !selectedTrendPaper) {
+      const firstPaper = attempts[0].paperTitle;
+      setSelectedTrendPaper(firstPaper);
+    }
+  }, [attempts, selectedTrendPaper]);
 
   const passRate =
     stats.completedCount > 0
@@ -166,116 +175,144 @@ export default function StudentDashboard() {
           </div>
         </div>
 
-        {/* Score Trend Chart */}
+        {/* Latest Scores & Trend Analysis */}
         {attempts.length > 0 && (() => {
-          // Get unique papers for filter
-          const uniquePapers = Array.from(
-            new Map(
-              attempts.map((a) => [a.paperid, a.paperTitle])
-            ).entries()
-          ).map(([id, title]) => ({ id, title }));
+          // Get unique papers with latest score
+          const paperMap = new Map<string, { latest: Attempt; count: number }>();
 
-          // Filter attempts by selected paper
-          const filteredAttempts = selectedPaper === "all"
-            ? attempts
-            : attempts.filter((a) => a.paperTitle === selectedPaper);
-
-          const chartData = [...filteredAttempts].reverse().map((attempt, index) => {
-            const attemptDate = new Date(attempt.submittedat);
-            const score = attempt.score ? Math.max(0, Math.min(100, Math.round(attempt.score))) : 0;
-            return {
-              id: attempt.id,
-              attemptNumber: index + 1,
-              paper: attempt.paperTitle || "Unknown Paper",
-              date: attemptDate.toLocaleDateString("en-US", { month: "short", day: "numeric" }),
-              time: attemptDate.toLocaleTimeString("en-US", { hour: "2-digit", minute: "2-digit" }),
-              score: score,
-              passed: attempt.result === "Pass" ? "✓" : "✗",
-              displayLabel: `${attemptDate.toLocaleDateString("en-US", { month: "short", day: "numeric" })} - ${attempt.paperTitle}`
-            };
+          attempts.forEach((attempt) => {
+            const existing = paperMap.get(attempt.paperTitle);
+            if (!existing) {
+              paperMap.set(attempt.paperTitle, { latest: attempt, count: 1 });
+            } else {
+              existing.count += 1;
+              // Keep the most recent attempt
+              if (new Date(attempt.submittedat) > new Date(existing.latest.submittedat)) {
+                existing.latest = attempt;
+              }
+            }
           });
 
+          const papersList = Array.from(paperMap.entries()).map(([title, data]) => ({
+            title,
+            latest: data.latest,
+            count: data.count,
+          })).sort((a, b) => new Date(b.latest.submittedat).getTime() - new Date(a.latest.submittedat).getTime());
+
+          // Get trend data for selected paper
+          const selectedPaperAttempts = attempts.filter((a) => a.paperTitle === selectedTrendPaper);
+          const trendData = [...selectedPaperAttempts]
+            .sort((a, b) => new Date(a.submittedat).getTime() - new Date(b.submittedat).getTime())
+            .map((attempt, index) => {
+              const attemptDate = new Date(attempt.submittedat);
+              const score = attempt.score ? Math.max(0, Math.min(100, Math.round(attempt.score))) : 0;
+              return {
+                id: attempt.id,
+                attemptNumber: index + 1,
+                paper: attempt.paperTitle || "Unknown Paper",
+                date: attemptDate.toLocaleDateString("en-US", { month: "short", day: "numeric" }),
+                time: attemptDate.toLocaleTimeString("en-US", { hour: "2-digit", minute: "2-digit" }),
+                score: score,
+                passed: attempt.result === "Pass" ? "✓" : "✗",
+              };
+            });
+
           return (
-          <div className="bg-white rounded-lg border border-gray-200 p-6 mb-12">
-            <div className="flex items-center justify-between mb-6">
-              <div>
-                <h2 className="text-2xl font-bold text-gray-900 mb-1">Score Trend</h2>
-                <p className="text-gray-600 text-sm">
-                  {selectedPaper === "all"
-                    ? "Your exam performance across all papers"
-                    : `Performance on ${selectedPaper}`}
-                </p>
-              </div>
-              <div className="w-64">
-                <select
-                  value={selectedPaper}
-                  onChange={(e) => setSelectedPaper(e.target.value)}
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm"
-                >
-                  <option value="all">All Papers ({attempts.length})</option>
-                  {uniquePapers.map((paper) => {
-                    const count = attempts.filter((a) => a.paperTitle === paper.title).length;
+            <>
+              {/* Latest Scores Cards */}
+              <div className="mb-12">
+                <h2 className="text-xl font-bold text-gray-900 mb-4">Your Latest Scores</h2>
+                <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3">
+                  {papersList.map((paper) => {
+                    const score = paper.latest.score;
+                    const isPassed = paper.latest.result === "Pass";
                     return (
-                      <option key={paper.id} value={paper.title}>
-                        {paper.title} ({count})
-                      </option>
+                      <button
+                        key={paper.title}
+                        onClick={() => setSelectedTrendPaper(paper.title)}
+                        className={`p-4 rounded-lg border-2 transition-all text-left ${
+                          selectedTrendPaper === paper.title
+                            ? "border-blue-500 bg-blue-50"
+                            : "border-gray-200 bg-white hover:border-gray-300"
+                        }`}
+                      >
+                        <div className="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-2">
+                          {paper.title}
+                        </div>
+                        <div className="text-2xl font-bold text-gray-900 mb-1">
+                          {Math.round(score)}%
+                        </div>
+                        <div className={`inline-block text-xs font-semibold px-2 py-1 rounded ${
+                          isPassed
+                            ? "bg-green-100 text-green-700"
+                            : "bg-red-100 text-red-700"
+                        }`}>
+                          {isPassed ? "✓ Passed" : "Failed"}
+                        </div>
+                      </button>
                     );
                   })}
-                </select>
+                </div>
               </div>
-            </div>
-            <p className="text-gray-500 text-xs mb-6">Attempts are numbered chronologically (1 = oldest, N = newest). Hover over each point to see paper name and timestamp.</p>
-            <div style={{ width: "100%", height: 300 }}>
-              <ResponsiveContainer width="100%" height="100%">
-                <LineChart data={chartData}>
-                  <CartesianGrid strokeDasharray="3 3" />
-                  <XAxis 
-                    dataKey="attemptNumber"
-                    label={{ value: "Attempt #", position: "insideBottomRight", offset: -5, fontSize: 12 }}
-                    tick={{ fontSize: 12 }}
-                  />
-                  <YAxis 
-                    domain={[0, 100]}
-                    tick={{ fontSize: 12 }}
-                    label={{ value: "Score (%)", angle: -90, position: "insideLeft" }}
-                  />
-                  <Tooltip 
-                    content={({ active, payload }: any) => {
-                      if (active && payload && payload.length) {
-                        const data = payload[0].payload;
-                        const score = data.score;
-                        return (
-                          <div style={{ padding: "10px 12px", backgroundColor: "#ffffff", border: "1px solid #d1d5db", borderRadius: "6px", boxShadow: "0 2px 4px rgba(0,0,0,0.1)" }}>
-                            <p style={{ margin: "0 0 6px 0", fontSize: "13px", fontWeight: "700", color: "#1f2937" }}>
-                              {data.paper}
-                            </p>
-                            <p style={{ margin: "0 0 3px 0", fontSize: "12px", color: "#374151" }}>
-                              <strong>Attempt #{data.attemptNumber}</strong>
-                            </p>
-                            <p style={{ margin: "0 0 3px 0", fontSize: "12px", color: "#374151" }}>
-                              Score: <strong style={{ fontSize: "14px" }}>{score}%</strong> {data.passed}
-                            </p>
-                            <p style={{ margin: "0", fontSize: "11px", color: "#6b7280" }}>
-                              {data.date} at {data.time}
-                            </p>
-                          </div>
-                        );
-                      }
-                      return null;
-                    }}
-                  />
-                  <Line 
-                    type="monotone" 
-                    dataKey="score" 
-                    stroke="#3b82f6" 
-                    strokeWidth={2}
-                    dot={{ fill: "#3b82f6", r: 4 }}
-                    activeDot={{ r: 6 }}
-                  />
-                </LineChart>
-              </ResponsiveContainer>
-            </div>
-          </div>
+
+              {/* Trend Chart */}
+              <div className="bg-white rounded-lg border border-gray-200 p-6 mb-12">
+                <div className="mb-6">
+                  <h2 className="text-2xl font-bold text-gray-900 mb-1">Your Progress</h2>
+                  <p className="text-gray-600 text-sm">
+                    📈 {selectedTrendPaper} — {trendData.length} attempt{trendData.length !== 1 ? "s" : ""} (click a paper above to change)
+                  </p>
+                </div>
+                <div style={{ width: "100%", height: 300 }}>
+                  <ResponsiveContainer width="100%" height="100%">
+                    <LineChart data={trendData}>
+                      <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" />
+                      <XAxis
+                        dataKey="attemptNumber"
+                        label={{ value: "Attempt", position: "insideBottomRight", offset: -5, fontSize: 12 }}
+                        tick={{ fontSize: 12 }}
+                        stroke="#9ca3af"
+                      />
+                      <YAxis
+                        domain={[0, 100]}
+                        tick={{ fontSize: 12 }}
+                        label={{ value: "Score (%)", angle: -90, position: "insideLeft" }}
+                        stroke="#9ca3af"
+                      />
+                      <Tooltip
+                        content={({ active, payload }: any) => {
+                          if (active && payload && payload.length) {
+                            const data = payload[0].payload;
+                            return (
+                              <div style={{ padding: "10px 12px", backgroundColor: "#ffffff", border: "1px solid #d1d5db", borderRadius: "6px", boxShadow: "0 2px 4px rgba(0,0,0,0.1)" }}>
+                                <p style={{ margin: "0 0 3px 0", fontSize: "12px", color: "#374151" }}>
+                                  <strong>Attempt #{data.attemptNumber}</strong>
+                                </p>
+                                <p style={{ margin: "0 0 3px 0", fontSize: "12px", color: "#374151" }}>
+                                  Score: <strong style={{ fontSize: "14px" }}>{data.score}%</strong> {data.passed}
+                                </p>
+                                <p style={{ margin: "0", fontSize: "11px", color: "#6b7280" }}>
+                                  {data.date} at {data.time}
+                                </p>
+                              </div>
+                            );
+                          }
+                          return null;
+                        }}
+                      />
+                      <Line
+                        type="monotone"
+                        dataKey="score"
+                        stroke="#3b82f6"
+                        strokeWidth={2.5}
+                        dot={{ fill: "#3b82f6", r: 4 }}
+                        activeDot={{ r: 6 }}
+                      />
+                    </LineChart>
+                  </ResponsiveContainer>
+                </div>
+              </div>
+            </>
           );
         })()}
 
