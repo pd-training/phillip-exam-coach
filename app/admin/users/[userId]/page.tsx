@@ -140,34 +140,50 @@ export default function UserDetailPage() {
 
   return (
     <div style={{ minHeight: "100vh", backgroundColor: "#f9fafb" }}>
+      {/* Hero Section */}
+      <div style={{
+        background: "linear-gradient(to right, #0f172a, #1e3a8a)",
+        color: "white",
+        padding: "24px 0",
+        borderBottom: "1px solid #e5e7eb",
+      }}>
+        <div style={{ maxWidth: "88rem", margin: "0 auto", paddingLeft: "24px", paddingRight: "24px" }}>
+          <h1 style={{ fontSize: "24px", fontWeight: "bold", margin: "0" }}>User Details</h1>
+        </div>
+      </div>
+
       <div style={{ maxWidth: "88rem", margin: "0 auto", paddingLeft: "24px", paddingRight: "24px" }}>
-        {/* Header */}
+        {/* Top Navigation */}
         <div style={{
-          backgroundColor: "white",
-          borderBottom: "1px solid #e5e7eb",
-          padding: "20px 0",
+          padding: "12px 0",
           display: "flex",
           justifyContent: "space-between",
           alignItems: "center",
+          borderBottom: "1px solid #e5e7eb",
         }}>
-        <Link href="/admin/users">
-          <a style={{ color: "#3b82f6", fontSize: "14px", textDecoration: "none", fontWeight: "500" }}>
+          <Link href="/admin/users" style={{ color: "#f59e0b", fontSize: "14px", textDecoration: "none", fontWeight: "500" }}>
             ← Back to users
-          </a>
-        </Link>
-        <button
-          onClick={handleLogout}
-          style={{
-            backgroundColor: "transparent",
-            color: "#2563eb",
-            border: "none",
-            cursor: "pointer",
-            fontSize: "14px",
-            fontWeight: "500",
-          }}
-        >
-          🚪 Log out
-        </button>
+          </Link>
+          <button
+            onClick={handleLogout}
+            style={{
+              backgroundColor: "transparent",
+              color: "#f59e0b",
+              border: "none",
+              cursor: "pointer",
+              fontSize: "14px",
+              fontWeight: "500",
+              transition: "color 0.2s",
+            }}
+            onMouseEnter={(e) => {
+              e.currentTarget.style.color = "#d97706";
+            }}
+            onMouseLeave={(e) => {
+              e.currentTarget.style.color = "#f59e0b";
+            }}
+          >
+            Log out
+          </button>
         </div>
 
       {/* Content */}
@@ -319,13 +335,20 @@ export default function UserDetailPage() {
           <button
             style={{
               padding: "8px 16px",
-              backgroundColor: "#3b82f6",
-              color: "white",
+              backgroundColor: "#f59e0b",
+              color: "#0f172a",
               border: "none",
               borderRadius: "6px",
               fontSize: "14px",
               fontWeight: "600",
               cursor: "pointer",
+              transition: "background-color 0.2s",
+            }}
+            onMouseEnter={(e) => {
+              e.currentTarget.style.backgroundColor = "#d97706";
+            }}
+            onMouseLeave={(e) => {
+              e.currentTarget.style.backgroundColor = "#f59e0b";
             }}
           >
             Save roles
@@ -362,13 +385,20 @@ export default function UserDetailPage() {
             <button
               style={{
                 padding: "8px 16px",
-                backgroundColor: "white",
-                color: "#3b82f6",
-                border: "1px solid #3b82f6",
+                backgroundColor: "#f59e0b",
+                color: "#0f172a",
+                border: "none",
                 borderRadius: "6px",
                 fontSize: "14px",
                 fontWeight: "600",
                 cursor: "pointer",
+                transition: "background-color 0.2s",
+              }}
+              onMouseEnter={(e) => {
+                e.currentTarget.style.backgroundColor = "#d97706";
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.backgroundColor = "#f59e0b";
               }}
             >
               Save
@@ -405,13 +435,20 @@ export default function UserDetailPage() {
             <button
               style={{
                 padding: "8px 16px",
-                backgroundColor: "white",
-                color: "#3b82f6",
-                border: "1px solid #3b82f6",
+                backgroundColor: "#f59e0b",
+                color: "#0f172a",
+                border: "none",
                 borderRadius: "6px",
                 fontSize: "14px",
                 fontWeight: "600",
                 cursor: "pointer",
+                transition: "background-color 0.2s",
+              }}
+              onMouseEnter={(e) => {
+                e.currentTarget.style.backgroundColor = "#d97706";
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.backgroundColor = "#f59e0b";
               }}
             >
               Reset
@@ -476,7 +513,7 @@ export default function UserDetailPage() {
                 <tbody>
                   {attempts.map((att) => (
                     <tr key={att.id} style={{ borderBottom: "1px solid #e5e7eb" }}>
-                      <td style={{ padding: "8px 0", color: "#3b82f6", fontWeight: "500" }}>{att.paperTitle}</td>
+                      <td style={{ padding: "8px 0", color: "#1f2937", fontWeight: "500" }}>{att.paperTitle}</td>
                       <td style={{ padding: "8px 0", color: "#6b7280", fontSize: "12px" }}>{att.status}</td>
                       <td style={{ padding: "8px 0", color: "#1f2937" }}>{att.score ? `${att.score}%` : "—"}</td>
                       <td style={{ padding: "8px 0" }}>
@@ -497,7 +534,11 @@ export default function UserDetailPage() {
                       <td style={{ padding: "8px 0", color: "#6b7280" }}>{formatTime(att.timeTaken)}</td>
                       <td style={{ padding: "8px 0", color: "#6b7280" }}>{formatDate(att.submittedAt || att.createdAt)}</td>
                       <td style={{ padding: "8px 0" }}>
-                        <a href={`/admin/attempts/${att.id}`} style={{ color: "#3b82f6", fontSize: "12px", textDecoration: "none", fontWeight: "600", cursor: "pointer" }}>
+                        <a href={`/admin/attempts/${att.id}`} style={{ color: "#f59e0b", fontSize: "12px", textDecoration: "none", fontWeight: "600", cursor: "pointer", transition: "color 0.2s" }} onMouseEnter={(e) => {
+                          e.currentTarget.style.color = "#d97706";
+                        }} onMouseLeave={(e) => {
+                          e.currentTarget.style.color = "#f59e0b";
+                        }}>
                           Review
                         </a>
                       </td>
