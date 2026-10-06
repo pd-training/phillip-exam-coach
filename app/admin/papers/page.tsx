@@ -419,7 +419,7 @@ export default function PapersManagement() {
 
       if (res.ok) {
         const modeText = uploadMode === 'APPEND' ? 'appended' : 'replaced all questions and added';
-        setUploadProgress(`✅ ${data.count} questions ${modeText} successfully!`);
+        setUploadProgress(`${data.count} questions ${modeText} successfully!`);
         await fetchPapers();
         await fetchQuestions(selectedPaperId);
         setTimeout(() => {
@@ -429,10 +429,10 @@ export default function PapersManagement() {
           setUploadMode("APPEND");
         }, 2000);
       } else {
-        setUploadProgress(`❌ Error: ${data.error}`);
+        setUploadProgress(`Error: ${data.error}`);
       }
     } catch (error) {
-      setUploadProgress(`❌ Upload failed: ${String(error)}`);
+      setUploadProgress(`Upload failed: ${String(error)}`);
     } finally {
       setSubmitting(false);
     }
@@ -719,13 +719,16 @@ export default function PapersManagement() {
     <div className="min-h-screen bg-gray-50">
       <AdminNav />
 
+      {/* Hero Section */}
+      <div style={{ background: "linear-gradient(to right, #0f172a, #1e3a8a)", color: "white", padding: "48px 0" }}>
+        <div className="max-w-7xl mx-auto px-6">
+          <h1 className="text-4xl font-bold mb-2">Papers & Questions</h1>
+          <p style={{ color: "#e0e7ff", margin: "0" }}>Manage exam papers, questions, and exam format</p>
+        </div>
+      </div>
+
       {/* Main Content */}
       <div className="max-w-7xl mx-auto px-6 py-12">
-        {/* Page Header */}
-        <div className="mb-8">
-          <h1 className="text-4xl font-bold text-gray-900 mb-2">Papers & Questions</h1>
-          <p className="text-gray-600">Manage exam papers, questions, and exam format</p>
-        </div>
 
         {/* Tabs */}
         <div className="border-b border-gray-200 mb-8">
@@ -736,7 +739,7 @@ export default function PapersManagement() {
                 onClick={() => setActiveTab(tab)}
                 className={`px-1 py-4 font-medium border-b-2 transition ${
                   activeTab === tab
-                    ? "text-blue-600 border-blue-600"
+                    ? "text-amber-600 border-amber-600"
                     : "text-gray-600 border-transparent hover:text-gray-900"
                 }`}
               >
@@ -754,7 +757,7 @@ export default function PapersManagement() {
               <h3 className="text-xl font-bold text-gray-900">Paper Availability</h3>
               <button
                 onClick={() => setActiveModal("createPaper")}
-                className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-medium text-sm transition"
+                className="px-4 py-2 bg-amber-500 hover:bg-amber-600 text-blue-900 rounded-lg font-medium text-sm transition"
               >
                 + Create New Paper
               </button>
@@ -797,7 +800,7 @@ export default function PapersManagement() {
                           fontWeight: "600",
                         }}
                       >
-                        {paper.isAvailable ? "✓ Available" : "✕ Unavailable"}
+                        {paper.isAvailable ? "Available" : "Unavailable"}
                       </span>
                       <button
                         onClick={() => {
@@ -812,15 +815,22 @@ export default function PapersManagement() {
                         style={{
                           padding: "6px 16px",
                           backgroundColor: "#white",
-                          color: "#3b82f6",
-                          border: "1px solid #3b82f6",
+                          color: "#f59e0b",
+                          border: "1px solid #f59e0b",
                           borderRadius: "6px",
                           fontSize: "12px",
                           fontWeight: "600",
                           cursor: "pointer",
+                          transition: "all 0.2s",
+                        }}
+                        onMouseEnter={(e) => {
+                          e.currentTarget.style.backgroundColor = "#fef3c7";
+                        }}
+                        onMouseLeave={(e) => {
+                          e.currentTarget.style.backgroundColor = "#white";
                         }}
                       >
-                        ⚙️ Settings
+                        Settings
                       </button>
                       <button
                         onClick={() => togglePaperAvailability(paper.id, paper.isAvailable)}
@@ -885,17 +895,26 @@ export default function PapersManagement() {
                 disabled={papers.length === 0}
                 style={{
                   padding: "8px 16px",
-                  backgroundColor: "#3b82f6",
-                  color: "white",
+                  backgroundColor: "#f59e0b",
+                  color: "#1e3a8a",
                   border: "none",
                   borderRadius: "6px",
                   fontSize: "13px",
                   fontWeight: "600",
                   cursor: papers.length === 0 ? "not-allowed" : "pointer",
                   opacity: papers.length === 0 ? 0.5 : 1,
+                  transition: "all 0.2s",
+                }}
+                onMouseEnter={(e) => {
+                  if (papers.length > 0) {
+                    e.currentTarget.style.backgroundColor = "#d97706";
+                  }
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.backgroundColor = "#f59e0b";
                 }}
               >
-                ⬆️ Upload Questions
+                Upload Questions
               </button>
             </div>
 
@@ -926,16 +945,23 @@ export default function PapersManagement() {
                               fetchQuestions(paper.id);
                             }}
                             style={{
-                              color: "#3b82f6",
+                              color: "#f59e0b",
                               backgroundColor: "transparent",
                               border: "none",
                               cursor: "pointer",
                               fontSize: "13px",
                               fontWeight: "600",
                               textDecoration: "underline",
+                              transition: "color 0.2s",
+                            }}
+                            onMouseEnter={(e) => {
+                              e.currentTarget.style.color = "#d97706";
+                            }}
+                            onMouseLeave={(e) => {
+                              e.currentTarget.style.color = "#f59e0b";
                             }}
                           >
-                            📋 View / Edit
+                            View / Edit
                           </button>
                         </td>
                       </tr>
@@ -1018,7 +1044,7 @@ export default function PapersManagement() {
                   style={{ cursor: "pointer" }}
                 />
                 <span style={{ fontSize: "13px" }}>
-                  ⭕ <strong>APPEND</strong> - Keep existing questions, add new ones
+                  <strong>APPEND</strong> - Keep existing questions, add new ones
                 </span>
               </label>
               <label style={{ display: "flex", alignItems: "center", cursor: "pointer", gap: "8px" }}>
@@ -1031,7 +1057,7 @@ export default function PapersManagement() {
                   style={{ cursor: "pointer" }}
                 />
                 <span style={{ fontSize: "13px" }}>
-                  ⭕ <strong>REPLACE</strong> - Delete all old questions, add new ones
+                  <strong>REPLACE</strong> - Delete all old questions, add new ones
                 </span>
               </label>
             </div>
@@ -1045,13 +1071,13 @@ export default function PapersManagement() {
                 fontSize: "12px",
                 color: "#92400e"
               }}>
-                ⚠️ <strong>WARNING:</strong> REPLACE mode will delete all existing questions. Students will not be able to properly review past exam attempts if questions are deleted!
+                <strong>WARNING:</strong> REPLACE mode will delete all existing questions. Students will not be able to properly review past exam attempts if questions are deleted!
               </div>
             )}
           </div>
 
           {uploadProgress && (
-            <div style={{ padding: "12px", backgroundColor: uploadProgress.startsWith("✅") ? "#dcfce7" : "#fee2e2", borderRadius: "6px", marginBottom: "16px", fontSize: "13px", color: uploadProgress.startsWith("✅") ? "#166534" : "#991b1b" }}>
+            <div style={{ padding: "12px", backgroundColor: uploadProgress.includes("Error") || uploadProgress.includes("failed") ? "#fee2e2" : "#dcfce7", borderRadius: "6px", marginBottom: "16px", fontSize: "13px", color: uploadProgress.includes("Error") || uploadProgress.includes("failed") ? "#991b1b" : "#166534" }}>
               {uploadProgress}
             </div>
           )}
@@ -1078,13 +1104,22 @@ export default function PapersManagement() {
               disabled={!uploadFile || !selectedPaperId || submitting}
               style={{
                 padding: "10px 24px",
-                backgroundColor: !uploadFile || !selectedPaperId || submitting ? "#9ca3af" : "#3b82f6",
-                color: "white",
+                backgroundColor: !uploadFile || !selectedPaperId || submitting ? "#9ca3af" : "#f59e0b",
+                color: !uploadFile || !selectedPaperId || submitting ? "white" : "#1e3a8a",
                 border: "none",
                 borderRadius: "6px",
                 fontSize: "14px",
                 fontWeight: "600",
                 cursor: !uploadFile || !selectedPaperId || submitting ? "not-allowed" : "pointer",
+                transition: "all 0.2s",
+              }}
+              onMouseEnter={(e) => {
+                if (!uploadFile || !selectedPaperId || submitting) return;
+                e.currentTarget.style.backgroundColor = "#d97706";
+              }}
+              onMouseLeave={(e) => {
+                if (!uploadFile || !selectedPaperId || submitting) return;
+                e.currentTarget.style.backgroundColor = "#f59e0b";
               }}
             >
               {submitting ? "Uploading..." : "Upload"}
@@ -1131,14 +1166,18 @@ export default function PapersManagement() {
                             setEditOptionD(q.optionD || "");
                             setActiveModal("editQuestion");
                           }}
-                          style={{ color: "#3b82f6", backgroundColor: "transparent", border: "none", cursor: "pointer", fontSize: "11px", textDecoration: "underline" }}
+                          style={{ color: "#f59e0b", backgroundColor: "transparent", border: "none", cursor: "pointer", fontSize: "11px", textDecoration: "underline", transition: "color 0.2s" }}
+                          onMouseEnter={(e) => { e.currentTarget.style.color = "#d97706"; }}
+                          onMouseLeave={(e) => { e.currentTarget.style.color = "#f59e0b"; }}
                         >
                           Edit
                         </button>
                         {" | "}
                         <button
                           onClick={() => handleDeleteQuestion(q.id)}
-                          style={{ color: "#ef4444", backgroundColor: "transparent", border: "none", cursor: "pointer", fontSize: "11px", textDecoration: "underline" }}
+                          style={{ color: "#ef4444", backgroundColor: "transparent", border: "none", cursor: "pointer", fontSize: "11px", textDecoration: "underline", transition: "color 0.2s" }}
+                          onMouseEnter={(e) => { e.currentTarget.style.color = "#dc2626"; }}
+                          onMouseLeave={(e) => { e.currentTarget.style.color = "#ef4444"; }}
                         >
                           Delete
                         </button>
@@ -1211,7 +1250,7 @@ export default function PapersManagement() {
           </div>
 
           <div style={{ marginBottom: "16px", padding: "12px", backgroundColor: "#f3f4f6", borderRadius: "6px", border: "1px solid #e5e7eb" }}>
-            <label style={{ display: "block", fontSize: "13px", fontWeight: "600", marginBottom: "10px", color: "#1f2937" }}>📋 Answer Options</label>
+            <label style={{ display: "block", fontSize: "13px", fontWeight: "600", marginBottom: "10px", color: "#1f2937" }}>Answer Options</label>
             
             <div style={{ marginBottom: "10px" }}>
               <label style={{ display: "block", fontSize: "12px", fontWeight: "500", marginBottom: "4px", color: "#374151" }}>Option A</label>
@@ -1280,13 +1319,22 @@ export default function PapersManagement() {
               disabled={submitting}
               style={{
                 padding: "10px 24px",
-                backgroundColor: submitting ? "#9ca3af" : "#3b82f6",
-                color: "white",
+                backgroundColor: submitting ? "#9ca3af" : "#f59e0b",
+                color: submitting ? "white" : "#1e3a8a",
                 border: "none",
                 borderRadius: "6px",
                 fontSize: "14px",
                 fontWeight: "600",
                 cursor: submitting ? "not-allowed" : "pointer",
+                transition: "all 0.2s",
+              }}
+              onMouseEnter={(e) => {
+                if (submitting) return;
+                e.currentTarget.style.backgroundColor = "#d97706";
+              }}
+              onMouseLeave={(e) => {
+                if (submitting) return;
+                e.currentTarget.style.backgroundColor = "#f59e0b";
               }}
             >
               {submitting ? "Saving..." : "Save"}
@@ -1345,7 +1393,7 @@ export default function PapersManagement() {
                     onChange={(e) => setEditPaperAvailability(e.target.checked)}
                     style={{ width: "18px", height: "18px", cursor: "pointer" }}
                   />
-                  {editPaperAvailability ? "✓ Available for Students" : "✕ Not Available"}
+                  {editPaperAvailability ? "Available for Students" : "Not Available"}
                 </label>
               </div>
             </div>
@@ -1397,14 +1445,14 @@ export default function PapersManagement() {
               {/* Show note when parts are defined */}
               {parts.length > 0 && (
                 <div style={{
-                  backgroundColor: "#eff6ff",
-                  border: "1px solid #bfdbfe",
+                  backgroundColor: "#fef3c7",
+                  border: "1px solid #fcd34d",
                   borderRadius: "6px",
                   padding: "12px",
                   marginTop: "12px",
                 }}>
-                  <p style={{ margin: "0", fontSize: "13px", color: "#1e40af" }}>
-                    ℹ️ With exam parts defined, Total Questions and Passing Score are configured per part. Only timer is needed at exam level.
+                  <p style={{ margin: "0", fontSize: "13px", color: "#92400e" }}>
+                    With exam parts defined, Total Questions and Passing Score are configured per part. Only timer is needed at exam level.
                   </p>
                 </div>
               )}
@@ -1448,9 +1496,16 @@ export default function PapersManagement() {
                           fontSize: "12px",
                           fontWeight: "600",
                           cursor: "pointer",
+                          transition: "all 0.2s",
+                        }}
+                        onMouseEnter={(e) => {
+                          e.currentTarget.style.backgroundColor = "#dc2626";
+                        }}
+                        onMouseLeave={(e) => {
+                          e.currentTarget.style.backgroundColor = "#ef4444";
                         }}
                       >
-                        ✕ Remove
+                        Remove
                       </button>
                     </div>
                   ))}
@@ -1522,16 +1577,25 @@ export default function PapersManagement() {
                   style={{
                     width: "100%",
                     padding: "8px 12px",
-                    backgroundColor: newPart.partName.trim() ? "#3b82f6" : "#d1d5db",
-                    color: "white",
+                    backgroundColor: newPart.partName.trim() ? "#f59e0b" : "#d1d5db",
+                    color: newPart.partName.trim() ? "#1e3a8a" : "#6b7280",
                     border: "none",
                     borderRadius: "4px",
                     fontSize: "13px",
                     fontWeight: "600",
                     cursor: newPart.partName.trim() ? "pointer" : "not-allowed",
+                    transition: "all 0.2s",
+                  }}
+                  onMouseEnter={(e) => {
+                    if (!newPart.partName.trim()) return;
+                    e.currentTarget.style.backgroundColor = "#d97706";
+                  }}
+                  onMouseLeave={(e) => {
+                    if (!newPart.partName.trim()) return;
+                    e.currentTarget.style.backgroundColor = "#f59e0b";
                   }}
                 >
-                  + Add Part
+                  Add Part
                 </button>
               </div>
             </div>
@@ -1550,7 +1614,7 @@ export default function PapersManagement() {
                             type="text"
                             value={editingChapterTitle}
                             onChange={(e) => setEditingChapterTitle(e.target.value)}
-                            style={{ flex: 1, padding: "8px", border: "1px solid #3b82f6", borderRadius: "4px", fontSize: "13px" }}
+                            style={{ flex: 1, padding: "8px", border: "1px solid #f59e0b", borderRadius: "4px", fontSize: "13px" }}
                             autoFocus
                           />
                           <button
@@ -1564,9 +1628,16 @@ export default function PapersManagement() {
                               fontSize: "12px",
                               fontWeight: "600",
                               cursor: "pointer",
+                              transition: "all 0.2s",
+                            }}
+                            onMouseEnter={(e) => {
+                              e.currentTarget.style.backgroundColor = "#059669";
+                            }}
+                            onMouseLeave={(e) => {
+                              e.currentTarget.style.backgroundColor = "#10b981";
                             }}
                           >
-                            ✓
+                            Save
                           </button>
                           <button
                             onClick={() => { setEditingChapterId(null); setEditingChapterTitle(""); }}
@@ -1579,9 +1650,16 @@ export default function PapersManagement() {
                               fontSize: "12px",
                               fontWeight: "600",
                               cursor: "pointer",
+                              transition: "all 0.2s",
+                            }}
+                            onMouseEnter={(e) => {
+                              e.currentTarget.style.backgroundColor = "#dc2626";
+                            }}
+                            onMouseLeave={(e) => {
+                              e.currentTarget.style.backgroundColor = "#ef4444";
                             }}
                           >
-                            ✕
+                            Cancel
                           </button>
                         </>
                       ) : (
@@ -1592,12 +1670,21 @@ export default function PapersManagement() {
                             style={{
                               padding: "6px 12px",
                               backgroundColor: "#f3f4f6",
-                              color: "#3b82f6",
+                              color: "#f59e0b",
                               border: "1px solid #d1d5db",
                               borderRadius: "4px",
                               fontSize: "12px",
                               fontWeight: "600",
                               cursor: "pointer",
+                              transition: "all 0.2s",
+                            }}
+                            onMouseEnter={(e) => {
+                              e.currentTarget.style.backgroundColor = "#fef3c7";
+                              e.currentTarget.style.borderColor = "#fcd34d";
+                            }}
+                            onMouseLeave={(e) => {
+                              e.currentTarget.style.backgroundColor = "#f3f4f6";
+                              e.currentTarget.style.borderColor = "#d1d5db";
                             }}
                           >
                             Edit
@@ -1632,13 +1719,22 @@ export default function PapersManagement() {
               disabled={submitting}
               style={{
                 padding: "10px 24px",
-                backgroundColor: submitting ? "#9ca3af" : "#3b82f6",
-                color: "white",
+                backgroundColor: submitting ? "#9ca3af" : "#f59e0b",
+                color: submitting ? "white" : "#1e3a8a",
                 border: "none",
                 borderRadius: "6px",
                 fontSize: "14px",
                 fontWeight: "600",
                 cursor: submitting ? "not-allowed" : "pointer",
+                transition: "all 0.2s",
+              }}
+              onMouseEnter={(e) => {
+                if (submitting) return;
+                e.currentTarget.style.backgroundColor = "#d97706";
+              }}
+              onMouseLeave={(e) => {
+                if (submitting) return;
+                e.currentTarget.style.backgroundColor = "#f59e0b";
               }}
             >
               {submitting ? "Saving..." : "Save All Settings"}
@@ -1712,13 +1808,22 @@ export default function PapersManagement() {
               disabled={submitting || !newPaperTitle.trim()}
               style={{
                 padding: "10px 24px",
-                backgroundColor: submitting || !newPaperTitle.trim() ? "#9ca3af" : "#3b82f6",
-                color: "white",
+                backgroundColor: submitting || !newPaperTitle.trim() ? "#9ca3af" : "#f59e0b",
+                color: submitting || !newPaperTitle.trim() ? "white" : "#1e3a8a",
                 border: "none",
                 borderRadius: "6px",
                 fontSize: "14px",
                 fontWeight: "600",
                 cursor: submitting || !newPaperTitle.trim() ? "not-allowed" : "pointer",
+                transition: "all 0.2s",
+              }}
+              onMouseEnter={(e) => {
+                if (submitting || !newPaperTitle.trim()) return;
+                e.currentTarget.style.backgroundColor = "#d97706";
+              }}
+              onMouseLeave={(e) => {
+                if (submitting || !newPaperTitle.trim()) return;
+                e.currentTarget.style.backgroundColor = "#f59e0b";
               }}
             >
               {submitting ? "Creating..." : "Create Paper"}
@@ -1768,9 +1873,16 @@ function Modal({ onClose, children }: { onClose: () => void; children: React.Rea
             fontSize: "24px",
             cursor: "pointer",
             color: "#6b7280",
+            transition: "color 0.2s",
+          }}
+          onMouseEnter={(e) => {
+            e.currentTarget.style.color = "#1f2937";
+          }}
+          onMouseLeave={(e) => {
+            e.currentTarget.style.color = "#6b7280";
           }}
         >
-          ✕
+          ×
         </button>
         {children}
       </div>

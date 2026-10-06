@@ -83,10 +83,10 @@ export default function AttemptsPage() {
   return (
     <div className="min-h-screen bg-gray-50">
       <AdminNav />
-      <div className="bg-gradient-to-r from-blue-600 to-blue-700 text-white py-12 px-0">
+      <div style={{ background: "linear-gradient(to right, #0f172a, #1e3a8a)", color: "white", padding: "48px 0" }}>
         <div className="max-w-7xl mx-auto px-6">
           <h1 className="text-4xl font-bold mb-2">Exam Attempts</h1>
-          <p className="text-blue-100">All student exam submissions</p>
+          <p style={{ color: "#e0e7ff", margin: "0" }}>All student exam submissions</p>
         </div>
       </div>
 
@@ -99,7 +99,8 @@ export default function AttemptsPage() {
           <select
             value={selectedPaperId}
             onChange={(e) => setSelectedPaperId(e.target.value)}
-            className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+            className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-amber-500"
+            style={{ transition: "ring 0.2s" }}
           >
             <option value="">All Papers</option>
             {Array.isArray(papers) && papers.map((paper) => (
@@ -150,8 +151,8 @@ export default function AttemptsPage() {
                     const passStatus =
                       attempt.passed !== null
                         ? attempt.passed
-                          ? "Passed ✅"
-                          : "Failed ❌"
+                          ? "Passed"
+                          : "Failed"
                         : "In Progress";
                     const submittedDate = attempt.submittedat
                       ? new Date(attempt.submittedat).toLocaleDateString()
@@ -184,15 +185,15 @@ export default function AttemptsPage() {
                               fontSize: "12px",
                               fontWeight: "600",
                               backgroundColor:
-                                passStatus === "Passed ✅"
+                                passStatus === "Passed"
                                   ? "#d1fae5"
-                                  : passStatus === "Failed ❌"
+                                  : passStatus === "Failed"
                                     ? "#fee2e2"
                                     : "#fef3c7",
                               color:
-                                passStatus === "Passed ✅"
+                                passStatus === "Passed"
                                   ? "#065f46"
-                                  : passStatus === "Failed ❌"
+                                  : passStatus === "Failed"
                                     ? "#991b1b"
                                     : "#92400e",
                             }}
@@ -206,10 +207,23 @@ export default function AttemptsPage() {
                         <td className="px-6 py-4 text-sm">
                           <Link href={`/admin/attempts/${attempt.id}`}>
                             <button
-                              className="text-blue-600 hover:text-blue-700 font-medium"
+                              className="font-medium"
+                              style={{
+                                color: "#f59e0b",
+                                backgroundColor: "transparent",
+                                border: "none",
+                                cursor: "pointer",
+                                transition: "color 0.2s",
+                              }}
+                              onMouseEnter={(e) => {
+                                e.currentTarget.style.color = "#d97706";
+                              }}
+                              onMouseLeave={(e) => {
+                                e.currentTarget.style.color = "#f59e0b";
+                              }}
                               onClick={(e) => e.stopPropagation()}
                             >
-                              View →
+                              View
                             </button>
                           </Link>
                         </td>

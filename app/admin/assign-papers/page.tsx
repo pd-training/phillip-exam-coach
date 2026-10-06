@@ -163,7 +163,7 @@ export default function AssignPapersPage() {
     return (
       <div className="min-h-screen bg-gray-50">
         <AdminNav />
-        <div className="bg-gradient-to-r from-blue-600 to-blue-700 text-white py-12 px-0">
+        <div style={{ background: "linear-gradient(to right, #0f172a, #1e3a8a)", color: "white", padding: "48px 0" }}>
           <div className="max-w-7xl mx-auto px-6">
             <h1 className="text-3xl font-bold">Assign Papers to Students</h1>
           </div>
@@ -182,10 +182,10 @@ export default function AssignPapersPage() {
   return (
     <div className="min-h-screen bg-gray-50">
       <AdminNav />
-      <div className="bg-gradient-to-r from-blue-600 to-blue-700 text-white py-12 px-0">
+      <div style={{ background: "linear-gradient(to right, #0f172a, #1e3a8a)", color: "white", padding: "48px 0" }}>
         <div className="max-w-7xl mx-auto px-6">
           <h1 className="text-3xl font-bold">Assign Papers to Students</h1>
-          <p className="text-blue-100 mt-2">Manage paper access for individual students</p>
+          <p style={{ color: "#e0e7ff", margin: "8px 0 0 0" }}>Manage paper access for individual students</p>
         </div>
       </div>
 
@@ -212,7 +212,8 @@ export default function AssignPapersPage() {
                 placeholder="Search by email or name..."
                 value={searchUserTerm}
                 onChange={(e) => setSearchUserTerm(e.target.value)}
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg mb-4 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="w-full px-3 py-2 border border-gray-300 rounded-lg mb-4 focus:outline-none focus:ring-2 focus:ring-amber-500"
+                style={{ transition: "ring 0.2s" }}
               />
               <div className="space-y-2 max-h-96 overflow-y-auto">
                 {filteredUsers.length === 0 ? (
@@ -224,7 +225,7 @@ export default function AssignPapersPage() {
                       onClick={() => handleUserSelect(user.id)}
                       className={`w-full text-left px-3 py-2 rounded-lg transition ${
                         selectedUser === user.id
-                          ? "bg-blue-100 text-blue-900 border-l-4 border-blue-600"
+                          ? "bg-yellow-100 text-yellow-900 border-l-4 border-amber-500"
                           : "hover:bg-gray-100 border-l-4 border-transparent"
                       }`}
                     >
@@ -282,7 +283,21 @@ export default function AssignPapersPage() {
                             <button
                               onClick={() => handleAssignPaper(paper.id)}
                               disabled={submitting}
-                              className="px-3 py-1 bg-blue-600 text-white text-xs rounded hover:bg-blue-700 disabled:opacity-50 transition"
+                              className="px-3 py-1 bg-amber-500 text-blue-900 text-xs rounded disabled:opacity-50 transition"
+                              style={{
+                                backgroundColor: submitting ? "#d1d5db" : "#f59e0b",
+                                color: submitting ? "#6b7280" : "#1e3a8a",
+                              }}
+                              onMouseEnter={(e) => {
+                                if (!submitting) {
+                                  e.currentTarget.style.backgroundColor = "#d97706";
+                                }
+                              }}
+                              onMouseLeave={(e) => {
+                                if (!submitting) {
+                                  e.currentTarget.style.backgroundColor = "#f59e0b";
+                                }
+                              }}
                             >
                               Assign
                             </button>

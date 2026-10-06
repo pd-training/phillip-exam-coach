@@ -165,17 +165,20 @@ export default function UserManagement() {
     <div className="min-h-screen bg-gray-50">
       <AdminNav />
 
-      <div className="max-w-7xl mx-auto px-6 py-12">
-        {/* Page Title */}
-        <div className="mb-8">
-          <h1 className="text-4xl font-bold text-gray-900 mb-2">Users</h1>
-          <p className="text-gray-600">Manage advisors and students</p>
+      {/* Hero Section */}
+      <div style={{ background: "linear-gradient(to right, #0f172a, #1e3a8a)", color: "white", padding: "48px 0" }}>
+        <div className="max-w-7xl mx-auto px-6">
+          <h1 className="text-4xl font-bold mb-2">Users</h1>
+          <p style={{ color: "#e0e7ff", margin: "0" }}>Manage advisors and students</p>
         </div>
+      </div>
+
+      <div className="max-w-7xl mx-auto px-6 py-12">
 
         {/* Success Message */}
         {success && (
           <div className="bg-green-50 border border-green-200 text-green-800 px-4 py-3 rounded-lg mb-6 text-sm font-medium">
-            ✅ {success}
+            {success}
           </div>
         )}
 
@@ -186,7 +189,8 @@ export default function UserManagement() {
             placeholder="Search by name or email..."
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
-            className="w-full max-w-md px-4 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:border-blue-600"
+            className="w-full max-w-md px-4 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:border-amber-500"
+            style={{ transition: "border-color 0.2s" }}
           />
         </div>
 
@@ -249,7 +253,7 @@ export default function UserManagement() {
                       <td style={{ padding: "16px", fontSize: "14px", fontWeight: "500", color: "#1f2937" }}>
                         {user.name || "—"}
                       </td>
-                      <td style={{ padding: "16px", fontSize: "14px", color: "#2563eb" }}>
+                      <td style={{ padding: "16px", fontSize: "14px", color: "#f59e0b" }}>
                         {user.email}
                       </td>
                       <td style={{ padding: "16px", fontSize: "14px" }}>
@@ -260,8 +264,8 @@ export default function UserManagement() {
                               style={{
                                 display: "inline-block",
                                 padding: "4px 12px",
-                                backgroundColor: role === "ADMIN" ? "#fee2e2" : "#dbeafe",
-                                color: role === "ADMIN" ? "#991b1b" : "#1e40af",
+                                backgroundColor: role === "ADMIN" ? "#fee2e2" : "#fef3c7",
+                                color: role === "ADMIN" ? "#991b1b" : "#92400e",
                                 borderRadius: "4px",
                                 fontSize: "12px",
                                 fontWeight: "600",
@@ -347,7 +351,7 @@ export default function UserManagement() {
               marginBottom: "20px",
               fontSize: "14px",
             }}>
-              ❌ {error}
+              {error}
             </div>
           )}
 
@@ -495,13 +499,22 @@ export default function UserManagement() {
               style={{
                 width: "100%",
                 padding: "12px 16px",
-                backgroundColor: submitting ? "#9ca3af" : "#2563eb",
-                color: "white",
+                backgroundColor: submitting ? "#9ca3af" : "#f59e0b",
+                color: submitting ? "white" : "#1e3a8a",
                 border: "none",
                 borderRadius: "6px",
                 fontSize: "16px",
                 fontWeight: "600",
                 cursor: submitting ? "not-allowed" : "pointer",
+                transition: "all 0.2s",
+              }}
+              onMouseEnter={(e) => {
+                if (submitting) return;
+                e.currentTarget.style.backgroundColor = "#d97706";
+              }}
+              onMouseLeave={(e) => {
+                if (submitting) return;
+                e.currentTarget.style.backgroundColor = "#f59e0b";
               }}
             >
               {submitting ? "Creating user..." : "Create user"}
