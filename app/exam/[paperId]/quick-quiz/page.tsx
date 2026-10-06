@@ -124,8 +124,8 @@ export default function QuickQuizMode() {
 
         <div className="flex-1 flex items-center justify-center px-6 py-12">
           <div className="bg-white rounded-2xl border border-gray-200 p-8 w-full max-w-2xl text-center">
-            <h1 className="text-3xl font-bold text-gray-900 mb-8">🎉 Quiz Complete!</h1>
-            
+            <h1 className="text-3xl font-bold text-gray-900 mb-8">Quiz Complete!</h1>
+
             <div className="bg-green-50 border-2 border-green-200 rounded-xl p-8 mb-8">
               <p className="text-5xl font-bold text-green-600 mb-3">{percentage}%</p>
               <p className="text-gray-700 font-medium">
@@ -135,7 +135,7 @@ export default function QuickQuizMode() {
 
             <button
               onClick={() => router.back()}
-              className="w-full px-6 py-3 bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-semibold transition"
+              className="w-full px-6 py-3 bg-amber-500 hover:bg-amber-600 text-blue-900 rounded-lg font-semibold transition duration-200"
             >
               Back to Practice
             </button>
@@ -161,14 +161,14 @@ export default function QuickQuizMode() {
               <h1 className="text-3xl font-bold text-gray-900">Quick Quiz</h1>
             </div>
             <div className="text-sm font-medium text-gray-600">
-              Question <span className="text-blue-600 font-bold">{progress}</span> of <span className="text-gray-900 font-bold">{questions.length}</span>
+              Question <span className="text-amber-600 font-bold">{progress}</span> of <span className="text-gray-900 font-bold">{questions.length}</span>
             </div>
           </div>
 
           {/* Progress bar */}
           <div className="w-full h-2 bg-gray-200 rounded-full mb-8 overflow-hidden">
             <div
-              className="h-full bg-blue-600 transition-all duration-300"
+              className="h-full bg-amber-500 transition-all duration-300"
               style={{
                 width: `${(progress / questions.length) * 100}%`,
               }}
@@ -209,14 +209,15 @@ export default function QuickQuizMode() {
                   padding: "12px",
                   marginBottom: "10px",
                   backgroundColor:
-                    selectedAnswer === option.key ? "#dbeafe" : "white",
+                    selectedAnswer === option.key ? "#fef3c7" : "white",
                   border:
                     selectedAnswer === option.key
-                      ? "2px solid #3b82f6"
+                      ? "2px solid #f59e0b"
                       : "1px solid #e5e7eb",
                   borderRadius: "6px",
                   cursor: showingFeedback ? "not-allowed" : "pointer",
                   opacity: showingFeedback && selectedAnswer !== option.key ? 0.6 : 1,
+                  transition: "all 0.2s",
                 }}
               >
                 <input
@@ -255,7 +256,7 @@ export default function QuickQuizMode() {
                   color: feedback.isCorrect ? "#166534" : "#991b1b",
                 }}
               >
-                {feedback.isCorrect ? "✓ Correct!" : "✗ Incorrect"}
+                {feedback.isCorrect ? "Correct!" : "Incorrect"}
               </p>
               
               {/* Your answer */}
@@ -320,12 +321,13 @@ export default function QuickQuizMode() {
                   flex: 1,
                   padding: "12px",
                   backgroundColor:
-                    selectedAnswer ? "#3b82f6" : "#9ca3af",
-                  color: "white",
+                    selectedAnswer ? "#f59e0b" : "#9ca3af",
+                  color: selectedAnswer ? "#1f2937" : "white",
                   border: "none",
                   borderRadius: "6px",
                   cursor: selectedAnswer ? "pointer" : "not-allowed",
                   fontWeight: "600",
+                  transition: "all 0.2s",
                 }}
               >
                 Submit
@@ -336,12 +338,13 @@ export default function QuickQuizMode() {
                 style={{
                   flex: 1,
                   padding: "12px",
-                  backgroundColor: "#3b82f6",
-                  color: "white",
+                  backgroundColor: "#f59e0b",
+                  color: "#1f2937",
                   border: "none",
                   borderRadius: "6px",
                   cursor: "pointer",
                   fontWeight: "600",
+                  transition: "all 0.2s",
                 }}
               >
                 {currentQIndex < questions.length - 1 ? "Next Question" : "See Results"}
@@ -354,10 +357,11 @@ export default function QuickQuizMode() {
             style={{
               marginTop: "20px",
               padding: "12px",
-              backgroundColor: "#f0f9ff",
+              backgroundColor: "#fef3c7",
               borderRadius: "6px",
               textAlign: "center",
               fontSize: "14px",
+              color: "#92400e",
             }}
           >
             Correct so far: {score} / {answered}

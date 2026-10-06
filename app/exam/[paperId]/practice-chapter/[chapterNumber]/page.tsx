@@ -162,16 +162,16 @@ export default function PracticeChapterMode() {
         <StudentNav />
 
         {/* Hero Section */}
-        <div className="bg-gradient-to-r from-blue-600 to-blue-700 text-white py-12 px-0">
+        <div className="text-white py-12 px-0" style={{ background: "linear-gradient(to right, #0f172a, #1e3a8a)" }}>
           <div className="max-w-7xl mx-auto px-6">
             <button
               onClick={() => router.back()}
-              className="text-blue-100 hover:text-white font-medium text-sm mb-6 transition"
+              className="text-white hover:text-amber-100 font-medium text-sm mb-6 transition duration-200"
             >
               ← Back
             </button>
             <h1 className="text-4xl font-bold mb-2">Practice by Chapter</h1>
-            <p className="text-blue-100">Select a chapter to practice questions from that specific topic</p>
+            <p className="text-gray-200">Select a chapter to practice questions from that specific topic</p>
           </div>
         </div>
 
@@ -183,20 +183,20 @@ export default function PracticeChapterMode() {
                 <button
                   key={ch.number}
                   onClick={() => handleSelectChapter(ch.number)}
-                  className="w-full bg-gray-50 rounded-lg px-6 py-6 border border-gray-200 hover:border-blue-500 hover:bg-blue-50 transition duration-200 text-left flex items-center justify-between group"
+                  className="w-full bg-gray-50 rounded-lg px-6 py-6 border border-gray-200 hover:border-amber-400 hover:bg-amber-50 transition duration-200 text-left flex items-center justify-between group"
                 >
                   <div className="flex items-center gap-4 flex-1">
-                    <div className="w-12 h-12 bg-blue-600 text-white rounded-lg flex items-center justify-center group-hover:bg-blue-700 transition font-semibold text-lg">
+                    <div className="w-12 h-12 bg-amber-500 text-blue-900 rounded-lg flex items-center justify-center group-hover:bg-amber-600 transition duration-200 font-semibold text-lg">
                       {ch.number}
                     </div>
                     <div className="flex-1">
-                      <h3 className="font-semibold text-gray-900 group-hover:text-blue-600 transition text-lg">
+                      <h3 className="font-semibold text-gray-900 group-hover:text-amber-600 transition text-lg">
                         {ch.title}
                       </h3>
                     </div>
                   </div>
                   <svg
-                    className="w-5 h-5 text-gray-400 group-hover:text-blue-600 transition flex-shrink-0 ml-4"
+                    className="w-5 h-5 text-gray-400 group-hover:text-amber-600 transition flex-shrink-0 ml-4"
                     fill="none"
                     stroke="currentColor"
                     viewBox="0 0 24 24"
@@ -222,7 +222,7 @@ export default function PracticeChapterMode() {
     return (
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
         <StudentNav />
-        <div className="w-12 h-12 border-4 border-gray-300 border-t-blue-600 rounded-full animate-spin" />
+        <div className="w-12 h-12 border-4 border-gray-300 border-t-amber-500 rounded-full animate-spin" />
       </div>
     );
   }
@@ -239,26 +239,26 @@ export default function PracticeChapterMode() {
           {/* Header */}
           <div className="mb-8 flex justify-between items-center">
             <div>
-              <p className="text-xs font-semibold text-blue-600 uppercase tracking-wide mb-2">{paperTitle}</p>
+              <p className="text-xs font-semibold text-amber-600 uppercase tracking-wide mb-2">{paperTitle}</p>
               <h1 className="text-2xl font-bold text-gray-900">
                 Chapter {selectedChapter}
               </h1>
             </div>
             <div className="text-sm font-medium text-gray-600">
-              Question <span className="text-blue-600 font-bold">{progress}</span> of <span className="text-gray-900 font-bold">{questions.length}</span>
+              Question <span className="text-amber-600 font-bold">{progress}</span> of <span className="text-gray-900 font-bold">{questions.length}</span>
             </div>
           </div>
 
           {/* Progress bar */}
           <div className="w-full h-2 bg-gray-200 rounded-full mb-8 overflow-hidden">
             <div
-              className="h-full bg-blue-600 transition-all duration-300"
+              className="h-full bg-amber-500 transition-all duration-300"
               style={{ width: `${(progress / questions.length) * 100}%` }}
             />
           </div>
 
           {/* Question */}
-          <div className="bg-blue-50 border border-blue-200 rounded-xl p-6 mb-8">
+          <div className="bg-amber-50 border border-amber-200 rounded-xl p-6 mb-8">
             <p className="m-0 font-medium text-lg leading-relaxed text-gray-900">
               {currentQuestion.text}
             </p>
@@ -274,9 +274,9 @@ export default function PracticeChapterMode() {
             ].map((option) => (
               <label
                 key={option.key}
-                className={`flex items-center p-4 rounded-lg border-2 cursor-pointer transition ${
+                className={`flex items-center p-4 rounded-lg border-2 cursor-pointer transition duration-200 ${
                   selectedAnswer === option.key
-                    ? "bg-blue-50 border-blue-600"
+                    ? "bg-amber-50 border-amber-500"
                     : "bg-white border-gray-200 hover:border-gray-300"
                 } ${showingFeedback && selectedAnswer !== option.key ? "opacity-50" : "opacity-100"}`}
               >
@@ -307,7 +307,7 @@ export default function PracticeChapterMode() {
               <p className={`m-0 mb-4 font-bold text-lg ${
                 feedback.isCorrect ? "text-green-700" : "text-red-700"
               }`}>
-                {feedback.isCorrect ? "✓ Correct!" : "✗ Incorrect"}
+                {feedback.isCorrect ? "Correct!" : "Incorrect"}
               </p>
               
               {/* Your answer */}
@@ -357,9 +357,9 @@ export default function PracticeChapterMode() {
               <button
                 onClick={handleSubmitAnswer}
                 disabled={!selectedAnswer}
-                className={`flex-1 px-6 py-3 rounded-lg font-semibold transition ${
+                className={`flex-1 px-6 py-3 rounded-lg font-semibold transition duration-200 ${
                   selectedAnswer
-                    ? "bg-blue-600 hover:bg-blue-700 text-white"
+                    ? "bg-amber-500 hover:bg-amber-600 text-blue-900"
                     : "bg-gray-300 text-gray-500 cursor-not-allowed"
                 }`}
               >
@@ -368,7 +368,7 @@ export default function PracticeChapterMode() {
             ) : (
               <button
                 onClick={handleNext}
-                className="flex-1 px-6 py-3 bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-semibold transition"
+                className="flex-1 px-6 py-3 bg-amber-500 hover:bg-amber-600 text-blue-900 rounded-lg font-semibold transition duration-200"
               >
                 {currentQIndex < questions.length - 1 ? "Next Question" : "Back to Chapters"}
               </button>
@@ -380,10 +380,11 @@ export default function PracticeChapterMode() {
             style={{
               marginTop: "20px",
               padding: "12px",
-              backgroundColor: "#f0f9ff",
+              backgroundColor: "#fef3c7",
               borderRadius: "6px",
               textAlign: "center",
               fontSize: "14px",
+              color: "#92400e",
             }}
           >
             Correct so far: {score} / {answered}
