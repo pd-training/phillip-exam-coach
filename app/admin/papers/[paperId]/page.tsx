@@ -111,8 +111,10 @@ export default function PaperDetailPage() {
       // Fetch chapters
       try {
         const chaptersRes = await fetch(`/api/admin/papers/${paperId}/chapters`);
-        const chaptersData = await chaptersRes.json();
-        setChapters(chaptersData.chapters || []);
+        if (chaptersRes.ok) {
+          const chaptersData = await chaptersRes.json();
+          setChapters(Array.isArray(chaptersData) ? chaptersData : []);
+        }
       } catch (error) {
         console.error("Error fetching chapters:", error);
       }
