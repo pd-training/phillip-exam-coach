@@ -204,14 +204,8 @@ export async function POST(request: Request) {
   try {
     console.log('Initializing database tables...');
 
-    // Split the SQL into individual statements and execute them
-    const statements = initSQL.split(';').filter((stmt) => stmt.trim());
-
-    for (const statement of statements) {
-      if (statement.trim()) {
-        await prisma.$executeRawUnsafe(statement + ';');
-      }
-    }
+    // Execute the entire SQL as one query to preserve dollar-quoted strings
+    await prisma.$executeRawUnsafe(initSQL);
 
     console.log('Database initialization successful');
 
