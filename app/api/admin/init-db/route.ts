@@ -128,6 +128,76 @@ CREATE TABLE IF NOT EXISTS "QuestionPool" (
 
     CONSTRAINT "QuestionPool_pkey" PRIMARY KEY ("id")
 );
+
+-- StudentPaper table (for student paper access tracking)
+CREATE TABLE IF NOT EXISTS "StudentPaper" (
+    "id" TEXT NOT NULL,
+    "userId" TEXT NOT NULL,
+    "paperId" UUID NOT NULL,
+    "status" TEXT NOT NULL DEFAULT 'active',
+    "requestedAt" TIMESTAMP(3),
+    "approvedAt" TIMESTAMP(3),
+    "approvedBy" TEXT,
+    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+
+    CONSTRAINT "StudentPaper_pkey" PRIMARY KEY ("id")
+);
+
+CREATE UNIQUE INDEX IF NOT EXISTS "StudentPaper_userId_paperId_key" ON "StudentPaper"("userId", "paperId");
+CREATE INDEX IF NOT EXISTS "StudentPaper_userId_idx" ON "StudentPaper"("userId");
+CREATE INDEX IF NOT EXISTS "StudentPaper_status_idx" ON "StudentPaper"("status");
+
+DO \$\$ BEGIN
+  BEGIN
+    ALTER TABLE "StudentPaper"
+      ADD CONSTRAINT "StudentPaper_userId_fkey"
+      FOREIGN KEY ("userId") REFERENCES "User"("id")
+      ON DELETE CASCADE ON UPDATE CASCADE;
+  EXCEPTION WHEN duplicate_object THEN null;
+  END;
+  BEGIN
+    ALTER TABLE "StudentPaper"
+      ADD CONSTRAINT "StudentPaper_paperId_fkey"
+      FOREIGN KEY ("paperId") REFERENCES "Paper"("id")
+      ON DELETE CASCADE ON UPDATE CASCADE;
+  EXCEPTION WHEN duplicate_object THEN null;
+  END;
+END \$\$;
+
+-- PaperRequest table
+CREATE TABLE IF NOT EXISTS "PaperRequest" (
+    "id" TEXT NOT NULL,
+    "userId" TEXT NOT NULL,
+    "paperId" UUID NOT NULL,
+    "status" TEXT NOT NULL DEFAULT 'pending',
+    "rejectionReason" TEXT,
+    "requestedAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "reviewedAt" TIMESTAMP(3),
+    "reviewedBy" TEXT,
+    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+
+    CONSTRAINT "PaperRequest_pkey" PRIMARY KEY ("id")
+);
+
+CREATE INDEX IF NOT EXISTS "PaperRequest_userId_idx" ON "PaperRequest"("userId");
+CREATE INDEX IF NOT EXISTS "PaperRequest_status_idx" ON "PaperRequest"("status");
+
+DO \$\$ BEGIN
+  BEGIN
+    ALTER TABLE "PaperRequest"
+      ADD CONSTRAINT "PaperRequest_userId_fkey"
+      FOREIGN KEY ("userId") REFERENCES "User"("id")
+      ON DELETE CASCADE ON UPDATE CASCADE;
+  EXCEPTION WHEN duplicate_object THEN null;
+  END;
+  BEGIN
+    ALTER TABLE "PaperRequest"
+      ADD CONSTRAINT "PaperRequest_paperId_fkey"
+      FOREIGN KEY ("paperId") REFERENCES "Paper"("id")
+      ON DELETE CASCADE ON UPDATE CASCADE;
+  EXCEPTION WHEN duplicate_object THEN null;
+  END;
+END \$\$;
 `;
 
 export async function POST(request: Request) {
