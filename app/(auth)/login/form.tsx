@@ -119,8 +119,8 @@ export function LoginForm() {
                 transition: "border-color 0.2s",
               }}
               onFocus={(e) => {
-                e.currentTarget.style.borderColor = "#3b82f6";
-                e.currentTarget.style.outline = "2px solid rgba(59, 130, 246, 0.1)";
+                e.currentTarget.style.borderColor = "#f59e0b";
+                e.currentTarget.style.outline = "2px solid rgba(245, 158, 11, 0.1)";
               }}
               onBlur={(e) => {
                 e.currentTarget.style.borderColor = "#d1d5db";
@@ -156,8 +156,8 @@ export function LoginForm() {
                 transition: "border-color 0.2s",
               }}
               onFocus={(e) => {
-                e.currentTarget.style.borderColor = "#3b82f6";
-                e.currentTarget.style.outline = "2px solid rgba(59, 130, 246, 0.1)";
+                e.currentTarget.style.borderColor = "#f59e0b";
+                e.currentTarget.style.outline = "2px solid rgba(245, 158, 11, 0.1)";
               }}
               onBlur={(e) => {
                 e.currentTarget.style.borderColor = "#d1d5db";
@@ -173,8 +173,8 @@ export function LoginForm() {
             style={{
               width: "100%",
               padding: "12px 16px",
-              backgroundColor: loading ? "#9ca3af" : "#2563eb",
-              color: "white",
+              backgroundColor: loading ? "#9ca3af" : "#f59e0b",
+              color: loading ? "white" : "#1f2937",
               border: "none",
               borderRadius: "8px",
               fontSize: "16px",
@@ -183,10 +183,10 @@ export function LoginForm() {
               transition: "background-color 0.2s",
             }}
             onMouseEnter={(e) => {
-              if (!loading) (e.currentTarget as HTMLButtonElement).style.backgroundColor = "#1d4ed8";
+              if (!loading) (e.currentTarget as HTMLButtonElement).style.backgroundColor = "#d97706";
             }}
             onMouseLeave={(e) => {
-              if (!loading) (e.currentTarget as HTMLButtonElement).style.backgroundColor = "#2563eb";
+              if (!loading) (e.currentTarget as HTMLButtonElement).style.backgroundColor = "#f59e0b";
             }}
           >
             {loading ? "Signing in..." : "Sign In"}
@@ -202,7 +202,7 @@ export function LoginForm() {
         }}>
           Don't have an account?{" "}
           <Link href="/signup" style={{
-            color: "#2563eb",
+            color: "#f59e0b",
             textDecoration: "none",
             fontWeight: "600",
             cursor: "pointer",
@@ -223,7 +223,7 @@ export function LoginForm() {
             cursor: "pointer",
           }}
             onMouseEnter={(e) => {
-              e.currentTarget.style.color = "#2563eb";
+              e.currentTarget.style.color = "#f59e0b";
             }}
             onMouseLeave={(e) => {
               e.currentTarget.style.color = "#6b7280";
