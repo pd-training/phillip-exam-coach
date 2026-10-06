@@ -1,85 +1,47 @@
 import { Suspense } from "react";
+import Link from "next/link";
 import { LoginForm } from "./form";
 
 export default function LoginPage() {
   return (
-    <div style={{
-      minHeight: "100vh",
-      display: "flex",
-      alignItems: "center",
-      justifyContent: "center",
-      background: "linear-gradient(135deg, #667eea 0%, #764ba2 100%)",
-      padding: "20px",
-    }}>
-      <div style={{
-        width: "100%",
-        maxWidth: "1200px",
-        backgroundColor: "white",
-        borderRadius: "16px",
-        overflow: "hidden",
-        boxShadow: "0 20px 60px rgba(0, 0, 0, 0.15)",
-      }}>
-        <div style={{
-          display: "grid",
-          gridTemplateColumns: "1fr 1fr",
-          minHeight: "600px",
-        }}>
+    <div className="min-h-screen bg-gradient-to-br from-slate-50 to-blue-50 flex items-center justify-center p-5">
+      {/* Sticky Header */}
+      <div className="fixed top-0 left-0 right-0 z-50 bg-white/95 backdrop-blur-sm border-b border-gray-200 shadow-sm">
+        <div className="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between">
+          <Link href="/" className="flex items-center gap-2 hover:opacity-80 transition">
+            <div className="w-8 h-8 bg-gradient-to-br from-blue-600 to-blue-700 rounded-lg flex items-center justify-center">
+              <span className="text-white font-bold text-lg">📊</span>
+            </div>
+            <span className="font-bold text-xl text-gray-900">Finance Ready</span>
+          </Link>
+          <Link href="/">
+            <button className="text-gray-600 hover:text-gray-900 font-medium transition">
+              ← Back to Home
+            </button>
+          </Link>
+        </div>
+      </div>
+
+      <div className="w-full max-w-5xl mt-20">
+        <div className="grid md:grid-cols-2 gap-0 bg-white rounded-2xl shadow-xl overflow-hidden border border-gray-200">
           {/* Left Panel - Illustration */}
-          <div style={{
-            background: "linear-gradient(135deg, #667eea 0%, #764ba2 100%)",
-            padding: "60px 40px",
-            display: "flex",
-            flexDirection: "column",
-            justifyContent: "center",
-            alignItems: "center",
-            color: "white",
-          }}>
-            <div style={{
-              textAlign: "center",
-            }}>
-              <div style={{
-                fontSize: "100px",
-                marginBottom: "24px",
-                lineHeight: "1",
-              }}>
-                🎓
-              </div>
-              <h2 style={{
-                fontSize: "32px",
-                fontWeight: "bold",
-                margin: "0 0 16px 0",
-              }}>
-                Master Your CMFAS
-              </h2>
-              <p style={{
-                fontSize: "16px",
-                lineHeight: "1.6",
-                margin: "0 0 40px 0",
-                opacity: "0.95",
-              }}>
-                AI-powered exam prep tool
-              </p>
+          <div className="hidden md:flex bg-gradient-to-br from-blue-600 to-blue-700 p-12 flex-col justify-center items-center text-white">
+            <div className="text-center">
+              <div className="text-8xl mb-6 leading-none">🎓</div>
+              <h2 className="text-4xl font-bold mb-4">Master Your CMFAS</h2>
+              <p className="text-blue-100 mb-8 text-lg">AI-powered exam prep tool</p>
 
               {/* Feature List */}
-              <div style={{
-                textAlign: "left",
-                display: "inline-block",
-              }}>
+              <div className="space-y-4 text-left inline-block">
                 {[
                   { icon: "🤖", text: "Intelligent AI Coaching" },
                   { icon: "📊", text: "Real-time Progress Tracking" },
                   { icon: "✨", text: "Personalized Study Plans" },
                   { icon: "⚡", text: "Instant Practice Questions" },
                 ].map((feature, idx) => (
-                  <div key={idx} style={{
-                    display: "flex",
-                    alignItems: "center",
-                    gap: "12px",
-                    marginBottom: "16px",
-                    fontSize: "15px",
-                  }}>
-                    <span style={{ fontSize: "20px" }}>{feature.icon}</span>
-                    <span>{feature.text}</span>
+                  <div key={idx} className="flex items-center gap-3 text-blue-50">
+                    <span className="text-2xl">{feature.icon}</span>
+                    <span className="text-base">{feature.text}</span>
                   </div>
                 ))}
               </div>
@@ -87,19 +49,9 @@ export default function LoginPage() {
           </div>
 
           {/* Right Panel - Form */}
-          <div style={{
-            padding: "60px 40px",
-            display: "flex",
-            flexDirection: "column",
-            justifyContent: "center",
-          }}>
+          <div className="p-8 md:p-12 flex flex-col justify-center">
             <Suspense fallback={
-              <div style={{
-                textAlign: "center",
-                color: "#6b7280",
-              }}>
-                Loading...
-              </div>
+              <div className="text-center text-gray-600">Loading...</div>
             }>
               <LoginForm />
             </Suspense>

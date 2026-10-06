@@ -3,6 +3,7 @@
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
+import { Suspense } from "react";
 
 interface Paper {
   id: string;
@@ -128,83 +129,44 @@ export default function SignupPage() {
   };
 
   return (
-    <div style={{
-      minHeight: "100vh",
-      display: "flex",
-      alignItems: "center",
-      justifyContent: "center",
-      background: "linear-gradient(135deg, #667eea 0%, #764ba2 100%)",
-      padding: "20px",
-    }}>
-      <div style={{
-        width: "100%",
-        maxWidth: "1200px",
-        backgroundColor: "white",
-        borderRadius: "16px",
-        overflow: "hidden",
-        boxShadow: "0 20px 60px rgba(0, 0, 0, 0.15)",
-      }}>
-        <div style={{
-          display: "grid",
-          gridTemplateColumns: "1fr 1fr",
-          minHeight: "600px",
-        }}>
+    <div className="min-h-screen bg-gradient-to-br from-slate-50 to-blue-50 flex items-center justify-center p-5">
+      {/* Sticky Header */}
+      <div className="fixed top-0 left-0 right-0 z-50 bg-white/95 backdrop-blur-sm border-b border-gray-200 shadow-sm">
+        <div className="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between">
+          <Link href="/" className="flex items-center gap-2 hover:opacity-80 transition">
+            <div className="w-8 h-8 bg-gradient-to-br from-blue-600 to-blue-700 rounded-lg flex items-center justify-center">
+              <span className="text-white font-bold text-lg">📊</span>
+            </div>
+            <span className="font-bold text-xl text-gray-900">Finance Ready</span>
+          </Link>
+          <Link href="/">
+            <button className="text-gray-600 hover:text-gray-900 font-medium transition">
+              ← Back to Home
+            </button>
+          </Link>
+        </div>
+      </div>
+
+      <div className="w-full max-w-5xl mt-20">
+        <div className="grid md:grid-cols-2 gap-0 bg-white rounded-2xl shadow-xl overflow-hidden border border-gray-200">
           {/* Left Panel - Illustration */}
-          <div style={{
-            background: "linear-gradient(135deg, #667eea 0%, #764ba2 100%)",
-            padding: "60px 40px",
-            display: "flex",
-            flexDirection: "column",
-            justifyContent: "center",
-            alignItems: "center",
-            color: "white",
-          }}>
-            <div style={{
-              textAlign: "center",
-            }}>
-              <div style={{
-                fontSize: "100px",
-                marginBottom: "24px",
-                lineHeight: "1",
-              }}>
-                🚀
-              </div>
-              <h2 style={{
-                fontSize: "32px",
-                fontWeight: "bold",
-                margin: "0 0 16px 0",
-              }}>
-                Start Your Journey
-              </h2>
-              <p style={{
-                fontSize: "16px",
-                lineHeight: "1.6",
-                margin: "0 0 40px 0",
-                opacity: "0.95",
-              }}>
-                Join thousands preparing with AI-powered exam coaching
-              </p>
+          <div className="hidden md:flex bg-gradient-to-br from-blue-600 to-blue-700 p-12 flex-col justify-center items-center text-white">
+            <div className="text-center">
+              <div className="text-8xl mb-6 leading-none">🚀</div>
+              <h2 className="text-4xl font-bold mb-4">Start Your Journey</h2>
+              <p className="text-blue-100 mb-8 text-lg">Join thousands preparing with AI-powered exam coaching</p>
 
               {/* Feature List */}
-              <div style={{
-                textAlign: "left",
-                display: "inline-block",
-              }}>
+              <div className="space-y-4 text-left inline-block">
                 {[
                   { icon: "🎯", text: "Ace Your CMFAS Exam" },
                   { icon: "📈", text: "Track Your Progress" },
                   { icon: "⚡", text: "Study Smarter" },
                   { icon: "🏆", text: "Achieve Success" },
                 ].map((feature, idx) => (
-                  <div key={idx} style={{
-                    display: "flex",
-                    alignItems: "center",
-                    gap: "12px",
-                    marginBottom: "16px",
-                    fontSize: "15px",
-                  }}>
-                    <span style={{ fontSize: "20px" }}>{feature.icon}</span>
-                    <span>{feature.text}</span>
+                  <div key={idx} className="flex items-center gap-3 text-blue-50">
+                    <span className="text-2xl">{feature.icon}</span>
+                    <span className="text-base">{feature.text}</span>
                   </div>
                 ))}
               </div>
@@ -212,224 +174,77 @@ export default function SignupPage() {
           </div>
 
           {/* Right Panel - Form */}
-          <div style={{
-            padding: "60px 40px",
-            display: "flex",
-            flexDirection: "column",
-            justifyContent: "center",
-          }}>
+          <div className="p-8 md:p-12 flex flex-col justify-center">
             {/* Error Message */}
             {error && (
-              <div style={{
-                backgroundColor: "#fee2e2",
-                border: "1px solid #fecaca",
-                color: "#991b1b",
-                padding: "12px 16px",
-                borderRadius: "8px",
-                marginBottom: "20px",
-                fontSize: "14px",
-                fontWeight: "500",
-              }}>
+              <div className="bg-red-50 border border-red-200 text-red-800 px-4 py-3 rounded-lg mb-6 text-sm font-medium">
                 ❌ {error}
               </div>
             )}
 
             {/* Form */}
             <form onSubmit={handleSubmit}>
-              <h3 style={{
-                fontSize: "20px",
-                fontWeight: "600",
-                color: "#1f2937",
-                margin: "0 0 24px 0",
-              }}>
-                Create Account
-              </h3>
+              <h3 className="text-2xl font-bold text-gray-900 mb-6">Create Account</h3>
 
               {/* Name Input */}
-              <div style={{ marginBottom: "20px" }}>
-                <label style={{
-                  display: "block",
-                  marginBottom: "8px",
-                  fontSize: "14px",
-                  fontWeight: "600",
-                  color: "#1f2937",
-                }}>
-                  Full Name
-                </label>
+              <div className="mb-4">
+                <label className="block text-sm font-semibold text-gray-900 mb-2">Full Name</label>
                 <input
                   type="text"
                   name="name"
                   value={formData.name}
                   onChange={handleChange}
                   placeholder="John Doe"
-                  style={{
-                    width: "100%",
-                    padding: "11px 13px",
-                    border: "1px solid #d1d5db",
-                    borderRadius: "8px",
-                    fontSize: "14px",
-                    fontFamily: "inherit",
-                    boxSizing: "border-box",
-                    transition: "border-color 0.2s",
-                  }}
-                  onFocus={(e) => {
-                    e.currentTarget.style.borderColor = "#3b82f6";
-                    e.currentTarget.style.outline = "2px solid rgba(59, 130, 246, 0.1)";
-                  }}
-                  onBlur={(e) => {
-                    e.currentTarget.style.borderColor = "#d1d5db";
-                    e.currentTarget.style.outline = "none";
-                  }}
+                  className="w-full px-4 py-2 border border-gray-300 rounded-lg text-gray-900 placeholder-gray-500 focus:border-blue-600 focus:outline-none focus:ring-1 focus:ring-blue-600 transition"
                 />
               </div>
 
               {/* Email Input */}
-              <div style={{ marginBottom: "20px" }}>
-                <label style={{
-                  display: "block",
-                  marginBottom: "8px",
-                  fontSize: "14px",
-                  fontWeight: "600",
-                  color: "#1f2937",
-                }}>
-                  Email Address
-                </label>
+              <div className="mb-4">
+                <label className="block text-sm font-semibold text-gray-900 mb-2">Email Address</label>
                 <input
                   type="email"
                   name="email"
                   value={formData.email}
                   onChange={handleChange}
                   placeholder="you@example.com"
-                  style={{
-                    width: "100%",
-                    padding: "11px 13px",
-                    border: "1px solid #d1d5db",
-                    borderRadius: "8px",
-                    fontSize: "14px",
-                    fontFamily: "inherit",
-                    boxSizing: "border-box",
-                    transition: "border-color 0.2s",
-                  }}
-                  onFocus={(e) => {
-                    e.currentTarget.style.borderColor = "#3b82f6";
-                    e.currentTarget.style.outline = "2px solid rgba(59, 130, 246, 0.1)";
-                  }}
-                  onBlur={(e) => {
-                    e.currentTarget.style.borderColor = "#d1d5db";
-                    e.currentTarget.style.outline = "none";
-                  }}
+                  className="w-full px-4 py-2 border border-gray-300 rounded-lg text-gray-900 placeholder-gray-500 focus:border-blue-600 focus:outline-none focus:ring-1 focus:ring-blue-600 transition"
                 />
               </div>
 
               {/* Password Input */}
-              <div style={{ marginBottom: "20px" }}>
-                <label style={{
-                  display: "block",
-                  marginBottom: "8px",
-                  fontSize: "14px",
-                  fontWeight: "600",
-                  color: "#1f2937",
-                }}>
-                  Password
-                </label>
+              <div className="mb-4">
+                <label className="block text-sm font-semibold text-gray-900 mb-2">Password</label>
                 <input
                   type="password"
                   name="password"
                   value={formData.password}
                   onChange={handleChange}
                   placeholder="••••••••"
-                  style={{
-                    width: "100%",
-                    padding: "11px 13px",
-                    border: "1px solid #d1d5db",
-                    borderRadius: "8px",
-                    fontSize: "14px",
-                    fontFamily: "inherit",
-                    boxSizing: "border-box",
-                    transition: "border-color 0.2s",
-                  }}
-                  onFocus={(e) => {
-                    e.currentTarget.style.borderColor = "#3b82f6";
-                    e.currentTarget.style.outline = "2px solid rgba(59, 130, 246, 0.1)";
-                  }}
-                  onBlur={(e) => {
-                    e.currentTarget.style.borderColor = "#d1d5db";
-                    e.currentTarget.style.outline = "none";
-                  }}
+                  className="w-full px-4 py-2 border border-gray-300 rounded-lg text-gray-900 placeholder-gray-500 focus:border-blue-600 focus:outline-none focus:ring-1 focus:ring-blue-600 transition"
                 />
               </div>
 
               {/* Confirm Password Input */}
-              <div style={{ marginBottom: "24px" }}>
-                <label style={{
-                  display: "block",
-                  marginBottom: "8px",
-                  fontSize: "14px",
-                  fontWeight: "600",
-                  color: "#1f2937",
-                }}>
-                  Confirm Password
-                </label>
+              <div className="mb-6">
+                <label className="block text-sm font-semibold text-gray-900 mb-2">Confirm Password</label>
                 <input
                   type="password"
                   name="confirmPassword"
                   value={formData.confirmPassword}
                   onChange={handleChange}
                   placeholder="••••••••"
-                  style={{
-                    width: "100%",
-                    padding: "11px 13px",
-                    border: "1px solid #d1d5db",
-                    borderRadius: "8px",
-                    fontSize: "14px",
-                    fontFamily: "inherit",
-                    boxSizing: "border-box",
-                    transition: "border-color 0.2s",
-                  }}
-                  onFocus={(e) => {
-                    e.currentTarget.style.borderColor = "#3b82f6";
-                    e.currentTarget.style.outline = "2px solid rgba(59, 130, 246, 0.1)";
-                  }}
-                  onBlur={(e) => {
-                    e.currentTarget.style.borderColor = "#d1d5db";
-                    e.currentTarget.style.outline = "none";
-                  }}
+                  className="w-full px-4 py-2 border border-gray-300 rounded-lg text-gray-900 placeholder-gray-500 focus:border-blue-600 focus:outline-none focus:ring-1 focus:ring-blue-600 transition"
                 />
               </div>
 
               {/* Paper Selection */}
-              <div style={{ marginBottom: "24px" }}>
-                <label style={{
-                  display: "block",
-                  marginBottom: "8px",
-                  fontSize: "14px",
-                  fontWeight: "600",
-                  color: "#1f2937",
-                }}>
-                  Select Exam Paper
-                </label>
+              <div className="mb-6">
+                <label className="block text-sm font-semibold text-gray-900 mb-2">Select Exam Paper</label>
                 <select
                   value={selectedPaper}
                   onChange={(e) => setSelectedPaper(e.target.value)}
-                  style={{
-                    width: "100%",
-                    padding: "11px 13px",
-                    border: "1px solid #d1d5db",
-                    borderRadius: "8px",
-                    fontSize: "14px",
-                    fontFamily: "inherit",
-                    boxSizing: "border-box",
-                    transition: "border-color 0.2s",
-                    cursor: "pointer",
-                  }}
-                  onFocus={(e) => {
-                    e.currentTarget.style.borderColor = "#3b82f6";
-                    e.currentTarget.style.outline = "2px solid rgba(59, 130, 246, 0.1)";
-                  }}
-                  onBlur={(e) => {
-                    e.currentTarget.style.borderColor = "#d1d5db";
-                    e.currentTarget.style.outline = "none";
-                  }}
+                  className="w-full px-4 py-2 border border-gray-300 rounded-lg text-gray-900 focus:border-blue-600 focus:outline-none focus:ring-1 focus:ring-blue-600 transition cursor-pointer"
                 >
                   <option value="">-- Select a paper --</option>
                   {papers.map((paper) => (
@@ -444,72 +259,18 @@ export default function SignupPage() {
               <button
                 type="submit"
                 disabled={loading}
-                style={{
-                  width: "100%",
-                  padding: "12px 16px",
-                  backgroundColor: loading ? "#9ca3af" : "#2563eb",
-                  color: "white",
-                  border: "none",
-                  borderRadius: "8px",
-                  fontSize: "16px",
-                  fontWeight: "600",
-                  cursor: loading ? "not-allowed" : "pointer",
-                  transition: "background-color 0.2s",
-                }}
-                onMouseEnter={(e) => {
-                  if (!loading) (e.currentTarget as HTMLButtonElement).style.backgroundColor = "#1d4ed8";
-                }}
-                onMouseLeave={(e) => {
-                  if (!loading) (e.currentTarget as HTMLButtonElement).style.backgroundColor = "#2563eb";
-                }}
+                className="w-full bg-gradient-to-r from-blue-600 to-blue-700 text-white font-semibold py-3 rounded-lg hover:from-blue-700 hover:to-blue-800 transition-all duration-300 transform hover:scale-105 active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 {loading ? "Creating Account..." : "Create Account"}
               </button>
             </form>
 
             {/* Login Link */}
-            <div style={{
-              textAlign: "center",
-              marginTop: "24px",
-              color: "#6b7280",
-              fontSize: "14px",
-            }}>
+            <div className="text-center mt-6 text-sm text-gray-600">
               Already have an account?{" "}
-              <Link href="/login" style={{
-                color: "#2563eb",
-                textDecoration: "none",
-                fontWeight: "600",
-                cursor: "pointer",
-              }}>
+              <Link href="/login" className="text-blue-600 font-semibold hover:text-blue-700 transition">
                 Login here
               </Link>
-            </div>
-
-            {/* Back to Home */}
-            <div style={{
-              textAlign: "center",
-              marginTop: "20px",
-            }}>
-              <div style={{
-                color: "#6b7280",
-                fontSize: "14px",
-                transition: "color 0.2s",
-                cursor: "pointer",
-              }}
-                onMouseEnter={(e) => {
-                  e.currentTarget.style.color = "#2563eb";
-                }}
-                onMouseLeave={(e) => {
-                  e.currentTarget.style.color = "#6b7280";
-                }}
-              >
-                <Link href="/" style={{
-                  color: "inherit",
-                  textDecoration: "none",
-                }}>
-                  ← Back to Home
-                </Link>
-              </div>
             </div>
           </div>
         </div>
