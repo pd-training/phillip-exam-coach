@@ -21,6 +21,7 @@ export default function AllAttemptsPage() {
   const { data: session, status } = useSession();
   const [attempts, setAttempts] = useState<Attempt[]>([]);
   const [loading, setLoading] = useState(true);
+  const [selectedPaper, setSelectedPaper] = useState("");
 
   useEffect(() => {
     if (status === "unauthenticated") {
@@ -80,6 +81,36 @@ export default function AllAttemptsPage() {
 
       {/* Main Content */}
       <div className="max-w-7xl mx-auto px-6 py-12 flex-1 w-full">
+        {/* Filter Section */}
+        {attempts.length > 0 && (
+          <div className="mb-8 bg-white p-6 rounded-lg border border-gray-200">
+            <label className="block text-sm font-semibold text-gray-900 mb-3">
+              Filter by Paper
+            </label>
+            <select
+              value={selectedPaper}
+              onChange={(e) => setSelectedPaper(e.target.value)}
+              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+            >
+              <option value="">All Papers ({attempts.length})</option>
+              {Array.from(
+                attempts.reduce((map, attempt) => {
+                  const count = (map.get(attempt.paperid) || 0) + 1;
+                  map.set(attempt.paperid, count);
+                  return map;
+                }, new Map<string, number>())
+              ).map(([paperId, count]) => {
+                const paperTitle = attempts.find((a) => a.paperid === paperId)?.paperTitle || paperId;
+                return (
+                  <option key={paperId} value={paperId}>
+                    {paperTitle} ({count})
+                  </option>
+                );
+              })}
+            </select>
+          </div>
+        )}
+
         {attempts.length === 0 ? (
           <div className="bg-white rounded-xl p-12 border border-gray-200 text-center">
             <div className="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
@@ -108,8 +139,25 @@ export default function AllAttemptsPage() {
             </Link>
           </div>
         ) : (
-          <div className="space-y-3">
-            {attempts.map((attempt) => (
+          <>
+            {(() => {
+              const filteredAttempts =
+                selectedPaper === ""
+                  ? attempts
+                  : attempts.filter((attempt) => attempt.paperid === selectedPaper);
+
+              return (
+                <>
+                  <div className="mb-4 text-sm text-gray-600">
+                    Showing {filteredAttempts.length} of {attempts.length} attempts
+                  </div>
+                  <div className="space-y-3">
+                    {filteredAttempts.length === 0 ? (
+                      <div className="bg-white rounded-lg p-8 border border-gray-200 text-center">
+                        <p className="text-gray-600">No attempts found for this paper</p>
+                      </div>
+                    ) : (
+                      filteredAttempts.map((attempt) => (
               <Link key={attempt.id} href={`/exam/attempts/${attempt.id}`}>
                 <div className="bg-white rounded-lg p-4 border border-gray-200 hover:border-blue-300 hover:shadow-md transition duration-300 cursor-pointer group">
                   <div className="flex items-center justify-between">
@@ -170,9 +218,14 @@ export default function AllAttemptsPage() {
                     </div>
                   </div>
                 </div>
-              </Link>
-            ))}
-          </div>
+                      </Link>
+                      ))
+                    )}
+                  </div>
+                </>
+              );
+            })()}
+          </>
         )}
       </div>
     </div>
