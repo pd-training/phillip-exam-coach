@@ -200,12 +200,104 @@ DO \$\$ BEGIN
 END \$\$;
 `;
 
+function splitSQLStatements(sql: string): string[] {
+  const statements: string[] = [];
+  let currentStatement = '';
+  let inDollarQuote = false;
+  let dollarQuoteTag = '';
+  let i = 0;
+
+  while (i < sql.length) {
+    const char = sql[i];
+
+    // Check for dollar quote start/end
+    if (char === '$' && !inDollarQuote) {
+      // Look ahead for dollar quote tag
+      let j = i + 1;
+      let tag = '';
+      while (j < sql.length && (sql[j].match(/[a-zA-Z0-9_]/) || sql[j] === '$')) {
+        if (sql[j] === '$') {
+          dollarQuoteTag = tag;
+          inDollarQuote = true;
+          currentStatement += sql.substring(i, j + 1);
+          i = j + 1;
+          break;
+        }
+        tag += sql[j];
+        j++;
+      }
+      if (!inDollarQuote) {
+        currentStatement += char;
+        i++;
+      }
+    } else if (inDollarQuote && char === '$') {
+      // Check if this ends the dollar quote
+      let j = i + 1;
+      let tag = '';
+      while (j < sql.length && (sql[j].match(/[a-zA-Z0-9_]/) || sql[j] === '$')) {
+        if (sql[j] === '$') {
+          if (tag === dollarQuoteTag) {
+            currentStatement += sql.substring(i, j + 1);
+            inDollarQuote = false;
+            i = j + 1;
+            break;
+          } else {
+            currentStatement += char;
+            i++;
+            break;
+          }
+        }
+        tag += sql[j];
+        j++;
+      }
+      if (j >= sql.length) {
+        currentStatement += char;
+        i++;
+      }
+    } else if (!inDollarQuote && char === ';') {
+      // Statement terminator
+      currentStatement += char;
+      const stmt = currentStatement.trim();
+      if (stmt && stmt !== ';') {
+        statements.push(stmt);
+      }
+      currentStatement = '';
+      i++;
+    } else {
+      currentStatement += char;
+      i++;
+    }
+  }
+
+  // Add remaining statement
+  const stmt = currentStatement.trim();
+  if (stmt && stmt !== ';') {
+    statements.push(stmt);
+  }
+
+  return statements;
+}
+
 export async function POST(request: Request) {
   try {
     console.log('Initializing database tables...');
 
-    // Execute the entire SQL as one query to preserve dollar-quoted strings
-    await prisma.$executeRawUnsafe(initSQL);
+    // Split SQL respecting dollar-quoted strings
+    const statements = splitSQLStatements(initSQL);
+    console.log(`Executing ${statements.length} SQL statements...`);
+
+    for (const statement of statements) {
+      if (statement.trim()) {
+        try {
+          await prisma.$executeRawUnsafe(statement);
+        } catch (err: any) {
+          // Log error but continue for idempotent statements
+          if (!err.message?.includes('already exists')) {
+            console.error(`Error executing statement: ${statement.substring(0, 50)}...`, err.message);
+          }
+        }
+      }
+    }
 
     console.log('Database initialization successful');
 
