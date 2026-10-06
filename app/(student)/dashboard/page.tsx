@@ -34,6 +34,7 @@ export default function StudentDashboard() {
     passCount: 0,
   });
   const [loading, setLoading] = useState(true);
+  const [selectedPaper, setSelectedPaper] = useState<string>("all");
 
   // Handle auth redirects
   useEffect(() => {
@@ -188,27 +189,67 @@ export default function StudentDashboard() {
         </div>
 
         {/* Score Trend Chart */}
-        {attempts.length > 0 && (
+        {attempts.length > 0 && (() => {
+          // Get unique papers for filter
+          const uniquePapers = Array.from(
+            new Map(
+              attempts.map((a) => [a.paperid, a.paperTitle])
+            ).entries()
+          ).map(([id, title]) => ({ id, title }));
+
+          // Filter attempts by selected paper
+          const filteredAttempts = selectedPaper === "all"
+            ? attempts
+            : attempts.filter((a) => a.paperTitle === selectedPaper);
+
+          const chartData = [...filteredAttempts].reverse().map((attempt, index) => {
+            const attemptDate = new Date(attempt.submittedat);
+            const score = attempt.score ? Math.max(0, Math.min(100, Math.round(attempt.score))) : 0;
+            return {
+              id: attempt.id,
+              attemptNumber: index + 1,
+              paper: attempt.paperTitle || "Unknown Paper",
+              date: attemptDate.toLocaleDateString("en-US", { month: "short", day: "numeric" }),
+              time: attemptDate.toLocaleTimeString("en-US", { hour: "2-digit", minute: "2-digit" }),
+              score: score,
+              passed: attempt.result === "Pass" ? "✓" : "✗",
+              displayLabel: `${attemptDate.toLocaleDateString("en-US", { month: "short", day: "numeric" })} - ${attempt.paperTitle}`
+            };
+          });
+
+          return (
           <div className="bg-white rounded-lg border border-gray-200 p-6 mb-12">
-            <h2 className="text-2xl font-bold text-gray-900 mb-1">Score Trend</h2>
-            <p className="text-gray-600 text-sm mb-1">Your exam performance across all papers</p>
+            <div className="flex items-center justify-between mb-6">
+              <div>
+                <h2 className="text-2xl font-bold text-gray-900 mb-1">Score Trend</h2>
+                <p className="text-gray-600 text-sm">
+                  {selectedPaper === "all"
+                    ? "Your exam performance across all papers"
+                    : `Performance on ${selectedPaper}`}
+                </p>
+              </div>
+              <div className="w-64">
+                <select
+                  value={selectedPaper}
+                  onChange={(e) => setSelectedPaper(e.target.value)}
+                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm"
+                >
+                  <option value="all">All Papers ({attempts.length})</option>
+                  {uniquePapers.map((paper) => {
+                    const count = attempts.filter((a) => a.paperTitle === paper.title).length;
+                    return (
+                      <option key={paper.id} value={paper.title}>
+                        {paper.title} ({count})
+                      </option>
+                    );
+                  })}
+                </select>
+              </div>
+            </div>
             <p className="text-gray-500 text-xs mb-6">Attempts are numbered chronologically (1 = oldest, N = newest). Hover over each point to see paper name and timestamp.</p>
             <div style={{ width: "100%", height: 300 }}>
               <ResponsiveContainer width="100%" height="100%">
-                <LineChart data={[...attempts].reverse().map((attempt, index) => {
-                  const attemptDate = new Date(attempt.submittedat);
-                  const score = attempt.score ? Math.max(0, Math.min(100, Math.round(attempt.score))) : 0;
-                  return {
-                    id: attempt.id,
-                    attemptNumber: index + 1,
-                    paper: attempt.paperTitle || "Unknown Paper",
-                    date: attemptDate.toLocaleDateString("en-US", { month: "short", day: "numeric" }),
-                    time: attemptDate.toLocaleTimeString("en-US", { hour: "2-digit", minute: "2-digit" }),
-                    score: score,
-                    passed: attempt.result === "Pass" ? "✓" : "✗",
-                    displayLabel: `${attemptDate.toLocaleDateString("en-US", { month: "short", day: "numeric" })} - ${attempt.paperTitle}`
-                  };
-                })}>
+                <LineChart data={chartData}>
                   <CartesianGrid strokeDasharray="3 3" />
                   <XAxis 
                     dataKey="attemptNumber"
@@ -257,7 +298,8 @@ export default function StudentDashboard() {
               </ResponsiveContainer>
             </div>
           </div>
-        )}
+          );
+        })()}
 
         {/* Recent Exam Attempts Section */}
         <div className="mb-12">
