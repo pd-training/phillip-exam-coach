@@ -274,7 +274,7 @@ export default function AdminDashboard() {
                 {attempts.length > 5 && (
                   <Link href="/admin/attempts">
                     <button className="text-blue-600 hover:text-blue-700 font-medium text-sm">
-                      View all {attempts.length} attempts →
+                      View all attempts →
                     </button>
                   </Link>
                 )}
