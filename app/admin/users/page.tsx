@@ -35,6 +35,7 @@ export default function UserManagement() {
   const [success, setSuccess] = useState<string | null>(null);
   const [deleteUserId, setDeleteUserId] = useState<string | null>(null);
   const [confirmDeleteName, setConfirmDeleteName] = useState("");
+  const [suspendingUserId, setSuspendingUserId] = useState<string | null>(null);
 
   // Auth check
   useEffect(() => {
@@ -119,7 +120,7 @@ export default function UserManagement() {
 
   const handleDeleteUser = async () => {
     setError(null);
-    
+
     if (!deleteUserId || !confirmDeleteName.trim()) {
       setError("Please type the user name to confirm deletion");
       return;
@@ -156,6 +157,35 @@ export default function UserManagement() {
       console.error("Delete error:", error);
     } finally {
       setSubmitting(false);
+    }
+  };
+
+  const handleSuspendUser = async (userId: string, currentActive: boolean) => {
+    setSuspendingUserId(userId);
+    setError(null);
+
+    try {
+      const newActiveStatus = !currentActive;
+      const res = await fetch("/api/admin/suspend-user", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ userId, active: newActiveStatus }),
+      });
+
+      const data = await res.json();
+
+      if (res.ok) {
+        setSuccess(data.message || `User ${newActiveStatus ? "activated" : "suspended"} successfully`);
+        await fetchUsers();
+        setTimeout(() => setSuccess(null), 3000);
+      } else {
+        setError(data.error || "Failed to update user status");
+      }
+    } catch (error: any) {
+      setError(error?.message || "An error occurred while updating user status");
+      console.error("Suspend error:", error);
+    } finally {
+      setSuspendingUserId(null);
     }
   };
 
@@ -291,32 +321,63 @@ export default function UserManagement() {
                         Admin created
                       </td>
                       <td style={{ padding: "16px", textAlign: "center" }}>
-                        <button
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            setDeleteUserId(user.id);
-                            setError(null);
-                          }}
-                          style={{
-                            padding: "6px 12px",
-                            backgroundColor: "#ef4444",
-                            color: "white",
-                            border: "none",
-                            borderRadius: "4px",
-                            fontSize: "12px",
-                            fontWeight: "600",
-                            cursor: "pointer",
-                            transition: "background-color 0.2s",
-                          }}
-                          onMouseEnter={(e) => {
-                            e.currentTarget.style.backgroundColor = "#dc2626";
-                          }}
-                          onMouseLeave={(e) => {
-                            e.currentTarget.style.backgroundColor = "#ef4444";
-                          }}
-                        >
-                          Delete
-                        </button>
+                        <div style={{ display: "flex", gap: "8px", justifyContent: "center", flexWrap: "wrap" }}>
+                          <button
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              handleSuspendUser(user.id, user.active);
+                            }}
+                            disabled={suspendingUserId === user.id}
+                            style={{
+                              padding: "6px 12px",
+                              backgroundColor: user.active ? "#f59e0b" : "#10b981",
+                              color: "white",
+                              border: "none",
+                              borderRadius: "4px",
+                              fontSize: "12px",
+                              fontWeight: "600",
+                              cursor: suspendingUserId === user.id ? "not-allowed" : "pointer",
+                              transition: "background-color 0.2s",
+                              opacity: suspendingUserId === user.id ? 0.6 : 1,
+                            }}
+                            onMouseEnter={(e) => {
+                              if (suspendingUserId !== user.id) {
+                                e.currentTarget.style.backgroundColor = user.active ? "#d97706" : "#059669";
+                              }
+                            }}
+                            onMouseLeave={(e) => {
+                              e.currentTarget.style.backgroundColor = user.active ? "#f59e0b" : "#10b981";
+                            }}
+                          >
+                            {suspendingUserId === user.id ? "..." : user.active ? "Suspend" : "Activate"}
+                          </button>
+                          <button
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              setDeleteUserId(user.id);
+                              setError(null);
+                            }}
+                            style={{
+                              padding: "6px 12px",
+                              backgroundColor: "#ef4444",
+                              color: "white",
+                              border: "none",
+                              borderRadius: "4px",
+                              fontSize: "12px",
+                              fontWeight: "600",
+                              cursor: "pointer",
+                              transition: "background-color 0.2s",
+                            }}
+                            onMouseEnter={(e) => {
+                              e.currentTarget.style.backgroundColor = "#dc2626";
+                            }}
+                            onMouseLeave={(e) => {
+                              e.currentTarget.style.backgroundColor = "#ef4444";
+                            }}
+                          >
+                            Delete
+                          </button>
+                        </div>
                       </td>
                     </tr>
                   ))

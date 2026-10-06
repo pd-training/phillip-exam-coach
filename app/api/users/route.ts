@@ -8,7 +8,7 @@ export async function GET() {
     const prisma = new PrismaClient({ datasources: { db: { url: dbUrl } } });
 
     const users = await prisma.$queryRaw`
-      SELECT id, email, name, role, "createdAt"
+      SELECT id, email, name, role, active, "createdAt"
       FROM "User"
       ORDER BY "createdAt" DESC
     `;
