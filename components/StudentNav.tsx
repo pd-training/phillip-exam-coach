@@ -11,7 +11,7 @@ export default function StudentNav() {
 
   const navItems = [
     { label: 'Dashboard', href: '/dashboard' },
-    { label: 'Your Papers', href: '/practice' },
+    { label: 'Practice', href: '/practice' },
     { label: 'Exam Attempts', href: '/dashboard/attempts' },
     { label: 'Browse Papers', href: '/practice/browse' },
     { label: 'Help', href: '/help' },
