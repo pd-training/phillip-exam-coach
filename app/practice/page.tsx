@@ -123,9 +123,6 @@ export default function PracticePage() {
                     : null;
                   const isPassed = latestAttempt?.result === 'Pass';
 
-                  const passingScore = 75;
-                  const progressPercent = latestAttempt ? Math.min(100, (latestAttempt.score / passingScore) * 100) : 0;
-
                   return (
                     <Link
                       key={paper.id}
@@ -156,14 +153,13 @@ export default function PracticePage() {
                           <div className="mb-3">
                             <div className="flex items-center justify-between mb-1">
                               <span className="text-sm text-gray-600">Latest: <span className="font-semibold">{latestAttempt.score}%</span></span>
-                              <span className="text-xs text-gray-500">Target: {passingScore}%</span>
                             </div>
                             <div className="w-full bg-gray-200 rounded-full h-2">
                               <div
                                 className={`h-2 rounded-full transition-all ${
                                   isPassed ? 'bg-green-500' : 'bg-amber-500'
                                 }`}
-                                style={{ width: `${progressPercent}%` }}
+                                style={{ width: `${latestAttempt.score}%` }}
                               />
                             </div>
                           </div>
