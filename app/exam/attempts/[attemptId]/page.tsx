@@ -192,7 +192,7 @@ export default function AttemptReviewPage() {
                     {part.partName}: <span className={part.passed ? 'text-green-200 font-bold' : 'text-red-200 font-bold'}>{part.score}%</span> ({part.correct}/{part.total}) {part.passed ? '✓ PASSED' : '✗ FAILED'}
                   </p>
                 ))}
-                <p className="text-blue-200 font-semibold mt-2 border-t border-blue-500 pt-2">
+                <p className={`text-base font-bold mt-2 border-t border-blue-500 pt-2 ${attempt.passed ? 'text-green-300' : 'text-red-300'}`}>
                   Overall: {attempt.passed ? '✓ PASSED' : '✗ FAILED'}
                 </p>
               </div>
@@ -381,27 +381,8 @@ export default function AttemptReviewPage() {
 
         {/* Right Sidebar - Navigation */}
         <div className="w-56 bg-gray-50 border-l border-gray-200 overflow-y-auto flex flex-col flex-shrink-0">
-          {/* Performance Summary */}
-          <div className="p-6 border-b border-gray-200">
-            <p className="text-sm font-semibold text-gray-600 mb-2">PERFORMANCE</p>
-            <div className="space-y-2 text-sm">
-              <div className="flex justify-between">
-                <span className="text-gray-700">Correct:</span>
-                <span className="font-bold text-green-600">{correctCount}/{attempt.totalQuestions}</span>
-              </div>
-              <div className="flex justify-between">
-                <span className="text-gray-700">Score:</span>
-                <span className={`font-bold ${attempt.score >= attempt.passingScore ? 'text-green-600' : 'text-red-600'}`}>{attempt.score}%</span>
-              </div>
-              <div className="flex justify-between">
-                <span className="text-gray-700">Passing:</span>
-                <span className="font-bold">{attempt.passingScore}%</span>
-              </div>
-            </div>
-          </div>
-
           {/* Question Navigator - Compact Scrollable */}
-          <div className="flex-1 p-3 overflow-y-auto" style={{ maxHeight: '400px' }}>
+          <div className="flex-1 p-6 overflow-y-auto">
             <p className="text-xs font-semibold text-gray-600 mb-3">QUESTIONS</p>
             <div className="grid grid-cols-6 gap-1">
               {questions.map((q, idx) => (
