@@ -472,7 +472,7 @@ export default function PaperDetailPage() {
               <h2 className="text-lg font-semibold mb-6 uppercase text-gray-600 text-xs tracking-wider">
                 Exam Configuration
               </h2>
-              <div className="grid grid-cols-2 gap-4 mb-6">
+              <div className="grid grid-cols-3 gap-4 mb-6">
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-2">Duration (minutes)</label>
                   <input
@@ -492,6 +492,12 @@ export default function PaperDetailPage() {
                     max="100"
                     className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-amber-500"
                   />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">No. of Questions</label>
+                  <div className="px-3 py-2 border border-gray-300 rounded-lg bg-gray-50 text-sm font-semibold text-gray-900">
+                    {parts.reduce((sum, part) => sum + part.questionCount, 0)}
+                  </div>
                 </div>
               </div>
 
