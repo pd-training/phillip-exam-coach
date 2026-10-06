@@ -48,6 +48,7 @@ export default function PaperDetailPage() {
   const [parts, setParts] = useState<ExamPart[]>([]);
   const [questions, setQuestions] = useState<any[]>([]);
   const [chapters, setChapters] = useState<any[]>([]);
+  const [chaptersError, setChaptersError] = useState<string>("");
 
   // Upload state
   const [uploadFile, setUploadFile] = useState<File | null>(null);
@@ -110,13 +111,24 @@ export default function PaperDetailPage() {
 
       // Fetch chapters
       try {
-        const chaptersRes = await fetch(`/api/admin/papers/${paperId}/chapters`);
+        const chaptersRes = await fetch(`/api/admin/papers/${paperId}/chapters`, {
+          method: "GET",
+          credentials: "include",
+        });
+        const chaptersData = await chaptersRes.json();
         if (chaptersRes.ok) {
-          const chaptersData = await chaptersRes.json();
+          console.log("Chapters data:", chaptersData);
           setChapters(Array.isArray(chaptersData) ? chaptersData : []);
+          setChaptersError("");
+        } else {
+          console.error("Error fetching chapters:", chaptersData);
+          setChaptersError(chaptersData?.error || "Failed to fetch chapters");
+          setChapters([]);
         }
       } catch (error) {
         console.error("Error fetching chapters:", error);
+        setChaptersError((error as Error).message);
+        setChapters([]);
       }
     } catch (error) {
       console.error("Error fetching paper data:", error);
@@ -561,6 +573,11 @@ export default function PaperDetailPage() {
             <h2 className="text-lg font-semibold mb-6 uppercase text-gray-600 text-xs tracking-wider">
               Chapter Titles
             </h2>
+            {chaptersError && (
+              <div className="mb-4 p-3 bg-red-50 text-red-700 text-sm rounded-lg">
+                Error: {chaptersError}
+              </div>
+            )}
             {chapters.length === 0 ? (
               <p className="text-gray-500 mb-6">No chapters configured yet.</p>
             ) : (
