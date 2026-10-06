@@ -17,7 +17,7 @@ export async function GET(request: NextRequest) {
     }
 
     const users = await prisma.$queryRaw`
-      SELECT id, email, name, role, "createdAt"
+      SELECT id, email, name, role, active, "createdAt"
       FROM "User"
       ORDER BY "createdAt" DESC
     ` as any[];

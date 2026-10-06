@@ -8,7 +8,7 @@ export async function GET() {
     const prisma = new PrismaClient({ datasources: { db: { url: dbUrl } } });
 
     const users = await prisma.$queryRaw`
-      SELECT id, email, name, role, "createdAt"
+      SELECT id, email, name, role, active, "createdAt"
       FROM "User"
       ORDER BY "createdAt" DESC
     `;
@@ -60,9 +60,9 @@ export async function POST(req: Request) {
 
     // Use raw SQL to bypass Prisma enum validation
     const result = await prisma.$queryRaw`
-      INSERT INTO "User" (id, name, email, password, role, "createdAt", "updatedAt")
-      VALUES (gen_random_uuid(), ${name}, ${email}, ${hashedPassword}, ${role || "STUDENT"}, NOW(), NOW())
-      RETURNING id, name, email, role, "createdAt"
+      INSERT INTO "User" (id, name, email, password, role, active, "createdAt", "updatedAt")
+      VALUES (gen_random_uuid(), ${name}, ${email}, ${hashedPassword}, ${role || "STUDENT"}, true, NOW(), NOW())
+      RETURNING id, name, email, role, active, "createdAt"
     `;
 
     const userId = result?.[0]?.id;
