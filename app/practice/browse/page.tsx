@@ -234,7 +234,7 @@ export default function BrowsePapersPage() {
                   className="bg-white rounded-lg border border-gray-200 p-6 hover:shadow-lg hover:border-blue-300 transition flex flex-col"
                 >
                   <div className="flex-1 mb-4">
-                    <div className="flex items-start gap-2 mb-2">
+                    <div className="flex items-start gap-2">
                       <h3 className="text-lg font-semibold text-gray-900 flex-1">
                         {paper.title}
                       </h3>
@@ -244,9 +244,6 @@ export default function BrowsePapersPage() {
                         </span>
                       )}
                     </div>
-                    {paper.description && paper.description.trim() ? (
-                      <p className="text-sm text-gray-600 line-clamp-2">{paper.description}</p>
-                    ) : null}
                   </div>
 
                   <div className="flex flex-col gap-2">
