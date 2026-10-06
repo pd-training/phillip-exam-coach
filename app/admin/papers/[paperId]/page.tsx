@@ -90,6 +90,9 @@ export default function PaperDetailPage() {
   const [editPartQuestionCount, setEditPartQuestionCount] = useState("");
   const [editPartPassingScore, setEditPartPassingScore] = useState("70");
 
+  // Edit chapters
+  const [editedChapters, setEditedChapters] = useState<{ [key: number]: string }>({});
+
   useEffect(() => {
     if (status === "unauthenticated") {
       router.push("/login");
@@ -402,6 +405,38 @@ export default function PaperDetailPage() {
     }
   };
 
+  const handleSaveChapters = async () => {
+    if (Object.keys(editedChapters).length === 0) {
+      alert("No changes to save");
+      return;
+    }
+
+    try {
+      setSubmitting(true);
+
+      const res = await fetch(`/api/admin/papers/${paperId}/chapters`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          chapters: Object.entries(editedChapters).map(([number, title]) => ({
+            number: parseInt(number),
+            title,
+          })),
+        }),
+      });
+
+      if (!res.ok) throw new Error("Failed to save chapters");
+
+      alert("Chapters updated successfully");
+      setEditedChapters({});
+      await fetchPaperData();
+    } catch (error) {
+      alert("Error saving chapters: " + (error as Error).message);
+    } finally {
+      setSubmitting(false);
+    }
+  };
+
   if (status === "loading" || loading) {
     return (
       <div className="min-h-screen bg-gray-50">
@@ -696,6 +731,10 @@ export default function PaperDetailPage() {
                       type="text"
                       defaultValue={ch.title || ""}
                       placeholder={`Chapter ${ch.number}`}
+                      onChange={(e) => setEditedChapters({
+                        ...editedChapters,
+                        [ch.number]: e.target.value
+                      })}
                       className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-amber-500"
                     />
                   </div>
@@ -703,10 +742,18 @@ export default function PaperDetailPage() {
               </div>
             )}
             <div className="flex gap-3">
-              <button className="px-6 py-2 bg-amber-500 text-gray-900 font-semibold rounded-lg hover:bg-amber-600 transition">
-                Save Changes
+              <button
+                onClick={handleSaveChapters}
+                disabled={submitting || Object.keys(editedChapters).length === 0}
+                className="px-6 py-2 bg-amber-500 text-gray-900 font-semibold rounded-lg hover:bg-amber-600 disabled:opacity-50 transition"
+              >
+                {submitting ? "Saving..." : "Save Changes"}
               </button>
-              <button className="px-6 py-2 bg-gray-200 text-gray-900 font-semibold rounded-lg hover:bg-gray-300 transition">
+              <button
+                onClick={() => setEditedChapters({})}
+                disabled={submitting}
+                className="px-6 py-2 bg-gray-200 text-gray-900 font-semibold rounded-lg hover:bg-gray-300 disabled:opacity-50 transition"
+              >
                 Cancel
               </button>
             </div>
