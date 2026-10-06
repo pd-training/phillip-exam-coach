@@ -4,6 +4,15 @@ import Link from 'next/link';
 import { useSession } from 'next-auth/react';
 import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
+import {
+  ChartBarIcon,
+  ArrowTrendingUpIcon,
+  DocumentCheckIcon,
+  BoltIcon,
+  CheckCircleIcon,
+  UserGroupIcon,
+  AcademicCapIcon,
+} from '@heroicons/react/24/outline';
 
 export default function LandingPage() {
   const router = useRouter();
@@ -29,11 +38,16 @@ export default function LandingPage() {
       {/* Sticky Header */}
       <header className="sticky top-0 z-50 bg-white/95 backdrop-blur-sm border-b border-gray-200 shadow-sm">
         <div className="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between">
-          <div className="flex items-center gap-2">
-            <div className="w-8 h-8 bg-gradient-to-br from-blue-600 to-blue-700 rounded-lg flex items-center justify-center">
-              <span className="text-white font-bold text-lg">📊</span>
+          <div className="flex items-center gap-3">
+            <div className="flex items-center gap-2">
+              <div className="w-8 h-8 bg-gradient-to-br from-blue-600 to-blue-700 rounded-lg flex items-center justify-center">
+                <ChartBarIcon className="text-white w-5 h-5" />
+              </div>
+              <div className="flex flex-col">
+                <span className="font-bold text-lg text-gray-900">Finance Ready</span>
+                <span className="text-xs text-gray-600">by Phillip Capital</span>
+              </div>
             </div>
-            <span className="font-bold text-xl text-gray-900">Finance Ready</span>
           </div>
           <nav className="hidden md:flex items-center gap-8">
             <a href="#features" className="text-gray-600 hover:text-blue-600 transition font-medium">Features</a>
@@ -140,7 +154,7 @@ export default function LandingPage() {
             {/* Card 1: What is CMFAS */}
             <div className="bg-gradient-to-br from-blue-50 to-blue-100 rounded-xl p-8 border border-blue-200 hover:shadow-lg transition-all duration-300">
               <div className="w-12 h-12 bg-blue-600 rounded-lg flex items-center justify-center mb-6">
-                <span className="text-white text-xl">📖</span>
+                <AcademicCapIcon className="text-white w-6 h-6" />
               </div>
               <h3 className="font-bold text-xl text-gray-900 mb-3">What is CMFAS?</h3>
               <p className="text-gray-700 leading-relaxed">
@@ -151,7 +165,7 @@ export default function LandingPage() {
             {/* Card 2: Who Needs It */}
             <div className="bg-gradient-to-br from-emerald-50 to-emerald-100 rounded-xl p-8 border border-emerald-200 hover:shadow-lg transition-all duration-300">
               <div className="w-12 h-12 bg-emerald-600 rounded-lg flex items-center justify-center mb-6">
-                <span className="text-white text-xl">👥</span>
+                <UserGroupIcon className="text-white w-6 h-6" />
               </div>
               <h3 className="font-bold text-xl text-gray-900 mb-3">Who Needs to Take It?</h3>
               <p className="text-gray-700 leading-relaxed">
@@ -162,7 +176,7 @@ export default function LandingPage() {
             {/* Card 3: Why It Matters */}
             <div className="bg-gradient-to-br from-amber-50 to-amber-100 rounded-xl p-8 border border-amber-200 hover:shadow-lg transition-all duration-300">
               <div className="w-12 h-12 bg-amber-600 rounded-lg flex items-center justify-center mb-6">
-                <span className="text-white text-xl">🎯</span>
+                <CheckCircleIcon className="text-white w-6 h-6" />
               </div>
               <h3 className="font-bold text-xl text-gray-900 mb-3">Why It Matters</h3>
               <p className="text-gray-700 leading-relaxed">
@@ -186,7 +200,7 @@ export default function LandingPage() {
             {/* Feature 1 */}
             <div className="group bg-gradient-to-br from-blue-50 to-blue-100 rounded-xl p-6 border border-blue-200 hover:shadow-lg hover:border-blue-400 transition-all duration-300 transform hover:-translate-y-2 cursor-pointer">
               <div className="w-12 h-12 bg-gradient-to-br from-blue-500 to-blue-600 rounded-lg flex items-center justify-center mb-4 group-hover:scale-110 transition-transform">
-                <span className="text-white text-xl">📈</span>
+                <ArrowTrendingUpIcon className="text-white w-6 h-6" />
               </div>
               <h3 className="font-bold text-lg text-gray-900 mb-2">Track Your Progress</h3>
               <p className="text-gray-700 text-sm">Monitor your performance across all exams with detailed analytics and score trends.</p>
@@ -195,7 +209,7 @@ export default function LandingPage() {
             {/* Feature 2 */}
             <div className="group bg-gradient-to-br from-emerald-50 to-emerald-100 rounded-xl p-6 border border-emerald-200 hover:shadow-lg hover:border-emerald-400 transition-all duration-300 transform hover:-translate-y-2 cursor-pointer">
               <div className="w-12 h-12 bg-gradient-to-br from-emerald-500 to-emerald-600 rounded-lg flex items-center justify-center mb-4 group-hover:scale-110 transition-transform">
-                <span className="text-white text-xl">📋</span>
+                <DocumentCheckIcon className="text-white w-6 h-6" />
               </div>
               <h3 className="font-bold text-lg text-gray-900 mb-2">Multiple Papers</h3>
               <p className="text-gray-700 text-sm">Access complete CMFAS exam papers with all questions and detailed answer explanations.</p>
@@ -204,7 +218,7 @@ export default function LandingPage() {
             {/* Feature 3 */}
             <div className="group bg-gradient-to-br from-amber-50 to-amber-100 rounded-xl p-6 border border-amber-200 hover:shadow-lg hover:border-amber-400 transition-all duration-300 transform hover:-translate-y-2 cursor-pointer">
               <div className="w-12 h-12 bg-gradient-to-br from-amber-500 to-amber-600 rounded-lg flex items-center justify-center mb-4 group-hover:scale-110 transition-transform">
-                <span className="text-white text-xl">⚡</span>
+                <BoltIcon className="text-white w-6 h-6" />
               </div>
               <h3 className="font-bold text-lg text-gray-900 mb-2">Instant Feedback</h3>
               <p className="text-gray-700 text-sm">Get immediate feedback on every answer with AI-powered explanations and learning tips.</p>
@@ -213,7 +227,7 @@ export default function LandingPage() {
             {/* Feature 4 */}
             <div className="group bg-gradient-to-br from-purple-50 to-purple-100 rounded-xl p-6 border border-purple-200 hover:shadow-lg hover:border-purple-400 transition-all duration-300 transform hover:-translate-y-2 cursor-pointer">
               <div className="w-12 h-12 bg-gradient-to-br from-purple-500 to-purple-600 rounded-lg flex items-center justify-center mb-4 group-hover:scale-110 transition-transform">
-                <span className="text-white text-xl">🎯</span>
+                <CheckCircleIcon className="text-white w-6 h-6" />
               </div>
               <h3 className="font-bold text-lg text-gray-900 mb-2">Practice Anytime</h3>
               <p className="text-gray-700 text-sm">Study on your schedule with full-length exams, chapter reviews, and timed practice sessions.</p>
@@ -254,7 +268,8 @@ export default function LandingPage() {
       {/* Stats Section */}
       <section id="stats" className="py-16 px-6 bg-gradient-to-r from-blue-600 to-blue-700 text-white">
         <div className="max-w-7xl mx-auto">
-          <h2 className="text-4xl font-bold mb-12 text-center">Trusted by Financial Professionals</h2>
+          <h2 className="text-4xl font-bold mb-2 text-center">Trusted by Financial Professionals</h2>
+          <p className="text-center text-blue-100 mb-12">Powered by Phillip Capital</p>
 
           <div className="grid md:grid-cols-4 gap-8">
             <div className="text-center hover:transform hover:scale-105 transition-transform cursor-default">
@@ -310,9 +325,12 @@ export default function LandingPage() {
           <div>
             <div className="flex items-center gap-2 mb-4">
               <div className="w-8 h-8 bg-blue-600 rounded-lg flex items-center justify-center">
-                <span className="text-white font-bold">📊</span>
+                <ChartBarIcon className="text-white w-5 h-5" />
               </div>
-              <span className="font-bold text-white">Finance Ready</span>
+              <div className="flex flex-col">
+                <span className="font-bold text-white text-sm">Finance Ready</span>
+                <span className="text-xs text-gray-400">by Phillip Capital</span>
+              </div>
             </div>
             <p className="text-sm text-gray-400">Master your CMFAS exam with confidence.</p>
           </div>
