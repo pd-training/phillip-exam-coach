@@ -75,7 +75,7 @@ export default function LandingPage() {
                     Start Free Practice Now
                   </button>
                 </Link>
-                <Link href="/papers">
+                <Link href="/login">
                   <button className="px-8 py-4 border-2 border-blue-600 text-blue-600 rounded-lg font-semibold hover:bg-blue-50 hover:border-blue-700 hover:text-blue-700 transition-all duration-300 transform hover:scale-105 active:scale-95">
                     Take Your First Mock Exam
                   </button>
