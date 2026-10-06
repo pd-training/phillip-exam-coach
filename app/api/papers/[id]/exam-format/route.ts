@@ -55,10 +55,13 @@ export async function POST(
     const { totalTime, parts } = body;
     const paperId = params.id;
 
-    // Update paper totalTime
+    // Calculate total questions from parts
+    const totalQuestions = parts.reduce((sum: number, part: any) => sum + (part.questionCount || 0), 0);
+
+    // Update paper totalTime and totalQuestions
     await prisma.$queryRaw`
       UPDATE "Paper"
-      SET "totalTime" = ${totalTime}
+      SET "totalTime" = ${totalTime}, "totalQuestions" = ${totalQuestions}
       WHERE id = ${paperId}::uuid
     `;
 
@@ -79,6 +82,7 @@ export async function POST(
     return NextResponse.json({
       success: true,
       partsCreated: parts.length,
+      totalQuestions: totalQuestions,
     });
   } catch (error: any) {
     console.error('Save exam format error:', error);

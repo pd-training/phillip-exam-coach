@@ -129,6 +129,14 @@ export default function PapersManagement() {
     fetchPapers();
   }, [status, session, router]);
 
+  // Auto-calculate total questions when parts change
+  useEffect(() => {
+    if (parts.length > 0) {
+      const calculatedTotal = parts.reduce((sum, part) => sum + (part.questionCount || 0), 0);
+      setEditPaperTotalQuestions(calculatedTotal.toString());
+    }
+  }, [parts]);
+
   // Fetch papers
   const fetchPapers = async () => {
     try {
@@ -1430,13 +1438,14 @@ export default function PapersManagement() {
                 <>
                   <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "12px", marginBottom: "16px" }}>
                     <div>
-                      <label style={{ display: "block", fontSize: "14px", fontWeight: "500", marginBottom: "6px" }}>Total Questions</label>
+                      <label style={{ display: "block", fontSize: "14px", fontWeight: "500", marginBottom: "6px" }}>Total Questions {parts.length > 0 && <span style={{ fontSize: "12px", color: "#6b7280" }}>(Auto-calculated from parts)</span>}</label>
                       <input
                         type="number"
                         value={editPaperTotalQuestions}
-                        onChange={(e) => setEditPaperTotalQuestions(e.target.value)}
+                        onChange={(e) => parts.length === 0 && setEditPaperTotalQuestions(e.target.value)}
                         min="0"
-                        style={{ width: "100%", padding: "10px", border: "1px solid #d1d5db", borderRadius: "6px", fontSize: "14px", boxSizing: "border-box" }}
+                        disabled={parts.length > 0}
+                        style={{ width: "100%", padding: "10px", border: "1px solid #d1d5db", borderRadius: "6px", fontSize: "14px", boxSizing: "border-box", backgroundColor: parts.length > 0 ? "#f3f4f6" : "#ffffff", cursor: parts.length > 0 ? "not-allowed" : "auto" }}
                       />
                     </div>
                     <div>
