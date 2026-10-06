@@ -143,53 +143,32 @@ export default function StudentDashboard() {
 
       {/* Main Content */}
       <div className="max-w-7xl mx-auto px-6 py-12">
-        {/* Compact Stats Row */}
-        <div className="grid md:grid-cols-2 gap-6 mb-12">
-          {/* Average Score */}
-          <div className="bg-white rounded-lg p-4 border border-gray-200">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-gray-600 text-sm font-medium">Average Score</p>
-                <p className="text-3xl font-bold text-gray-900 mt-1">
-                  {stats.completedCount > 0 ? `${Math.round(stats.averageScore)}%` : "—"}
-                </p>
-              </div>
-              <div className="w-10 h-10 bg-green-100 rounded flex items-center justify-center flex-shrink-0">
-                <svg
-                  className="w-5 h-5 text-green-600"
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M13 10V3L4 14h7v7l9-11h-7z"
-                  />
-                </svg>
-              </div>
+        {/* Secondary Stats Row */}
+        <div className="flex gap-6 mb-8 text-sm">
+          <div className="flex items-center gap-3">
+            <div>
+              <p className="text-gray-500 text-xs font-medium">Overall Average</p>
+              <p className="text-lg font-semibold text-gray-900">
+                {stats.completedCount > 0 ? `${Math.round(stats.averageScore)}%` : "—"}
+              </p>
             </div>
           </div>
-
-          {/* Pass Rate */}
-          <div className="bg-white rounded-lg p-4 border border-gray-200">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-gray-600 text-sm font-medium">Pass Rate</p>
-                <p className="text-3xl font-bold text-gray-900 mt-1">
-                  {stats.completedCount > 0 ? `${passRate}%` : "—"}
-                </p>
-              </div>
-              <div className="w-10 h-10 bg-emerald-100 rounded flex items-center justify-center flex-shrink-0">
-                <svg
-                  className="w-5 h-5 text-emerald-600"
-                  fill="currentColor"
-                  viewBox="0 0 24 24"
-                >
-                  <path d="M10 15.172l9.192-9.193a1 1 0 111.415 1.415l-10.606 10.606a1 1 0 01-1.415 0l-5.656-5.657a1 1 0 111.415-1.415l4.243 4.242z" />
-                </svg>
-              </div>
+          <div className="w-px bg-gray-200"></div>
+          <div className="flex items-center gap-3">
+            <div>
+              <p className="text-gray-500 text-xs font-medium">Pass Rate</p>
+              <p className="text-lg font-semibold text-gray-900">
+                {stats.completedCount > 0 ? `${passRate}%` : "—"}
+              </p>
+            </div>
+          </div>
+          <div className="w-px bg-gray-200"></div>
+          <div className="flex items-center gap-3">
+            <div>
+              <p className="text-gray-500 text-xs font-medium">Attempts</p>
+              <p className="text-lg font-semibold text-gray-900">
+                {stats.completedCount}
+              </p>
             </div>
           </div>
         </div>
