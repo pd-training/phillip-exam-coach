@@ -55,7 +55,7 @@ export function LoginForm() {
             fontSize: "14px",
             fontWeight: "500",
           }}>
-            ✅ {successMessage}
+            {successMessage}
           </div>
         )}
 
@@ -71,7 +71,7 @@ export function LoginForm() {
             fontSize: "14px",
             fontWeight: "500",
           }}>
-            ❌ {error}
+            {error}
           </div>
         )}
 

@@ -134,9 +134,6 @@ export default function SignupPage() {
       <div className="fixed top-0 left-0 right-0 z-50 bg-blue-900/95 backdrop-blur-sm border-b border-blue-800 shadow-sm">
         <div className="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between">
           <Link href="/" className="flex items-center gap-2 hover:opacity-80 transition">
-            <div className="w-8 h-8 bg-gradient-to-br from-amber-400 to-amber-500 rounded-lg flex items-center justify-center">
-              <span className="text-blue-900 font-bold text-lg">📊</span>
-            </div>
             <span className="font-bold text-xl text-white">Finance<span className="text-amber-400">Ready</span></span>
           </Link>
           <Link href="/">
@@ -149,26 +146,28 @@ export default function SignupPage() {
 
       <div className="w-full max-w-5xl mt-20">
         <div className="grid md:grid-cols-2 gap-0 bg-white rounded-2xl shadow-xl overflow-hidden border border-gray-200">
-          {/* Left Panel - Illustration */}
-          <div className="hidden md:flex bg-gradient-to-br from-blue-900 to-blue-800 p-12 flex-col justify-center items-center text-white">
-            <div className="text-center">
-              <div className="text-8xl mb-6 leading-none">🚀</div>
-              <h2 className="text-4xl font-bold mb-4">Start Your Journey</h2>
-              <p className="text-blue-100 mb-8 text-lg">Join thousands preparing with AI-powered exam coaching</p>
+          {/* Left Panel - Value Proposition */}
+          <div className="hidden md:flex bg-gradient-to-br from-blue-900 to-blue-800 p-12 flex-col justify-center items-start text-white">
+            <div>
+              <h2 className="text-5xl font-bold mb-6 leading-tight">Exam Ready</h2>
+              <p className="text-blue-100 mb-12 text-lg leading-relaxed max-w-sm">
+                Master the CMFAS certification with comprehensive practice papers, detailed performance tracking, and expert-curated study materials.
+              </p>
 
-              {/* Feature List */}
-              <div className="space-y-4 text-left inline-block">
-                {[
-                  { icon: "🎯", text: "Ace Your CMFAS Exam" },
-                  { icon: "📈", text: "Track Your Progress" },
-                  { icon: "⚡", text: "Study Smarter" },
-                  { icon: "🏆", text: "Achieve Success" },
-                ].map((feature, idx) => (
-                  <div key={idx} className="flex items-center gap-3 text-blue-50">
-                    <span className="text-2xl">{feature.icon}</span>
-                    <span className="text-base text-amber-100">{feature.text}</span>
-                  </div>
-                ))}
+              {/* Key Benefits - Text Only */}
+              <div className="space-y-6">
+                <div>
+                  <p className="text-amber-300 font-semibold mb-2">Real Exam Experience</p>
+                  <p className="text-blue-100 text-sm leading-relaxed">Full mock papers designed with authentic difficulty and realistic timing constraints</p>
+                </div>
+                <div>
+                  <p className="text-amber-300 font-semibold mb-2">Performance Insights</p>
+                  <p className="text-blue-100 text-sm leading-relaxed">Track your progress with detailed analytics to identify and strengthen weak areas</p>
+                </div>
+                <div>
+                  <p className="text-amber-300 font-semibold mb-2">Personalized Learning</p>
+                  <p className="text-blue-100 text-sm leading-relaxed">Study recommendations tailored to your performance patterns and learning pace</p>
+                </div>
               </div>
             </div>
           </div>
@@ -178,7 +177,7 @@ export default function SignupPage() {
             {/* Error Message */}
             {error && (
               <div className="bg-red-50 border border-red-200 text-red-800 px-4 py-3 rounded-lg mb-6 text-sm font-medium">
-                ❌ {error}
+                {error}
               </div>
             )}
 
