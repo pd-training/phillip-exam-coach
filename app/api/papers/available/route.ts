@@ -6,10 +6,9 @@ export const dynamic = 'force-dynamic';
 export async function GET(request: NextRequest) {
   try {
     const papers = await prisma.$queryRaw`
-      SELECT 
+      SELECT
         p.id,
         p.title,
-        p.description,
         p."externalLink",
         p."totalTime"
       FROM "Paper" p

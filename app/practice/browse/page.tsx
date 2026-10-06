@@ -16,7 +16,6 @@ interface StudentPaper {
 interface Paper {
   id: string;
   title: string;
-  description: string;
   totalTime: number;
   externalLink?: string;
 }

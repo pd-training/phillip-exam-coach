@@ -27,7 +27,6 @@ interface Attempt {
 interface Paper {
   id: string;
   title: string;
-  description: string;
   externalLink?: string;
   totalTime: number;
 }
@@ -324,19 +323,16 @@ export default function StudentDashboard() {
             <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
               {availablePapers.slice(0, 6).map((paper) => (
                 <Link key={paper.id} href={`/exam/${paper.id}/full-exam`}>
-                  <div className="bg-white rounded-lg p-5 border border-gray-200 hover:border-amber-400 hover:shadow-md transition duration-300 cursor-pointer group h-full flex flex-col">
-                    <h3 className="font-semibold text-gray-900 group-hover:text-amber-600 transition mb-2">
+                  <div className="bg-white rounded-lg p-5 border border-gray-200 hover:border-amber-400 hover:shadow-md transition duration-300 cursor-pointer group">
+                    <h3 className="font-semibold text-gray-900 group-hover:text-amber-600 transition mb-4">
                       {paper.title}
                     </h3>
-                    <p className="text-gray-600 text-sm mb-4 flex-grow">
-                      {paper.description || "Practice exam"}
-                    </p>
-                    <div className="flex items-center justify-between pt-4 border-t border-gray-100">
+                    <div className="flex items-center justify-between">
                       <span className="text-xs text-gray-500 font-medium">
                         ⏱️ {paper.totalTime} min
                       </span>
                       <span className="text-amber-600 group-hover:text-amber-700 text-sm font-medium">
-                        Start →
+                        Learn more →
                       </span>
                     </div>
                   </div>
