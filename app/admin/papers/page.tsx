@@ -1345,7 +1345,19 @@ export default function PapersManagement() {
 
       {/* MODAL: Paper Settings (Consolidated) */}
       {activeModal === "paperSettings" && selectedPaperId && (
-        <Modal onClose={() => { setActiveModal(null); }}>
+        <Modal onClose={() => {
+          setActiveModal(null);
+          setEditPaperTitle("");
+          setEditPaperDescription("");
+          setEditPaperExternalLink("");
+          setEditPaperDuration("120");
+          setEditPaperTotalQuestions("0");
+          setEditPaperPassingScore("75");
+          setEditPaperAvailability(false);
+          setParts([]);
+          setNewPart({ partName: "", chapterStart: 1, chapterEnd: 13, questionCount: 110, passingScore: 75 });
+          setChapters([]);
+        }}>
           <h2 style={{ marginTop: "0" }}>Paper Settings</h2>
           <div style={{ maxHeight: "70vh", overflowY: "auto" }}>
             {/* Paper Details Section */}
