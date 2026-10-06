@@ -16,18 +16,20 @@ async function runMigrations() {
       console.log('✅ Migrations deployed successfully');
       console.log(stdout);
     } catch (error) {
+      const errorOutput = error.stderr || error.message;
+
       // Check if it's the P3005 error (baseline required)
-      if (error.stderr && error.stderr.includes('P3005')) {
+      if (errorOutput.includes('P3005')) {
         console.log('⚠️  Database schema exists but migrations not tracked');
         console.log('Running baseline process...');
-        
+
         // Read migrations directory
         const migrationsDir = path.join(process.cwd(), 'prisma', 'migrations');
         const migrations = fs.readdirSync(migrationsDir)
           .filter(f => fs.statSync(path.join(migrationsDir, f)).isDirectory());
-        
+
         console.log(`Found ${migrations.length} migrations to baseline`);
-        
+
         // Mark each migration as applied
         for (const migration of migrations) {
           try {
@@ -38,14 +40,42 @@ async function runMigrations() {
             console.warn(`  ⚠️  Could not resolve ${migration}:`, err.message);
           }
         }
-        
+
         // Try to deploy again
         console.log('\nAttempting migration deploy after baseline...');
         await execAsync('npx prisma migrate deploy');
         console.log('✅ Migrations deployed after baseline');
+      }
+      // Check if it's the P3009 error (failed migrations in database)
+      else if (errorOutput.includes('P3009')) {
+        console.log('⚠️  Found failed migrations in database');
+        console.log('Attempting to resolve failed migrations...');
+
+        // Extract migration name from error if possible
+        const match = errorOutput.match(/The `([^`]+)` migration/);
+        const failedMigration = match ? match[1] : null;
+
+        if (failedMigration) {
+          try {
+            console.log(`  Resolving failed migration: ${failedMigration}`);
+            await execAsync(`npx prisma migrate resolve --rolled-back "${failedMigration}"`);
+            console.log(`  ✅ ${failedMigration} marked as rolled back`);
+          } catch (err) {
+            console.warn(`  ⚠️  Could not resolve migration:`, err.message);
+            throw err;
+          }
+
+          // Try to deploy again
+          console.log('\nAttempting migration deploy after resolution...');
+          await execAsync('npx prisma migrate deploy');
+          console.log('✅ Migrations deployed after failed migration resolution');
+        } else {
+          console.error('❌ Could not extract failed migration name');
+          throw error;
+        }
       } else {
         // Re-throw if it's a different error
-        console.error('❌ Migration failed:', error.stderr || error.message);
+        console.error('❌ Migration failed:', errorOutput);
         process.exit(1);
       }
     }
