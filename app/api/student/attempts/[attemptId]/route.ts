@@ -289,7 +289,7 @@ export async function GET(
         student_name: attempt.student_name,
         student_email: attempt.student_email,
         paper_name: attempt.paper_name,
-        totalQuestions: attempt.totalQuestions,
+        totalQuestions: questionsWithAnswers.length,
         passingScore: attempt.passingScore,
         timeTaken: Math.round((new Date(attempt.submittedat).getTime() - new Date(attempt.startedat).getTime()) / 1000),
         partScores: finalPartScores.length > 0 ? finalPartScores : null,
