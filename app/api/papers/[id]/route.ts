@@ -60,6 +60,10 @@ export async function GET(
         correctAnswer: true,
         explanation: true,
         chapterNumber: true,
+        optionA: true,
+        optionB: true,
+        optionC: true,
+        optionD: true,
       },
       orderBy: { chapterNumber: 'asc' }
     });
