@@ -1,415 +1,303 @@
-"use client";
+'use client';
 
-import Link from "next/link";
-
-// SVG Illustration Components
-const HeroIllustration = () => (
-  <svg viewBox="0 0 400 300" className="w-full h-auto">
-    <defs>
-      <linearGradient id="grad1" x1="0%" y1="0%" x2="100%" y2="100%">
-        <stop offset="0%" stopColor="#3b82f6" />
-        <stop offset="100%" stopColor="#1e40af" />
-      </linearGradient>
-    </defs>
-    {/* Background circles */}
-    <circle cx="320" cy="50" r="80" fill="#dbeafe" opacity="0.5" />
-    <circle cx="80" cy="250" r="60" fill="#dbeafe" opacity="0.5" />
-    
-    {/* Study chart */}
-    <rect x="50" y="120" width="40" height="100" fill="url(#grad1)" rx="4" />
-    <rect x="110" y="90" width="40" height="130" fill="url(#grad1)" rx="4" />
-    <rect x="170" y="60" width="40" height="160" fill="url(#grad1)" rx="4" />
-    <rect x="230" y="30" width="40" height="190" fill="url(#grad1)" rx="4" />
-    
-    {/* Chart base line */}
-    <line x1="40" y1="230" x2="280" y2="230" stroke="#e5e7eb" strokeWidth="2" />
-    
-    {/* Success checkmarks */}
-    <circle cx="70" cy="30" r="15" fill="#10b981" opacity="0.2" />
-    <path d="M 65 30 L 70 35 L 78 27" stroke="#10b981" strokeWidth="2" fill="none" />
-    
-    <circle cx="300" cy="220" r="15" fill="#10b981" opacity="0.2" />
-    <path d="M 295 220 L 300 225 L 308 217" stroke="#10b981" strokeWidth="2" fill="none" />
-  </svg>
-);
-
-const ExamIcon = () => (
-  <svg viewBox="0 0 64 64" className="w-12 h-12">
-    <rect x="12" y="16" width="40" height="36" rx="2" fill="none" stroke="#3b82f6" strokeWidth="2" />
-    <line x1="12" y1="28" x2="52" y2="28" stroke="#3b82f6" strokeWidth="2" />
-    <circle cx="20" cy="40" r="2" fill="#3b82f6" />
-    <circle cx="28" cy="40" r="2" fill="#3b82f6" />
-    <circle cx="36" cy="40" r="2" fill="#3b82f6" />
-    <circle cx="20" cy="50" r="2" fill="#3b82f6" />
-    <circle cx="28" cy="50" r="2" fill="#3b82f6" />
-  </svg>
-);
-
-const PracticeIcon = () => (
-  <svg viewBox="0 0 64 64" className="w-12 h-12">
-    <path d="M 20 16 L 16 20 L 20 24 L 24 20 Z" fill="none" stroke="#3b82f6" strokeWidth="2" />
-    <path d="M 44 16 L 40 20 L 44 24 L 48 20 Z" fill="none" stroke="#3b82f6" strokeWidth="2" />
-    <line x1="24" y1="20" x2="40" y2="20" stroke="#3b82f6" strokeWidth="2" />
-    <rect x="16" y="32" width="32" height="24" rx="2" fill="none" stroke="#3b82f6" strokeWidth="2" />
-    <line x1="24" y1="40" x2="40" y2="40" stroke="#3b82f6" strokeWidth="2" />
-    <line x1="24" y1="48" x2="40" y2="48" stroke="#3b82f6" strokeWidth="2" />
-  </svg>
-);
-
-const AnalyticsIcon = () => (
-  <svg viewBox="0 0 64 64" className="w-12 h-12">
-    <polyline points="16,44 24,32 32,40 48,16" fill="none" stroke="#3b82f6" strokeWidth="2" />
-    <circle cx="16" cy="44" r="2" fill="#3b82f6" />
-    <circle cx="24" cy="32" r="2" fill="#3b82f6" />
-    <circle cx="32" cy="40" r="2" fill="#3b82f6" />
-    <circle cx="48" cy="16" r="2" fill="#3b82f6" />
-    <line x1="12" y1="48" x2="52" y2="48" stroke="#3b82f6" strokeWidth="2" />
-    <line x1="12" y1="48" x2="12" y2="12" stroke="#3b82f6" strokeWidth="2" />
-  </svg>
-);
-
-const Step1Illustration = () => (
-  <svg viewBox="0 0 200 200" className="w-full h-auto">
-    {/* Clipboard */}
-    <rect x="45" y="35" width="85" height="110" rx="4" fill="#dbeafe" stroke="#3b82f6" strokeWidth="2" />
-    {/* Clip */}
-    <circle cx="87.5" cy="42" r="5" fill="#3b82f6" />
-    {/* Paper lines */}
-    <line x1="55" y1="55" x2="125" y2="55" stroke="#3b82f6" strokeWidth="2" />
-    <line x1="55" y1="68" x2="125" y2="68" stroke="#e5e7eb" strokeWidth="1.5" />
-    <line x1="55" y1="79" x2="125" y2="79" stroke="#e5e7eb" strokeWidth="1.5" />
-    <line x1="55" y1="90" x2="115" y2="90" stroke="#e5e7eb" strokeWidth="1.5" />
-    <line x1="55" y1="101" x2="110" y2="101" stroke="#e5e7eb" strokeWidth="1.5" />
-    <line x1="55" y1="112" x2="120" y2="112" stroke="#e5e7eb" strokeWidth="1.5" />
-    {/* Checkmark */}
-    <circle cx="145" cy="50" r="16" fill="#10b981" opacity="0.2" />
-    <path d="M 140 50 L 143 53 L 150 46" stroke="#10b981" strokeWidth="2" fill="none" strokeLinecap="round" strokeLinejoin="round" />
-  </svg>
-);
-
-const Step2Illustration = () => (
-  <svg viewBox="0 0 200 200" className="w-full h-auto">
-    {/* Test form */}
-    <rect x="40" y="40" width="100" height="110" rx="6" fill="none" stroke="#3b82f6" strokeWidth="2" />
-    {/* Questions */}
-    <circle cx="55" cy="60" r="3" fill="#3b82f6" />
-    <line x1="62" y1="55" x2="120" y2="55" stroke="#3b82f6" strokeWidth="1.5" />
-    <line x1="62" y1="65" x2="120" y2="65" stroke="#3b82f6" strokeWidth="1.5" />
-    {/* Answer options */}
-    <rect x="50" y="75" width="12" height="12" rx="2" fill="none" stroke="#3b82f6" strokeWidth="1.5" />
-    <line x1="65" y1="78" x2="115" y2="78" stroke="#e5e7eb" strokeWidth="1" />
-    <rect x="50" y="92" width="12" height="12" rx="2" fill="#3b82f6" />
-    <line x1="65" y1="95" x2="115" y2="95" stroke="#e5e7eb" strokeWidth="1" />
-    <rect x="50" y="109" width="12" height="12" rx="2" fill="none" stroke="#3b82f6" strokeWidth="1.5" />
-    <line x1="65" y1="112" x2="115" y2="112" stroke="#e5e7eb" strokeWidth="1" />
-    {/* Checkmark */}
-    <path d="M 150 75 L 155 80 L 165 70" stroke="#10b981" strokeWidth="2.5" fill="none" strokeLinecap="round" strokeLinejoin="round" />
-  </svg>
-);
-
-const Step3Illustration = () => (
-  <svg viewBox="0 0 200 200" className="w-full h-auto">
-    {/* Chart bars */}
-    <rect x="35" y="110" width="15" height="30" rx="2" fill="#3b82f6" opacity="0.6" />
-    <rect x="58" y="95" width="15" height="45" rx="2" fill="#3b82f6" />
-    <rect x="81" y="75" width="15" height="65" rx="2" fill="#3b82f6" opacity="0.6" />
-    <rect x="104" y="60" width="15" height="80" rx="2" fill="#3b82f6" />
-    {/* Baseline */}
-    <line x1="30" y1="140" x2="130" y2="140" stroke="#e5e7eb" strokeWidth="2" />
-    {/* Light bulb (AI insight) */}
-    <circle cx="155" cy="65" r="12" fill="#fbbf24" opacity="0.3" stroke="#fbbf24" strokeWidth="1.5" />
-    <path d="M 155 77 L 150 85 L 160 85 Z" fill="#fbbf24" opacity="0.3" stroke="#fbbf24" strokeWidth="1.5" />
-    <line x1="155" y1="85" x2="155" y2="92" stroke="#fbbf24" strokeWidth="2" />
-  </svg>
-);
-
-const Step4Illustration = () => (
-  <svg viewBox="0 0 200 200" className="w-full h-auto">
-    {/* Stack of books */}
-    <rect x="50" y="100" width="60" height="15" rx="2" fill="#3b82f6" stroke="#1d4ed8" strokeWidth="1.5" />
-    <line x1="50" y1="100" x2="110" y2="100" stroke="#1d4ed8" strokeWidth="1" />
-    <rect x="45" y="82" width="60" height="15" rx="2" fill="#60a5fa" stroke="#1d4ed8" strokeWidth="1.5" />
-    <line x1="45" y1="82" x2="105" y2="82" stroke="#1d4ed8" strokeWidth="1" />
-    <rect x="40" y="64" width="60" height="15" rx="2" fill="#93c5fd" stroke="#1d4ed8" strokeWidth="1.5" />
-    <line x1="40" y1="64" x2="100" y2="64" stroke="#1d4ed8" strokeWidth="1" />
-    {/* Trophy/achievement */}
-    <circle cx="150" cy="75" r="15" fill="#f59e0b" opacity="0.2" />
-    <path d="M 145 70 L 150 65 L 155 70 L 155 75 Q 150 82 145 75 Z" fill="#f59e0b" />
-    <rect x="148" y="82" width="4" height="8" fill="#f59e0b" />
-    {/* Stars around trophy */}
-    <text x="128" y="68" fontSize="12" fill="#f59e0b">★</text>
-    <text x="168" y="78" fontSize="12" fill="#f59e0b">★</text>
-    <text x="155" y="50" fontSize="12" fill="#f59e0b">★</text>
-  </svg>
-);
+import Link from 'next/link';
+import { useSession } from 'next-auth/react';
+import { useRouter } from 'next/navigation';
+import { useEffect, useState } from 'react';
 
 export default function LandingPage() {
+  const router = useRouter();
+  const { data: session } = useSession();
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => {
+    setMounted(true);
+    if (session?.user) {
+      const userRole = (session.user as any)?.role;
+      if (userRole === 'ADMIN') {
+        router.push('/admin/dashboard');
+      } else {
+        router.push('/dashboard');
+      }
+    }
+  }, [session, router]);
+
+  if (!mounted) return null;
+
   return (
-    <div className="min-h-screen bg-white">
+    <div className="min-h-screen bg-gradient-to-br from-slate-50 to-blue-50">
       {/* Sticky Header */}
-      <header className="sticky top-0 z-50 bg-white backdrop-blur-sm border-b border-gray-200">
-        <nav className="max-w-7xl mx-auto px-6 py-4 flex justify-between items-center">
-          <div className="flex items-center gap-3">
-            <div className="w-10 h-10 bg-gradient-to-br from-blue-600 to-blue-700 rounded-lg flex items-center justify-center">
-              <span className="text-white font-bold text-lg">📚</span>
+      <header className="sticky top-0 z-50 bg-white/95 backdrop-blur-sm border-b border-gray-200 shadow-sm">
+        <div className="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between">
+          <div className="flex items-center gap-2">
+            <div className="w-8 h-8 bg-gradient-to-br from-blue-600 to-blue-700 rounded-lg flex items-center justify-center">
+              <span className="text-white font-bold text-lg">📊</span>
             </div>
-            <span className="text-xl font-semibold text-gray-900">Finance Ready</span>
+            <span className="font-bold text-xl text-gray-900">Finance Ready</span>
           </div>
-          <div className="hidden md:flex gap-8 items-center">
-            <a href="#features" className="text-gray-600 hover:text-gray-900 font-medium transition">Features</a>
-            <a href="#how-it-works" className="text-gray-600 hover:text-gray-900 font-medium transition">How It Works</a>
+          <nav className="hidden md:flex items-center gap-8">
+            <a href="#features" className="text-gray-600 hover:text-blue-600 transition font-medium">Features</a>
+            <a href="#stats" className="text-gray-600 hover:text-blue-600 transition font-medium">Why Choose Us</a>
             <Link href="/login">
-              <button className="px-5 py-2 text-gray-700 border border-gray-300 rounded-lg hover:bg-gray-50 font-medium transition">
-                Login
+              <button className="px-6 py-2 text-blue-600 hover:text-blue-700 font-medium transition">
+                Sign In
               </button>
             </Link>
-          </div>
-          <Link href="/signup">
-            <button className="px-6 py-2 rounded-lg font-semibold bg-blue-600 hover:bg-blue-700 text-white transition duration-200">
-              Get Started
-            </button>
-          </Link>
-        </nav>
+          </nav>
+        </div>
       </header>
 
       {/* Hero Section */}
-      <section className="relative overflow-hidden py-24 md:py-32">
-        {/* Background elements */}
-        <div className="absolute inset-0">
-          <div className="absolute top-0 right-0 w-96 h-96 bg-blue-50 rounded-full blur-3xl opacity-40" />
-          <div className="absolute bottom-0 left-0 w-80 h-80 bg-blue-50 rounded-full blur-3xl opacity-40" />
-        </div>
-
-        <div className="relative max-w-7xl mx-auto px-6 flex flex-col md:flex-row gap-12 items-center">
-          <div className="flex-1 z-10">
-            <h1 className="text-5xl md:text-6xl font-bold text-gray-900 mb-6 leading-tight">
-              Master Your CMFAS Exam with Confidence
-            </h1>
-            <p className="text-xl text-gray-600 mb-8 leading-relaxed max-w-lg">
-              Practice with real questions, get personalized AI coaching, and track your progress with detailed analytics.
-            </p>
-            <div className="flex gap-4 flex-col sm:flex-row">
-              <Link href="/signup">
-                <button className="px-8 py-4 rounded-lg font-semibold bg-blue-600 hover:bg-blue-700 text-white text-lg transition duration-200 shadow-lg hover:shadow-xl">
-                  Start Learning Now
-                </button>
-              </Link>
-              <Link href="/login">
-                <button className="px-8 py-4 rounded-lg font-semibold border-2 border-gray-300 text-gray-900 hover:bg-gray-50 text-lg transition duration-200">
-                  Sign In
-                </button>
-              </Link>
-            </div>
-            
-            {/* Trust indicators */}
-            <div className="mt-12 pt-8 border-t border-gray-200">
-              <p className="text-sm text-gray-600 mb-4 font-medium">TRUSTED BY EXAM CANDIDATES</p>
-              <div className="flex gap-6 items-center text-sm text-gray-600">
-                <div className="flex items-center gap-2">
-                  <svg className="w-5 h-5 text-green-500" fill="currentColor" viewBox="0 0 20 20">
-                    <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
-                  </svg>
-                  1000+ Questions
-                </div>
-                <div className="flex items-center gap-2">
-                  <svg className="w-5 h-5 text-green-500" fill="currentColor" viewBox="0 0 20 20">
-                    <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
-                  </svg>
-                  AI-Powered Coaching
-                </div>
-                <div className="flex items-center gap-2">
-                  <svg className="w-5 h-5 text-green-500" fill="currentColor" viewBox="0 0 20 20">
-                    <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
-                  </svg>
-                  Detailed Analytics
-                </div>
-              </div>
+      <section className="relative pt-12 pb-16 px-6 overflow-hidden">
+        <div className="max-w-7xl mx-auto">
+          {/* Badge */}
+          <div className="flex justify-center mb-6">
+            <div className="inline-flex items-center gap-2 bg-blue-50 border border-blue-200 rounded-full px-4 py-2 hover:bg-blue-100 transition">
+              <span className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></span>
+              <span className="text-sm font-semibold text-blue-900">Join 800+ financial advisors passing CMFAS exams</span>
             </div>
           </div>
 
-          {/* Hero Illustration */}
-          <div className="flex-1 z-10">
-            <div className="bg-gradient-to-br from-gray-50 to-blue-50 rounded-2xl p-8 shadow-xl border border-gray-200">
-              <HeroIllustration />
+          {/* Main Content */}
+          <div className="grid md:grid-cols-2 gap-12 items-center">
+            {/* Left Side - Text */}
+            <div className="flex flex-col justify-center">
+              <h1 className="text-5xl md:text-6xl font-bold text-gray-900 mb-6 leading-tight">
+                Master Your <span className="bg-gradient-to-r from-blue-600 to-blue-700 bg-clip-text text-transparent">CMFAS Exam</span> with Confidence
+              </h1>
+
+              <p className="text-xl text-gray-600 mb-2 font-semibold">Get instant feedback, track progress, ace your exams</p>
+              <p className="text-gray-600 mb-8">Practice with real exam papers, get detailed explanations, and identify your weak areas with our AI-powered feedback system.</p>
+
+              <div className="flex flex-col sm:flex-row gap-4 mb-8">
+                <Link href="/signup">
+                  <button className="px-8 py-4 bg-gradient-to-r from-blue-600 to-blue-700 text-white rounded-lg font-semibold hover:shadow-lg hover:from-blue-700 hover:to-blue-800 transition-all duration-300 transform hover:scale-105 active:scale-95">
+                    Start Free Practice Now
+                  </button>
+                </Link>
+                <Link href="/papers">
+                  <button className="px-8 py-4 border-2 border-blue-600 text-blue-600 rounded-lg font-semibold hover:bg-blue-50 hover:border-blue-700 hover:text-blue-700 transition-all duration-300 transform hover:scale-105 active:scale-95">
+                    Take Your First Mock Exam
+                  </button>
+                </Link>
+              </div>
+
+              <div className="flex items-center gap-4 text-sm text-gray-600">
+                <div className="flex -space-x-2">
+                  <div className="w-8 h-8 bg-blue-400 rounded-full border-2 border-white flex items-center justify-center text-white font-bold text-xs">A</div>
+                  <div className="w-8 h-8 bg-blue-500 rounded-full border-2 border-white flex items-center justify-center text-white font-bold text-xs">J</div>
+                  <div className="w-8 h-8 bg-blue-600 rounded-full border-2 border-white flex items-center justify-center text-white font-bold text-xs">R</div>
+                </div>
+                <span><strong>800+</strong> advisors already practicing</span>
+              </div>
+            </div>
+
+            {/* Right Side - Illustration */}
+            <div className="relative h-96 flex items-center justify-center">
+              <div className="absolute inset-0 bg-gradient-to-br from-blue-100 to-transparent rounded-3xl"></div>
+              <svg viewBox="0 0 400 300" className="w-full h-full relative z-10" xmlns="http://www.w3.org/2000/svg">
+                {/* Chart Background */}
+                <rect x="40" y="40" width="320" height="220" fill="#F0F9FF" stroke="#BFDBFE" strokeWidth="2" rx="8"/>
+
+                {/* Grid Lines */}
+                <line x1="40" y1="100" x2="360" y2="100" stroke="#E0E7FF" strokeWidth="1" strokeDasharray="4"/>
+                <line x1="40" y1="160" x2="360" y2="160" stroke="#E0E7FF" strokeWidth="1" strokeDasharray="4"/>
+
+                {/* Bars */}
+                <rect x="70" y="180" width="35" height="80" fill="#93C5FD" rx="4"/>
+                <rect x="125" y="150" width="35" height="110" fill="#60A5FA" rx="4"/>
+                <rect x="180" y="120" width="35" height="140" fill="#3B82F6" rx="4"/>
+                <rect x="235" y="90" width="35" height="170" fill="#1D4ED8" rx="4"/>
+                <rect x="290" y="60" width="35" height="200" fill="#1E40AF" rx="4"/>
+
+                {/* Y Axis */}
+                <line x1="40" y1="40" x2="40" y2="260" stroke="#4B5563" strokeWidth="2"/>
+
+                {/* X Axis */}
+                <line x1="40" y1="260" x2="360" y2="260" stroke="#4B5563" strokeWidth="2"/>
+
+                {/* Labels */}
+                <text x="87" y="285" fontSize="12" fill="#6B7280" textAnchor="middle">Week 1</text>
+                <text x="142" y="285" fontSize="12" fill="#6B7280" textAnchor="middle">Week 2</text>
+                <text x="197" y="285" fontSize="12" fill="#6B7280" textAnchor="middle">Week 3</text>
+                <text x="252" y="285" fontSize="12" fill="#6B7280" textAnchor="middle">Week 4</text>
+                <text x="307" y="285" fontSize="12" fill="#6B7280" textAnchor="middle">Week 5</text>
+              </svg>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Features Section */}
+      <section id="features" className="py-16 px-6 bg-white border-t border-b border-gray-200">
+        <div className="max-w-7xl mx-auto">
+          <div className="text-center mb-12">
+            <h2 className="text-4xl font-bold text-gray-900 mb-4">Designed for Your Success</h2>
+            <p className="text-xl text-gray-600">Everything you need to pass your CMFAS exams</p>
+          </div>
+
+          <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
+            {/* Feature 1 */}
+            <div className="group bg-gradient-to-br from-blue-50 to-blue-100 rounded-xl p-6 border border-blue-200 hover:shadow-lg hover:border-blue-400 transition-all duration-300 transform hover:-translate-y-2 cursor-pointer">
+              <div className="w-12 h-12 bg-gradient-to-br from-blue-500 to-blue-600 rounded-lg flex items-center justify-center mb-4 group-hover:scale-110 transition-transform">
+                <span className="text-white text-xl">📈</span>
+              </div>
+              <h3 className="font-bold text-lg text-gray-900 mb-2">Track Your Progress</h3>
+              <p className="text-gray-700 text-sm">Monitor your performance across all exams with detailed analytics and score trends.</p>
+            </div>
+
+            {/* Feature 2 */}
+            <div className="group bg-gradient-to-br from-emerald-50 to-emerald-100 rounded-xl p-6 border border-emerald-200 hover:shadow-lg hover:border-emerald-400 transition-all duration-300 transform hover:-translate-y-2 cursor-pointer">
+              <div className="w-12 h-12 bg-gradient-to-br from-emerald-500 to-emerald-600 rounded-lg flex items-center justify-center mb-4 group-hover:scale-110 transition-transform">
+                <span className="text-white text-xl">📋</span>
+              </div>
+              <h3 className="font-bold text-lg text-gray-900 mb-2">Multiple Papers</h3>
+              <p className="text-gray-700 text-sm">Access complete CMFAS exam papers with all questions and detailed answer explanations.</p>
+            </div>
+
+            {/* Feature 3 */}
+            <div className="group bg-gradient-to-br from-amber-50 to-amber-100 rounded-xl p-6 border border-amber-200 hover:shadow-lg hover:border-amber-400 transition-all duration-300 transform hover:-translate-y-2 cursor-pointer">
+              <div className="w-12 h-12 bg-gradient-to-br from-amber-500 to-amber-600 rounded-lg flex items-center justify-center mb-4 group-hover:scale-110 transition-transform">
+                <span className="text-white text-xl">⚡</span>
+              </div>
+              <h3 className="font-bold text-lg text-gray-900 mb-2">Instant Feedback</h3>
+              <p className="text-gray-700 text-sm">Get immediate feedback on every answer with AI-powered explanations and learning tips.</p>
+            </div>
+
+            {/* Feature 4 */}
+            <div className="group bg-gradient-to-br from-purple-50 to-purple-100 rounded-xl p-6 border border-purple-200 hover:shadow-lg hover:border-purple-400 transition-all duration-300 transform hover:-translate-y-2 cursor-pointer">
+              <div className="w-12 h-12 bg-gradient-to-br from-purple-500 to-purple-600 rounded-lg flex items-center justify-center mb-4 group-hover:scale-110 transition-transform">
+                <span className="text-white text-xl">🎯</span>
+              </div>
+              <h3 className="font-bold text-lg text-gray-900 mb-2">Practice Anytime</h3>
+              <p className="text-gray-700 text-sm">Study on your schedule with full-length exams, chapter reviews, and timed practice sessions.</p>
             </div>
           </div>
         </div>
       </section>
 
       {/* How It Works */}
-      <section id="how-it-works" className="py-24 bg-gray-50">
-        <div className="max-w-7xl mx-auto px-6">
-          <div className="text-center mb-20">
-            <h2 className="text-4xl md:text-5xl font-bold text-gray-900 mb-4">
-              Your Journey to Success
-            </h2>
-            <p className="text-xl text-gray-600 max-w-2xl mx-auto">
-              A simple, effective 4-step process designed to help you excel
-            </p>
-          </div>
+      <section className="py-16 px-6">
+        <div className="max-w-7xl mx-auto">
+          <h2 className="text-4xl font-bold text-gray-900 mb-12 text-center">How It Works</h2>
 
           <div className="grid md:grid-cols-4 gap-8">
             {[
-              { step: 1, title: "Select Your Exam", desc: "Choose from 6 official CMFAS papers", illustration: Step1Illustration },
-              { step: 2, title: "Take Practice Tests", desc: "Full exams, quick quizzes, or chapter drills", illustration: Step2Illustration },
-              { step: 3, title: "Get AI Insights", desc: "Personalized recommendations for weak areas", illustration: Step3Illustration },
-              { step: 4, title: "Master Topics", desc: "Focused study with guided resources", illustration: Step4Illustration },
-            ].map((item, idx) => {
-              const Illustration = item.illustration;
-              return (
-                <div key={item.step} className="flex flex-col">
-                  <div className="relative mb-6">
-                    {idx < 3 && (
-                      <div className="hidden md:block absolute top-16 left-full w-8 h-0.5 bg-gradient-to-r from-blue-300 to-transparent" />
-                    )}
-                    <div className="w-16 h-16 bg-blue-600 text-white rounded-full flex items-center justify-center font-bold text-xl mx-auto mb-4">
-                      {item.step}
-                    </div>
-                  </div>
-                  <div className="bg-white rounded-xl p-6 border border-gray-200 flex flex-col flex-grow">
-                    <div className="h-24 mb-4 flex items-center justify-center">
-                      <Illustration />
-                    </div>
-                    <h3 className="font-bold text-lg text-gray-900 mb-2 text-center">{item.title}</h3>
-                    <p className="text-gray-600 text-sm text-center">{item.desc}</p>
-                  </div>
-                </div>
-              );
-            })}
-          </div>
-        </div>
-      </section>
-
-      {/* Features */}
-      <section id="features" className="py-24 bg-white">
-        <div className="max-w-7xl mx-auto px-6">
-          <div className="text-center mb-20">
-            <h2 className="text-4xl md:text-5xl font-bold text-gray-900 mb-4">
-              Powerful Features for Success
-            </h2>
-            <p className="text-xl text-gray-600 max-w-2xl mx-auto">
-              Everything you need to ace your exam
-            </p>
-          </div>
-
-          <div className="grid md:grid-cols-3 gap-8">
-            {[
-              {
-                title: "Real Exam Practice",
-                desc: "Practice with actual questions from official CMFAS papers. Experience the real exam format and timing.",
-                icon: ExamIcon,
-              },
-              {
-                title: "Flexible Learning Modes",
-                desc: "Choose between full exams, quick quizzes, or focused chapter practice. Learn at your own pace.",
-                icon: PracticeIcon,
-              },
-              {
-                title: "Detailed Analytics",
-                desc: "Track your progress with comprehensive statistics. Identify strengths and weaknesses instantly.",
-                icon: AnalyticsIcon,
-              },
-            ].map((item, idx) => {
-              const Icon = item.icon;
-              return (
-                <div
-                  key={idx}
-                  className="bg-white p-8 rounded-2xl border border-gray-200 hover:border-blue-300 hover:shadow-lg transition duration-300 group"
-                >
-                  <div className="w-14 h-14 bg-blue-100 rounded-lg flex items-center justify-center mb-6 group-hover:bg-blue-600 transition duration-300">
-                    <Icon />
-                  </div>
-                  <h3 className="font-bold text-lg text-gray-900 mb-3">{item.title}</h3>
-                  <p className="text-gray-600 leading-relaxed">{item.desc}</p>
-                </div>
-              );
-            })}
-          </div>
-        </div>
-      </section>
-
-      {/* Stats Section */}
-      <section className="py-24 bg-blue-600">
-        <div className="max-w-7xl mx-auto px-6">
-          <div className="grid md:grid-cols-3 gap-8 text-center">
-            {[
-              { number: "1000+", label: "Practice Questions" },
-              { number: "6", label: "Official Exam Papers" },
-              { number: "24/7", label: "AI Coaching Support" },
+              { step: 1, title: 'Sign Up', desc: 'Create your free account in seconds' },
+              { step: 2, title: 'Choose Papers', desc: 'Select which CMFAS papers to practice' },
+              { step: 3, title: 'Take Exams', desc: 'Complete full-length or chapter practice' },
+              { step: 4, title: 'Improve', desc: 'Review answers and track your progress' },
             ].map((item, idx) => (
-              <div key={idx} className="text-white">
-                <div className="text-4xl md:text-5xl font-bold mb-2">{item.number}</div>
-                <p className="text-blue-100 text-lg">{item.label}</p>
+              <div key={idx} className="relative">
+                <div className="flex flex-col items-center text-center">
+                  <div className="w-16 h-16 bg-gradient-to-br from-blue-600 to-blue-700 text-white rounded-full flex items-center justify-center mb-4 font-bold text-2xl hover:shadow-lg hover:scale-110 transition-all">
+                    {item.step}
+                  </div>
+                  <h3 className="font-bold text-lg text-gray-900 mb-2">{item.title}</h3>
+                  <p className="text-gray-600 text-sm">{item.desc}</p>
+                </div>
+                {idx < 3 && (
+                  <div className="hidden md:block absolute top-8 -right-4 text-blue-300 text-2xl">→</div>
+                )}
               </div>
             ))}
           </div>
         </div>
       </section>
 
-      {/* CTA Section */}
-      <section className="py-24 bg-gray-50">
-        <div className="max-w-4xl mx-auto px-6 text-center">
-          <h2 className="text-4xl md:text-5xl font-bold text-gray-900 mb-6">
-            Ready to ace your CMFAS exam?
-          </h2>
-          <p className="text-xl text-gray-600 mb-10">
-            Join hundreds of financial advisors who passed their CMFAS exams with Finance Ready.
-          </p>
-          <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <Link href="/signup">
-              <button className="px-8 py-4 rounded-lg font-semibold bg-blue-600 hover:bg-blue-700 text-white text-lg transition duration-200 shadow-lg hover:shadow-xl">
-                Start Your Journey
-              </button>
-            </Link>
-            <Link href="/login">
-              <button className="px-8 py-4 rounded-lg font-semibold border-2 border-gray-300 text-gray-900 hover:bg-white text-lg transition duration-200">
-                Already have an account?
-              </button>
-            </Link>
+      {/* Stats Section */}
+      <section id="stats" className="py-16 px-6 bg-gradient-to-r from-blue-600 to-blue-700 text-white">
+        <div className="max-w-7xl mx-auto">
+          <h2 className="text-4xl font-bold mb-12 text-center">Trusted by Financial Professionals</h2>
+
+          <div className="grid md:grid-cols-4 gap-8">
+            <div className="text-center hover:transform hover:scale-105 transition-transform cursor-default">
+              <div className="text-5xl font-bold mb-2">800+</div>
+              <p className="text-blue-100 font-semibold">Financial Advisors</p>
+              <p className="text-blue-200 text-sm mt-1">Currently practicing</p>
+            </div>
+            <div className="text-center hover:transform hover:scale-105 transition-transform cursor-default">
+              <div className="text-5xl font-bold mb-2">95%</div>
+              <p className="text-blue-100 font-semibold">Pass Rate</p>
+              <p className="text-blue-200 text-sm mt-1">After full course</p>
+            </div>
+            <div className="text-center hover:transform hover:scale-105 transition-transform cursor-default">
+              <div className="text-5xl font-bold mb-2">10K+</div>
+              <p className="text-blue-100 font-semibold">Practice Questions</p>
+              <p className="text-blue-200 text-sm mt-1">Across all papers</p>
+            </div>
+            <div className="text-center hover:transform hover:scale-105 transition-transform cursor-default">
+              <div className="text-5xl font-bold mb-2">24/7</div>
+              <p className="text-blue-100 font-semibold">Expert Support</p>
+              <p className="text-blue-200 text-sm mt-1">Answer any question</p>
+            </div>
           </div>
         </div>
       </section>
 
+      {/* Final CTA Section */}
+      <section className="py-16 px-6 bg-gradient-to-br from-slate-50 to-blue-50">
+        <div className="max-w-3xl mx-auto text-center">
+          <h2 className="text-4xl font-bold text-gray-900 mb-6">Ready to Pass Your CMFAS Exam?</h2>
+          <p className="text-xl text-gray-600 mb-8">Start your free practice today. No credit card required.</p>
+
+          <div className="flex flex-col sm:flex-row gap-4 justify-center">
+            <Link href="/signup">
+              <button className="px-8 py-4 bg-gradient-to-r from-blue-600 to-blue-700 text-white rounded-lg font-semibold hover:shadow-lg hover:from-blue-700 hover:to-blue-800 transition-all duration-300 transform hover:scale-105 active:scale-95">
+                Get Started Free
+              </button>
+            </Link>
+            <Link href="/login">
+              <button className="px-8 py-4 border-2 border-gray-300 text-gray-700 rounded-lg font-semibold hover:bg-white hover:border-gray-400 transition-all duration-300 transform hover:scale-105 active:scale-95">
+                Already a Member
+              </button>
+            </Link>
+          </div>
+
+          <p className="text-gray-500 text-sm mt-6">✓ Free practice with all papers &nbsp; ✓ No signup required to start &nbsp; ✓ Full access to explanations</p>
+        </div>
+      </section>
+
       {/* Footer */}
-      <footer className="bg-gray-900 text-gray-400 py-12 border-t border-gray-800">
-        <div className="max-w-7xl mx-auto px-6">
-          <div className="grid md:grid-cols-4 gap-8 mb-8">
-            <div>
-              <div className="flex items-center gap-2 mb-4">
-                <div className="w-8 h-8 bg-blue-600 rounded-lg flex items-center justify-center">
-                  <span className="text-white font-bold text-sm">📚</span>
-                </div>
-                <span className="font-semibold text-white">Finance Ready</span>
+      <footer className="bg-gray-900 text-gray-300 px-6 py-12">
+        <div className="max-w-7xl mx-auto grid md:grid-cols-4 gap-8 mb-8">
+          <div>
+            <div className="flex items-center gap-2 mb-4">
+              <div className="w-8 h-8 bg-blue-600 rounded-lg flex items-center justify-center">
+                <span className="text-white font-bold">📊</span>
               </div>
-              <p className="text-sm">Master your CMFAS exams with confidence.</p>
+              <span className="font-bold text-white">Finance Ready</span>
             </div>
-            <div>
-              <h4 className="text-white font-semibold mb-4">Product</h4>
-              <ul className="space-y-2 text-sm">
-                <li><a href="#features" className="hover:text-white transition">Features</a></li>
-                <li><a href="#how-it-works" className="hover:text-white transition">How it works</a></li>
-              </ul>
-            </div>
-            <div>
-              <h4 className="text-white font-semibold mb-4">Company</h4>
-              <ul className="space-y-2 text-sm">
-                <li><a href="#" className="hover:text-white transition">About</a></li>
-                <li><a href="#" className="hover:text-white transition">Contact</a></li>
-              </ul>
-            </div>
-            <div>
-              <h4 className="text-white font-semibold mb-4">Legal</h4>
-              <ul className="space-y-2 text-sm">
-                <li><a href="#" className="hover:text-white transition">Privacy</a></li>
-                <li><a href="#" className="hover:text-white transition">Terms</a></li>
-              </ul>
-            </div>
+            <p className="text-sm text-gray-400">Master your CMFAS exam with confidence.</p>
           </div>
-          <div className="border-t border-gray-800 pt-8">
-            <p className="text-center text-sm">
-              © 2024 Finance Ready. All rights reserved.
-            </p>
+          <div>
+            <h4 className="font-bold text-white mb-4">Product</h4>
+            <ul className="space-y-2 text-sm">
+              <li><a href="#features" className="hover:text-blue-400 transition">Features</a></li>
+              <li><a href="#" className="hover:text-blue-400 transition">Pricing</a></li>
+              <li><a href="#" className="hover:text-blue-400 transition">About</a></li>
+            </ul>
           </div>
+          <div>
+            <h4 className="font-bold text-white mb-4">Legal</h4>
+            <ul className="space-y-2 text-sm">
+              <li><a href="#" className="hover:text-blue-400 transition">Privacy</a></li>
+              <li><a href="#" className="hover:text-blue-400 transition">Terms</a></li>
+              <li><a href="#" className="hover:text-blue-400 transition">Contact</a></li>
+            </ul>
+          </div>
+          <div>
+            <h4 className="font-bold text-white mb-4">Follow Us</h4>
+            <ul className="space-y-2 text-sm">
+              <li><a href="#" className="hover:text-blue-400 transition">Twitter</a></li>
+              <li><a href="#" className="hover:text-blue-400 transition">LinkedIn</a></li>
+              <li><a href="#" className="hover:text-blue-400 transition">Facebook</a></li>
+            </ul>
+          </div>
+        </div>
+
+        <div className="border-t border-gray-800 pt-8">
+          <p className="text-center text-sm text-gray-400">© 2024 Finance Ready. All rights reserved.</p>
         </div>
       </footer>
     </div>
