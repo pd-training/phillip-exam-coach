@@ -340,9 +340,20 @@ export async function POST(
       }
     }
 
-    // Score is based on TOTAL questions in the paper, regardless of how many were answered
-    // Unanswered questions count as 0 (incorrect)
-    const totalQuestions = paper.totalQuestions || allQuestions.length;
+    // Score is based on questions actually presented in the exam (from questionIds)
+    // If no questionIds, fall back to the sum of part question counts, then paper.totalQuestions
+    let totalQuestions = 0;
+    if (questionIds && questionIds.length > 0) {
+      // Use the actual questions presented in this exam attempt
+      totalQuestions = questionIds.length;
+    } else if (examParts && examParts.length > 0) {
+      // Sum up questions from all parts
+      totalQuestions = examParts.reduce((sum, part) => sum + part.questionCount, 0);
+    } else {
+      // Fall back to paper configuration
+      totalQuestions = paper.totalQuestions || allQuestions.length;
+    }
+
     const score = totalQuestions > 0 ? Math.round((correctCount / totalQuestions) * 100) : 0;
     
     console.log(`Score calculation: ${correctCount} correct out of ${totalQuestions} total = ${score}%`);
