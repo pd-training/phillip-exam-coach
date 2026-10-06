@@ -171,27 +171,6 @@ export default function LandingPage() {
             </div>
           </div>
 
-          {/* Papers Overview */}
-          <div className="mt-12 bg-gray-50 rounded-xl p-8 border border-gray-200">
-            <h3 className="font-bold text-2xl text-gray-900 mb-6 text-center">CMFAS Exam Papers</h3>
-            <p className="text-gray-700 text-center mb-8">Finance Ready covers all official CMFAS papers with comprehensive practice materials:</p>
-            <div className="grid md:grid-cols-3 gap-6">
-              {[
-                { code: 'RES 1A', name: 'Rules, Ethics and Skills', questions: '80 Questions' },
-                { code: 'RES 5', name: 'Rules, Ethics and Skills (Advisory)', questions: '150 Questions' },
-                { code: 'CM-SIP', name: 'Capital Markets - Specified Investment Products', questions: '80 Questions' },
-                { code: 'CM-LIP', name: 'Capital Markets - Life Insurance & ILP', questions: '150 Questions' },
-                { code: 'HI', name: 'Health Insurance', questions: '172 Questions' },
-                { code: 'GI', name: 'General Insurance', questions: 'Full Coverage' },
-              ].map((paper, idx) => (
-                <div key={idx} className="bg-white rounded-lg p-4 border border-gray-200 hover:border-blue-400 transition">
-                  <p className="font-bold text-blue-600 text-sm mb-1">{paper.code}</p>
-                  <p className="text-gray-900 font-semibold mb-2">{paper.name}</p>
-                  <p className="text-gray-600 text-sm">{paper.questions}</p>
-                </div>
-              ))}
-            </div>
-          </div>
         </div>
       </section>
 
