@@ -197,8 +197,15 @@ export default function AttemptReviewPage() {
                 </p>
               </div>
             ) : (
-              // Show overall result if no parts
-              <p className="text-blue-100 mt-1">Score: {attempt.score}% | {attempt.passed ? '✓ PASSED' : '✗ FAILED'}</p>
+              // Show overall result if no parts (single-part paper)
+              <div className="mt-3 space-y-1">
+                <p className="text-blue-100">
+                  Score: <span className={attempt.passed ? 'text-green-200 font-bold' : 'text-red-200 font-bold'}>{attempt.score}%</span> ({correctCount}/{attempt.totalQuestions})
+                </p>
+                <p className={`text-base font-bold border-t border-blue-500 pt-2 ${attempt.passed ? 'text-green-300' : 'text-red-300'}`}>
+                  Overall: {attempt.passed ? '✓ PASSED' : '✗ FAILED'}
+                </p>
+              </div>
             )}
           </div>
           <div className="text-right">
