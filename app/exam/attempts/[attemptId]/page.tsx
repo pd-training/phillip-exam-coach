@@ -55,6 +55,7 @@ export default function AttemptReviewPage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
   const [currentQIndex, setCurrentQIndex] = useState(0);
+  const [activeTab, setActiveTab] = useState<'summary' | 'questions' | 'performance'>('summary');
 
   // Check authentication
   useEffect(() => {
@@ -207,49 +208,88 @@ export default function AttemptReviewPage() {
         </div>
       </div>
 
-      {/* Part Scores Summary Card - If parts exist */}
-      {/* Part-Wise breakdown removed - already shown in header summary */}
-
-      {/* Summary & Feedback Section */}
-      <div className="bg-white border-b border-gray-200">
-        <div className="max-w-7xl mx-auto px-6 py-8">
-          <h2 className="text-2xl font-bold text-gray-900 mb-6">Attempt Summary</h2>
-          
-          <div className="max-w-3xl">
-            {/* Performance Summary */}
-            <div className="p-6 bg-blue-50 rounded-lg border border-blue-200">
-              {weakChapters.length === 0 ? (
-                <>
-                  <h3 className="text-lg font-semibold text-gray-900 mb-3">🎉 Excellent Work!</h3>
-                  <p className="text-gray-700 leading-relaxed">
-                    You've demonstrated strong understanding across all chapters. Your score of <strong>{attempt.score}%</strong> shows solid mastery of the material. Keep up the excellent effort and continue practicing to maintain your high performance.
-                  </p>
-                </>
-              ) : strongChapters.length === 0 ? (
-                <>
-                  <h3 className="text-lg font-semibold text-gray-900 mb-3">📚 Keep Practicing</h3>
-                  <p className="text-gray-700 leading-relaxed mb-4">
-                    Your score of <strong>{attempt.score}%</strong> shows there's room for improvement. All chapters need more focus right now. Don't get discouraged—consistent practice and review of the explanations will help you improve. Start with the practice-by-chapter mode to strengthen your understanding.
-                  </p>
-                </>
-              ) : (
-                <>
-                  <h3 className="text-lg font-semibold text-gray-900 mb-3">💪 Good Effort, More to Go</h3>
-                  <p className="text-gray-700 leading-relaxed mb-4">
-                    Your score of <strong>{attempt.score}%</strong> shows you have a solid foundation. You performed well in some areas, but chapters <strong>{topWeakChapters.map(c => c.chapter).join(', ')}</strong> need more attention. Focus your practice on these areas and review the explanations for questions you missed to improve.
-                  </p>
-                </>
-              )}
-              <p className="text-sm text-blue-700 font-medium mt-4">💡 Tip: Use the practice-by-chapter mode to target weak areas and reinforce your strengths.</p>
-            </div>
-          </div>
+      {/* Navigation Tabs */}
+      <div className="bg-white border-b border-gray-200 sticky top-0 z-40">
+        <div className="max-w-7xl mx-auto px-6 flex gap-8">
+          <button
+            onClick={() => setActiveTab('summary')}
+            className={`py-4 px-1 font-semibold text-sm border-b-2 transition ${
+              activeTab === 'summary'
+                ? 'border-blue-600 text-blue-600'
+                : 'border-transparent text-gray-600 hover:text-gray-900'
+            }`}
+          >
+            📊 Summary
+          </button>
+          <button
+            onClick={() => setActiveTab('questions')}
+            className={`py-4 px-1 font-semibold text-sm border-b-2 transition ${
+              activeTab === 'questions'
+                ? 'border-blue-600 text-blue-600'
+                : 'border-transparent text-gray-600 hover:text-gray-900'
+            }`}
+          >
+            ❓ Question Review
+          </button>
+          <button
+            onClick={() => setActiveTab('performance')}
+            className={`py-4 px-1 font-semibold text-sm border-b-2 transition ${
+              activeTab === 'performance'
+                ? 'border-blue-600 text-blue-600'
+                : 'border-transparent text-gray-600 hover:text-gray-900'
+            }`}
+          >
+            📈 Performance
+          </button>
         </div>
       </div>
 
-      {/* Main Content */}
+      {/* Part Scores Summary Card - If parts exist */}
+      {/* Part-Wise breakdown removed - already shown in header summary */}
+
+      {/* Content Sections - Tab-based */}
+      {activeTab === 'summary' && (
+        <div className="bg-white border-b border-gray-200">
+          <div className="max-w-7xl mx-auto px-6 py-8">
+            <h2 className="text-2xl font-bold text-gray-900 mb-6">Attempt Summary</h2>
+
+            <div className="max-w-3xl">
+              {/* Performance Summary */}
+              <div className="p-6 bg-blue-50 rounded-lg border border-blue-200">
+                {weakChapters.length === 0 ? (
+                  <>
+                    <h3 className="text-lg font-semibold text-gray-900 mb-3">🎉 Excellent Work!</h3>
+                    <p className="text-gray-700 leading-relaxed">
+                      You've demonstrated strong understanding across all chapters. Your score of <strong>{attempt.score}%</strong> shows solid mastery of the material. Keep up the excellent effort and continue practicing to maintain your high performance.
+                    </p>
+                  </>
+                ) : strongChapters.length === 0 ? (
+                  <>
+                    <h3 className="text-lg font-semibold text-gray-900 mb-3">📚 Keep Practicing</h3>
+                    <p className="text-gray-700 leading-relaxed mb-4">
+                      Your score of <strong>{attempt.score}%</strong> shows there's room for improvement. All chapters need more focus right now. Don't get discouraged—consistent practice and review of the explanations will help you improve. Start with the practice-by-chapter mode to strengthen your understanding.
+                    </p>
+                  </>
+                ) : (
+                  <>
+                    <h3 className="text-lg font-semibold text-gray-900 mb-3">💪 Good Effort, More to Go</h3>
+                    <p className="text-gray-700 leading-relaxed mb-4">
+                      Your score of <strong>{attempt.score}%</strong> shows you have a solid foundation. You performed well in some areas, but chapters <strong>{topWeakChapters.map(c => c.chapter).join(', ')}</strong> need more attention. Focus your practice on these areas and review the explanations for questions you missed to improve.
+                    </p>
+                  </>
+                )}
+                <p className="text-sm text-blue-700 font-medium mt-4">💡 Tip: Use the practice-by-chapter mode to target weak areas and reinforce your strengths.</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Main Content - Questions Tab */}
+      {activeTab === 'questions' && (
       <div className="flex-1 overflow-hidden bg-white">
         <div className="max-w-7xl mx-auto px-6 h-full flex overflow-hidden">
-          {/* Left Content - Question */}
+          {/* Left Content */}
           <div className="flex-1 overflow-y-auto py-8 pr-6">
             {currentQuestion ? (
               <div className="max-w-2xl">
@@ -386,7 +426,44 @@ export default function AttemptReviewPage() {
           {/* Question Details section removed - info already displayed on the left */}
         </div>
       </div>
-    </div>
+      )}
+
+      {/* Performance Analysis Tab */}
+      {activeTab === 'performance' && (
+        <div className="bg-white">
+          <div className="max-w-7xl mx-auto px-6 py-8">
+            <h2 className="text-2xl font-bold text-gray-900 mb-8">Performance by Chapter</h2>
+            <div className="grid md:grid-cols-2 gap-6">
+              {chapterStats.map((chapter) => (
+                <div key={chapter.chapter} className="bg-gray-50 rounded-lg p-6 border border-gray-200">
+                  <div className="flex items-center justify-between mb-4">
+                    <h3 className="font-semibold text-gray-900 text-lg">Chapter {chapter.chapter}</h3>
+                    <span className={`text-2xl font-bold ${chapter.percentage >= 80 ? 'text-green-600' : chapter.percentage >= 60 ? 'text-amber-600' : 'text-red-600'}`}>
+                      {chapter.percentage}%
+                    </span>
+                  </div>
+                  <div className="w-full bg-gray-200 rounded-full h-3 mb-3">
+                    <div
+                      className={`h-3 rounded-full transition ${
+                        chapter.percentage >= 80 ? 'bg-green-500' : chapter.percentage >= 60 ? 'bg-amber-500' : 'bg-red-500'
+                      }`}
+                      style={{ width: `${chapter.percentage}%` }}
+                    ></div>
+                  </div>
+                  <p className="text-sm text-gray-700">
+                    <span className="font-semibold text-green-600">{chapter.correct}</span> out of <span className="font-semibold">{chapter.total}</span> questions correct
+                  </p>
+                  <p className="text-xs text-gray-500 mt-2">
+                    {chapter.percentage >= 80 && '✓ Strong Performance'}
+                    {chapter.percentage >= 60 && chapter.percentage < 80 && '→ Needs Improvement'}
+                    {chapter.percentage < 60 && '✗ Priority for Review'}
+                  </p>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
