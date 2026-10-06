@@ -40,6 +40,7 @@ export default function BrowsePapersPage() {
   const [error, setError] = useState('');
   const [submitting, setSubmitting] = useState<string | null>(null);
   const [submitMessages, setSubmitMessages] = useState<{ [key: string]: string }>({});
+  const [filterStatus, setFilterStatus] = useState<'all' | 'available' | 'owned' | 'pending'>('all');
 
   useEffect(() => {
     if (status === 'unauthenticated') {
@@ -180,36 +181,84 @@ export default function BrowsePapersPage() {
           </div>
         )}
 
+        {/* Filter Section */}
+        {allPapers.length > 0 && (
+          <div className="mb-8 bg-white p-6 rounded-lg border border-gray-200">
+            <label className="block text-sm font-semibold text-gray-900 mb-3">
+              Filter by status
+            </label>
+            <select
+              value={filterStatus}
+              onChange={(e) => setFilterStatus(e.target.value as any)}
+              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+            >
+              <option value="all">All papers ({allPapers.length})</option>
+              <option value="owned">You have access ({papers.length})</option>
+              <option value="available">Request available ({allPapers.filter((p) => getStatusForPaper(p.id) === 'available').length})</option>
+              <option value="pending">Pending requests ({requests.filter((r) => r.status === 'pending').length})</option>
+            </select>
+          </div>
+        )}
+
         {allPapers.length === 0 ? (
           <div className="bg-white rounded-lg border border-gray-200 p-12 text-center">
             <p className="text-gray-600">No papers available</p>
           </div>
         ) : (
-          <div className="space-y-3">
-            {allPapers.map((paper) => {
-              const status = getStatusForPaper(paper.id);
-              const msg = submitMessages[paper.id];
+          <>
+            {(() => {
+              const filteredPapers = allPapers.filter((paper) => {
+                const status = getStatusForPaper(paper.id);
+                if (filterStatus === 'all') return true;
+                return status === filterStatus;
+              });
+
+              return (
+                <>
+                  <div className="mb-4 text-sm text-gray-600">
+                    Showing {filteredPapers.length} of {allPapers.length} papers
+                  </div>
+                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                    {filteredPapers.length === 0 ? (
+                      <div className="col-span-full bg-white rounded-lg p-8 border border-gray-200 text-center">
+                        <p className="text-gray-600">No papers found in this category</p>
+                      </div>
+                    ) : (
+                      filteredPapers.map((paper) => {
+                        const status = getStatusForPaper(paper.id);
+                        const msg = submitMessages[paper.id];
 
               return (
                 <div
                   key={paper.id}
-                  className="bg-white rounded-lg border border-gray-200 p-6 flex items-center justify-between"
+                  className="bg-white rounded-lg border border-gray-200 p-6 hover:shadow-lg hover:border-blue-300 transition flex flex-col"
                 >
-                  <div className="flex-1">
-                    <h3 className="text-lg font-semibold text-gray-900">
-                      {paper.title}
-                    </h3>
-                    <p className="text-sm text-gray-600 mt-1">
-                      Available for practice
-                    </p>
+                  <div className="flex-1 mb-4">
+                    <div className="flex items-start gap-2 mb-2">
+                      <h3 className="text-lg font-semibold text-gray-900 flex-1">
+                        {paper.title}
+                      </h3>
+                      {status === 'owned' && (
+                        <span className="px-2 py-1 bg-green-100 text-green-700 rounded text-xs font-semibold whitespace-nowrap">
+                          ✓ Access
+                        </span>
+                      )}
+                    </div>
                     {paper.description && paper.description.trim() ? (
-                      <p className="text-sm text-gray-600 mt-3">{paper.description}</p>
-                    ) : (
-                      <p className="text-sm text-gray-500 italic mt-3">No description available</p>
-                    )}
+                      <p className="text-sm text-gray-600 line-clamp-2">{paper.description}</p>
+                    ) : null}
                   </div>
 
-                  <div className="ml-6 flex flex-col items-end gap-2">
+                  <div className="flex flex-col gap-2">
+                    {status === 'owned' && (
+                      <Link
+                        href={`/exam/${paper.id}`}
+                        className="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 font-medium text-center whitespace-nowrap"
+                      >
+                        Practice →
+                      </Link>
+                    )}
+
                     {status === 'available' && (
                       <>
                         <button
@@ -222,7 +271,7 @@ export default function BrowsePapersPage() {
                           {submitting === paper.id ? 'Requesting...' : 'Request'}
                         </button>
                         {msg && (
-                          <p className="text-xs text-green-600 font-medium text-right">
+                          <p className="text-xs text-green-600 font-medium text-center">
                             {msg}
                           </p>
                         )}
@@ -230,19 +279,19 @@ export default function BrowsePapersPage() {
                     )}
 
                     {status === 'pending' && (
-                      <span className="px-3 py-2 bg-yellow-100 text-yellow-800 rounded-lg text-sm font-medium whitespace-nowrap">
+                      <span className="px-3 py-2 bg-yellow-100 text-yellow-800 rounded-lg text-sm font-medium text-center whitespace-nowrap">
                         ⏳ Pending
                       </span>
                     )}
 
                     {status === 'approved' && (
-                      <span className="px-3 py-2 bg-green-100 text-green-800 rounded-lg text-sm font-medium whitespace-nowrap">
+                      <span className="px-3 py-2 bg-green-100 text-green-800 rounded-lg text-sm font-medium text-center whitespace-nowrap">
                         ✓ Approved
                       </span>
                     )}
 
                     {status === 'rejected' && (
-                      <span className="px-3 py-2 bg-red-100 text-red-800 rounded-lg text-sm font-medium whitespace-nowrap">
+                      <span className="px-3 py-2 bg-red-100 text-red-800 rounded-lg text-sm font-medium text-center whitespace-nowrap">
                         ✗ Rejected
                       </span>
                     )}
@@ -252,16 +301,21 @@ export default function BrowsePapersPage() {
                         href={paper.externalLink}
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="px-3 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 text-sm font-medium whitespace-nowrap transition"
+                        className="px-3 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 text-sm font-medium text-center whitespace-nowrap transition"
                       >
                         Learn more →
                       </a>
                     )}
                   </div>
-                </div>
+                      </div>
+                      );
+                      })
+                    )}
+                  </div>
+                </>
               );
-            })}
-          </div>
+            })()}
+          </>
         )}
       </div>
     </div>

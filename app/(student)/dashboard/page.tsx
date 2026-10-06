@@ -107,8 +107,30 @@ export default function StudentDashboard() {
       {/* Hero Section */}
       <div className="bg-gradient-to-r from-blue-600 to-blue-700 text-white py-12 px-0">
         <div className="max-w-7xl mx-auto px-6">
-          <h1 className="text-4xl font-bold mb-2">Welcome, {session?.user?.name || "Student"}!</h1>
-          <p className="text-blue-100">Your CMFAS exam preparation dashboard</p>
+          {attempts.length > 0 && (() => {
+            const latest = [...attempts].sort((a, b) => new Date(b.submittedat).getTime() - new Date(a.submittedat).getTime())[0];
+            return (
+              <>
+                <p className="text-blue-100 text-sm mb-2">Latest attempt</p>
+                <h1 className="text-4xl font-bold mb-2">{latest.paperTitle}</h1>
+                <div className="flex items-center gap-4 flex-wrap">
+                  <span className={`text-2xl font-bold ${latest.result === 'Pass' ? 'text-green-300' : 'text-orange-300'}`}>
+                    {latest.score}%
+                  </span>
+                  <span className={`text-sm font-semibold px-3 py-1 rounded ${latest.result === 'Pass' ? 'bg-green-500' : 'bg-orange-500'}`}>
+                    {latest.result === 'Pass' ? '✓ Passed' : '○ Not passed'}
+                  </span>
+                  <span className="text-blue-100 text-sm">{new Date(latest.submittedat).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}</span>
+                </div>
+              </>
+            );
+          })()}
+          {attempts.length === 0 && (
+            <>
+              <h1 className="text-4xl font-bold mb-2">Welcome, {session?.user?.name || "Student"}!</h1>
+              <p className="text-blue-100">Ready to practice? Start your first exam attempt</p>
+            </>
+          )}
         </div>
       </div>
 

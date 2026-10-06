@@ -22,6 +22,7 @@ export default function AllAttemptsPage() {
   const [attempts, setAttempts] = useState<Attempt[]>([]);
   const [loading, setLoading] = useState(true);
   const [selectedPaper, setSelectedPaper] = useState("");
+  const [sortBy, setSortBy] = useState<'newest' | 'oldest' | 'highest' | 'lowest'>('newest');
 
   useEffect(() => {
     if (status === "unauthenticated") {
@@ -81,33 +82,51 @@ export default function AllAttemptsPage() {
 
       {/* Main Content */}
       <div className="max-w-7xl mx-auto px-6 py-12 flex-1 w-full">
-        {/* Filter Section */}
+        {/* Filter & Sort Section */}
         {attempts.length > 0 && (
-          <div className="mb-8 bg-white p-6 rounded-lg border border-gray-200">
-            <label className="block text-sm font-semibold text-gray-900 mb-3">
-              Filter by Paper
-            </label>
-            <select
-              value={selectedPaper}
-              onChange={(e) => setSelectedPaper(e.target.value)}
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-            >
-              <option value="">All Papers ({attempts.length})</option>
-              {Array.from(
-                attempts.reduce((map, attempt) => {
-                  const count = (map.get(attempt.paperid) || 0) + 1;
-                  map.set(attempt.paperid, count);
-                  return map;
-                }, new Map<string, number>())
-              ).map(([paperId, count]) => {
-                const paperTitle = attempts.find((a) => a.paperid === paperId)?.paperTitle || paperId;
-                return (
-                  <option key={paperId} value={paperId}>
-                    {paperTitle} ({count})
-                  </option>
-                );
-              })}
-            </select>
+          <div className="mb-8 grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div className="bg-white p-6 rounded-lg border border-gray-200">
+              <label className="block text-sm font-semibold text-gray-900 mb-3">
+                Filter by Paper
+              </label>
+              <select
+                value={selectedPaper}
+                onChange={(e) => setSelectedPaper(e.target.value)}
+                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+              >
+                <option value="">All Papers ({attempts.length})</option>
+                {Array.from(
+                  attempts.reduce((map, attempt) => {
+                    const count = (map.get(attempt.paperid) || 0) + 1;
+                    map.set(attempt.paperid, count);
+                    return map;
+                  }, new Map<string, number>())
+                ).map(([paperId, count]) => {
+                  const paperTitle = attempts.find((a) => a.paperid === paperId)?.paperTitle || paperId;
+                  return (
+                    <option key={paperId} value={paperId}>
+                      {paperTitle} ({count})
+                    </option>
+                  );
+                })}
+              </select>
+            </div>
+
+            <div className="bg-white p-6 rounded-lg border border-gray-200">
+              <label className="block text-sm font-semibold text-gray-900 mb-3">
+                Sort by
+              </label>
+              <select
+                value={sortBy}
+                onChange={(e) => setSortBy(e.target.value as any)}
+                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+              >
+                <option value="newest">Newest first</option>
+                <option value="oldest">Oldest first</option>
+                <option value="highest">Highest score</option>
+                <option value="lowest">Lowest score</option>
+              </select>
+            </div>
           </div>
         )}
 
@@ -141,10 +160,21 @@ export default function AllAttemptsPage() {
         ) : (
           <>
             {(() => {
-              const filteredAttempts =
+              let filteredAttempts =
                 selectedPaper === ""
                   ? attempts
                   : attempts.filter((attempt) => attempt.paperid === selectedPaper);
+
+              // Apply sorting
+              if (sortBy === 'newest') {
+                filteredAttempts.sort((a, b) => new Date(b.submittedat).getTime() - new Date(a.submittedat).getTime());
+              } else if (sortBy === 'oldest') {
+                filteredAttempts.sort((a, b) => new Date(a.submittedat).getTime() - new Date(b.submittedat).getTime());
+              } else if (sortBy === 'highest') {
+                filteredAttempts.sort((a, b) => b.score - a.score);
+              } else if (sortBy === 'lowest') {
+                filteredAttempts.sort((a, b) => a.score - b.score);
+              }
 
               return (
                 <>

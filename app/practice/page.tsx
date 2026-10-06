@@ -13,11 +13,19 @@ interface StudentPaper {
   status: string;
 }
 
+interface Attempt {
+  id: string;
+  paperid: string;
+  score: number;
+  result: string;
+}
+
 export default function PracticePage() {
   const { data: session, status } = useSession();
   const router = useRouter();
 
   const [papers, setPapers] = useState<StudentPaper[]>([]);
+  const [attempts, setAttempts] = useState<Attempt[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
 
@@ -35,14 +43,19 @@ export default function PracticePage() {
         setLoading(true);
         setError('');
 
-        const papersRes = await fetch('/api/student/papers');
+        const [papersRes, attemptsRes] = await Promise.all([
+          fetch('/api/student/papers'),
+          fetch('/api/student/attempts'),
+        ]);
 
-        if (!papersRes.ok) {
-          throw new Error('Failed to fetch papers');
+        if (!papersRes.ok || !attemptsRes.ok) {
+          throw new Error('Failed to fetch data');
         }
 
         const papersData = await papersRes.json();
+        const attemptsData = await attemptsRes.json();
         setPapers(papersData.papers || []);
+        setAttempts(attemptsData.attempts || []);
       } catch (err: any) {
         setError(err.message || 'Failed to load papers');
         console.error('Practice error:', err);
@@ -103,23 +116,65 @@ export default function PracticePage() {
               </div>
             ) : (
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                {papers.map((paper) => (
-                  <Link
-                    key={paper.id}
-                    href={`/exam/${paper.paperId}`}
-                    className="bg-white rounded-lg border border-gray-200 p-6 hover:shadow-lg hover:border-blue-300 transition"
-                  >
-                    <h3 className="text-lg font-semibold text-gray-900">
-                      {paper.paper_name}
-                    </h3>
-                    <p className="text-sm text-gray-600 mt-2 line-clamp-2">
-                      Ready to practice
-                    </p>
-                    <div className="mt-4 flex items-center text-blue-600 font-medium">
-                      Start practicing →
-                    </div>
-                  </Link>
-                ))}
+                {papers.map((paper) => {
+                  const paperAttempts = attempts.filter((a) => a.paperid === paper.paperId);
+                  const latestAttempt = paperAttempts.length > 0
+                    ? paperAttempts.sort((a, b) => new Date(b.id).getTime() - new Date(a.id).getTime())[0]
+                    : null;
+                  const isPassed = latestAttempt?.result === 'Pass';
+
+                  const passingScore = 75;
+                  const progressPercent = latestAttempt ? Math.min(100, (latestAttempt.score / passingScore) * 100) : 0;
+
+                  return (
+                    <Link
+                      key={paper.id}
+                      href={`/exam/${paper.paperId}`}
+                      className="bg-white rounded-lg border border-gray-200 p-6 hover:shadow-lg hover:border-blue-300 transition flex flex-col"
+                    >
+                      <div className="flex items-start justify-between gap-3 mb-3">
+                        <h3 className="text-lg font-semibold text-gray-900 flex-1">
+                          {paper.paper_name}
+                        </h3>
+                        {latestAttempt && (
+                          <div className={`px-2 py-1 rounded text-xs font-semibold whitespace-nowrap ${
+                            isPassed
+                              ? 'bg-green-100 text-green-700'
+                              : 'bg-orange-100 text-orange-700'
+                          }`}>
+                            {isPassed ? '✓ Passed' : '○ Attempted'}
+                          </div>
+                        )}
+                        {!latestAttempt && (
+                          <div className="px-2 py-1 rounded text-xs font-semibold whitespace-nowrap bg-blue-100 text-blue-700">
+                            Not started
+                          </div>
+                        )}
+                      </div>
+                      {latestAttempt && (
+                        <>
+                          <div className="mb-3">
+                            <div className="flex items-center justify-between mb-1">
+                              <span className="text-sm text-gray-600">Latest: <span className="font-semibold">{latestAttempt.score}%</span></span>
+                              <span className="text-xs text-gray-500">Target: {passingScore}%</span>
+                            </div>
+                            <div className="w-full bg-gray-200 rounded-full h-2">
+                              <div
+                                className={`h-2 rounded-full transition-all ${
+                                  isPassed ? 'bg-green-500' : 'bg-blue-500'
+                                }`}
+                                style={{ width: `${progressPercent}%` }}
+                              />
+                            </div>
+                          </div>
+                        </>
+                      )}
+                      <div className="mt-auto flex items-center text-blue-600 font-medium">
+                        {latestAttempt ? 'Practice again' : 'Start practicing'} →
+                      </div>
+                    </Link>
+                  );
+                })}
               </div>
             )}
           </div>
