@@ -27,7 +27,7 @@ interface ExamPart {
   orderIndex: number;
 }
 
-type TabType = "settings" | "format" | "questions" | "chapters";
+type TabType = "settings" | "questions" | "chapters";
 
 export default function PaperDetailPage() {
   const router = useRouter();
@@ -72,6 +72,13 @@ export default function PaperDetailPage() {
   const [editOptionB, setEditOptionB] = useState("");
   const [editOptionC, setEditOptionC] = useState("");
   const [editOptionD, setEditOptionD] = useState("");
+
+  // Exam parts form
+  const [showAddPartModal, setShowAddPartModal] = useState(false);
+  const [partName, setPartName] = useState("");
+  const [partChapterStart, setPartChapterStart] = useState("");
+  const [partChapterEnd, setPartChapterEnd] = useState("");
+  const [partPassingScore, setPartPassingScore] = useState("70");
 
   useEffect(() => {
     if (status === "unauthenticated") {
@@ -301,6 +308,42 @@ export default function PaperDetailPage() {
     }
   };
 
+  const handleAddPart = async () => {
+    if (!partName.trim() || !partChapterStart || !partChapterEnd) {
+      alert("Please fill in all part details");
+      return;
+    }
+
+    try {
+      setSubmitting(true);
+
+      const res = await fetch(`/api/papers/${paperId}/exam-format/parts`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          partName: partName.trim(),
+          chapterStart: parseInt(partChapterStart),
+          chapterEnd: parseInt(partChapterEnd),
+          passingScore: parseInt(partPassingScore),
+        }),
+      });
+
+      if (!res.ok) throw new Error("Failed to add part");
+
+      alert("Exam part added successfully");
+      setShowAddPartModal(false);
+      setPartName("");
+      setPartChapterStart("");
+      setPartChapterEnd("");
+      setPartPassingScore("70");
+      await fetchPaperData();
+    } catch (error) {
+      alert("Error adding part: " + (error as Error).message);
+    } finally {
+      setSubmitting(false);
+    }
+  };
+
   if (status === "loading" || loading) {
     return (
       <div className="min-h-screen bg-gray-50">
@@ -364,7 +407,7 @@ export default function PaperDetailPage() {
         <div className="border-t border-gray-200 bg-gray-50">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div className="flex gap-8">
-              {(["settings", "format", "questions", "chapters"] as TabType[]).map((tab) => (
+              {(["settings", "questions", "chapters"] as TabType[]).map((tab) => (
                 <button
                   key={tab}
                   onClick={() => setActiveTab(tab)}
@@ -375,7 +418,6 @@ export default function PaperDetailPage() {
                   }`}
                 >
                   {tab === "settings" && "Settings"}
-                  {tab === "format" && "Exam Format"}
                   {tab === "questions" && "Questions"}
                   {tab === "chapters" && "Chapters"}
                 </button>
@@ -451,6 +493,35 @@ export default function PaperDetailPage() {
               </div>
 
               <h2 className="text-lg font-semibold mb-6 uppercase text-gray-600 text-xs tracking-wider">
+                Exam Parts
+              </h2>
+              <div className="space-y-3 mb-6">
+                {parts.length === 0 ? (
+                  <p className="text-gray-500">No exam parts configured</p>
+                ) : (
+                  parts.map((part) => (
+                    <div key={part.id} className="bg-gray-100 p-4 rounded-lg flex justify-between items-center">
+                      <div>
+                        <p className="font-semibold text-gray-900">{part.partName}</p>
+                        <p className="text-sm text-gray-600">
+                          Chapters {part.chapterStart}–{part.chapterEnd} • {part.questionCount} questions • {part.passingScore}% pass score
+                        </p>
+                      </div>
+                      <button className="px-3 py-1 bg-white text-gray-900 border border-gray-300 rounded text-sm hover:bg-gray-50">
+                        Edit
+                      </button>
+                    </div>
+                  ))
+                )}
+              </div>
+              <button
+                onClick={() => setShowAddPartModal(true)}
+                className="mb-6 px-6 py-2 bg-amber-500 text-gray-900 font-semibold rounded-lg hover:bg-amber-600 transition"
+              >
+                + Add Exam Part
+              </button>
+
+              <h2 className="text-lg font-semibold mb-6 uppercase text-gray-600 text-xs tracking-wider">
                 Availability
               </h2>
               <div className="flex items-center gap-3 mb-8">
@@ -482,37 +553,6 @@ export default function PaperDetailPage() {
                 </button>
               </div>
             </div>
-          </div>
-        )}
-
-        {/* Exam Format Tab */}
-        {activeTab === "format" && (
-          <div className="bg-white rounded-lg shadow p-6">
-            <h2 className="text-lg font-semibold mb-6 uppercase text-gray-600 text-xs tracking-wider">
-              Exam Parts
-            </h2>
-            <div className="space-y-3 mb-6">
-              {parts.length === 0 ? (
-                <p className="text-gray-500">No exam parts configured</p>
-              ) : (
-                parts.map((part) => (
-                  <div key={part.id} className="bg-gray-100 p-4 rounded-lg flex justify-between items-center">
-                    <div>
-                      <p className="font-semibold text-gray-900">{part.partName}</p>
-                      <p className="text-sm text-gray-600">
-                        Chapters {part.chapterStart}–{part.chapterEnd} • {part.questionCount} questions • {part.passingScore}% pass score
-                      </p>
-                    </div>
-                    <button className="px-3 py-1 bg-white text-gray-900 border border-gray-300 rounded text-sm hover:bg-gray-50">
-                      Edit
-                    </button>
-                  </div>
-                ))
-              )}
-            </div>
-            <button className="px-6 py-2 bg-amber-500 text-gray-900 font-semibold rounded-lg hover:bg-amber-600 transition">
-              + Add Part
-            </button>
           </div>
         )}
 
@@ -824,6 +864,86 @@ export default function PaperDetailPage() {
                 className="px-4 py-2 bg-amber-500 text-gray-900 font-medium rounded-lg hover:bg-amber-600 disabled:opacity-50"
               >
                 {submitting ? "Saving..." : "Save Changes"}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Add Exam Part Modal */}
+      {showAddPartModal && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+          <div className="bg-white rounded-lg shadow-lg p-6 max-w-md w-full mx-4">
+            <h3 className="text-lg font-bold text-gray-900 mb-6">Add Exam Part</h3>
+
+            <div className="space-y-4 mb-6">
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">Part Name</label>
+                <input
+                  type="text"
+                  value={partName}
+                  onChange={(e) => setPartName(e.target.value)}
+                  placeholder="e.g., Part A, Section 1"
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-amber-500"
+                />
+              </div>
+
+              <div className="grid grid-cols-2 gap-3">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">Chapter Start</label>
+                  <input
+                    type="number"
+                    value={partChapterStart}
+                    onChange={(e) => setPartChapterStart(e.target.value)}
+                    min="1"
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-amber-500"
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">Chapter End</label>
+                  <input
+                    type="number"
+                    value={partChapterEnd}
+                    onChange={(e) => setPartChapterEnd(e.target.value)}
+                    min="1"
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-amber-500"
+                  />
+                </div>
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">Passing Score (%)</label>
+                <input
+                  type="number"
+                  value={partPassingScore}
+                  onChange={(e) => setPartPassingScore(e.target.value)}
+                  min="1"
+                  max="100"
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-amber-500"
+                />
+              </div>
+            </div>
+
+            <div className="flex gap-3 justify-end">
+              <button
+                onClick={() => {
+                  setShowAddPartModal(false);
+                  setPartName("");
+                  setPartChapterStart("");
+                  setPartChapterEnd("");
+                  setPartPassingScore("70");
+                }}
+                disabled={submitting}
+                className="px-4 py-2 bg-gray-200 text-gray-900 font-medium rounded-lg hover:bg-gray-300 disabled:opacity-50"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={handleAddPart}
+                disabled={submitting || !partName}
+                className="px-4 py-2 bg-amber-500 text-gray-900 font-medium rounded-lg hover:bg-amber-600 disabled:opacity-50"
+              >
+                {submitting ? "Adding..." : "Add Part"}
               </button>
             </div>
           </div>
