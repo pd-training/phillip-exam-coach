@@ -40,11 +40,14 @@ export default function PaperDetailPage() {
   const [submitting, setSubmitting] = useState(false);
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
   const [showUploadModal, setShowUploadModal] = useState(false);
+  const [showEditModal, setShowEditModal] = useState(false);
+  const [selectedQuestion, setSelectedQuestion] = useState<any>(null);
 
   // Paper data
   const [paper, setPaper] = useState<Paper | null>(null);
   const [parts, setParts] = useState<ExamPart[]>([]);
   const [questions, setQuestions] = useState<any[]>([]);
+  const [chapters, setChapters] = useState<any[]>([]);
 
   // Upload state
   const [uploadFile, setUploadFile] = useState<File | null>(null);
@@ -58,6 +61,16 @@ export default function PaperDetailPage() {
   const [duration, setDuration] = useState("");
   const [passingScore, setPassingScore] = useState("");
   const [isAvailable, setIsAvailable] = useState(false);
+
+  // Edit question form
+  const [editQuestionText, setEditQuestionText] = useState("");
+  const [editAnswer, setEditAnswer] = useState("A");
+  const [editChapter, setEditChapter] = useState("1");
+  const [editExplanation, setEditExplanation] = useState("");
+  const [editOptionA, setEditOptionA] = useState("");
+  const [editOptionB, setEditOptionB] = useState("");
+  const [editOptionC, setEditOptionC] = useState("");
+  const [editOptionD, setEditOptionD] = useState("");
 
   useEffect(() => {
     if (status === "unauthenticated") {
@@ -94,6 +107,15 @@ export default function PaperDetailPage() {
       const formatRes = await fetch(`/api/papers/${paperId}/exam-format`);
       const formatData = await formatRes.json();
       setParts(formatData.examFormat?.parts || []);
+
+      // Fetch chapters
+      try {
+        const chaptersRes = await fetch(`/api/admin/papers/${paperId}/chapters`);
+        const chaptersData = await chaptersRes.json();
+        setChapters(chaptersData.chapters || []);
+      } catch (error) {
+        console.error("Error fetching chapters:", error);
+      }
     } catch (error) {
       console.error("Error fetching paper data:", error);
     } finally {
@@ -186,6 +208,80 @@ export default function PaperDetailPage() {
       }
     } catch (error) {
       setUploadProgress(`Upload failed: ${(error as Error).message}`);
+    } finally {
+      setSubmitting(false);
+    }
+  };
+
+  const handleEditQuestion = (question: any) => {
+    setSelectedQuestion(question);
+    setEditQuestionText(question.questionText || "");
+    setEditAnswer(question.correctAnswer || "A");
+    setEditChapter(question.chapterNumber?.toString() || "1");
+    setEditExplanation(question.explanation || "");
+    setEditOptionA(question.optionA || "");
+    setEditOptionB(question.optionB || "");
+    setEditOptionC(question.optionC || "");
+    setEditOptionD(question.optionD || "");
+    setShowEditModal(true);
+  };
+
+  const handleUpdateQuestion = async () => {
+    if (!selectedQuestion || !editQuestionText.trim()) {
+      alert("Question text is required");
+      return;
+    }
+
+    try {
+      setSubmitting(true);
+
+      const res = await fetch(
+        `/api/papers/${paperId}/questions/${selectedQuestion.id}`,
+        {
+          method: "PATCH",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            questionText: editQuestionText,
+            correctAnswer: editAnswer,
+            chapterNumber: parseInt(editChapter),
+            explanation: editExplanation,
+            optionA: editOptionA,
+            optionB: editOptionB,
+            optionC: editOptionC,
+            optionD: editOptionD,
+          }),
+        }
+      );
+
+      if (!res.ok) throw new Error("Failed to update");
+
+      alert("Question updated successfully");
+      await fetchPaperData();
+      setShowEditModal(false);
+    } catch (error) {
+      alert("Error updating question: " + (error as Error).message);
+    } finally {
+      setSubmitting(false);
+    }
+  };
+
+  const handleDeleteQuestion = async (questionId: string) => {
+    if (!confirm("Are you sure you want to delete this question?")) return;
+
+    try {
+      setSubmitting(true);
+
+      const res = await fetch(
+        `/api/papers/${paperId}/questions/${questionId}`,
+        { method: "DELETE" }
+      );
+
+      if (!res.ok) throw new Error("Failed to delete");
+
+      alert("Question deleted successfully");
+      await fetchPaperData();
+    } catch (error) {
+      alert("Error deleting question: " + (error as Error).message);
     } finally {
       setSubmitting(false);
     }
@@ -434,9 +530,18 @@ export default function PaperDetailPage() {
                         <td className="px-4 py-3 font-semibold text-gray-900">{q.chapterNumber}</td>
                         <td className="px-4 py-3 text-gray-700 truncate max-w-xs">{q.questionText?.substring(0, 50)}...</td>
                         <td className="px-4 py-3 font-semibold text-gray-900">{q.correctAnswer}</td>
-                        <td className="px-4 py-3">
-                          <button className="px-3 py-1 bg-gray-200 text-gray-900 text-xs rounded hover:bg-gray-300">
+                        <td className="px-4 py-3 flex gap-2">
+                          <button
+                            onClick={() => handleEditQuestion(q)}
+                            className="px-3 py-1 bg-blue-100 text-blue-700 text-xs rounded hover:bg-blue-200"
+                          >
                             Edit
+                          </button>
+                          <button
+                            onClick={() => handleDeleteQuestion(q.id)}
+                            className="px-3 py-1 bg-red-100 text-red-700 text-xs rounded hover:bg-red-200"
+                          >
+                            Delete
                           </button>
                         </td>
                       </tr>
@@ -454,18 +559,23 @@ export default function PaperDetailPage() {
             <h2 className="text-lg font-semibold mb-6 uppercase text-gray-600 text-xs tracking-wider">
               Chapter Titles
             </h2>
-            <div className="space-y-4 mb-6">
-              {[1, 2, 3, 4, 5].map((ch) => (
-                <div key={ch}>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">Chapter {ch}</label>
-                  <input
-                    type="text"
-                    placeholder={`Chapter ${ch}`}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-amber-500"
-                  />
-                </div>
-              ))}
-            </div>
+            {chapters.length === 0 ? (
+              <p className="text-gray-500 mb-6">No chapters configured yet.</p>
+            ) : (
+              <div className="space-y-4 mb-6">
+                {chapters.map((ch) => (
+                  <div key={ch.number}>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">Chapter {ch.number}</label>
+                    <input
+                      type="text"
+                      defaultValue={ch.title || ""}
+                      placeholder={`Chapter ${ch.number}`}
+                      className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-amber-500"
+                    />
+                  </div>
+                ))}
+              </div>
+            )}
             <div className="flex gap-3">
               <button className="px-6 py-2 bg-amber-500 text-gray-900 font-semibold rounded-lg hover:bg-amber-600 transition">
                 Save Changes
@@ -583,6 +693,118 @@ export default function PaperDetailPage() {
                 className="px-4 py-2 bg-amber-500 text-gray-900 font-medium rounded-lg hover:bg-amber-600 disabled:opacity-50"
               >
                 {submitting ? "Uploading..." : "Upload"}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Edit Question Modal */}
+      {showEditModal && selectedQuestion && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 overflow-y-auto">
+          <div className="bg-white rounded-lg shadow-lg p-6 max-w-2xl w-full mx-4 my-8">
+            <h3 className="text-lg font-bold text-gray-900 mb-4">Edit Question</h3>
+
+            <div className="space-y-4 max-h-96 overflow-y-auto">
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">Chapter Number</label>
+                <input
+                  type="number"
+                  value={editChapter}
+                  onChange={(e) => setEditChapter(e.target.value)}
+                  min="1"
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-amber-500"
+                />
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">Question Text</label>
+                <textarea
+                  value={editQuestionText}
+                  onChange={(e) => setEditQuestionText(e.target.value)}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-amber-500 resize-none"
+                  rows={3}
+                />
+              </div>
+
+              <div className="grid grid-cols-2 gap-3">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">Option A</label>
+                  <input
+                    type="text"
+                    value={editOptionA}
+                    onChange={(e) => setEditOptionA(e.target.value)}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-amber-500"
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">Option B</label>
+                  <input
+                    type="text"
+                    value={editOptionB}
+                    onChange={(e) => setEditOptionB(e.target.value)}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-amber-500"
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">Option C</label>
+                  <input
+                    type="text"
+                    value={editOptionC}
+                    onChange={(e) => setEditOptionC(e.target.value)}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-amber-500"
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">Option D</label>
+                  <input
+                    type="text"
+                    value={editOptionD}
+                    onChange={(e) => setEditOptionD(e.target.value)}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-amber-500"
+                  />
+                </div>
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">Correct Answer</label>
+                <select
+                  value={editAnswer}
+                  onChange={(e) => setEditAnswer(e.target.value)}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-amber-500"
+                >
+                  <option value="A">A</option>
+                  <option value="B">B</option>
+                  <option value="C">C</option>
+                  <option value="D">D</option>
+                </select>
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">Explanation</label>
+                <textarea
+                  value={editExplanation}
+                  onChange={(e) => setEditExplanation(e.target.value)}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-amber-500 resize-none"
+                  rows={3}
+                />
+              </div>
+            </div>
+
+            <div className="flex gap-3 justify-end mt-6">
+              <button
+                onClick={() => setShowEditModal(false)}
+                disabled={submitting}
+                className="px-4 py-2 bg-gray-200 text-gray-900 font-medium rounded-lg hover:bg-gray-300 disabled:opacity-50"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={handleUpdateQuestion}
+                disabled={submitting}
+                className="px-4 py-2 bg-amber-500 text-gray-900 font-medium rounded-lg hover:bg-amber-600 disabled:opacity-50"
+              >
+                {submitting ? "Saving..." : "Save Changes"}
               </button>
             </div>
           </div>
