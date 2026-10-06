@@ -41,6 +41,17 @@ export async function POST(req: Request) {
       RETURNING id, title, description, "externalLink", "durationMinutes", "totalQuestions", "isAvailable", "createdAt"
     `;
 
+    const paperId = result?.[0]?.id;
+
+    // Auto-create default exam part for single-part papers
+    if (paperId) {
+      const questionCount = totalQuestions || 150;
+      await prisma.$queryRaw`
+        INSERT INTO "ExamPart" (id, "paperId", "partName", "chapterStart", "chapterEnd", "questionCount", "passingScore", "orderIndex", "createdAt", "updatedAt")
+        VALUES (gen_random_uuid(), ${paperId}::uuid, 'Full Exam', 1, 100, ${questionCount}, 70, 1, NOW(), NOW())
+      `;
+    }
+
     return Response.json({
       success: true,
       paper: result?.[0] || null,
