@@ -305,8 +305,8 @@ export default function FullExamMode() {
                       <div style={{
                         marginTop: "12px",
                         padding: "12px",
-                        backgroundColor: answerData.isCorrect ? "#ecfdf5" : "#fef3c7",
-                        border: `1px solid ${answerData.isCorrect ? "#d1fae5" : "#fde68a"}`,
+                        backgroundColor: answerData.isCorrect ? "#ecfdf5" : "#eff6ff",
+                        border: `1px solid ${answerData.isCorrect ? "#d1fae5" : "#bfdbfe"}`,
                         borderRadius: "4px",
                         fontSize: "13px",
                         lineHeight: "1.5",
@@ -336,8 +336,8 @@ export default function FullExamMode() {
           style={{
             marginTop: "20px",
             padding: "10px 20px",
-            backgroundColor: "#f59e0b",
-            color: "#1f2937",
+            backgroundColor: "#2563eb",
+            color: "white",
             border: "none",
             borderRadius: "6px",
             cursor: "pointer",
@@ -401,7 +401,7 @@ export default function FullExamMode() {
             <div className="text-sm text-gray-600">
               Question <span className="font-semibold text-gray-900">{currentQIndex + 1}</span> of <span className="font-semibold text-gray-900">{questions.length}</span>
             </div>
-            <div className={`text-xl font-bold ${timeLeft < 300 ? "text-red-600" : "text-amber-600"}`}>
+            <div className={`text-xl font-bold ${timeLeft < 300 ? "text-red-600" : "text-blue-600"}`}>
               {formatTime(timeLeft)}
             </div>
           </div>
@@ -456,10 +456,10 @@ export default function FullExamMode() {
                     padding: "15px",
                     marginBottom: "12px",
                     backgroundColor:
-                      answers[currentQuestion.id] === option.key ? "#fef3c7" : "white",
+                      answers[currentQuestion.id] === option.key ? "#eff6ff" : "white",
                     border:
                       answers[currentQuestion.id] === option.key
-                        ? "2px solid #f59e0b"
+                        ? "2px solid #3b82f6"
                         : "1px solid #e5e7eb",
                     borderRadius: "6px",
                     cursor: "pointer",
@@ -561,14 +561,14 @@ export default function FullExamMode() {
         >
           {/* Part Info - If parts exist */}
           {parts.length > 0 && currentPart && (
-            <div style={{ marginBottom: "20px", padding: "12px", backgroundColor: "#fef3c7", border: "1px solid #fde68a", borderRadius: "6px" }}>
-              <p style={{ margin: "0 0 8px 0", fontSize: "12px", color: "#b45309", fontWeight: "600" }}>
+            <div style={{ marginBottom: "20px", padding: "12px", backgroundColor: "#eff6ff", border: "1px solid #bfdbfe", borderRadius: "6px" }}>
+              <p style={{ margin: "0 0 8px 0", fontSize: "12px", color: "#1d4ed8", fontWeight: "600" }}>
                 CURRENT PART
               </p>
-              <div style={{ fontSize: "14px", fontWeight: "600", color: "#d97706", marginBottom: "6px" }}>
+              <div style={{ fontSize: "14px", fontWeight: "600", color: "#2563eb", marginBottom: "6px" }}>
                 {currentPart.partName}
               </div>
-              <div style={{ fontSize: "12px", color: "#b45309", lineHeight: "1.6" }}>
+              <div style={{ fontSize: "12px", color: "#1d4ed8", lineHeight: "1.6" }}>
                 <div>Progress: Q{currentPart.questionInPart}/{currentPart.totalInPart}</div>
                 <div>Passing: {currentPart.passingScore}%</div>
               </div>
@@ -628,17 +628,17 @@ export default function FullExamMode() {
                     style={{
                       padding: "10px",
                       backgroundColor: isCurrent
-                        ? "#f59e0b"
+                        ? "#3b82f6"
                         : qAnswered
-                        ? "#fef3c7"
+                        ? "#eff6ff"
                         : "white",
-                      color: isCurrent ? "#1f2937" : "#1f2937",
+                      color: isCurrent ? "white" : "#1f2937",
                       border: isCurrent
-                        ? "2px solid #f59e0b"
+                        ? "2px solid #3b82f6"
                         : isPartStart && parts.length > 0
-                        ? "2px solid #d97706"
+                        ? "2px solid #2563eb"
                         : qAnswered
-                        ? "1px solid #fcd34d"
+                        ? "1px solid #bfdbfe"
                         : "1px solid #d1d5db",
                       borderRadius: "4px",
                       cursor: "pointer",
@@ -646,7 +646,7 @@ export default function FullExamMode() {
                       fontSize: "12px",
                       transition: "all 0.2s",
                       position: "relative",
-                      boxShadow: isPartStart && parts.length > 0 ? "0 0 4px #d97706" : "none",
+                      boxShadow: isPartStart && parts.length > 0 ? "0 0 4px #2563eb" : "none",
                     }}
                     title={isPartStart && parts.length > 0 ? `Start of ${parts[questionPartIndex]?.partName}` : ""}
                   >
@@ -676,8 +676,8 @@ export default function FullExamMode() {
               disabled={submitting}
               style={{
                 padding: "12px",
-                backgroundColor: submitting ? "#9ca3af" : "#f59e0b",
-                color: "#1f2937",
+                backgroundColor: submitting ? "#9ca3af" : "#2563eb",
+                color: "white",
                 border: "none",
                 borderRadius: "6px",
                 cursor: submitting ? "not-allowed" : "pointer",
@@ -772,8 +772,8 @@ export default function FullExamMode() {
                 style={{
                   flex: 1,
                   padding: "12px",
-                  backgroundColor: submitting ? "#9ca3af" : "#f59e0b",
-                  color: "#1f2937",
+                  backgroundColor: submitting ? "#9ca3af" : "#2563eb",
+                  color: "white",
                   border: "none",
                   borderRadius: "6px",
                   cursor: submitting ? "not-allowed" : "pointer",
@@ -781,8 +781,8 @@ export default function FullExamMode() {
                   fontSize: "14px",
                   transition: "background-color 0.2s",
                 }}
-                onMouseEnter={(e) => !submitting && (e.currentTarget.style.backgroundColor = "#d97706")}
-                onMouseLeave={(e) => !submitting && (e.currentTarget.style.backgroundColor = "#f59e0b")}
+                onMouseEnter={(e) => !submitting && (e.currentTarget.style.backgroundColor = "#1d4ed8")}
+                onMouseLeave={(e) => !submitting && (e.currentTarget.style.backgroundColor = "#2563eb")}
               >
                 {submitting ? "Submitting..." : "Submit Anyway"}
               </button>

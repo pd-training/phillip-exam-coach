@@ -209,10 +209,10 @@ export default function QuickQuizMode() {
                   padding: "12px",
                   marginBottom: "10px",
                   backgroundColor:
-                    selectedAnswer === option.key ? "#fef3c7" : "white",
+                    selectedAnswer === option.key ? "#eff6ff" : "white",
                   border:
                     selectedAnswer === option.key
-                      ? "2px solid #f59e0b"
+                      ? "2px solid #3b82f6"
                       : "1px solid #e5e7eb",
                   borderRadius: "6px",
                   cursor: showingFeedback ? "not-allowed" : "pointer",
@@ -321,8 +321,8 @@ export default function QuickQuizMode() {
                   flex: 1,
                   padding: "12px",
                   backgroundColor:
-                    selectedAnswer ? "#f59e0b" : "#9ca3af",
-                  color: selectedAnswer ? "#1f2937" : "white",
+                    selectedAnswer ? "#2563eb" : "#9ca3af",
+                  color: "white",
                   border: "none",
                   borderRadius: "6px",
                   cursor: selectedAnswer ? "pointer" : "not-allowed",
@@ -338,8 +338,8 @@ export default function QuickQuizMode() {
                 style={{
                   flex: 1,
                   padding: "12px",
-                  backgroundColor: "#f59e0b",
-                  color: "#1f2937",
+                  backgroundColor: "#2563eb",
+                  color: "white",
                   border: "none",
                   borderRadius: "6px",
                   cursor: "pointer",
@@ -357,11 +357,11 @@ export default function QuickQuizMode() {
             style={{
               marginTop: "20px",
               padding: "12px",
-              backgroundColor: "#fef3c7",
+              backgroundColor: "#eff6ff",
               borderRadius: "6px",
               textAlign: "center",
               fontSize: "14px",
-              color: "#92400e",
+              color: "#1d4ed8",
             }}
           >
             Correct so far: {score} / {answered}
