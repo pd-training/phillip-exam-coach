@@ -77,6 +77,42 @@ export default function AllAttemptsPage() {
 
       {/* Main Content */}
       <div className="max-w-7xl mx-auto px-6 py-12 flex-1 w-full">
+        {/* Stats Card */}
+        {attempts.length > 0 && (
+          <div className="mb-8 bg-white rounded-lg p-6 border border-gray-200">
+            <div className="grid grid-cols-3 gap-6">
+              <div>
+                <p className="text-sm text-gray-600 font-medium mb-1">Total Attempts</p>
+                <p className="text-3xl font-bold text-gray-900">{attempts.length}</p>
+              </div>
+              <div>
+                <p className="text-sm text-gray-600 font-medium mb-1">Pass Rate</p>
+                <p className="text-3xl font-bold text-green-600">
+                  {attempts.length > 0
+                    ? Math.round(
+                        (attempts.filter((a) => a.result === "Pass").length /
+                          attempts.length) *
+                          100
+                      )
+                    : 0}
+                  %
+                </p>
+              </div>
+              <div>
+                <p className="text-sm text-gray-600 font-medium mb-1">Avg Score</p>
+                <p className="text-3xl font-bold text-blue-600">
+                  {attempts.length > 0
+                    ? Math.round(
+                        attempts.reduce((sum, a) => sum + a.score, 0) / attempts.length
+                      )
+                    : 0}
+                  %
+                </p>
+              </div>
+            </div>
+          </div>
+        )}
+
         {/* Filter & Sort Section */}
         {attempts.length > 0 && (
           <div className="mb-8 grid grid-cols-1 md:grid-cols-2 gap-4">
