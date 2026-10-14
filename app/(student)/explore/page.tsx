@@ -250,10 +250,7 @@ export default function ExplorePage() {
       <StudentNav />
 
       {/* Hero Section */}
-      <div
-        className="text-white py-12 px-0"
-        style={{ background: 'linear-gradient(to right, #0f172a, #1e3a8a)' }}
-      >
+      <div className="bg-gradient-to-r from-blue-600 to-blue-700 text-white py-12 px-0 border-b border-blue-800">
         <div className="max-w-7xl mx-auto px-6">
           <h1 className="text-4xl font-bold mb-2">Explore Papers</h1>
           <p className="text-blue-100">
@@ -379,7 +376,7 @@ export default function ExplorePage() {
                         )}
                       </div>
                       <Link href={`/exam/${paper.id}`}>
-                        <button className="w-full px-4 py-2 bg-amber-500 hover:bg-amber-600 text-blue-900 rounded-lg font-medium transition">
+                        <button className="w-full px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-medium transition">
                           Practice →
                         </button>
                       </Link>
