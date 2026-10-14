@@ -567,22 +567,6 @@ export default function FullExamMode() {
             flexShrink: 0,
           }}
         >
-          {/* Part Info - If parts exist */}
-          {parts.length > 0 && currentPart && (
-            <div style={{ marginBottom: "20px", padding: "12px", backgroundColor: "#eff6ff", border: "1px solid #bfdbfe", borderRadius: "6px" }}>
-              <p style={{ margin: "0 0 8px 0", fontSize: "12px", color: "#1d4ed8", fontWeight: "600" }}>
-                CURRENT PART
-              </p>
-              <div style={{ fontSize: "14px", fontWeight: "600", color: "#2563eb", marginBottom: "6px" }}>
-                {currentPart.partName}
-              </div>
-              <div style={{ fontSize: "12px", color: "#1d4ed8", lineHeight: "1.6" }}>
-                <div>Progress: Q{currentPart.questionInPart}/{currentPart.totalInPart}</div>
-                <div>Passing: {currentPart.passingScore}%</div>
-              </div>
-            </div>
-          )}
-
           {/* Progress Counter */}
           <div style={{ marginBottom: "20px", paddingBottom: "15px", borderBottom: "1px solid #e5e7eb" }}>
             <p style={{ margin: "0 0 8px 0", fontSize: "13px", color: "#666", fontWeight: "500" }}>
