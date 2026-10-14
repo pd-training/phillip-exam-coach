@@ -55,6 +55,7 @@ export default function AttemptReviewPage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
   const [currentQIndex, setCurrentQIndex] = useState(0);
+  const [filterIncorrectOnly, setFilterIncorrectOnly] = useState(false);
 
   // Check authentication
   useEffect(() => {
@@ -143,14 +144,9 @@ export default function AttemptReviewPage() {
 
       {/* Header */}
       <div className="bg-gradient-to-r from-blue-600 to-blue-700 text-white py-8 px-0 border-b border-blue-800">
-        <div className="max-w-7xl mx-auto px-6 flex justify-between items-center">
-          <div>
-            <Link href="/dashboard">
-              <button className="text-blue-100 hover:text-white font-medium text-sm mb-4 block">
-                ← Back to Dashboard
-              </button>
-            </Link>
-            <h1 className="text-3xl font-bold">{attempt.paper_name} - Exam Review</h1>
+        <div className="max-w-7xl mx-auto px-6 flex justify-between items-start">
+          <div className="flex-1">
+            <h1 className="text-3xl font-bold mb-4">{attempt.paper_name} - Exam Review</h1>
             {attempt.partScores && attempt.partScores.length > 0 ? (
               // Show part-wise results if parts exist
               <div className="mt-3 space-y-1">
@@ -175,38 +171,45 @@ export default function AttemptReviewPage() {
               </div>
             )}
           </div>
-          <div className="text-right">
-            <p className="text-blue-100 text-sm">Time Taken</p>
-            <p className="text-2xl font-bold">{timeTaken} min</p>
+          <div className="flex flex-col items-end gap-3">
+            <Link href="/dashboard">
+              <button className="px-4 py-2 bg-white bg-opacity-20 hover:bg-opacity-30 text-white font-medium rounded-lg transition text-sm border border-blue-300">
+                ← Back to Dashboard
+              </button>
+            </Link>
+            <div className="text-right">
+              <p className="text-blue-100 text-sm">Time Taken</p>
+              <p className="text-2xl font-bold">{timeTaken} min</p>
+            </div>
           </div>
         </div>
       </div>
 
       {/* Main Content - Questions Review */}
-      <div className="flex-1 overflow-hidden bg-white">
-        <div className="max-w-7xl mx-auto px-6 h-full flex overflow-hidden">
+      <div className="flex-1 overflow-hidden bg-white flex flex-col">
+        <div className="max-w-7xl mx-auto px-6 flex-1 flex overflow-hidden w-full">
           {/* Left Content */}
-          <div className="flex-1 overflow-y-auto py-8 pr-6">
+          <div className="flex-1 overflow-y-auto py-8 pr-6 pb-24">
             {currentQuestion ? (
               <div className="max-w-2xl">
                 {/* Question Header */}
                 <div className="mb-8">
-                <div className="flex items-center gap-3 mb-4">
-                  <div className={`w-10 h-10 rounded-full flex items-center justify-center font-bold text-lg ${
-                    currentQuestion.isCorrect
-                      ? 'bg-green-100 text-green-700'
-                      : 'bg-red-100 text-red-700'
-                  }`}>
-                    {currentQuestion.isCorrect ? '✓' : '✗'}
-                  </div>
-                  <div>
-                    <h2 className="text-xl font-bold text-gray-900">
-                      Question {currentQIndex + 1} of {questions.length}
-                    </h2>
-                    <p className="text-sm text-gray-600">Chapter {currentQuestion.chapterNumber}</p>
+                  <div className="flex items-center gap-3 mb-4">
+                    <div className={`w-10 h-10 rounded-full flex items-center justify-center font-bold text-lg ${
+                      currentQuestion.isCorrect
+                        ? 'bg-green-100 text-green-700'
+                        : 'bg-red-100 text-red-700'
+                    }`}>
+                      {currentQuestion.isCorrect ? '✓' : '✗'}
+                    </div>
+                    <div>
+                      <h2 className="text-xl font-bold text-gray-900">
+                        Question {currentQIndex + 1} of {questions.length}
+                      </h2>
+                      <p className="text-sm text-gray-600">Chapter {currentQuestion.chapterNumber}</p>
+                    </div>
                   </div>
                 </div>
-              </div>
 
               {/* Question Text */}
               <div className="bg-gray-50 rounded-lg p-6 mb-8 border border-gray-200">
@@ -264,56 +267,9 @@ export default function AttemptReviewPage() {
 
               {/* Explanation */}
               {currentQuestion.explanation && (
-                <div className="bg-blue-50 border border-blue-200 rounded-lg p-6 mb-12">
+                <div className="bg-blue-50 border border-blue-200 rounded-lg p-6 mb-8">
                   <h3 className="font-bold text-blue-900 mb-2">📝 Explanation</h3>
                   <p className="text-sm text-blue-800 leading-relaxed">{currentQuestion.explanation}</p>
-                </div>
-              )}
-
-              {/* Results CTAs - Only show on last question */}
-              {currentQIndex === questions.length - 1 && (
-                <div className="border-t border-gray-200 pt-8">
-                  <h2 className="text-xl font-bold text-gray-900 mb-6">What's next?</h2>
-                  <div className="space-y-3">
-                    {/* Primary CTA - contextual based on performance */}
-                    {attempt.passed ? (
-                      <Link href="/explore">
-                        <button className="w-full px-6 py-4 bg-green-600 hover:bg-green-700 text-white font-semibold rounded-lg transition flex items-center justify-center gap-2">
-                          ✓ Try Another Paper
-                        </button>
-                      </Link>
-                    ) : (
-                      <button
-                        onClick={() => setCurrentQIndex(0)}
-                        className="w-full px-6 py-4 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-lg transition flex items-center justify-center gap-2"
-                      >
-                        🔄 Practice Again
-                      </button>
-                    )}
-
-                    {/* Secondary CTAs */}
-                    <div className="grid grid-cols-2 gap-3">
-                      <Link href="/dashboard">
-                        <button className="w-full px-4 py-3 bg-gray-100 hover:bg-gray-200 text-gray-700 font-medium rounded-lg transition text-sm">
-                          Back to Dashboard
-                        </button>
-                      </Link>
-                      {attempt.passed ? (
-                        <button
-                          onClick={() => setCurrentQIndex(0)}
-                          className="w-full px-4 py-3 bg-gray-100 hover:bg-gray-200 text-gray-700 font-medium rounded-lg transition text-sm"
-                        >
-                          Review Again
-                        </button>
-                      ) : (
-                        <Link href="/explore">
-                          <button className="w-full px-4 py-3 bg-gray-100 hover:bg-gray-200 text-gray-700 font-medium rounded-lg transition text-sm">
-                            Explore Papers
-                          </button>
-                        </Link>
-                      )}
-                    </div>
-                  </div>
                 </div>
               )}
             </div>
@@ -323,34 +279,80 @@ export default function AttemptReviewPage() {
         </div>
 
         {/* Right Sidebar - Navigation */}
-        <div className="w-56 bg-gray-50 border-l border-gray-200 overflow-y-auto flex flex-col flex-shrink-0">
+        <div className="hidden md:flex w-56 bg-gray-50 border-l border-gray-200 overflow-y-auto flex-col flex-shrink-0">
           {/* Question Navigator - Compact Scrollable */}
           <div className="flex-1 p-6 overflow-y-auto">
+            {/* Filter Toggle */}
+            <div className="mb-4">
+              <button
+                onClick={() => setFilterIncorrectOnly(!filterIncorrectOnly)}
+                className={`w-full px-3 py-2 rounded text-xs font-medium transition ${
+                  filterIncorrectOnly
+                    ? 'bg-red-100 text-red-700 border border-red-300'
+                    : 'bg-gray-200 text-gray-700 border border-gray-300 hover:bg-gray-300'
+                }`}
+              >
+                {filterIncorrectOnly ? '✗ Incorrect Only' : 'All Questions'}
+              </button>
+            </div>
+
             <p className="text-xs font-semibold text-gray-600 mb-3">QUESTIONS</p>
             <div className="grid grid-cols-6 gap-1">
-              {questions.map((q, idx) => (
-                <button
-                  key={q.id}
-                  onClick={() => setCurrentQIndex(idx)}
-                  className={`w-full aspect-square rounded font-semibold text-xs transition ${
-                    currentQIndex === idx
-                      ? 'bg-blue-600 text-white border-2 border-blue-700'
-                      : q.isCorrect
-                      ? 'bg-green-100 text-green-700 border border-green-300 hover:bg-green-200'
-                      : 'bg-red-100 text-red-700 border border-red-300 hover:bg-red-200'
-                  }`}
-                  title={`Q${idx + 1}: ${q.isCorrect ? 'Correct' : 'Incorrect'}`}
-                >
-                  {idx + 1}
-                </button>
-              ))}
+              {questions
+                .map((q, idx) => ({ q, idx }))
+                .filter(({ q }) => !filterIncorrectOnly || !q.isCorrect)
+                .map(({ q, idx }) => (
+                  <button
+                    key={q.id}
+                    onClick={() => setCurrentQIndex(idx)}
+                    className={`w-full aspect-square rounded font-semibold text-xs transition ${
+                      currentQIndex === idx
+                        ? 'bg-blue-600 text-white border-2 border-blue-700'
+                        : q.isCorrect
+                        ? 'bg-green-100 text-green-700 border border-green-300 hover:bg-green-200'
+                        : 'bg-red-100 text-red-700 border border-red-300 hover:bg-red-200'
+                    }`}
+                    title={`Q${idx + 1}: ${q.isCorrect ? 'Correct' : 'Incorrect'}`}
+                  >
+                    {idx + 1}
+                  </button>
+                ))}
             </div>
           </div>
 
           {/* Question Details section removed - info already displayed on the left */}
         </div>
       </div>
-    </div>
+
+      {/* Sticky Footer with CTAs */}
+      <div className="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 shadow-lg z-50">
+        <div className="max-w-7xl mx-auto px-6 py-4">
+          <div className="grid grid-cols-3 gap-3">
+            {/* Primary CTA */}
+            {attempt.passed ? (
+              <Link href="/explore" className="col-span-2">
+                <button className="w-full px-6 py-3 bg-green-600 hover:bg-green-700 text-white font-semibold rounded-lg transition">
+                  ✓ Try Another Paper
+                </button>
+              </Link>
+            ) : (
+              <button
+                onClick={() => setCurrentQIndex(0)}
+                className="col-span-2 px-6 py-3 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-lg transition"
+              >
+                🔄 Practice Again
+              </button>
+            )}
+
+            {/* Secondary CTA */}
+            <Link href="/dashboard">
+              <button className="w-full px-4 py-3 bg-gray-100 hover:bg-gray-200 text-gray-700 font-medium rounded-lg transition">
+                Back to Dashboard
+              </button>
+            </Link>
+          </div>
+        </div>
+      </div>
     </div>
   );
 }
