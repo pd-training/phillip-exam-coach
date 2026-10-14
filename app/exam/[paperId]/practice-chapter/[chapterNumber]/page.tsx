@@ -257,16 +257,18 @@ export default function PracticeChapterMode() {
       <style>{styles}</style>
       <StudentNav />
 
+      {/* Back to Practice Navigation */}
+      <div className="max-w-7xl mx-auto px-6 py-4 w-full">
+        <button
+          onClick={() => router.push(`/exam/${paperId}`)}
+          className="text-blue-600 hover:text-blue-700 font-medium text-sm transition duration-200"
+        >
+          ← Back to Practice
+        </button>
+      </div>
+
       <div className="flex-1 flex items-center justify-center px-6 py-12">
         <div className="bg-white rounded-2xl border border-gray-200 p-8 w-full max-w-2xl">
-          {/* Back to Practice Link */}
-          <button
-            onClick={() => router.push(`/exam/${paperId}`)}
-            className="text-blue-600 hover:text-blue-700 font-medium text-sm mb-6 transition duration-200 flex items-center gap-2"
-          >
-            ← Back to Practice
-          </button>
-
           {/* Header */}
           <div className="mb-8 flex justify-between items-center">
             <div>
