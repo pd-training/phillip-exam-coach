@@ -135,7 +135,7 @@ export default function QuickQuizMode() {
 
             <button
               onClick={() => router.back()}
-              className="w-full px-6 py-3 bg-amber-500 hover:bg-amber-600 text-blue-900 rounded-lg font-semibold transition duration-200"
+              className="w-full px-6 py-3 bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-semibold transition duration-200"
             >
               Back to Practice
             </button>
@@ -161,14 +161,14 @@ export default function QuickQuizMode() {
               <h1 className="text-3xl font-bold text-gray-900">Quick Quiz</h1>
             </div>
             <div className="text-sm font-medium text-gray-600">
-              Question <span className="text-amber-600 font-bold">{progress}</span> of <span className="text-gray-900 font-bold">{questions.length}</span>
+              Question <span className="text-blue-600 font-bold">{progress}</span> of <span className="text-gray-900 font-bold">{questions.length}</span>
             </div>
           </div>
 
           {/* Progress bar */}
           <div className="w-full h-2 bg-gray-200 rounded-full mb-8 overflow-hidden">
             <div
-              className="h-full bg-amber-500 transition-all duration-300"
+              className="h-full bg-blue-600 transition-all duration-300"
               style={{
                 width: `${(progress / questions.length) * 100}%`,
               }}

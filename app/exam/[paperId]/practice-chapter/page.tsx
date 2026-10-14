@@ -154,11 +154,11 @@ export default function PracticeChapterMode() {
         <StudentNav />
 
         {/* Hero Section */}
-        <div className="text-white py-12 px-0" style={{ background: "linear-gradient(to right, #0f172a, #1e3a8a)" }}>
+        <div className="bg-gradient-to-r from-blue-600 to-blue-700 text-white py-12 px-0 border-b border-blue-800">
           <div className="max-w-7xl mx-auto px-6">
             <button
               onClick={() => router.back()}
-              className="text-white hover:text-amber-100 font-medium text-sm mb-6 transition duration-200"
+              className="text-white hover:text-blue-100 font-medium text-sm mb-6 transition duration-200"
             >
               ← Back
             </button>
@@ -175,20 +175,20 @@ export default function PracticeChapterMode() {
                 <button
                   key={ch.number}
                   onClick={() => handleSelectChapter(ch.number)}
-                  className="w-full bg-gray-50 rounded-lg px-6 py-6 border border-gray-200 hover:border-amber-400 hover:bg-amber-50 transition duration-200 text-left flex items-center justify-between group"
+                  className="w-full bg-gray-50 rounded-lg px-6 py-6 border border-gray-200 hover:border-blue-400 hover:bg-blue-50 transition duration-200 text-left flex items-center justify-between group"
                 >
                   <div className="flex items-center gap-4 flex-1">
-                    <div className="w-12 h-12 bg-amber-500 text-blue-900 rounded-lg flex items-center justify-center group-hover:bg-amber-600 transition duration-200 font-semibold text-lg">
+                    <div className="w-12 h-12 bg-blue-600 text-white rounded-lg flex items-center justify-center group-hover:bg-blue-700 transition duration-200 font-semibold text-lg">
                       {ch.number}
                     </div>
                     <div className="flex-1">
-                      <h3 className="font-semibold text-gray-900 group-hover:text-amber-600 transition text-lg">
+                      <h3 className="font-semibold text-gray-900 group-hover:text-blue-600 transition text-lg">
                         {ch.title}
                       </h3>
                     </div>
                   </div>
                   <svg
-                    className="w-5 h-5 text-gray-400 group-hover:text-amber-600 transition flex-shrink-0 ml-4"
+                    className="w-5 h-5 text-gray-400 group-hover:text-blue-600 transition flex-shrink-0 ml-4"
                     fill="none"
                     stroke="currentColor"
                     viewBox="0 0 24 24"
@@ -234,20 +234,20 @@ export default function PracticeChapterMode() {
               Chapter {selectedChapter}
             </h1>
             <div className="text-sm font-medium text-gray-600">
-              Question <span className="text-amber-600 font-bold">{progress}</span> of <span className="text-gray-900 font-bold">{questions.length}</span>
+              Question <span className="text-blue-600 font-bold">{progress}</span> of <span className="text-gray-900 font-bold">{questions.length}</span>
             </div>
           </div>
 
           {/* Progress bar */}
           <div className="w-full h-2 bg-gray-200 rounded-full mb-8 overflow-hidden">
             <div
-              className="h-full bg-amber-500 transition-all duration-300"
+              className="h-full bg-blue-600 transition-all duration-300"
               style={{ width: `${(progress / questions.length) * 100}%` }}
             />
           </div>
 
           {/* Question */}
-          <div className="bg-amber-50 border border-amber-200 rounded-xl p-6 mb-8">
+          <div className="bg-blue-50 border border-blue-200 rounded-xl p-6 mb-8">
             <p className="m-0 font-medium text-lg leading-relaxed text-gray-900">
               {currentQuestion.text}
             </p>
@@ -265,7 +265,7 @@ export default function PracticeChapterMode() {
                 key={option.key}
                 className={`flex items-center p-4 rounded-lg border-2 cursor-pointer transition duration-200 ${
                   selectedAnswer === option.key
-                    ? "bg-amber-50 border-amber-500"
+                    ? "bg-blue-50 border-blue-500"
                     : "bg-white border-gray-200 hover:border-gray-300"
                 } ${showingFeedback && selectedAnswer !== option.key ? "opacity-50" : "opacity-100"}`}
               >
@@ -348,7 +348,7 @@ export default function PracticeChapterMode() {
                 disabled={!selectedAnswer}
                 className={`flex-1 px-6 py-3 rounded-lg font-semibold transition duration-200 ${
                   selectedAnswer
-                    ? "bg-amber-500 hover:bg-amber-600 text-blue-900"
+                    ? "bg-blue-600 hover:bg-blue-700 text-white"
                     : "bg-gray-300 text-gray-500 cursor-not-allowed"
                 }`}
               >
@@ -357,7 +357,7 @@ export default function PracticeChapterMode() {
             ) : (
               <button
                 onClick={handleNext}
-                className="flex-1 px-6 py-3 bg-amber-500 hover:bg-amber-600 text-blue-900 rounded-lg font-semibold transition duration-200"
+                className="flex-1 px-6 py-3 bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-semibold transition duration-200"
               >
                 {currentQIndex < questions.length - 1 ? "Next Question" : "Back to Chapters"}
               </button>
@@ -365,17 +365,7 @@ export default function PracticeChapterMode() {
           </div>
 
           {/* Score tracker */}
-          <div
-            style={{
-              marginTop: "20px",
-              padding: "12px",
-              backgroundColor: "#fef3c7",
-              borderRadius: "6px",
-              textAlign: "center",
-              fontSize: "14px",
-              color: "#92400e",
-            }}
-          >
+          <div className="mt-5 p-3 bg-blue-50 rounded text-center text-sm text-blue-900 font-medium">
             Correct so far: {score} / {answered}
           </div>
         </div>
