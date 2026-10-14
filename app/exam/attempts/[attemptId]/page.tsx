@@ -55,7 +55,7 @@ export default function AttemptReviewPage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
   const [currentQIndex, setCurrentQIndex] = useState(0);
-  const [filterIncorrectOnly, setFilterIncorrectOnly] = useState(false);
+  const [showIncorrectOnly, setShowIncorrectOnly] = useState(false);
 
   // Check authentication
   useEffect(() => {
@@ -144,11 +144,10 @@ export default function AttemptReviewPage() {
 
       {/* Header */}
       <div className="bg-gradient-to-r from-blue-600 to-blue-700 text-white py-8 px-0 border-b border-blue-800">
-        <div className="max-w-7xl mx-auto px-6 flex justify-between items-start">
+        <div className="max-w-7xl mx-auto px-6 flex justify-between items-start gap-6">
           <div className="flex-1">
             <h1 className="text-3xl font-bold mb-4">{attempt.paper_name} - Exam Review</h1>
             {attempt.partScores && attempt.partScores.length > 0 ? (
-              // Show part-wise results if parts exist
               <div className="mt-3 space-y-1">
                 {attempt.partScores.map((part, idx) => (
                   <p key={idx} className="text-blue-100">
@@ -160,7 +159,6 @@ export default function AttemptReviewPage() {
                 </p>
               </div>
             ) : (
-              // Show overall result if no parts (single-part paper)
               <div className="mt-3 space-y-1">
                 <p className="text-blue-100">
                   Score: <span className={attempt.passed ? 'text-green-200 font-bold' : 'text-red-200 font-bold'}>{attempt.score}%</span> ({correctCount}/{attempt.totalQuestions})
@@ -171,7 +169,7 @@ export default function AttemptReviewPage() {
               </div>
             )}
           </div>
-          <div className="flex flex-col items-end gap-3">
+          <div className="flex flex-col items-end gap-4">
             <Link href="/dashboard">
               <button className="px-4 py-2 bg-white bg-opacity-20 hover:bg-opacity-30 text-white font-medium rounded-lg transition text-sm border border-blue-300">
                 ← Back to Dashboard
@@ -186,8 +184,8 @@ export default function AttemptReviewPage() {
       </div>
 
       {/* Main Content - Questions Review */}
-      <div className="flex-1 overflow-hidden bg-white flex flex-col">
-        <div className="max-w-7xl mx-auto px-6 flex-1 flex overflow-hidden w-full">
+      <div className="flex-1 overflow-hidden bg-white">
+        <div className="max-w-7xl mx-auto px-6 h-full flex overflow-hidden">
           {/* Left Content */}
           <div className="flex-1 overflow-y-auto py-8 pr-6 pb-24">
             {currentQuestion ? (
@@ -211,122 +209,119 @@ export default function AttemptReviewPage() {
                   </div>
                 </div>
 
-              {/* Question Text */}
-              <div className="bg-gray-50 rounded-lg p-6 mb-8 border border-gray-200">
-                <p className="text-lg text-gray-900 leading-relaxed">{currentQuestion.questionText}</p>
-              </div>
+                {/* Question Text */}
+                <div className="bg-gray-50 rounded-lg p-6 mb-8 border border-gray-200">
+                  <p className="text-lg text-gray-900 leading-relaxed">{currentQuestion.questionText}</p>
+                </div>
 
-              {/* Answer Options */}
-              <div className="mb-8">
-                <h3 className="font-semibold text-gray-900 mb-4">Your Response vs Correct Answer</h3>
-                <div className="space-y-3">
-                  {[
-                    { key: 'A', text: currentQuestion.optionA },
-                    { key: 'B', text: currentQuestion.optionB },
-                    { key: 'C', text: currentQuestion.optionC },
-                    { key: 'D', text: currentQuestion.optionD },
-                  ].map((option) => {
-                    const isStudentAnswer = currentQuestion.studentAnswer === option.key;
-                    const isCorrectAnswer = currentQuestion.correctAnswer === option.key;
+                {/* Answer Options */}
+                <div className="mb-8">
+                  <h3 className="font-semibold text-gray-900 mb-4">Your Response vs Correct Answer</h3>
+                  <div className="space-y-3">
+                    {[
+                      { key: 'A', text: currentQuestion.optionA },
+                      { key: 'B', text: currentQuestion.optionB },
+                      { key: 'C', text: currentQuestion.optionC },
+                      { key: 'D', text: currentQuestion.optionD },
+                    ].map((option) => {
+                      const isStudentAnswer = currentQuestion.studentAnswer === option.key;
+                      const isCorrectAnswer = currentQuestion.correctAnswer === option.key;
 
-                    return (
-                      <div
-                        key={option.key}
-                        className={`p-4 rounded-lg border-2 transition ${
-                          isCorrectAnswer
-                            ? 'border-green-500 bg-green-50'
-                            : isStudentAnswer
-                            ? 'border-red-500 bg-red-50'
-                            : 'border-gray-200 bg-white'
-                        }`}
-                      >
-                        <div className="flex items-start gap-3">
-                          <div className={`w-8 h-8 rounded-full border-2 flex items-center justify-center font-bold text-sm flex-shrink-0 ${
+                      return (
+                        <div
+                          key={option.key}
+                          className={`p-4 rounded-lg border-2 transition ${
                             isCorrectAnswer
-                              ? 'border-green-500 bg-green-100 text-green-700'
+                              ? 'border-green-500 bg-green-50'
                               : isStudentAnswer
-                              ? 'border-red-500 bg-red-100 text-red-700'
-                              : 'border-gray-300 bg-gray-100 text-gray-600'
-                          }`}>
-                            {option.key}
-                          </div>
-                          <div className="flex-1">
-                            <p className="text-gray-800 font-medium">{option.text}</p>
-                            <div className="flex gap-2 mt-2">
-                              {isCorrectAnswer && <span className="text-xs bg-green-200 text-green-800 px-2 py-1 rounded font-medium">✓ Correct Answer</span>}
-                              {isStudentAnswer && !isCorrectAnswer && <span className="text-xs bg-red-200 text-red-800 px-2 py-1 rounded font-medium">✗ Your Answer</span>}
-                              {isStudentAnswer && isCorrectAnswer && <span className="text-xs bg-green-200 text-green-800 px-2 py-1 rounded font-medium">✓ Your Answer</span>}
+                              ? 'border-red-500 bg-red-50'
+                              : 'border-gray-200 bg-white'
+                          }`}
+                        >
+                          <div className="flex items-start gap-3">
+                            <div className={`w-8 h-8 rounded-full border-2 flex items-center justify-center font-bold text-sm flex-shrink-0 ${
+                              isCorrectAnswer
+                                ? 'border-green-500 bg-green-100 text-green-700'
+                                : isStudentAnswer
+                                ? 'border-red-500 bg-red-100 text-red-700'
+                                : 'border-gray-300 bg-gray-100 text-gray-600'
+                            }`}>
+                              {option.key}
+                            </div>
+                            <div className="flex-1">
+                              <p className="text-gray-800 font-medium">{option.text}</p>
+                              <div className="flex gap-2 mt-2">
+                                {isCorrectAnswer && <span className="text-xs bg-green-200 text-green-800 px-2 py-1 rounded font-medium">✓ Correct Answer</span>}
+                                {isStudentAnswer && !isCorrectAnswer && <span className="text-xs bg-red-200 text-red-800 px-2 py-1 rounded font-medium">✗ Your Answer</span>}
+                                {isStudentAnswer && isCorrectAnswer && <span className="text-xs bg-green-200 text-green-800 px-2 py-1 rounded font-medium">✓ Your Answer</span>}
+                              </div>
                             </div>
                           </div>
                         </div>
-                      </div>
-                    );
-                  })}
+                      );
+                    })}
+                  </div>
                 </div>
+
+                {/* Explanation */}
+                {currentQuestion.explanation && (
+                  <div className="bg-blue-50 border border-blue-200 rounded-lg p-6 mb-8">
+                    <h3 className="font-bold text-blue-900 mb-2">📝 Explanation</h3>
+                    <p className="text-sm text-blue-800 leading-relaxed">{currentQuestion.explanation}</p>
+                  </div>
+                )}
               </div>
+            ) : (
+              <div className="text-center text-gray-600">No questions to display</div>
+            )}
+          </div>
 
-              {/* Explanation */}
-              {currentQuestion.explanation && (
-                <div className="bg-blue-50 border border-blue-200 rounded-lg p-6 mb-8">
-                  <h3 className="font-bold text-blue-900 mb-2">📝 Explanation</h3>
-                  <p className="text-sm text-blue-800 leading-relaxed">{currentQuestion.explanation}</p>
-                </div>
-              )}
-            </div>
-          ) : (
-            <div className="text-center text-gray-600">No questions to display</div>
-          )}
-        </div>
-
-        {/* Right Sidebar - Navigation */}
-        <div className="hidden md:flex w-56 bg-gray-50 border-l border-gray-200 overflow-y-auto flex-col flex-shrink-0">
-          {/* Question Navigator - Compact Scrollable */}
-          <div className="flex-1 p-6 overflow-y-auto">
-            {/* Filter Toggle */}
-            <div className="mb-4">
+          {/* Right Sidebar - Navigation */}
+          <div className="hidden md:flex w-56 bg-gray-50 border-l border-gray-200 overflow-y-auto flex-col flex-shrink-0">
+            {/* Question Navigator - Compact Scrollable */}
+            <div className="flex-1 p-6 overflow-y-auto">
+              {/* Filter Toggle */}
               <button
-                onClick={() => setFilterIncorrectOnly(!filterIncorrectOnly)}
-                className={`w-full px-3 py-2 rounded text-xs font-medium transition ${
-                  filterIncorrectOnly
+                onClick={() => setShowIncorrectOnly(!showIncorrectOnly)}
+                className={`w-full px-3 py-2 rounded text-xs font-medium transition mb-4 ${
+                  showIncorrectOnly
                     ? 'bg-red-100 text-red-700 border border-red-300'
                     : 'bg-gray-200 text-gray-700 border border-gray-300 hover:bg-gray-300'
                 }`}
               >
-                {filterIncorrectOnly ? '✗ Incorrect Only' : 'All Questions'}
+                {showIncorrectOnly ? '✗ Incorrect Only' : 'All Questions'}
               </button>
-            </div>
 
-            <p className="text-xs font-semibold text-gray-600 mb-3">QUESTIONS</p>
-            <div className="grid grid-cols-6 gap-1">
-              {questions
-                .map((q, idx) => ({ q, idx }))
-                .filter(({ q }) => !filterIncorrectOnly || !q.isCorrect)
-                .map(({ q, idx }) => (
-                  <button
-                    key={q.id}
-                    onClick={() => setCurrentQIndex(idx)}
-                    className={`w-full aspect-square rounded font-semibold text-xs transition ${
-                      currentQIndex === idx
-                        ? 'bg-blue-600 text-white border-2 border-blue-700'
-                        : q.isCorrect
-                        ? 'bg-green-100 text-green-700 border border-green-300 hover:bg-green-200'
-                        : 'bg-red-100 text-red-700 border border-red-300 hover:bg-red-200'
-                    }`}
-                    title={`Q${idx + 1}: ${q.isCorrect ? 'Correct' : 'Incorrect'}`}
-                  >
-                    {idx + 1}
-                  </button>
-                ))}
+              <p className="text-xs font-semibold text-gray-600 mb-3">QUESTIONS</p>
+              <div className="grid grid-cols-6 gap-1">
+                {questions
+                  .map((q, idx) => ({ q, idx }))
+                  .filter(({ q }) => !showIncorrectOnly || !q.isCorrect)
+                  .map(({ q, idx }) => (
+                    <button
+                      key={q.id}
+                      onClick={() => setCurrentQIndex(idx)}
+                      className={`w-full aspect-square rounded font-semibold text-xs transition ${
+                        currentQIndex === idx
+                          ? 'bg-blue-600 text-white border-2 border-blue-700'
+                          : q.isCorrect
+                          ? 'bg-green-100 text-green-700 border border-green-300 hover:bg-green-200'
+                          : 'bg-red-100 text-red-700 border border-red-300 hover:bg-red-200'
+                      }`}
+                      title={`Q${idx + 1}: ${q.isCorrect ? 'Correct' : 'Incorrect'}`}
+                    >
+                      {idx + 1}
+                    </button>
+                  ))}
+              </div>
             </div>
           </div>
-
-          {/* Question Details section removed - info already displayed on the left */}
         </div>
       </div>
 
       {/* Sticky Footer with CTAs */}
       <div className="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 shadow-lg z-50">
-        <div className="max-w-7xl mx-auto px-6 py-4">
+        <div className="max-w-7xl mx-auto px-6 py-4 ml-auto mr-auto">
           <div className="grid grid-cols-3 gap-3">
             {/* Primary CTA */}
             {attempt.passed ? (
