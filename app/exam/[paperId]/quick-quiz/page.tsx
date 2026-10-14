@@ -123,6 +123,17 @@ export default function QuickQuizMode() {
     }
   };
 
+  const handleRetryQuiz = () => {
+    // Reset all quiz state
+    setCurrentQIndex(0);
+    setSelectedAnswer("");
+    setFeedback(null);
+    setShowingFeedback(false);
+    setScore(0);
+    setAnswered(0);
+    setCompleted(false);
+  };
+
   if (loading) return <div style={{ padding: "20px" }}>Loading quiz...</div>;
 
   if (completed) {
@@ -142,12 +153,20 @@ export default function QuickQuizMode() {
               </p>
             </div>
 
-            <button
-              onClick={() => router.back()}
-              className="w-full px-6 py-3 bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-semibold transition duration-200"
-            >
-              Back to Practice
-            </button>
+            <div className="flex gap-3">
+              <button
+                onClick={() => router.back()}
+                className="flex-1 px-6 py-3 bg-gray-500 hover:bg-gray-600 text-white rounded-lg font-semibold transition duration-200"
+              >
+                Back to Practice
+              </button>
+              <button
+                onClick={handleRetryQuiz}
+                className="flex-1 px-6 py-3 bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-semibold transition duration-200"
+              >
+                Attempt Another Quiz
+              </button>
+            </div>
           </div>
         </div>
       </div>
