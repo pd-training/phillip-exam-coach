@@ -115,7 +115,7 @@ export default function PracticePage() {
       <div className="min-h-screen bg-gray-50">
         <StudentNav />
         <div className="flex items-center justify-center h-[calc(100vh-64px)]">
-          <div className="w-12 h-12 border-4 border-gray-300 border-t-amber-500 rounded-full animate-spin" />
+          <div className="w-12 h-12 border-4 border-gray-300 border-t-blue-600 rounded-full animate-spin" />
         </div>
       </div>
     );

@@ -269,7 +269,7 @@ export default function ExplorePage() {
               placeholder="Search papers..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-transparent"
+              className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
             />
           </div>
 
@@ -547,9 +547,9 @@ export default function ExplorePage() {
             {groupedPapers.available.length > 0 && (
               <div>
                 <div className="flex items-center gap-3 mb-6">
-                  <div className="w-8 h-8 bg-amber-100 rounded-full flex items-center justify-center">
+                  <div className="w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center">
                     <svg
-                      className="w-5 h-5 text-amber-700"
+                      className="w-5 h-5 text-blue-700"
                       fill="none"
                       stroke="currentColor"
                       viewBox="0 0 24 24"

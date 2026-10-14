@@ -40,7 +40,7 @@ export default function LandingPage() {
         <div className="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between">
           <div className="flex items-center gap-3">
             <div className="flex items-center gap-2">
-              <div className="w-8 h-8 bg-gradient-to-br from-amber-400 to-amber-500 rounded-lg flex items-center justify-center">
+              <div className="w-8 h-8 bg-gradient-to-br from-blue-400 to-blue-500 rounded-lg flex items-center justify-center">
                 <ChartBarIcon className="text-blue-900 w-5 h-5" />
               </div>
               <div className="flex flex-col">
@@ -50,11 +50,11 @@ export default function LandingPage() {
             </div>
           </div>
           <nav className="hidden md:flex items-center gap-8">
-            <a href="#features" className="text-blue-200 hover:text-amber-400 transition font-medium">Features</a>
-            <a href="#how-it-works" className="text-blue-200 hover:text-amber-400 transition font-medium">How It Works</a>
-            <a href="#stats" className="text-blue-200 hover:text-amber-400 transition font-medium">Why Choose Us</a>
+            <a href="#features" className="text-blue-200 hover:text-blue-400 transition font-medium">Features</a>
+            <a href="#how-it-works" className="text-blue-200 hover:text-blue-400 transition font-medium">How It Works</a>
+            <a href="#stats" className="text-blue-200 hover:text-blue-400 transition font-medium">Why Choose Us</a>
             <Link href="/login">
-              <button className="px-6 py-2 text-amber-400 hover:text-amber-300 font-medium transition">
+              <button className="px-6 py-2 text-amber-400 hover:text-blue-300 font-medium transition">
                 Sign In
               </button>
             </Link>
@@ -100,12 +100,12 @@ export default function LandingPage() {
             {/* CTA Buttons */}
             <div className="flex flex-col sm:flex-row gap-4 mb-12">
               <Link href="/signup">
-                <button className="px-8 py-4 bg-amber-500 hover:bg-amber-600 text-blue-900 rounded-lg font-semibold transition-all duration-300 transform hover:scale-105 active:scale-95 shadow-lg">
+                <button className="px-8 py-4 bg-blue-600 hover:bg-blue-700 text-blue-900 rounded-lg font-semibold transition-all duration-300 transform hover:scale-105 active:scale-95 shadow-lg">
                   Start Practicing Free
                 </button>
               </Link>
               <Link href="/login">
-                <button className="px-8 py-4 border-2 border-amber-400 text-amber-400 hover:bg-amber-400/10 rounded-lg font-semibold transition-all duration-300 transform hover:scale-105 active:scale-95">
+                <button className="px-8 py-4 border-2 border-blue-400 text-amber-400 hover:bg-blue-400/10 rounded-lg font-semibold transition-all duration-300 transform hover:scale-105 active:scale-95">
                   Sign In to Continue
                 </button>
               </Link>
@@ -114,9 +114,9 @@ export default function LandingPage() {
             {/* Social Proof */}
             <div className="inline-flex items-center gap-3 bg-blue-800/50 rounded-full px-6 py-3 border border-blue-700">
               <div className="flex -space-x-2">
-                <div className="w-8 h-8 bg-amber-500 rounded-full border-2 border-blue-900 flex items-center justify-center text-blue-900 font-bold text-xs">A</div>
-                <div className="w-8 h-8 bg-amber-400 rounded-full border-2 border-blue-900 flex items-center justify-center text-blue-900 font-bold text-xs">J</div>
-                <div className="w-8 h-8 bg-amber-600 rounded-full border-2 border-blue-900 flex items-center justify-center text-white font-bold text-xs">R</div>
+                <div className="w-8 h-8 bg-blue-600 rounded-full border-2 border-blue-900 flex items-center justify-center text-blue-900 font-bold text-xs">A</div>
+                <div className="w-8 h-8 bg-blue-400 rounded-full border-2 border-blue-900 flex items-center justify-center text-blue-900 font-bold text-xs">J</div>
+                <div className="w-8 h-8 bg-blue-700 rounded-full border-2 border-blue-900 flex items-center justify-center text-white font-bold text-xs">R</div>
               </div>
               <span className="text-blue-100 text-sm"><strong className="text-amber-400">800+</strong> financial advisors mastering their exams</span>
             </div>
@@ -156,8 +156,8 @@ export default function LandingPage() {
             </div>
 
             {/* Card 3: Why It Matters */}
-            <div className="bg-gradient-to-br from-amber-50 to-amber-100 rounded-xl p-8 border border-amber-200 hover:shadow-lg transition-all duration-300">
-              <div className="w-12 h-12 bg-amber-600 rounded-lg flex items-center justify-center mb-6">
+            <div className="bg-gradient-to-br from-blue-50 to-blue-100 rounded-xl p-8 border border-blue-200 hover:shadow-lg transition-all duration-300">
+              <div className="w-12 h-12 bg-blue-700 rounded-lg flex items-center justify-center mb-6">
                 <CheckCircleIcon className="text-white w-6 h-6" />
               </div>
               <h3 className="font-bold text-xl text-gray-900 mb-3">Why It Matters</h3>
@@ -180,7 +180,7 @@ export default function LandingPage() {
 
           <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
             {/* Feature 1 */}
-            <div className="group bg-gradient-to-br from-blue-50 to-blue-100 rounded-xl p-6 border border-blue-200 hover:shadow-lg hover:border-amber-400 transition-all duration-300 transform hover:-translate-y-2 cursor-pointer">
+            <div className="group bg-gradient-to-br from-blue-50 to-blue-100 rounded-xl p-6 border border-blue-200 hover:shadow-lg hover:border-blue-400 transition-all duration-300 transform hover:-translate-y-2 cursor-pointer">
               <div className="w-12 h-12 bg-gradient-to-br from-blue-900 to-blue-800 rounded-lg flex items-center justify-center mb-4 group-hover:scale-110 transition-transform">
                 <ArrowTrendingUpIcon className="text-amber-400 w-6 h-6" />
               </div>
@@ -189,7 +189,7 @@ export default function LandingPage() {
             </div>
 
             {/* Feature 2 */}
-            <div className="group bg-gradient-to-br from-emerald-50 to-emerald-100 rounded-xl p-6 border border-emerald-200 hover:shadow-lg hover:border-amber-400 transition-all duration-300 transform hover:-translate-y-2 cursor-pointer">
+            <div className="group bg-gradient-to-br from-emerald-50 to-emerald-100 rounded-xl p-6 border border-emerald-200 hover:shadow-lg hover:border-blue-400 transition-all duration-300 transform hover:-translate-y-2 cursor-pointer">
               <div className="w-12 h-12 bg-gradient-to-br from-blue-900 to-blue-800 rounded-lg flex items-center justify-center mb-4 group-hover:scale-110 transition-transform">
                 <DocumentCheckIcon className="text-amber-400 w-6 h-6" />
               </div>
@@ -198,7 +198,7 @@ export default function LandingPage() {
             </div>
 
             {/* Feature 3 */}
-            <div className="group bg-gradient-to-br from-amber-50 to-amber-100 rounded-xl p-6 border border-amber-200 hover:shadow-lg hover:border-amber-400 transition-all duration-300 transform hover:-translate-y-2 cursor-pointer">
+            <div className="group bg-gradient-to-br from-blue-50 to-blue-100 rounded-xl p-6 border border-blue-200 hover:shadow-lg hover:border-blue-400 transition-all duration-300 transform hover:-translate-y-2 cursor-pointer">
               <div className="w-12 h-12 bg-gradient-to-br from-blue-900 to-blue-800 rounded-lg flex items-center justify-center mb-4 group-hover:scale-110 transition-transform">
                 <BoltIcon className="text-amber-400 w-6 h-6" />
               </div>
@@ -207,7 +207,7 @@ export default function LandingPage() {
             </div>
 
             {/* Feature 4 */}
-            <div className="group bg-gradient-to-br from-purple-50 to-purple-100 rounded-xl p-6 border border-purple-200 hover:shadow-lg hover:border-amber-400 transition-all duration-300 transform hover:-translate-y-2 cursor-pointer">
+            <div className="group bg-gradient-to-br from-purple-50 to-purple-100 rounded-xl p-6 border border-purple-200 hover:shadow-lg hover:border-blue-400 transition-all duration-300 transform hover:-translate-y-2 cursor-pointer">
               <div className="w-12 h-12 bg-gradient-to-br from-blue-900 to-blue-800 rounded-lg flex items-center justify-center mb-4 group-hover:scale-110 transition-transform">
                 <CheckCircleIcon className="text-amber-400 w-6 h-6" />
               </div>
@@ -286,12 +286,12 @@ export default function LandingPage() {
 
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Link href="/signup">
-              <button className="px-8 py-4 bg-amber-500 hover:bg-amber-600 text-blue-900 rounded-lg font-semibold hover:shadow-lg transition-all duration-300 transform hover:scale-105 active:scale-95">
+              <button className="px-8 py-4 bg-blue-600 hover:bg-blue-700 text-blue-900 rounded-lg font-semibold hover:shadow-lg transition-all duration-300 transform hover:scale-105 active:scale-95">
                 Get Started Free
               </button>
             </Link>
             <Link href="/login">
-              <button className="px-8 py-4 border-2 border-amber-400 text-amber-400 hover:bg-amber-400/10 rounded-lg font-semibold transition-all duration-300 transform hover:scale-105 active:scale-95">
+              <button className="px-8 py-4 border-2 border-blue-400 text-amber-400 hover:bg-blue-400/10 rounded-lg font-semibold transition-all duration-300 transform hover:scale-105 active:scale-95">
                 Already a Member
               </button>
             </Link>
@@ -306,7 +306,7 @@ export default function LandingPage() {
         <div className="max-w-7xl mx-auto grid md:grid-cols-4 gap-8 mb-8">
           <div>
             <div className="flex items-center gap-2 mb-4">
-              <div className="w-8 h-8 bg-gradient-to-br from-amber-400 to-amber-500 rounded-lg flex items-center justify-center">
+              <div className="w-8 h-8 bg-gradient-to-br from-blue-400 to-blue-500 rounded-lg flex items-center justify-center">
                 <ChartBarIcon className="text-blue-900 w-5 h-5" />
               </div>
               <div className="flex flex-col">
@@ -319,25 +319,25 @@ export default function LandingPage() {
           <div>
             <h4 className="font-bold text-white mb-4">Product</h4>
             <ul className="space-y-2 text-sm">
-              <li><a href="#features" className="hover:text-amber-400 transition">Features</a></li>
-              <li><a href="#" className="hover:text-amber-400 transition">Pricing</a></li>
-              <li><a href="#" className="hover:text-amber-400 transition">About</a></li>
+              <li><a href="#features" className="hover:text-blue-400 transition">Features</a></li>
+              <li><a href="#" className="hover:text-blue-400 transition">Pricing</a></li>
+              <li><a href="#" className="hover:text-blue-400 transition">About</a></li>
             </ul>
           </div>
           <div>
             <h4 className="font-bold text-white mb-4">Legal</h4>
             <ul className="space-y-2 text-sm">
-              <li><a href="#" className="hover:text-amber-400 transition">Privacy</a></li>
-              <li><a href="#" className="hover:text-amber-400 transition">Terms</a></li>
-              <li><a href="#" className="hover:text-amber-400 transition">Contact</a></li>
+              <li><a href="#" className="hover:text-blue-400 transition">Privacy</a></li>
+              <li><a href="#" className="hover:text-blue-400 transition">Terms</a></li>
+              <li><a href="#" className="hover:text-blue-400 transition">Contact</a></li>
             </ul>
           </div>
           <div>
             <h4 className="font-bold text-white mb-4">Follow Us</h4>
             <ul className="space-y-2 text-sm">
-              <li><a href="#" className="hover:text-amber-400 transition">Twitter</a></li>
-              <li><a href="#" className="hover:text-amber-400 transition">LinkedIn</a></li>
-              <li><a href="#" className="hover:text-amber-400 transition">Facebook</a></li>
+              <li><a href="#" className="hover:text-blue-400 transition">Twitter</a></li>
+              <li><a href="#" className="hover:text-blue-400 transition">LinkedIn</a></li>
+              <li><a href="#" className="hover:text-blue-400 transition">Facebook</a></li>
             </ul>
           </div>
         </div>

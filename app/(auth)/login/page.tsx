@@ -12,7 +12,7 @@ export default function LoginPage() {
             <span className="font-bold text-xl text-white">Finance<span className="text-amber-400">Ready</span></span>
           </Link>
           <Link href="/">
-            <button className="text-blue-200 hover:text-amber-400 font-medium transition">
+            <button className="text-blue-200 hover:text-blue-400 font-medium transition">
               ← Back to Home
             </button>
           </Link>

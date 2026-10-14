@@ -137,7 +137,7 @@ export default function SignupPage() {
             <span className="font-bold text-xl text-white">Finance<span className="text-amber-400">Ready</span></span>
           </Link>
           <Link href="/">
-            <button className="text-blue-200 hover:text-amber-400 font-medium transition">
+            <button className="text-blue-200 hover:text-blue-400 font-medium transition">
               ← Back to Home
             </button>
           </Link>
@@ -194,7 +194,7 @@ export default function SignupPage() {
                   value={formData.name}
                   onChange={handleChange}
                   placeholder="John Doe"
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg text-gray-900 placeholder-gray-500 focus:border-amber-500 focus:outline-none focus:ring-1 focus:ring-amber-500 transition"
+                  className="w-full px-4 py-2 border border-gray-300 rounded-lg text-gray-900 placeholder-gray-500 focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500 transition"
                 />
               </div>
 
@@ -207,7 +207,7 @@ export default function SignupPage() {
                   value={formData.email}
                   onChange={handleChange}
                   placeholder="you@example.com"
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg text-gray-900 placeholder-gray-500 focus:border-amber-500 focus:outline-none focus:ring-1 focus:ring-amber-500 transition"
+                  className="w-full px-4 py-2 border border-gray-300 rounded-lg text-gray-900 placeholder-gray-500 focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500 transition"
                 />
               </div>
 
@@ -220,7 +220,7 @@ export default function SignupPage() {
                   value={formData.password}
                   onChange={handleChange}
                   placeholder="••••••••"
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg text-gray-900 placeholder-gray-500 focus:border-amber-500 focus:outline-none focus:ring-1 focus:ring-amber-500 transition"
+                  className="w-full px-4 py-2 border border-gray-300 rounded-lg text-gray-900 placeholder-gray-500 focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500 transition"
                 />
               </div>
 
@@ -233,7 +233,7 @@ export default function SignupPage() {
                   value={formData.confirmPassword}
                   onChange={handleChange}
                   placeholder="••••••••"
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg text-gray-900 placeholder-gray-500 focus:border-amber-500 focus:outline-none focus:ring-1 focus:ring-amber-500 transition"
+                  className="w-full px-4 py-2 border border-gray-300 rounded-lg text-gray-900 placeholder-gray-500 focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500 transition"
                 />
               </div>
 
@@ -243,7 +243,7 @@ export default function SignupPage() {
                 <select
                   value={selectedPaper}
                   onChange={(e) => setSelectedPaper(e.target.value)}
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg text-gray-900 focus:border-amber-500 focus:outline-none focus:ring-1 focus:ring-amber-500 transition cursor-pointer"
+                  className="w-full px-4 py-2 border border-gray-300 rounded-lg text-gray-900 focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500 transition cursor-pointer"
                 >
                   <option value="">-- Select a paper --</option>
                   {papers.map((paper) => (
@@ -258,7 +258,7 @@ export default function SignupPage() {
               <button
                 type="submit"
                 disabled={loading}
-                className="w-full bg-amber-500 hover:bg-amber-600 text-blue-900 font-semibold py-3 rounded-lg transition-all duration-300 transform hover:scale-105 active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed"
+                className="w-full bg-blue-600 hover:bg-blue-700 text-blue-900 font-semibold py-3 rounded-lg transition-all duration-300 transform hover:scale-105 active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 {loading ? "Creating Account..." : "Create Account"}
               </button>
@@ -267,7 +267,7 @@ export default function SignupPage() {
             {/* Login Link */}
             <div className="text-center mt-6 text-sm text-gray-600">
               Already have an account?{" "}
-              <Link href="/login" className="text-amber-500 font-semibold hover:text-amber-600 transition">
+              <Link href="/login" className="text-blue-600 font-semibold hover:text-blue-600 transition">
                 Login here
               </Link>
             </div>
