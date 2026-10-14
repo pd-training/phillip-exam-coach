@@ -371,7 +371,9 @@ export default function ExplorePage() {
                         </p>
                       )}
                       <div className="text-xs text-gray-500 mb-4 space-y-1">
-                        <p className="font-medium text-gray-700">{paper.title}</p>
+                        {paper.description && (
+                          <p className="font-medium text-gray-700">{paper.description}</p>
+                        )}
                         {paper.totalQuestions && (
                           <p>❓ {paper.totalQuestions} questions</p>
                         )}
