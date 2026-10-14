@@ -460,9 +460,9 @@ export default function FullExamMode() {
                   key={option.key}
                   style={{
                     display: "flex",
-                    alignItems: "center",
-                    padding: "15px",
-                    marginBottom: "12px",
+                    alignItems: "flex-start",
+                    padding: "20px",
+                    marginBottom: "14px",
                     backgroundColor:
                       answers[currentQuestion.id] === option.key ? "#eff6ff" : "white",
                     border:
@@ -480,11 +480,11 @@ export default function FullExamMode() {
                     value={option.key}
                     checked={answers[currentQuestion.id] === option.key}
                     onChange={() => handleAnswerChange(option.key)}
-                    style={{ marginRight: "12px", cursor: "pointer" }}
+                    style={{ marginRight: "16px", marginTop: "2px", cursor: "pointer", flexShrink: 0 }}
                   />
                   <div style={{ flex: 1 }}>
-                    <span style={{ fontWeight: "500", fontSize: "16px", marginRight: "8px" }}>{option.key}.</span>
-                    <span style={{ fontSize: "15px" }}>{option.text}</span>
+                    <span style={{ fontWeight: "700", fontSize: "17px", marginRight: "12px", color: "#1f2937" }}>{option.key}.</span>
+                    <span style={{ fontSize: "16px", lineHeight: "1.6", color: "#374151" }}>{option.text}</span>
                   </div>
                 </label>
               ))}
@@ -593,6 +593,18 @@ export default function FullExamMode() {
             </p>
           </div>
 
+          {/* Flagged Counter */}
+          {flagged.size > 0 && (
+            <div style={{ marginBottom: "20px", paddingBottom: "15px", borderBottom: "1px solid #e5e7eb" }}>
+              <p style={{ margin: "0 0 8px 0", fontSize: "13px", color: "#666", fontWeight: "500" }}>
+                🚩 FLAGGED
+              </p>
+              <p style={{ margin: "0", fontSize: "18px", fontWeight: "600", color: "#f97316" }}>
+                {flagged.size} question{flagged.size !== 1 ? 's' : ''}
+              </p>
+            </div>
+          )}
+
           {/* Question Navigator Grid */}
           <div style={{ marginBottom: "20px" }}>
             <p style={{ margin: "0 0 12px 0", fontSize: "13px", color: "#666", fontWeight: "500" }}>
@@ -637,12 +649,16 @@ export default function FullExamMode() {
                       padding: "10px",
                       backgroundColor: isCurrent
                         ? "#3b82f6"
+                        : qFlagged
+                        ? "#fef3c7"
                         : qAnswered
                         ? "#eff6ff"
                         : "white",
                       color: isCurrent ? "white" : "#1f2937",
                       border: isCurrent
                         ? "2px solid #3b82f6"
+                        : qFlagged
+                        ? "2px solid #f97316"
                         : isPartStart && parts.length > 0
                         ? "2px solid #2563eb"
                         : qAnswered
@@ -650,27 +666,15 @@ export default function FullExamMode() {
                         : "1px solid #d1d5db",
                       borderRadius: "4px",
                       cursor: "pointer",
-                      fontWeight: isPartStart ? "700" : "500",
+                      fontWeight: qFlagged || isPartStart ? "700" : "500",
                       fontSize: "12px",
                       transition: "all 0.2s",
                       position: "relative",
-                      boxShadow: isPartStart && parts.length > 0 ? "0 0 4px #2563eb" : "none",
+                      boxShadow: (qFlagged || (isPartStart && parts.length > 0)) ? "0 0 4px rgba(249, 115, 22, 0.5)" : "none",
                     }}
-                    title={isPartStart && parts.length > 0 ? `Start of ${parts[questionPartIndex]?.partName}` : ""}
+                    title={qFlagged ? `Q${idx + 1}: Flagged for review` : isPartStart && parts.length > 0 ? `Start of ${parts[questionPartIndex]?.partName}` : `Q${idx + 1}`}
                   >
                     {idx + 1}
-                    {qFlagged && (
-                      <span
-                        style={{
-                          position: "absolute",
-                          top: "-6px",
-                          right: "-6px",
-                          fontSize: "12px",
-                        }}
-                      >
-                        🚩
-                      </span>
-                      )}
                     </button>
                 );
               })}
