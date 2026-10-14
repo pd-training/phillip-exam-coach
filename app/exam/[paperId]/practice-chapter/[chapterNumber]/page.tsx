@@ -5,6 +5,20 @@ import { useSession } from "next-auth/react";
 import { useRouter, useParams } from "next/navigation";
 import StudentNav from "@/components/StudentNav";
 
+// Add animation styles
+const styles = `
+  @keyframes slideUp {
+    from {
+      opacity: 0;
+      transform: translateY(20px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+`;
+
 interface Chapter {
   number: number;
   title: string;
@@ -232,10 +246,19 @@ export default function PracticeChapterMode() {
 
   return (
     <div className="min-h-screen bg-gray-50 flex flex-col">
+      <style>{styles}</style>
       <StudentNav />
 
       <div className="flex-1 flex items-center justify-center px-6 py-12">
         <div className="bg-white rounded-2xl border border-gray-200 p-8 w-full max-w-2xl">
+          {/* Back to Practice Link */}
+          <button
+            onClick={() => router.push(`/exam/${paperId}`)}
+            className="text-blue-600 hover:text-blue-700 font-medium text-sm mb-6 transition duration-200 flex items-center gap-2"
+          >
+            ← Back to Practice
+          </button>
+
           {/* Header */}
           <div className="mb-8 flex justify-between items-center">
             <div>
@@ -297,80 +320,168 @@ export default function PracticeChapterMode() {
             ))}
           </div>
 
-          {/* Feedback */}
+          {/* Feedback Modal */}
           {showingFeedback && feedback && (
-            <div className={`rounded-lg p-6 mb-8 border-l-4 ${
-              feedback.isCorrect
-                ? "bg-green-50 border-green-500"
-                : "bg-red-50 border-red-500"
-            }`}>
-              <p className={`m-0 mb-4 font-bold text-lg ${
-                feedback.isCorrect ? "text-green-700" : "text-red-700"
-              }`}>
-                {feedback.isCorrect ? "Correct!" : "Incorrect"}
-              </p>
-              
-              {/* Your answer */}
-              <div className="mb-4">
-                <p className="m-0 text-sm font-semibold text-gray-700 mb-2">Your answer:</p>
-                <p className="m-0 text-sm text-gray-700">
-                  <strong>{feedback.studentAnswer}.</strong> {
-                    feedback.studentAnswer === "A" ? feedback.optionA :
-                    feedback.studentAnswer === "B" ? feedback.optionB :
-                    feedback.studentAnswer === "C" ? feedback.optionC :
-                    feedback.optionD
-                  }
-                </p>
-              </div>
-              
-              {/* Correct answer - always show */}
-              <div className="mb-4">
-                <p className="m-0 text-sm font-semibold text-gray-700 mb-2">Correct answer:</p>
-                <p className="m-0 text-sm text-gray-700">
-                  <strong>{feedback.correctAnswer}.</strong> {
-                    feedback.correctAnswer === "A" ? feedback.optionA :
-                    feedback.correctAnswer === "B" ? feedback.optionB :
-                    feedback.correctAnswer === "C" ? feedback.optionC :
-                    feedback.optionD
-                  }
-                </p>
-              </div>
-              
-              {/* Explanation */}
-              <div className="pt-4 border-t border-gray-300">
-                <p className="m-0 text-sm text-gray-700 leading-relaxed">
-                  {feedback.explanation}
-                </p>
+            <div
+              style={{
+                position: "fixed",
+                top: 0,
+                left: 0,
+                right: 0,
+                bottom: 0,
+                backgroundColor: "rgba(0, 0, 0, 0.5)",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                zIndex: 1000,
+                padding: "20px",
+              }}
+            >
+              <div
+                style={{
+                  backgroundColor: "white",
+                  borderRadius: "12px",
+                  padding: "32px",
+                  maxWidth: "500px",
+                  width: "100%",
+                  boxShadow: "0 20px 25px -5px rgba(0, 0, 0, 0.1)",
+                  animation: "slideUp 0.3s ease-out",
+                }}
+              >
+                {/* Header with Icon */}
+                <div style={{ marginBottom: "24px" }}>
+                  <div
+                    style={{
+                      width: "56px",
+                      height: "56px",
+                      borderRadius: "50%",
+                      backgroundColor: feedback.isCorrect ? "#dcfce7" : "#fee2e2",
+                      display: "flex",
+                      alignItems: "center",
+                      justifyContent: "center",
+                      marginBottom: "16px",
+                      fontSize: "28px",
+                    }}
+                  >
+                    {feedback.isCorrect ? "✓" : "✕"}
+                  </div>
+                  <h2
+                    style={{
+                      margin: "0",
+                      fontSize: "24px",
+                      fontWeight: "700",
+                      color: feedback.isCorrect ? "#166534" : "#991b1b",
+                    }}
+                  >
+                    {feedback.isCorrect ? "Correct!" : "Incorrect"}
+                  </h2>
+                </div>
+
+                {/* Your answer */}
+                <div style={{ marginBottom: "20px" }}>
+                  <p style={{ margin: "0 0 8px 0", fontSize: "12px", fontWeight: "700", color: "#6b7280", textTransform: "uppercase", letterSpacing: "0.5px" }}>
+                    Your answer
+                  </p>
+                  <p style={{ margin: "0", fontSize: "15px", color: "#1f2937" }}>
+                    <strong>{feedback.studentAnswer}.</strong> {
+                      feedback.studentAnswer === "A" ? feedback.optionA :
+                      feedback.studentAnswer === "B" ? feedback.optionB :
+                      feedback.studentAnswer === "C" ? feedback.optionC :
+                      feedback.optionD
+                    }
+                  </p>
+                </div>
+
+                {/* Correct answer */}
+                <div style={{ marginBottom: "20px", paddingBottom: "20px", borderBottom: "1px solid #e5e7eb" }}>
+                  <p style={{ margin: "0 0 8px 0", fontSize: "12px", fontWeight: "700", color: "#6b7280", textTransform: "uppercase", letterSpacing: "0.5px" }}>
+                    Correct answer
+                  </p>
+                  <p style={{ margin: "0", fontSize: "15px", color: "#1f2937" }}>
+                    <strong>{feedback.correctAnswer}.</strong> {
+                      feedback.correctAnswer === "A" ? feedback.optionA :
+                      feedback.correctAnswer === "B" ? feedback.optionB :
+                      feedback.correctAnswer === "C" ? feedback.optionC :
+                      feedback.optionD
+                    }
+                  </p>
+                </div>
+
+                {/* Explanation */}
+                <div style={{ marginBottom: "24px" }}>
+                  <p style={{ margin: "0 0 8px 0", fontSize: "12px", fontWeight: "700", color: "#6b7280", textTransform: "uppercase", letterSpacing: "0.5px" }}>
+                    Explanation
+                  </p>
+                  <p style={{ margin: "0", fontSize: "14px", lineHeight: "1.6", color: "#374151" }}>
+                    {feedback.explanation}
+                  </p>
+                </div>
+
+                {/* Continue Button */}
+                <button
+                  onClick={handleNext}
+                  style={{
+                    width: "100%",
+                    padding: "12px",
+                    backgroundColor: "#2563eb",
+                    color: "white",
+                    border: "none",
+                    borderRadius: "6px",
+                    cursor: "pointer",
+                    fontWeight: "600",
+                    fontSize: "15px",
+                    transition: "background-color 0.2s",
+                  }}
+                  onMouseEnter={(e) => {
+                    (e.target as HTMLButtonElement).style.backgroundColor = "#1d4ed8";
+                  }}
+                  onMouseLeave={(e) => {
+                    (e.target as HTMLButtonElement).style.backgroundColor = "#2563eb";
+                  }}
+                >
+                  {currentQIndex < questions.length - 1 ? "Next Question" : "Back to Chapters"}
+                </button>
               </div>
             </div>
           )}
 
           {/* Buttons */}
-          <div className="flex gap-4">
+          <div style={{ display: "flex", gap: "12px" }}>
             <button
               onClick={() => setSelectedChapter(null)}
-              className="flex-1 px-6 py-3 bg-gray-200 hover:bg-gray-300 text-gray-900 rounded-lg font-semibold transition"
+              disabled={showingFeedback}
+              style={{
+                flex: 1,
+                padding: "12px",
+                backgroundColor: showingFeedback ? "#d1d5db" : "#e5e7eb",
+                color: "#1f2937",
+                border: "none",
+                borderRadius: "6px",
+                cursor: showingFeedback ? "not-allowed" : "pointer",
+                fontWeight: "600",
+                opacity: showingFeedback ? 0.6 : 1,
+              }}
             >
               Back to Chapters
             </button>
-            {!showingFeedback ? (
+            {!showingFeedback && (
               <button
                 onClick={handleSubmitAnswer}
                 disabled={!selectedAnswer}
-                className={`flex-1 px-6 py-3 rounded-lg font-semibold transition duration-200 ${
-                  selectedAnswer
-                    ? "bg-blue-600 hover:bg-blue-700 text-white"
-                    : "bg-gray-300 text-gray-500 cursor-not-allowed"
-                }`}
+                style={{
+                  flex: 1,
+                  padding: "12px",
+                  backgroundColor:
+                    selectedAnswer ? "#2563eb" : "#9ca3af",
+                  color: "white",
+                  border: "none",
+                  borderRadius: "6px",
+                  cursor: selectedAnswer ? "pointer" : "not-allowed",
+                  fontWeight: "600",
+                  transition: "all 0.2s",
+                }}
               >
                 Submit
-              </button>
-            ) : (
-              <button
-                onClick={handleNext}
-                className="flex-1 px-6 py-3 bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-semibold transition duration-200"
-              >
-                {currentQIndex < questions.length - 1 ? "Next Question" : "Back to Chapters"}
               </button>
             )}
           </div>
