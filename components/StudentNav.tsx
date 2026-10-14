@@ -12,7 +12,7 @@ export default function StudentNav() {
   const navItems = [
     { label: 'Dashboard', href: '/dashboard' },
     { label: 'My Progress', href: '/dashboard/attempts' },
-    { label: 'Explore', href: '/practice/browse' },
+    { label: 'Explore', href: '/explore' },
     { label: 'Help', href: '/help' },
   ];
 
