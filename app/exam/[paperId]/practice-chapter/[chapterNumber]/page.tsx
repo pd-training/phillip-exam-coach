@@ -143,12 +143,15 @@ export default function PracticeChapterMode() {
 
       if (res.ok) {
         const data = await res.json();
+        console.log("Feedback received:", data);
         setFeedback(data);
         setShowingFeedback(true);
         if (data.isCorrect) {
           setScore(score + 1);
         }
         setAnswered(answered + 1);
+      } else {
+        console.error("API response not ok:", res.status);
       }
     } catch (error) {
       console.error("Submit answer error:", error);
