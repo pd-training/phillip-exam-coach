@@ -197,6 +197,14 @@ export default function QuickQuizMode() {
 
       <div className="flex-1 flex items-center justify-center px-6 py-12">
         <div className="bg-white rounded-2xl border border-gray-200 p-8 w-full max-w-2xl">
+          {/* Back to Practice Link */}
+          <button
+            onClick={() => router.push(`/exam/${paperId}`)}
+            className="text-blue-600 hover:text-blue-700 font-medium text-sm mb-6 transition duration-200 flex items-center gap-2"
+          >
+            ← Back to Practice
+          </button>
+
           {/* Header */}
           <div className="mb-8 flex justify-between items-center">
             <div>
@@ -405,26 +413,26 @@ export default function QuickQuizMode() {
             </div>
           )}
 
-          {/* Buttons - Hidden when showing feedback (modal is shown instead) */}
-          {!showingFeedback && (
-            <div style={{ display: "flex", gap: "12px" }}>
-              <button
-                onClick={handlePrevious}
-                disabled={currentQIndex === 0}
-                style={{
-                  flex: 1,
-                  padding: "12px",
-                  backgroundColor: currentQIndex === 0 ? "#d1d5db" : "#e5e7eb",
-                  color: "#1f2937",
-                  border: "none",
-                  borderRadius: "6px",
-                  cursor: currentQIndex === 0 ? "not-allowed" : "pointer",
-                  fontWeight: "600",
-                  opacity: currentQIndex === 0 ? 0.6 : 1,
-                }}
-              >
-                ← Back
-              </button>
+          {/* Buttons */}
+          <div style={{ display: "flex", gap: "12px" }}>
+            <button
+              onClick={handlePrevious}
+              disabled={currentQIndex === 0 || showingFeedback}
+              style={{
+                flex: 1,
+                padding: "12px",
+                backgroundColor: (currentQIndex === 0 || showingFeedback) ? "#d1d5db" : "#e5e7eb",
+                color: "#1f2937",
+                border: "none",
+                borderRadius: "6px",
+                cursor: (currentQIndex === 0 || showingFeedback) ? "not-allowed" : "pointer",
+                fontWeight: "600",
+                opacity: (currentQIndex === 0 || showingFeedback) ? 0.6 : 1,
+              }}
+            >
+              ← Back
+            </button>
+            {!showingFeedback && (
               <button
                 onClick={handleSubmitAnswer}
                 disabled={!selectedAnswer}
@@ -443,8 +451,8 @@ export default function QuickQuizMode() {
               >
                 Submit
               </button>
-            </div>
-          )}
+            )}
+          </div>
 
           {/* Score tracker */}
           <div
