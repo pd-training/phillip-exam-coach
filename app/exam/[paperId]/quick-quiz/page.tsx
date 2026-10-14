@@ -103,6 +103,15 @@ export default function QuickQuizMode() {
     }
   };
 
+  const handlePrevious = () => {
+    if (currentQIndex > 0) {
+      setCurrentQIndex(currentQIndex - 1);
+      setSelectedAnswer("");
+      setFeedback(null);
+      setShowingFeedback(false);
+    }
+  };
+
   const handleNext = () => {
     if (currentQIndex < questions.length - 1) {
       setCurrentQIndex(currentQIndex + 1);
@@ -299,19 +308,21 @@ export default function QuickQuizMode() {
           {/* Buttons */}
           <div style={{ display: "flex", gap: "12px" }}>
             <button
-                onClick={() => router.back()}
+              onClick={handlePrevious}
+              disabled={currentQIndex === 0}
               style={{
                 flex: 1,
                 padding: "12px",
-                backgroundColor: "#e5e7eb",
+                backgroundColor: currentQIndex === 0 ? "#d1d5db" : "#e5e7eb",
                 color: "#1f2937",
                 border: "none",
                 borderRadius: "6px",
-                cursor: "pointer",
+                cursor: currentQIndex === 0 ? "not-allowed" : "pointer",
                 fontWeight: "600",
+                opacity: currentQIndex === 0 ? 0.6 : 1,
               }}
             >
-              Back
+              ← Back
             </button>
             {!showingFeedback ? (
               <button
