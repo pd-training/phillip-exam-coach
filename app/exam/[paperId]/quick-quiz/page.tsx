@@ -5,6 +5,20 @@ import { useSession } from "next-auth/react";
 import { useRouter, useParams } from "next/navigation";
 import StudentNav from "@/components/StudentNav";
 
+// Add animation styles
+const styles = `
+  @keyframes slideUp {
+    from {
+      opacity: 0;
+      transform: translateY(20px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+`;
+
 interface Question {
   id: string;
   text: string;
@@ -178,6 +192,7 @@ export default function QuickQuizMode() {
 
   return (
     <div className="min-h-screen bg-gray-50 flex flex-col">
+      <style>{styles}</style>
       <StudentNav />
 
       <div className="flex-1 flex items-center justify-center px-6 py-12">
@@ -265,85 +280,151 @@ export default function QuickQuizMode() {
             ))}
           </div>
 
-          {/* Feedback */}
+          {/* Feedback Modal */}
           {showingFeedback && feedback && (
             <div
               style={{
-                padding: "15px",
-                marginBottom: "20px",
-                backgroundColor: feedback.isCorrect ? "#dcfce7" : "#fee2e2",
-                borderRadius: "6px",
-                borderLeft: `4px solid ${feedback.isCorrect ? "#22c55e" : "#ef4444"}`,
+                position: "fixed",
+                top: 0,
+                left: 0,
+                right: 0,
+                bottom: 0,
+                backgroundColor: "rgba(0, 0, 0, 0.5)",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                zIndex: 1000,
+                padding: "20px",
               }}
             >
-              <p
+              <div
                 style={{
-                  margin: "0 0 10px 0",
-                  fontWeight: "600",
-                  fontSize: "16px",
-                  color: feedback.isCorrect ? "#166534" : "#991b1b",
+                  backgroundColor: "white",
+                  borderRadius: "12px",
+                  padding: "32px",
+                  maxWidth: "500px",
+                  width: "100%",
+                  boxShadow: "0 20px 25px -5px rgba(0, 0, 0, 0.1)",
+                  animation: "slideUp 0.3s ease-out",
                 }}
               >
-                {feedback.isCorrect ? "Correct!" : "Incorrect"}
-              </p>
-              
-              {/* Your answer */}
-              <div style={{ marginBottom: "10px" }}>
-                <p style={{ margin: "0 0 5px 0", fontSize: "13px", fontWeight: "600", color: "#374151" }}>
-                  Your answer:
-                </p>
-                <p style={{ margin: "0 0 10px 0", fontSize: "14px" }}>
-                  <strong>{feedback.studentAnswer}.</strong> {
-                    feedback.studentAnswer === "A" ? feedback.optionA :
-                    feedback.studentAnswer === "B" ? feedback.optionB :
-                    feedback.studentAnswer === "C" ? feedback.optionC :
-                    feedback.optionD
-                  }
-                </p>
+                {/* Header with Icon */}
+                <div style={{ marginBottom: "24px" }}>
+                  <div
+                    style={{
+                      width: "56px",
+                      height: "56px",
+                      borderRadius: "50%",
+                      backgroundColor: feedback.isCorrect ? "#dcfce7" : "#fee2e2",
+                      display: "flex",
+                      alignItems: "center",
+                      justifyContent: "center",
+                      marginBottom: "16px",
+                      fontSize: "28px",
+                    }}
+                  >
+                    {feedback.isCorrect ? "✓" : "✕"}
+                  </div>
+                  <h2
+                    style={{
+                      margin: "0",
+                      fontSize: "24px",
+                      fontWeight: "700",
+                      color: feedback.isCorrect ? "#166534" : "#991b1b",
+                    }}
+                  >
+                    {feedback.isCorrect ? "Correct!" : "Incorrect"}
+                  </h2>
+                </div>
+
+                {/* Your answer */}
+                <div style={{ marginBottom: "20px" }}>
+                  <p style={{ margin: "0 0 8px 0", fontSize: "12px", fontWeight: "700", color: "#6b7280", textTransform: "uppercase", letterSpacing: "0.5px" }}>
+                    Your answer
+                  </p>
+                  <p style={{ margin: "0", fontSize: "15px", color: "#1f2937" }}>
+                    <strong>{feedback.studentAnswer}.</strong> {
+                      feedback.studentAnswer === "A" ? feedback.optionA :
+                      feedback.studentAnswer === "B" ? feedback.optionB :
+                      feedback.studentAnswer === "C" ? feedback.optionC :
+                      feedback.optionD
+                    }
+                  </p>
+                </div>
+
+                {/* Correct answer */}
+                <div style={{ marginBottom: "20px", paddingBottom: "20px", borderBottom: "1px solid #e5e7eb" }}>
+                  <p style={{ margin: "0 0 8px 0", fontSize: "12px", fontWeight: "700", color: "#6b7280", textTransform: "uppercase", letterSpacing: "0.5px" }}>
+                    Correct answer
+                  </p>
+                  <p style={{ margin: "0", fontSize: "15px", color: "#1f2937" }}>
+                    <strong>{feedback.correctAnswer}.</strong> {
+                      feedback.correctAnswer === "A" ? feedback.optionA :
+                      feedback.correctAnswer === "B" ? feedback.optionB :
+                      feedback.correctAnswer === "C" ? feedback.optionC :
+                      feedback.optionD
+                    }
+                  </p>
+                </div>
+
+                {/* Explanation */}
+                <div style={{ marginBottom: "24px" }}>
+                  <p style={{ margin: "0 0 8px 0", fontSize: "12px", fontWeight: "700", color: "#6b7280", textTransform: "uppercase", letterSpacing: "0.5px" }}>
+                    Explanation
+                  </p>
+                  <p style={{ margin: "0", fontSize: "14px", lineHeight: "1.6", color: "#374151" }}>
+                    {feedback.explanation}
+                  </p>
+                </div>
+
+                {/* Continue Button */}
+                <button
+                  onClick={handleNext}
+                  style={{
+                    width: "100%",
+                    padding: "12px",
+                    backgroundColor: "#2563eb",
+                    color: "white",
+                    border: "none",
+                    borderRadius: "6px",
+                    cursor: "pointer",
+                    fontWeight: "600",
+                    fontSize: "15px",
+                    transition: "background-color 0.2s",
+                  }}
+                  onMouseEnter={(e) => {
+                    (e.target as HTMLButtonElement).style.backgroundColor = "#1d4ed8";
+                  }}
+                  onMouseLeave={(e) => {
+                    (e.target as HTMLButtonElement).style.backgroundColor = "#2563eb";
+                  }}
+                >
+                  {currentQIndex < questions.length - 1 ? "Next Question" : "See Results"}
+                </button>
               </div>
-              
-              {/* Correct answer */}
-              <div style={{ marginBottom: "10px", paddingBottom: "10px", borderBottom: "1px solid rgba(0,0,0,0.1)" }}>
-                <p style={{ margin: "0 0 5px 0", fontSize: "13px", fontWeight: "600", color: "#374151" }}>
-                  Correct answer:
-                </p>
-                <p style={{ margin: "0", fontSize: "14px" }}>
-                  <strong>{feedback.correctAnswer}.</strong> {
-                    feedback.correctAnswer === "A" ? feedback.optionA :
-                    feedback.correctAnswer === "B" ? feedback.optionB :
-                    feedback.correctAnswer === "C" ? feedback.optionC :
-                    feedback.optionD
-                  }
-                </p>
-              </div>
-              
-              {/* Explanation */}
-              <p style={{ margin: "10px 0 0 0", fontSize: "14px", lineHeight: "1.5", color: "#374151" }}>
-                {feedback.explanation}
-              </p>
             </div>
           )}
 
-          {/* Buttons */}
-          <div style={{ display: "flex", gap: "12px" }}>
-            <button
-              onClick={handlePrevious}
-              disabled={currentQIndex === 0}
-              style={{
-                flex: 1,
-                padding: "12px",
-                backgroundColor: currentQIndex === 0 ? "#d1d5db" : "#e5e7eb",
-                color: "#1f2937",
-                border: "none",
-                borderRadius: "6px",
-                cursor: currentQIndex === 0 ? "not-allowed" : "pointer",
-                fontWeight: "600",
-                opacity: currentQIndex === 0 ? 0.6 : 1,
-              }}
-            >
-              ← Back
-            </button>
-            {!showingFeedback ? (
+          {/* Buttons - Hidden when showing feedback (modal is shown instead) */}
+          {!showingFeedback && (
+            <div style={{ display: "flex", gap: "12px" }}>
+              <button
+                onClick={handlePrevious}
+                disabled={currentQIndex === 0}
+                style={{
+                  flex: 1,
+                  padding: "12px",
+                  backgroundColor: currentQIndex === 0 ? "#d1d5db" : "#e5e7eb",
+                  color: "#1f2937",
+                  border: "none",
+                  borderRadius: "6px",
+                  cursor: currentQIndex === 0 ? "not-allowed" : "pointer",
+                  fontWeight: "600",
+                  opacity: currentQIndex === 0 ? 0.6 : 1,
+                }}
+              >
+                ← Back
+              </button>
               <button
                 onClick={handleSubmitAnswer}
                 disabled={!selectedAnswer}
@@ -362,25 +443,8 @@ export default function QuickQuizMode() {
               >
                 Submit
               </button>
-            ) : (
-              <button
-                onClick={handleNext}
-                style={{
-                  flex: 1,
-                  padding: "12px",
-                  backgroundColor: "#2563eb",
-                  color: "white",
-                  border: "none",
-                  borderRadius: "6px",
-                  cursor: "pointer",
-                  fontWeight: "600",
-                  transition: "all 0.2s",
-                }}
-              >
-                {currentQIndex < questions.length - 1 ? "Next Question" : "See Results"}
-              </button>
-            )}
-          </div>
+            </div>
+          )}
 
           {/* Score tracker */}
           <div
