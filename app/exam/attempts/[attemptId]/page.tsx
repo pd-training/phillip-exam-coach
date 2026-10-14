@@ -169,16 +169,9 @@ export default function AttemptReviewPage() {
               </div>
             )}
           </div>
-          <div className="flex flex-col items-end gap-4">
-            <Link href="/dashboard">
-              <button className="px-4 py-2 bg-white bg-opacity-20 hover:bg-opacity-30 text-white font-medium rounded-lg transition text-sm border border-blue-300">
-                ← Back to Dashboard
-              </button>
-            </Link>
-            <div className="text-right">
-              <p className="text-blue-100 text-sm">Time Taken</p>
-              <p className="text-2xl font-bold">{timeTaken} min</p>
-            </div>
+          <div className="text-right">
+            <p className="text-blue-100 text-sm">Time Taken</p>
+            <p className="text-2xl font-bold">{timeTaken} min</p>
           </div>
         </div>
       </div>
