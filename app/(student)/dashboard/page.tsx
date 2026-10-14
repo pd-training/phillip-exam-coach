@@ -240,6 +240,32 @@ export default function StudentDashboard() {
 
       {/* Main Content */}
       <div className="max-w-7xl mx-auto px-6 py-12">
+        {/* New User Welcome Banner */}
+        {attempts.length === 0 && studentPapers.length === 0 && (
+          <div className="mb-12 bg-gradient-to-r from-blue-50 to-amber-50 border-2 border-blue-200 rounded-lg p-8">
+            <div className="flex items-start justify-between">
+              <div>
+                <h2 className="text-2xl font-bold text-gray-900 mb-2">Welcome to Finance Ready! 👋</h2>
+                <p className="text-gray-700 mb-4">
+                  Get ready for your certification exams with our comprehensive practice platform.
+                </p>
+                <div className="space-y-2 text-sm text-gray-700 mb-6">
+                  <p><span className="font-semibold">📋 Step 1:</span> Request access to papers in the Explore section</p>
+                  <p><span className="font-semibold">✅ Step 2:</span> Wait for admin approval (or get instant access if pre-assigned)</p>
+                  <p><span className="font-semibold">📚 Step 3:</span> Start practicing with Full Exam, Quick Quiz, or Chapter modes</p>
+                  <p><span className="font-semibold">📊 Step 4:</span> Track your progress and focus on weak areas</p>
+                </div>
+                <Link href="/explore">
+                  <button className="px-6 py-3 bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-semibold transition">
+                    Browse Papers & Request Access →
+                  </button>
+                </Link>
+              </div>
+              <div className="hidden md:block text-6xl">🚀</div>
+            </div>
+          </div>
+        )}
+
         {/* Your Papers - Quick Access */}
         {studentPapers.length > 0 && (
           <div className="mb-12">
@@ -301,35 +327,37 @@ export default function StudentDashboard() {
           </div>
         )}
 
-        {/* Secondary Stats Row */}
-        <div className="flex gap-6 mb-8 text-sm">
-          <div className="flex items-center gap-3">
-            <div>
-              <p className="text-gray-500 text-xs font-medium">Overall Average</p>
-              <p className="text-lg font-semibold text-gray-900">
-                {stats.completedCount > 0 ? `${Math.round(stats.averageScore)}%` : "—"}
-              </p>
+        {/* Secondary Stats Row - Only show if user has attempts */}
+        {attempts.length > 0 && (
+          <div className="flex gap-6 mb-8 text-sm">
+            <div className="flex items-center gap-3">
+              <div>
+                <p className="text-gray-500 text-xs font-medium">Overall Average</p>
+                <p className="text-lg font-semibold text-gray-900">
+                  {stats.completedCount > 0 ? `${Math.round(stats.averageScore)}%` : "—"}
+                </p>
+              </div>
+            </div>
+            <div className="w-px bg-gray-200"></div>
+            <div className="flex items-center gap-3">
+              <div>
+                <p className="text-gray-500 text-xs font-medium">Pass Rate</p>
+                <p className="text-lg font-semibold text-gray-900">
+                  {stats.completedCount > 0 ? `${passRate}%` : "—"}
+                </p>
+              </div>
+            </div>
+            <div className="w-px bg-gray-200"></div>
+            <div className="flex items-center gap-3">
+              <div>
+                <p className="text-gray-500 text-xs font-medium">Attempts</p>
+                <p className="text-lg font-semibold text-gray-900">
+                  {stats.completedCount}
+                </p>
+              </div>
             </div>
           </div>
-          <div className="w-px bg-gray-200"></div>
-          <div className="flex items-center gap-3">
-            <div>
-              <p className="text-gray-500 text-xs font-medium">Pass Rate</p>
-              <p className="text-lg font-semibold text-gray-900">
-                {stats.completedCount > 0 ? `${passRate}%` : "—"}
-              </p>
-            </div>
-          </div>
-          <div className="w-px bg-gray-200"></div>
-          <div className="flex items-center gap-3">
-            <div>
-              <p className="text-gray-500 text-xs font-medium">Attempts</p>
-              <p className="text-lg font-semibold text-gray-900">
-                {stats.completedCount}
-              </p>
-            </div>
-          </div>
-        </div>
+        )}
 
         {/* Latest Scores & Trend Analysis */}
         {attempts.length > 0 && (() => {
@@ -483,14 +511,42 @@ export default function StudentDashboard() {
         })()}
 
         {/* Get Started Section for New Users */}
-        {attempts.length === 0 && availablePapers.length > 0 && (
+        {attempts.length === 0 && (
           <div className="mb-12">
-            <div className="mb-6">
-              <h2 className="text-2xl font-bold text-gray-900 mb-1">Get Started</h2>
-              <p className="text-gray-600 text-sm">Browse available exam papers and take your first practice test</p>
+            <div className="mb-6 flex items-center justify-between">
+              <div>
+                <h2 className="text-2xl font-bold text-gray-900 mb-1">Available Papers</h2>
+                <p className="text-gray-600 text-sm">Request access or start practicing with papers</p>
+              </div>
+              <Link href="/explore" className="text-amber-600 hover:text-amber-700 font-semibold">
+                View All →
+              </Link>
             </div>
-            <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
-              {availablePapers.slice(0, 6).map((paper) => {
+            {availablePapers.length === 0 ? (
+              <div className="bg-white rounded-lg border border-gray-200 p-12 text-center">
+                <div className="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                  <svg
+                    className="w-8 h-8 text-gray-400"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
+                    />
+                  </svg>
+                </div>
+                <p className="text-gray-700 font-medium mb-2">No papers available yet</p>
+                <p className="text-gray-600 text-sm mb-6">
+                  Check back soon! Your admin is preparing papers for you.
+                </p>
+              </div>
+            ) : (
+              <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
+                {availablePapers.slice(0, 6).map((paper) => {
                 const status = getStatusForPaper(paper.id);
                 const msg = submitMessages[paper.id];
 
