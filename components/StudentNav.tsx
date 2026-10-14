@@ -11,9 +11,8 @@ export default function StudentNav() {
 
   const navItems = [
     { label: 'Dashboard', href: '/dashboard' },
-    { label: 'Practice', href: '/practice' },
-    { label: 'Exam Attempts', href: '/dashboard/attempts' },
-    { label: 'Browse Papers', href: '/practice/browse' },
+    { label: 'My Progress', href: '/dashboard/attempts' },
+    { label: 'Explore', href: '/practice/browse' },
     { label: 'Help', href: '/help' },
   ];
 
@@ -28,10 +27,8 @@ export default function StudentNav() {
         {/* Navigation Links */}
         <div className="flex gap-8">
           {navItems.map((item) => {
-            const isActive = item.href === '/practice'
-              ? pathname === '/practice'
-              : pathname === item.href || pathname.startsWith(item.href + '/');
-            
+            const isActive = pathname === item.href || pathname.startsWith(item.href + '/');
+
             return (
               <Link
                 key={item.href}
