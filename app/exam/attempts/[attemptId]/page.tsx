@@ -180,7 +180,7 @@ export default function AttemptReviewPage() {
       <div className="flex-1 overflow-hidden bg-white">
         <div className="max-w-7xl mx-auto px-6 h-full flex overflow-hidden">
           {/* Left Content */}
-          <div className="flex-1 overflow-y-auto py-8 pr-6 pb-24">
+          <div className="flex-1 overflow-y-auto py-8 pr-6">
             {currentQuestion ? (
               <div className="max-w-2xl">
                 {/* Question Header */}
@@ -263,6 +263,31 @@ export default function AttemptReviewPage() {
                     <p className="text-sm text-blue-800 leading-relaxed">{currentQuestion.explanation}</p>
                   </div>
                 )}
+
+                {/* CTAs */}
+                <div className="mt-12 pt-8 border-t border-gray-200">
+                  <div className="grid grid-cols-2 gap-3">
+                    {attempt.passed ? (
+                      <Link href="/explore">
+                        <button className="w-full px-6 py-3 bg-green-600 hover:bg-green-700 text-white font-semibold rounded-lg transition">
+                          ✓ Try Another Paper
+                        </button>
+                      </Link>
+                    ) : (
+                      <button
+                        onClick={() => setCurrentQIndex(0)}
+                        className="w-full px-6 py-3 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-lg transition"
+                      >
+                        🔄 Practice Again
+                      </button>
+                    )}
+                    <Link href="/dashboard">
+                      <button className="w-full px-6 py-3 bg-gray-100 hover:bg-gray-200 text-gray-700 font-medium rounded-lg transition">
+                        Back to Dashboard
+                      </button>
+                    </Link>
+                  </div>
+                </div>
               </div>
             ) : (
               <div className="text-center text-gray-600">No questions to display</div>
@@ -308,36 +333,6 @@ export default function AttemptReviewPage() {
                   ))}
               </div>
             </div>
-          </div>
-        </div>
-      </div>
-
-      {/* Sticky Footer with CTAs */}
-      <div className="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 shadow-lg z-50">
-        <div className="max-w-7xl mx-auto px-6 py-4 ml-auto mr-auto">
-          <div className="grid grid-cols-3 gap-3">
-            {/* Primary CTA */}
-            {attempt.passed ? (
-              <Link href="/explore" className="col-span-2">
-                <button className="w-full px-6 py-3 bg-green-600 hover:bg-green-700 text-white font-semibold rounded-lg transition">
-                  ✓ Try Another Paper
-                </button>
-              </Link>
-            ) : (
-              <button
-                onClick={() => setCurrentQIndex(0)}
-                className="col-span-2 px-6 py-3 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-lg transition"
-              >
-                🔄 Practice Again
-              </button>
-            )}
-
-            {/* Secondary CTA */}
-            <Link href="/dashboard">
-              <button className="w-full px-4 py-3 bg-gray-100 hover:bg-gray-200 text-gray-700 font-medium rounded-lg transition">
-                Back to Dashboard
-              </button>
-            </Link>
           </div>
         </div>
       </div>
