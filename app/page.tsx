@@ -51,6 +51,7 @@ export default function LandingPage() {
           </div>
           <nav className="hidden md:flex items-center gap-8">
             <a href="#features" className="text-blue-200 hover:text-amber-400 transition font-medium">Features</a>
+            <a href="#how-it-works" className="text-blue-200 hover:text-amber-400 transition font-medium">How It Works</a>
             <a href="#stats" className="text-blue-200 hover:text-amber-400 transition font-medium">Why Choose Us</a>
             <Link href="/login">
               <button className="px-6 py-2 text-amber-400 hover:text-amber-300 font-medium transition">
@@ -93,7 +94,7 @@ export default function LandingPage() {
 
             {/* Description */}
             <p className="text-lg text-blue-200 mb-6 max-w-2xl leading-relaxed">
-              Practice with authentic CMFAS exam papers, receive detailed feedback on every answer, and track your progress toward mastery. Designed specifically for financial advisors who demand excellence.
+              Practice with CMFAS exam papers, receive detailed feedback on every answer, and track your progress toward mastery. Designed specifically for financial advisors who demand excellence.
             </p>
 
             {/* CTA Buttons */}
@@ -218,7 +219,7 @@ export default function LandingPage() {
       </section>
 
       {/* How It Works */}
-      <section className="py-16 px-6 bg-gradient-to-b from-white to-blue-50">
+      <section id="how-it-works" className="py-16 px-6 bg-gradient-to-b from-white to-blue-50">
         <div className="max-w-7xl mx-auto">
           <h2 className="text-4xl font-bold text-gray-900 mb-12 text-center">How It Works</h2>
 
@@ -226,7 +227,7 @@ export default function LandingPage() {
             {[
               { step: 1, title: 'Sign Up', desc: 'Create your free account in seconds' },
               { step: 2, title: 'Choose Papers', desc: 'Select which CMFAS papers to practice' },
-              { step: 3, title: 'Take Exams', desc: 'Complete full-length or chapter practice' },
+              { step: 3, title: 'Take Mock Exams', desc: 'Complete full-length or chapter practice' },
               { step: 4, title: 'Improve', desc: 'Review answers and track your progress' },
             ].map((item, idx) => (
               <div key={idx} className="relative">
