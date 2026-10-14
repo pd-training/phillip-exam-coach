@@ -70,12 +70,6 @@ export default function AllAttemptsPage() {
       {/* Hero Section */}
       <div className="bg-gradient-to-r from-blue-600 to-blue-700 text-white py-12 px-0 border-b border-blue-800">
         <div className="max-w-7xl mx-auto px-6">
-          <button
-            onClick={() => router.back()}
-            className="text-white hover:text-blue-100 font-medium text-sm mb-6 transition duration-200"
-          >
-            ← Back
-          </button>
           <h1 className="text-4xl font-bold mb-2">My Progress</h1>
           <p className="text-gray-200">View all your exam attempts and performance</p>
         </div>
