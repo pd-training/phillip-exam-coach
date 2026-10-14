@@ -621,6 +621,8 @@ export default function StudentDashboard() {
             </div>
           </div>
         )}
+          </div>
+        )}
 
         {/* Recent Exam Attempts Section */}
         <div className="mb-12">
