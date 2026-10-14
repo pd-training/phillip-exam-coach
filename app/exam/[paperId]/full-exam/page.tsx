@@ -387,16 +387,23 @@ export default function FullExamMode() {
 
       {/* Exam Header */}
       <div className="bg-white border-b border-gray-200 px-0 py-4">
-        <div className="max-w-7xl mx-auto px-6 flex justify-between items-center">
-          <div>
-            <h1 className="text-xl font-bold text-gray-900">{examConfig?.title || "Full Exam Mode"}</h1>
-            <p className="text-sm text-gray-500 mt-1">
-              {currentPart 
-                ? `${currentPart.partName} (Q${currentPart.questionInPart}/${currentPart.totalInPart})`
-                : "Full Exam Mode"
-              }
-            </p>
-          </div>
+        <div className="max-w-7xl mx-auto px-6">
+          <button
+            onClick={() => router.push(`/exam/${paperId}`)}
+            className="text-blue-600 hover:text-blue-700 font-medium text-sm mb-4 transition duration-200"
+          >
+            ← Back to Practice
+          </button>
+          <div className="flex justify-between items-center">
+            <div>
+              <h1 className="text-xl font-bold text-gray-900">{examConfig?.title || "Full Exam Mode"}</h1>
+              <p className="text-sm text-gray-500 mt-1">
+                {currentPart
+                  ? `${currentPart.partName} (Q${currentPart.questionInPart}/${currentPart.totalInPart})`
+                  : "Full Exam Mode"
+                }
+              </p>
+            </div>
           <div className="flex items-center gap-8">
             <div className="text-sm text-gray-600">
               Question <span className="font-semibold text-gray-900">{currentQIndex + 1}</span> of <span className="font-semibold text-gray-900">{questions.length}</span>
