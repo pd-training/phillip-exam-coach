@@ -99,7 +99,7 @@ export default function AttemptsPage() {
           <select
             value={selectedPaperId}
             onChange={(e) => setSelectedPaperId(e.target.value)}
-            className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-amber-500"
+            className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
             style={{ transition: "ring 0.2s" }}
           >
             <option value="">All Papers</option>

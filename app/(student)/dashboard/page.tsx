@@ -84,7 +84,7 @@ export default function StudentDashboard() {
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
         <div className="text-center">
           <div className="inline-block">
-            <div className="w-12 h-12 border-4 border-gray-300 border-t-amber-500 rounded-full animate-spin" />
+            <div className="w-12 h-12 border-4 border-gray-300 border-t-blue-600 rounded-full animate-spin" />
           </div>
           <p className="mt-4 text-gray-600">Loading...</p>
         </div>
@@ -242,7 +242,7 @@ export default function StudentDashboard() {
       <div className="max-w-7xl mx-auto px-6 py-12">
         {/* New User Welcome Banner */}
         {attempts.length === 0 && studentPapers.length === 0 && (
-          <div className="mb-12 bg-gradient-to-r from-blue-50 to-amber-50 border-2 border-blue-200 rounded-lg p-8">
+          <div className="mb-12 bg-gradient-to-r from-blue-50 to-blue-100 border-2 border-blue-200 rounded-lg p-8">
             <div className="flex items-start justify-between">
               <div>
                 <h2 className="text-2xl font-bold text-gray-900 mb-2">Welcome to Finance Ready! 👋</h2>
@@ -416,8 +416,8 @@ export default function StudentDashboard() {
                         key={paper.title}
                         className={`p-4 rounded-lg border-2 transition-all ${
                           selectedTrendPaper === paper.title
-                            ? "border-amber-500 bg-amber-50"
-                            : "border-gray-200 bg-white hover:border-amber-200"
+                            ? "border-blue-500 bg-blue-50"
+                            : "border-gray-200 bg-white hover:border-blue-200"
                         }`}
                       >
                         <button
@@ -439,7 +439,7 @@ export default function StudentDashboard() {
                           </div>
                         </button>
                         <Link href={`/exam/${paperId}`}>
-                          <button className="w-full mt-3 px-2 py-1.5 bg-amber-500 hover:bg-amber-600 text-blue-900 rounded text-xs font-semibold transition">
+                          <button className="w-full mt-3 px-2 py-1.5 bg-blue-600 hover:bg-blue-700 text-white rounded text-xs font-semibold transition">
                             Practice Again
                           </button>
                         </Link>
@@ -518,7 +518,7 @@ export default function StudentDashboard() {
                 <h2 className="text-2xl font-bold text-gray-900 mb-1">Available Papers</h2>
                 <p className="text-gray-600 text-sm">Request access or start practicing with papers</p>
               </div>
-              <Link href="/explore" className="text-amber-600 hover:text-amber-700 font-semibold">
+              <Link href="/explore" className="text-blue-600 hover:text-blue-700 font-semibold">
                 View All →
               </Link>
             </div>
@@ -553,7 +553,7 @@ export default function StudentDashboard() {
                 return (
                   <div
                     key={paper.id}
-                    className="bg-white rounded-lg p-5 border border-gray-200 hover:border-amber-400 hover:shadow-md transition duration-300"
+                    className="bg-white rounded-lg p-5 border border-gray-200 hover:border-blue-400 hover:shadow-md transition duration-300"
                   >
                     <h3 className="font-semibold text-gray-900 mb-4">
                       {paper.title}
@@ -665,7 +665,7 @@ export default function StudentDashboard() {
                       {/* Left: Attempt Details */}
                       <div className="flex-1 min-w-0">
                         <Link href={`/exam/attempts/${attempt.id}`}>
-                          <h3 className="font-semibold text-gray-900 hover:text-amber-600 transition mb-1 cursor-pointer">
+                          <h3 className="font-semibold text-gray-900 hover:text-blue-600 transition mb-1 cursor-pointer">
                             {attempt.paperTitle}
                           </h3>
                         </Link>
@@ -703,7 +703,7 @@ export default function StudentDashboard() {
                           </button>
                         </Link>
                         <Link href={`/exam/${attempt.paperid}`}>
-                          <button className="px-3 py-1.5 text-sm font-medium text-blue-900 bg-amber-500 hover:bg-amber-600 rounded-lg transition">
+                          <button className="px-3 py-1.5 text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 rounded-lg transition">
                             Again
                           </button>
                         </Link>
@@ -716,7 +716,7 @@ export default function StudentDashboard() {
               {attempts.length > 5 && (
                 <div className="mt-4 text-center">
                   <Link href="/dashboard/attempts">
-                    <button className="text-amber-600 hover:text-amber-700 font-medium text-sm">
+                    <button className="text-blue-600 hover:text-blue-700 font-medium text-sm">
                       View all attempts →
                     </button>
                   </Link>

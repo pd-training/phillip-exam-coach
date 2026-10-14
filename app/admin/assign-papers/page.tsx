@@ -212,7 +212,7 @@ export default function AssignPapersPage() {
                 placeholder="Search by email or name..."
                 value={searchUserTerm}
                 onChange={(e) => setSearchUserTerm(e.target.value)}
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg mb-4 focus:outline-none focus:ring-2 focus:ring-amber-500"
+                className="w-full px-3 py-2 border border-gray-300 rounded-lg mb-4 focus:outline-none focus:ring-2 focus:ring-blue-500"
                 style={{ transition: "ring 0.2s" }}
               />
               <div className="space-y-2 max-h-96 overflow-y-auto">
@@ -225,7 +225,7 @@ export default function AssignPapersPage() {
                       onClick={() => handleUserSelect(user.id)}
                       className={`w-full text-left px-3 py-2 rounded-lg transition ${
                         selectedUser === user.id
-                          ? "bg-yellow-100 text-yellow-900 border-l-4 border-amber-500"
+                          ? "bg-blue-100 text-blue-900 border-l-4 border-blue-500"
                           : "hover:bg-gray-100 border-l-4 border-transparent"
                       }`}
                     >
@@ -283,9 +283,9 @@ export default function AssignPapersPage() {
                             <button
                               onClick={() => handleAssignPaper(paper.id)}
                               disabled={submitting}
-                              className="px-3 py-1 bg-amber-500 text-blue-900 text-xs rounded disabled:opacity-50 transition"
+                              className="px-3 py-1 bg-blue-600 text-white text-xs rounded disabled:opacity-50 transition"
                               style={{
-                                backgroundColor: submitting ? "#d1d5db" : "#f59e0b",
+                                backgroundColor: submitting ? "#d1d5db" : "#2563eb",
                                 color: submitting ? "#6b7280" : "#1e3a8a",
                               }}
                               onMouseEnter={(e) => {
