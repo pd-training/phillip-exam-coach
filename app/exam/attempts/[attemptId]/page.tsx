@@ -264,9 +264,56 @@ export default function AttemptReviewPage() {
 
               {/* Explanation */}
               {currentQuestion.explanation && (
-                <div className="bg-blue-50 border border-blue-200 rounded-lg p-6">
+                <div className="bg-blue-50 border border-blue-200 rounded-lg p-6 mb-12">
                   <h3 className="font-bold text-blue-900 mb-2">📝 Explanation</h3>
                   <p className="text-sm text-blue-800 leading-relaxed">{currentQuestion.explanation}</p>
+                </div>
+              )}
+
+              {/* Results CTAs - Only show on last question */}
+              {currentQIndex === questions.length - 1 && (
+                <div className="border-t border-gray-200 pt-8">
+                  <h2 className="text-xl font-bold text-gray-900 mb-6">What's next?</h2>
+                  <div className="space-y-3">
+                    {/* Primary CTA - contextual based on performance */}
+                    {attempt.passed ? (
+                      <Link href="/explore">
+                        <button className="w-full px-6 py-4 bg-green-600 hover:bg-green-700 text-white font-semibold rounded-lg transition flex items-center justify-center gap-2">
+                          ✓ Try Another Paper
+                        </button>
+                      </Link>
+                    ) : (
+                      <button
+                        onClick={() => setCurrentQIndex(0)}
+                        className="w-full px-6 py-4 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-lg transition flex items-center justify-center gap-2"
+                      >
+                        🔄 Practice Again
+                      </button>
+                    )}
+
+                    {/* Secondary CTAs */}
+                    <div className="grid grid-cols-2 gap-3">
+                      <Link href="/dashboard">
+                        <button className="w-full px-4 py-3 bg-gray-100 hover:bg-gray-200 text-gray-700 font-medium rounded-lg transition text-sm">
+                          Back to Dashboard
+                        </button>
+                      </Link>
+                      {attempt.passed ? (
+                        <button
+                          onClick={() => setCurrentQIndex(0)}
+                          className="w-full px-4 py-3 bg-gray-100 hover:bg-gray-200 text-gray-700 font-medium rounded-lg transition text-sm"
+                        >
+                          Review Again
+                        </button>
+                      ) : (
+                        <Link href="/explore">
+                          <button className="w-full px-4 py-3 bg-gray-100 hover:bg-gray-200 text-gray-700 font-medium rounded-lg transition text-sm">
+                            Explore Papers
+                          </button>
+                        </Link>
+                      )}
+                    </div>
+                  </div>
                 </div>
               )}
             </div>
