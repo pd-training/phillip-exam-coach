@@ -240,6 +240,67 @@ export default function StudentDashboard() {
 
       {/* Main Content */}
       <div className="max-w-7xl mx-auto px-6 py-12">
+        {/* Your Papers - Quick Access */}
+        {studentPapers.length > 0 && (
+          <div className="mb-12">
+            <div className="flex items-center justify-between mb-6">
+              <h2 className="text-2xl font-bold text-gray-900">Your Papers</h2>
+              <Link href="/explore" className="text-amber-600 hover:text-amber-700 font-medium text-sm">
+                View all →
+              </Link>
+            </div>
+            <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-4">
+              {studentPapers.slice(0, 4).map((paper) => {
+                const paperAttempts = attempts.filter((a) => a.paperid === paper.paperId);
+                const latestAttempt = paperAttempts.length > 0
+                  ? paperAttempts.sort((a, b) => new Date(b.submittedat).getTime() - new Date(a.submittedat).getTime())[0]
+                  : null;
+                const isPassed = latestAttempt?.result === 'Pass';
+
+                return (
+                  <div
+                    key={paper.id}
+                    className="bg-white rounded-lg border-2 border-amber-200 p-5 hover:shadow-lg transition"
+                  >
+                    <h3 className="font-bold text-gray-900 mb-3 line-clamp-2">
+                      {paper.paper_name}
+                    </h3>
+                    {latestAttempt ? (
+                      <>
+                        <div className="mb-4">
+                          <div className="flex items-center justify-between mb-2">
+                            <span className="text-xs text-gray-600">Latest</span>
+                            <span className={`text-sm font-bold ${isPassed ? 'text-green-600' : 'text-amber-600'}`}>
+                              {latestAttempt.score}%
+                            </span>
+                          </div>
+                          <div className="w-full bg-gray-200 rounded-full h-2">
+                            <div
+                              className={`h-2 rounded-full ${isPassed ? 'bg-green-500' : 'bg-amber-500'}`}
+                              style={{ width: `${latestAttempt.score}%` }}
+                            />
+                          </div>
+                        </div>
+                        <Link href={`/exam/${paper.paperId}`}>
+                          <button className="w-full px-3 py-2 bg-amber-500 hover:bg-amber-600 text-blue-900 rounded-lg font-medium text-sm transition">
+                            Practice Again →
+                          </button>
+                        </Link>
+                      </>
+                    ) : (
+                      <Link href={`/exam/${paper.paperId}`}>
+                        <button className="w-full px-3 py-2 bg-green-600 hover:bg-green-700 text-white rounded-lg font-medium text-sm transition">
+                          Start →
+                        </button>
+                      </Link>
+                    )}
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+        )}
+
         {/* Secondary Stats Row */}
         <div className="flex gap-6 mb-8 text-sm">
           <div className="flex items-center gap-3">
@@ -321,30 +382,40 @@ export default function StudentDashboard() {
                   {papersList.map((paper) => {
                     const score = paper.latest.score;
                     const isPassed = paper.latest.result === "Pass";
+                    const paperId = paper.latest.paperid;
                     return (
-                      <button
+                      <div
                         key={paper.title}
-                        onClick={() => setSelectedTrendPaper(paper.title)}
-                        className={`p-4 rounded-lg border-2 transition-all text-left ${
+                        className={`p-4 rounded-lg border-2 transition-all ${
                           selectedTrendPaper === paper.title
                             ? "border-amber-500 bg-amber-50"
-                            : "border-gray-200 bg-white hover:border-gray-300"
+                            : "border-gray-200 bg-white hover:border-amber-200"
                         }`}
                       >
-                        <div className="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-2">
-                          {paper.title}
-                        </div>
-                        <div className="text-2xl font-bold text-gray-900 mb-1">
-                          {Math.round(score)}%
-                        </div>
-                        <div className={`inline-block text-xs font-semibold px-2 py-1 rounded ${
-                          isPassed
-                            ? "bg-green-100 text-green-700"
-                            : "bg-red-100 text-red-700"
-                        }`}>
-                          {isPassed ? "✓ Passed" : "Failed"}
-                        </div>
-                      </button>
+                        <button
+                          onClick={() => setSelectedTrendPaper(paper.title)}
+                          className="w-full text-left mb-3"
+                        >
+                          <div className="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-2">
+                            {paper.title}
+                          </div>
+                          <div className="text-2xl font-bold text-gray-900 mb-2">
+                            {Math.round(score)}%
+                          </div>
+                          <div className={`inline-block text-xs font-semibold px-2 py-1 rounded ${
+                            isPassed
+                              ? "bg-green-100 text-green-700"
+                              : "bg-red-100 text-red-700"
+                          }`}>
+                            {isPassed ? "✓ Passed" : "Failed"}
+                          </div>
+                        </button>
+                        <Link href={`/exam/${paperId}`}>
+                          <button className="w-full mt-3 px-2 py-1.5 bg-amber-500 hover:bg-amber-600 text-blue-900 rounded text-xs font-semibold transition">
+                            Practice Again
+                          </button>
+                        </Link>
+                      </div>
                     );
                   })}
                 </div>
@@ -532,54 +603,56 @@ export default function StudentDashboard() {
             <>
               <div className="space-y-3">
                 {attempts.slice(0, 5).map((attempt) => (
-                  <Link key={attempt.id} href={`/exam/attempts/${attempt.id}`}>
-                    <div className="bg-white rounded-lg p-4 border border-gray-200 hover:border-amber-300 hover:shadow-md transition duration-300 cursor-pointer group">
-                      <div className="flex items-center justify-between">
-                        <div className="flex-1 min-w-0">
-                          <h3 className="font-semibold text-gray-900 group-hover:text-amber-600 transition mb-1">
+                  <div key={attempt.id} className="bg-white rounded-lg p-4 border border-gray-200 hover:shadow-md transition duration-300">
+                    <div className="flex items-center justify-between gap-4">
+                      {/* Left: Attempt Details */}
+                      <div className="flex-1 min-w-0">
+                        <Link href={`/exam/attempts/${attempt.id}`}>
+                          <h3 className="font-semibold text-gray-900 hover:text-amber-600 transition mb-1 cursor-pointer">
                             {attempt.paperTitle}
                           </h3>
-                          <div className="flex items-center gap-4 text-xs text-gray-600">
-                            <span>
-                              {new Date(attempt.submittedat).toLocaleDateString('en-US', {
-                                year: 'numeric',
-                                month: 'short',
-                                day: 'numeric',
-                              })}
-                            </span>
-                            <span>{attempt.timeTaken} min</span>
-                          </div>
-                        </div>
-                        <div className="flex items-center gap-3 flex-shrink-0">
-                          <div className="text-right">
-                            <div className={`font-bold ${
-                              attempt.result === 'Pass' ? 'text-green-600' : 'text-red-600'
-                            }`}>
-                              {attempt.score}%
-                            </div>
-                            <div className={`text-xs font-medium ${
-                              attempt.result === 'Pass' ? 'text-green-600' : 'text-red-600'
-                            }`}>
-                              {attempt.result}
-                            </div>
-                          </div>
-                          <svg
-                            className="w-4 h-4 text-gray-400 group-hover:text-amber-600 transition"
-                            fill="none"
-                            stroke="currentColor"
-                            viewBox="0 0 24 24"
-                          >
-                            <path
-                              strokeLinecap="round"
-                              strokeLinejoin="round"
-                              strokeWidth={2}
-                              d="M9 5l7 7-7 7"
-                            />
-                          </svg>
+                        </Link>
+                        <div className="flex items-center gap-4 text-xs text-gray-600">
+                          <span>
+                            {new Date(attempt.submittedat).toLocaleDateString('en-US', {
+                              year: 'numeric',
+                              month: 'short',
+                              day: 'numeric',
+                            })}
+                          </span>
+                          <span>{attempt.timeTaken} min</span>
                         </div>
                       </div>
+
+                      {/* Middle: Score */}
+                      <div className="text-right flex-shrink-0">
+                        <div className={`font-bold ${
+                          attempt.result === 'Pass' ? 'text-green-600' : 'text-red-600'
+                        }`}>
+                          {attempt.score}%
+                        </div>
+                        <div className={`text-xs font-medium ${
+                          attempt.result === 'Pass' ? 'text-green-600' : 'text-red-600'
+                        }`}>
+                          {attempt.result}
+                        </div>
+                      </div>
+
+                      {/* Right: Action Buttons */}
+                      <div className="flex items-center gap-2 flex-shrink-0">
+                        <Link href={`/exam/attempts/${attempt.id}`}>
+                          <button className="px-3 py-1.5 text-sm font-medium text-gray-700 bg-gray-100 hover:bg-gray-200 rounded-lg transition">
+                            Review
+                          </button>
+                        </Link>
+                        <Link href={`/exam/${attempt.paperid}`}>
+                          <button className="px-3 py-1.5 text-sm font-medium text-blue-900 bg-amber-500 hover:bg-amber-600 rounded-lg transition">
+                            Again
+                          </button>
+                        </Link>
+                      </div>
                     </div>
-                  </Link>
+                  </div>
                 ))}
               </div>
               
