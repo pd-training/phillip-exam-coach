@@ -362,7 +362,7 @@ export default function ExplorePage() {
                           {paper.title}
                         </h3>
                         <span className="ml-2 px-2 py-1 bg-green-100 text-green-700 text-xs font-bold rounded">
-                          ✓ Owned
+                          ✓ Ready
                         </span>
                       </div>
                       {paper.description && (
@@ -371,7 +371,7 @@ export default function ExplorePage() {
                         </p>
                       )}
                       <div className="text-xs text-gray-500 mb-4 space-y-1">
-                        <p>⏱ {paper.totalTime} minutes</p>
+                        <p className="font-medium text-gray-700">{paper.title}</p>
                         {paper.totalQuestions && (
                           <p>❓ {paper.totalQuestions} questions</p>
                         )}
