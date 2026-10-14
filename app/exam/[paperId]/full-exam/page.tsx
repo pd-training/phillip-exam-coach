@@ -413,6 +413,7 @@ export default function FullExamMode() {
             </div>
           </div>
         </div>
+        </div>
       </div>
 
       {/* Main Content & Sidebar */}
