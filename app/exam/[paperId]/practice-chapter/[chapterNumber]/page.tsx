@@ -63,6 +63,11 @@ export default function PracticeChapterMode() {
   const [answered, setAnswered] = useState(0);
   const [paperTitle, setPaperTitle] = useState<string>("");
 
+  // Debug: Log feedback state changes
+  useEffect(() => {
+    console.log("🔍 Practice Chapter Debug:", { showingFeedback, feedbackExists: !!feedback });
+  }, [showingFeedback, feedback]);
+
   // Auth check
   useEffect(() => {
     if (status === "unauthenticated") {
