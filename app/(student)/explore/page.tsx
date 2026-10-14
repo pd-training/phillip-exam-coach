@@ -381,6 +381,16 @@ export default function ExplorePage() {
                           Practice →
                         </button>
                       </Link>
+                      {paper.externalLink && (
+                        <a
+                          href={paper.externalLink}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="w-full px-4 py-2 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-lg font-medium text-center text-sm transition"
+                        >
+                          Learn more →
+                        </a>
+                      )}
                     </div>
                   ))}
                 </div>
@@ -445,9 +455,19 @@ export default function ExplorePage() {
                           </p>
                         )}
                       </div>
-                      <p className="text-sm text-yellow-700 font-medium">
+                      <p className="text-sm text-yellow-700 font-medium mb-3">
                         Awaiting admin approval...
                       </p>
+                      {paper.externalLink && (
+                        <a
+                          href={paper.externalLink}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="w-full px-4 py-2 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-lg font-medium text-center text-sm transition"
+                        >
+                          Learn more →
+                        </a>
+                      )}
                     </div>
                   ))}
                 </div>
@@ -508,6 +528,16 @@ export default function ExplorePage() {
                           Start Practicing →
                         </button>
                       </Link>
+                      {paper.externalLink && (
+                        <a
+                          href={paper.externalLink}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="w-full px-4 py-2 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-lg font-medium text-center text-sm transition"
+                        >
+                          Learn more →
+                        </a>
+                      )}
                     </div>
                   ))}
                 </div>
@@ -640,9 +670,19 @@ export default function ExplorePage() {
                           {paper.description}
                         </p>
                       )}
-                      <p className="text-sm text-red-700 font-medium">
+                      <p className="text-sm text-red-700 font-medium mb-3">
                         Your request was declined.
                       </p>
+                      {paper.externalLink && (
+                        <a
+                          href={paper.externalLink}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="w-full px-4 py-2 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-lg font-medium text-center text-sm transition"
+                        >
+                          Learn more →
+                        </a>
+                      )}
                     </div>
                   ))}
                 </div>
