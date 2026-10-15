@@ -82,15 +82,14 @@ export default function LandingPage() {
             {/* Tagline */}
             <p className="text-amber-400 font-semibold tracking-wide mb-4 text-sm uppercase">Financial Excellence</p>
 
-            {/* Main Heading */}
-            <h1 className="text-5xl md:text-7xl font-bold text-white mb-6 leading-tight max-w-4xl">
-              Finance<span className="text-amber-400">Ready</span>
-            </h1>
-
-            {/* Subheading with accent */}
-            <p className="text-2xl md:text-3xl text-blue-100 mb-8 max-w-3xl font-light">
-              Where Preparation Meets <span className="text-amber-400 font-semibold">Opportunity</span>
-            </p>
+            {/* Hero banner (FinanceReady brand image, includes the heading and tagline) */}
+            <img
+              src="/finance-ready-banner.png"
+              alt="FinanceReady by PhillipCapital. Where Preparation Meets Opportunity"
+              width={441}
+              height={245}
+              className="w-full max-w-xl rounded-xl shadow-2xl mb-8"
+            />
 
             {/* Description */}
             <p className="text-lg text-blue-200 mb-6 max-w-2xl leading-relaxed">
