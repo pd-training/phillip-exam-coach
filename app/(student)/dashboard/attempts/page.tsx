@@ -24,6 +24,7 @@ export default function AllAttemptsPage() {
   const [selectedPaper, setSelectedPaper] = useState("");
   const [sortBy, setSortBy] = useState<'newest' | 'oldest' | 'highest' | 'lowest'>('newest');
   const [recs, setRecs] = useState<any>(null);
+  const [paperSort, setPaperSort] = useState<{ key: 'paper' | 'attempts' | 'passRate' | 'avgScore' | 'best'; dir: 'asc' | 'desc' }>({ key: 'attempts', dir: 'desc' });
 
   useEffect(() => {
     if (status !== "authenticated") return;
@@ -72,6 +73,42 @@ export default function AllAttemptsPage() {
     );
   }
 
+  // Per-paper breakdown for the stats table
+  const paperRows = (() => {
+    const map = new Map<string, { paperId: string; paperTitle: string; attempts: number; passes: number; scoreSum: number; best: number }>();
+    for (const a of attempts) {
+      const row = map.get(a.paperid) ?? { paperId: a.paperid, paperTitle: a.paperTitle, attempts: 0, passes: 0, scoreSum: 0, best: 0 };
+      row.attempts += 1;
+      if (a.result === "Pass") row.passes += 1;
+      row.scoreSum += a.score;
+      row.best = Math.max(row.best, a.score);
+      map.set(a.paperid, row);
+    }
+    return Array.from(map.values()).map((r) => ({
+      ...r,
+      passRate: Math.round((r.passes / r.attempts) * 100),
+      avgScore: Math.round(r.scoreSum / r.attempts),
+    }));
+  })();
+
+  const sortedPaperRows = [...paperRows].sort((a, b) => {
+    const dir = paperSort.dir === "asc" ? 1 : -1;
+    if (paperSort.key === "paper") return a.paperTitle.localeCompare(b.paperTitle) * dir;
+    const key = paperSort.key === "passRate" ? "passRate" : paperSort.key === "avgScore" ? "avgScore" : paperSort.key === "best" ? "best" : "attempts";
+    return (a[key] - b[key]) * dir;
+  });
+
+  const togglePaperSort = (key: typeof paperSort.key) => {
+    setPaperSort((prev) =>
+      prev.key === key
+        ? { key, dir: prev.dir === "asc" ? "desc" : "asc" }
+        : { key, dir: key === "paper" ? "asc" : "desc" }
+    );
+  };
+
+  const sortIndicator = (key: typeof paperSort.key) =>
+    paperSort.key === key ? (paperSort.dir === "asc" ? " ↑" : " ↓") : "";
+
   return (
     <div className="min-h-screen bg-gray-50 flex flex-col">
       <StudentNav />
@@ -86,6 +123,84 @@ export default function AllAttemptsPage() {
 
       {/* Main Content */}
       <div className="max-w-7xl mx-auto px-6 py-12 flex-1 w-full">
+        {/* Overall stats and per-paper breakdown */}
+        {attempts.length > 0 && (
+          <div className="mb-8 bg-white rounded-lg p-6 border border-gray-200">
+            <div className="grid grid-cols-3 gap-6 mb-8">
+              <div>
+                <p className="text-sm text-gray-600 font-medium mb-1">Total Attempts</p>
+                <p className="text-3xl font-bold text-gray-900">{attempts.length}</p>
+              </div>
+              <div>
+                <p className="text-sm text-gray-600 font-medium mb-1">Pass Rate</p>
+                <p className="text-3xl font-bold text-green-600">
+                  {Math.round((attempts.filter((a) => a.result === "Pass").length / attempts.length) * 100)}%
+                </p>
+              </div>
+              <div>
+                <p className="text-sm text-gray-600 font-medium mb-1">Avg Score</p>
+                <p className="text-3xl font-bold text-blue-600">
+                  {Math.round(attempts.reduce((sum, a) => sum + a.score, 0) / attempts.length)}%
+                </p>
+              </div>
+            </div>
+
+            <div className="flex items-center justify-between mb-3">
+              <h2 className="text-sm font-semibold text-gray-900">By paper</h2>
+              {selectedPaper && (
+                <button
+                  onClick={() => setSelectedPaper("")}
+                  className="text-xs font-medium text-blue-600 hover:text-blue-700"
+                >
+                  Show all papers
+                </button>
+              )}
+            </div>
+            <div className="overflow-x-auto">
+              <table className="w-full text-sm">
+                <thead>
+                  <tr className="border-b border-gray-200 text-left text-xs uppercase text-gray-600">
+                    <th className="py-2 pr-4 font-semibold">
+                      <button onClick={() => togglePaperSort("paper")} className="hover:text-gray-900">Paper{sortIndicator("paper")}</button>
+                    </th>
+                    <th className="py-2 pr-4 font-semibold text-right">
+                      <button onClick={() => togglePaperSort("attempts")} className="hover:text-gray-900">Attempts{sortIndicator("attempts")}</button>
+                    </th>
+                    <th className="py-2 pr-4 font-semibold text-right">
+                      <button onClick={() => togglePaperSort("passRate")} className="hover:text-gray-900">Pass rate{sortIndicator("passRate")}</button>
+                    </th>
+                    <th className="py-2 pr-4 font-semibold text-right">
+                      <button onClick={() => togglePaperSort("avgScore")} className="hover:text-gray-900">Avg score{sortIndicator("avgScore")}</button>
+                    </th>
+                    <th className="py-2 font-semibold text-right">
+                      <button onClick={() => togglePaperSort("best")} className="hover:text-gray-900">Best{sortIndicator("best")}</button>
+                    </th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {sortedPaperRows.map((row) => {
+                    const isSelected = selectedPaper === row.paperId;
+                    return (
+                      <tr
+                        key={row.paperId}
+                        onClick={() => setSelectedPaper(isSelected ? "" : row.paperId)}
+                        className={`border-b border-gray-100 cursor-pointer transition ${isSelected ? "bg-blue-50" : "hover:bg-gray-50"}`}
+                      >
+                        <td className="py-3 pr-4 font-medium text-gray-900">{row.paperTitle}</td>
+                        <td className="py-3 pr-4 text-right text-gray-900">{row.attempts}</td>
+                        <td className={`py-3 pr-4 text-right font-semibold ${row.passRate >= 50 ? "text-green-600" : "text-red-600"}`}>{row.passRate}%</td>
+                        <td className="py-3 pr-4 text-right text-gray-900">{row.avgScore}%</td>
+                        <td className="py-3 text-right text-gray-900">{row.best}%</td>
+                      </tr>
+                    );
+                  })}
+                </tbody>
+              </table>
+            </div>
+            <p className="text-xs text-gray-500 mt-3">Click a paper to show only its attempts below.</p>
+          </div>
+        )}
+
         {/* Next Steps (rules-based recommendations) */}
         {recs && (recs.priority.length > 0 || recs.review.length > 0 || recs.notPractised.length > 0) && (
           <div className="mb-8 bg-white rounded-lg p-6 border border-gray-200">
@@ -164,42 +279,6 @@ export default function AllAttemptsPage() {
                 Chapters need at least 5 answers before we rank them.
               </p>
             )}
-          </div>
-        )}
-
-        {/* Stats Card */}
-        {attempts.length > 0 && (
-          <div className="mb-8 bg-white rounded-lg p-6 border border-gray-200">
-            <div className="grid grid-cols-3 gap-6">
-              <div>
-                <p className="text-sm text-gray-600 font-medium mb-1">Total Attempts</p>
-                <p className="text-3xl font-bold text-gray-900">{attempts.length}</p>
-              </div>
-              <div>
-                <p className="text-sm text-gray-600 font-medium mb-1">Pass Rate</p>
-                <p className="text-3xl font-bold text-green-600">
-                  {attempts.length > 0
-                    ? Math.round(
-                        (attempts.filter((a) => a.result === "Pass").length /
-                          attempts.length) *
-                          100
-                      )
-                    : 0}
-                  %
-                </p>
-              </div>
-              <div>
-                <p className="text-sm text-gray-600 font-medium mb-1">Avg Score</p>
-                <p className="text-3xl font-bold text-blue-600">
-                  {attempts.length > 0
-                    ? Math.round(
-                        attempts.reduce((sum, a) => sum + a.score, 0) / attempts.length
-                      )
-                    : 0}
-                  %
-                </p>
-              </div>
-            </div>
           </div>
         )}
 
