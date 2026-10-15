@@ -28,8 +28,8 @@ interface Attempt {
   score: number | null;
   result: string | null;
   timeTaken: number | null;
-  submittedAt: string | null;
-  createdAt: string;
+  submittedat: string | null;
+  createdat: string;
 }
 
 export default function UserDetailPage() {
@@ -104,8 +104,11 @@ export default function UserDetailPage() {
     return `${h}h ${m}m`;
   };
 
-  const formatDate = (date: string) => {
-    return new Date(date).toLocaleDateString("en-GB", { day: "2-digit", month: "short", year: "numeric" });
+  const formatDate = (date: string | null | undefined) => {
+    if (!date) return "—";
+    const d = new Date(date);
+    if (isNaN(d.getTime())) return "—";
+    return d.toLocaleDateString("en-GB", { day: "2-digit", month: "short", year: "numeric" });
   };
 
   // Loading state
@@ -511,7 +514,7 @@ export default function UserDetailPage() {
                         ) : "—"}
                       </td>
                       <td style={{ padding: "8px 0", color: "#6b7280" }}>{formatTime(att.timeTaken)}</td>
-                      <td style={{ padding: "8px 0", color: "#6b7280" }}>{formatDate(att.submittedAt || att.createdAt)}</td>
+                      <td style={{ padding: "8px 0", color: "#6b7280" }}>{formatDate(att.submittedat || att.createdat)}</td>
                       <td style={{ padding: "8px 0" }}>
                         <a href={`/admin/attempts/${att.id}`} style={{ color: "#f59e0b", fontSize: "12px", textDecoration: "none", fontWeight: "600", cursor: "pointer", transition: "color 0.2s" }} onMouseEnter={(e) => {
                           e.currentTarget.style.color = "#d97706";
