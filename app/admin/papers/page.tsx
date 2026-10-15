@@ -76,9 +76,9 @@ export default function PapersListPage() {
       <AdminNav />
 
       {/* Header */}
-      <div className="bg-gradient-to-r from-slate-900 to-blue-900 text-white">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-          <h1 className="text-3xl font-bold mb-2">Papers</h1>
+      <div className="bg-gradient-to-r from-blue-900 to-blue-800 text-white py-12 px-0 border-b border-blue-900">
+        <div className="max-w-7xl mx-auto px-6">
+          <h1 className="text-4xl font-bold mb-2">Papers</h1>
           <p className="text-blue-100">Manage all exam papers</p>
         </div>
       </div>
