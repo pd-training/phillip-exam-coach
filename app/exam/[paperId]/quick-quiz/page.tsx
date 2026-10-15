@@ -169,7 +169,7 @@ export default function QuickQuizMode() {
 
             <div className="flex gap-3">
               <button
-                onClick={() => router.back()}
+                onClick={() => router.push(`/exam/${paperId}`)}
                 className="flex-1 px-6 py-3 bg-gray-500 hover:bg-gray-600 text-white rounded-lg font-semibold transition duration-200"
               >
                 Back to Practice
