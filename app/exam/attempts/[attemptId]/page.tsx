@@ -140,25 +140,6 @@ export default function AttemptReviewPage() {
 
   // Check authentication
   const [previous, setPrevious] = useState<{ score: number; chapters: ChapterPct[] } | null>(null);
-  const [aiLines, setAiLines] = useState<string[] | null>(null);
-
-  // AI-written feedback; the rules-based text stays on screen if this is unavailable
-  useEffect(() => {
-    if (!attemptId) return;
-    const loadAiFeedback = async () => {
-      try {
-        const res = await fetch(`/api/student/attempts/${attemptId}/feedback`);
-        if (!res.ok) return;
-        const data = await res.json();
-        if (data.source === 'ai' && Array.isArray(data.lines) && data.lines.length === 2) {
-          setAiLines(data.lines);
-        }
-      } catch (err) {
-        console.error('Could not load AI feedback:', err);
-      }
-    };
-    loadAiFeedback();
-  }, [attemptId]);
 
   // Load the previous attempt on the same paper for comparison
   useEffect(() => {
@@ -350,11 +331,11 @@ export default function AttemptReviewPage() {
       </div>
 
       {/* Personalised feedback */}
-      {(aiLines ?? summaryLines).length > 0 && (
+      {summaryLines.length > 0 && (
         <div className="bg-white border-b border-gray-200">
           <div className="max-w-7xl mx-auto px-6 py-4">
             <h3 className="text-sm font-semibold text-gray-900 mb-1">Personalised feedback</h3>
-            {(aiLines ?? summaryLines).map((line, i) => (
+            {summaryLines.map((line, i) => (
               <p key={i} className="text-sm text-gray-700 leading-relaxed">{line}</p>
             ))}
           </div>
