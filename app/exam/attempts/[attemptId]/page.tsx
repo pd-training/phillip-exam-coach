@@ -153,10 +153,10 @@ export default function AttemptReviewPage() {
       <StudentNav />
 
       {/* Header */}
-      <div className="bg-gradient-to-r from-blue-900 to-blue-800 text-white py-8 px-0 border-b border-blue-900">
+      <div className="bg-gradient-to-r from-blue-900 to-blue-800 text-white py-5 px-0 border-b border-blue-900">
         <div className="max-w-7xl mx-auto px-6 flex justify-between items-start gap-6">
           <div className="flex-1">
-            <h1 className="text-3xl font-bold mb-4">{attempt.paper_name} - Exam Review</h1>
+            <h1 className="text-2xl font-bold mb-2">{attempt.paper_name} - Exam Review</h1>
             {attempt.partScores && attempt.partScores.length > 0 ? (
               <div className="mt-3 space-y-1">
                 {attempt.partScores.map((part, idx) => (
@@ -190,13 +190,13 @@ export default function AttemptReviewPage() {
       <div className="flex-1 overflow-hidden bg-white">
         <div className="max-w-7xl mx-auto px-6 h-full flex overflow-hidden">
           {/* Left Content */}
-          <div className="flex-1 overflow-y-auto py-8 pr-6">
+          <div className="flex-1 overflow-y-auto py-5 pr-6">
             {currentQuestion ? (
               <div className="max-w-2xl">
-                {/* Question Header */}
-                <div className="mb-8">
-                  <div className="flex items-center gap-3 mb-4">
-                    <div className={`w-10 h-10 rounded-full flex items-center justify-center font-bold text-lg ${
+                {/* Question Header with Prev / Next */}
+                <div className="mb-4 flex items-center justify-between gap-4">
+                  <div className="flex items-center gap-3">
+                    <div className={`w-8 h-8 rounded-full flex items-center justify-center font-bold ${
                       currentQuestion.isCorrect
                         ? 'bg-green-100 text-green-700'
                         : 'bg-red-100 text-red-700'
@@ -204,22 +204,38 @@ export default function AttemptReviewPage() {
                       {currentQuestion.isCorrect ? '✓' : '✗'}
                     </div>
                     <div>
-                      <h2 className="text-xl font-bold text-gray-900">
+                      <h2 className="text-lg font-bold text-gray-900">
                         Question {currentQIndex + 1} of {questions.length}
                       </h2>
-                      <p className="text-sm text-gray-600">Chapter {currentQuestion.chapterNumber}</p>
+                      <p className="text-xs text-gray-600">Chapter {currentQuestion.chapterNumber}</p>
                     </div>
+                  </div>
+                  <div className="flex gap-2 flex-shrink-0">
+                    <button
+                      onClick={() => prevIndex !== undefined && setCurrentQIndex(prevIndex)}
+                      disabled={prevIndex === undefined}
+                      className="px-4 py-2 bg-gray-100 hover:bg-gray-200 text-gray-700 text-sm font-medium rounded-lg transition disabled:opacity-40 disabled:cursor-not-allowed"
+                    >
+                      ← Previous
+                    </button>
+                    <button
+                      onClick={() => nextIndex !== undefined && setCurrentQIndex(nextIndex)}
+                      disabled={nextIndex === undefined}
+                      className="px-4 py-2 bg-blue-900 hover:bg-blue-800 text-white text-sm font-semibold rounded-lg transition disabled:opacity-40 disabled:cursor-not-allowed"
+                    >
+                      Next →
+                    </button>
                   </div>
                 </div>
 
                 {/* Question Text */}
-                <div className="bg-gray-50 rounded-lg p-6 mb-8 border border-gray-200">
-                  <p className="text-lg text-gray-900 leading-relaxed">{currentQuestion.questionText}</p>
+                <div className="bg-gray-50 rounded-lg p-4 mb-5 border border-gray-200">
+                  <p className="text-base text-gray-900 leading-relaxed">{currentQuestion.questionText}</p>
                 </div>
 
                 {/* Answer Options */}
-                <div className="mb-8">
-                  <div className="space-y-3">
+                <div className="mb-5">
+                  <div className="space-y-2">
                     {buildOptions(currentQuestion, currentQuestion.displayOrder ?? [...LETTERS]).map((option) => {
                       const isStudentAnswer = currentQuestion.studentAnswer === option.key;
                       const isCorrectAnswer = currentQuestion.correctAnswer === option.key;
@@ -227,7 +243,7 @@ export default function AttemptReviewPage() {
                       return (
                         <div
                           key={option.key}
-                          className={`p-4 rounded-lg border-2 transition ${
+                          className={`p-3 rounded-lg border-2 transition ${
                             isCorrectAnswer
                               ? 'border-green-500 bg-green-50'
                               : isStudentAnswer
@@ -254,54 +270,11 @@ export default function AttemptReviewPage() {
 
                 {/* Explanation */}
                 {currentQuestion.explanation && (
-                  <div className="bg-blue-50 border border-blue-200 rounded-lg p-6 mb-8">
+                  <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-5">
                     <h3 className="font-bold text-blue-900 mb-2">📝 Explanation</h3>
                     <p className="text-sm text-blue-800 leading-relaxed">{currentQuestion.explanation}</p>
                   </div>
                 )}
-
-                {/* Prev / Next */}
-                <div className="mt-10 grid grid-cols-2 gap-3">
-                  <button
-                    onClick={() => prevIndex !== undefined && setCurrentQIndex(prevIndex)}
-                    disabled={prevIndex === undefined}
-                    className="w-full px-6 py-3 bg-gray-100 hover:bg-gray-200 text-gray-700 font-medium rounded-lg transition disabled:opacity-40 disabled:cursor-not-allowed disabled:hover:bg-gray-100"
-                  >
-                    ← Previous
-                  </button>
-                  <button
-                    onClick={() => nextIndex !== undefined && setCurrentQIndex(nextIndex)}
-                    disabled={nextIndex === undefined}
-                    className="w-full px-6 py-3 bg-blue-900 hover:bg-blue-800 text-white font-semibold rounded-lg transition disabled:opacity-40 disabled:cursor-not-allowed disabled:hover:bg-blue-900"
-                  >
-                    Next →
-                  </button>
-                </div>
-
-                {/* CTAs */}
-                <div className="mt-12 pt-8 border-t border-gray-200">
-                  <div className="grid grid-cols-2 gap-3">
-                    {attempt.passed ? (
-                      <Link href="/explore">
-                        <button className="w-full px-6 py-3 bg-green-600 hover:bg-green-700 text-white font-semibold rounded-lg transition">
-                          ✓ Try Another Paper
-                        </button>
-                      </Link>
-                    ) : (
-                      <button
-                        onClick={() => setCurrentQIndex(0)}
-                        className="w-full px-6 py-3 bg-blue-900 hover:bg-blue-800 text-white font-semibold rounded-lg transition"
-                      >
-                        Practice Again
-                      </button>
-                    )}
-                    <Link href="/dashboard">
-                      <button className="w-full px-6 py-3 bg-gray-100 hover:bg-gray-200 text-gray-700 font-medium rounded-lg transition">
-                        Back to Dashboard
-                      </button>
-                    </Link>
-                  </div>
-                </div>
               </div>
             ) : (
               <div className="text-center text-gray-600">No questions to display</div>
@@ -346,6 +319,23 @@ export default function AttemptReviewPage() {
                     </button>
                   ))}
               </div>
+            </div>
+
+            <div className="p-6 border-t border-gray-200">
+              {attempt.passed ? (
+                <Link href="/explore">
+                  <button className="w-full px-4 py-3 bg-green-600 hover:bg-green-700 text-white text-sm font-semibold rounded-lg transition">
+                    ✓ Try Another Paper
+                  </button>
+                </Link>
+              ) : (
+                <button
+                  onClick={() => setCurrentQIndex(0)}
+                  className="w-full px-4 py-3 bg-blue-900 hover:bg-blue-800 text-white text-sm font-semibold rounded-lg transition"
+                >
+                  Practice Again
+                </button>
+              )}
             </div>
           </div>
         </div>
