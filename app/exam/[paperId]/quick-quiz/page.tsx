@@ -345,21 +345,6 @@ export default function QuickQuizMode() {
                   </h2>
                 </div>
 
-                {/* Your answer */}
-                <div style={{ marginBottom: "20px" }}>
-                  <p style={{ margin: "0 0 8px 0", fontSize: "12px", fontWeight: "700", color: "#6b7280", textTransform: "uppercase", letterSpacing: "0.5px" }}>
-                    Your answer
-                  </p>
-                  <p style={{ margin: "0", fontSize: "15px", color: "#1f2937" }}>
-                    <strong>{feedback.studentAnswer}.</strong> {
-                      feedback.studentAnswer === "A" ? feedback.optionA :
-                      feedback.studentAnswer === "B" ? feedback.optionB :
-                      feedback.studentAnswer === "C" ? feedback.optionC :
-                      feedback.optionD
-                    }
-                  </p>
-                </div>
-
                 {/* Correct answer */}
                 <div style={{ marginBottom: "20px", paddingBottom: "20px", borderBottom: "1px solid #e5e7eb" }}>
                   <p style={{ margin: "0 0 8px 0", fontSize: "12px", fontWeight: "700", color: "#6b7280", textTransform: "uppercase", letterSpacing: "0.5px" }}>
