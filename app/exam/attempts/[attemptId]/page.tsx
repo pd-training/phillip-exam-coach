@@ -64,45 +64,49 @@ function summarizeAttempt(
   previous: { score: number; chapters: ChapterPct[] } | null,
   score: number
 ): string[] {
-  const lines: string[] = [];
-  const strong = chapters.filter((c) => c.percentage >= 80).sort((a, b) => a.chapter - b.chapter);
+  const strong = chapters.filter((c) => c.percentage >= 80).map((c) => c.chapter).sort((x, y) => x - y);
   const weak = chapters
     .filter((c) => c.percentage < 80)
-    .sort((a, b) => a.percentage - b.percentage || a.chapter - b.chapter);
+    .sort((x, y) => x.percentage - y.percentage || x.chapter - y.chapter)
+    .map((c) => c.chapter);
 
-  if (strong.length > 0) {
-    lines.push(`You did really well in ${listChapters(strong.map((c) => c.chapter), 3)}.`);
-  }
-
+  // Line 1: strengths and focus areas
+  let first: string;
   if (weak.length === 0) {
-    lines.push("You were solid across every chapter, so there is no clear weak spot this time.");
+    first = strong.length > 0
+      ? `You did really well in ${listChapters(strong, 3)}, and were solid across every chapter.`
+      : "You were solid across every chapter.";
+  } else if (strong.length === 0) {
+    first = `Focus on ${listChapters(weak, 3)} next, as these were your weakest areas.`;
   } else {
-    lines.push(`Focus on ${listChapters(weak.slice(0, 3).map((c) => c.chapter), 3)} next, as these were your weakest areas.`);
+    first = `You did really well in ${listChapters(strong, 3)}, but focus on ${listChapters(weak, 3)} next.`;
   }
 
+  // Line 2: comparison with the previous attempt on this paper
+  let second: string;
   if (!previous) {
-    lines.push("This is your first attempt on this paper, so it sets your starting point.");
+    second = "This is your first attempt on this paper, so it sets your starting point.";
   } else {
-    if (score > previous.score) lines.push("Your overall score is higher than your last attempt.");
-    else if (score === previous.score) lines.push("Your overall score is the same as your last attempt.");
-    else lines.push("Your overall score is lower than your last attempt.");
+    const base = score > previous.score
+      ? "Your score is higher than last time"
+      : score === previous.score
+      ? "Your score is the same as last time"
+      : "Your score is lower than last time";
 
     const prevMap = new Map(previous.chapters.map((c) => [c.chapter, c.percentage]));
     const changes = chapters
       .filter((c) => prevMap.has(c.chapter))
-      .map((c) => ({ chapter: c.chapter, diff: c.percentage - (prevMap.get(c.chapter) as number) }))
-      .sort((a, b) => a.chapter - b.chapter);
-    const improved = changes.filter((c) => c.diff >= 10).map((c) => c.chapter);
-    const slipped = changes.filter((c) => c.diff <= -10).map((c) => c.chapter);
-    if (improved.length > 0) {
-      lines.push(`${listChapters(improved, 2)} improved since your last attempt.`);
-    }
-    if (slipped.length > 0) {
-      lines.push(`${listChapters(slipped, 2)} slipped since your last attempt.`);
-    }
+      .map((c) => ({ chapter: c.chapter, diff: c.percentage - (prevMap.get(c.chapter) as number) }));
+    const improved = changes.filter((c) => c.diff >= 10).map((c) => c.chapter).sort((x, y) => x - y);
+    const slipped = changes.filter((c) => c.diff <= -10).map((c) => c.chapter).sort((x, y) => x - y);
+
+    const parts: string[] = [];
+    if (improved.length > 0) parts.push(`${listChapters(improved, 2)} improving`);
+    if (slipped.length > 0) parts.push(`${listChapters(slipped, 2)} slipping`);
+    second = parts.length > 0 ? `${base}, with ${parts.join(" and ")}.` : `${base}.`;
   }
 
-  return lines;
+  return [first, second];
 }
 
 export default function AttemptReviewPage() {
@@ -303,12 +307,13 @@ export default function AttemptReviewPage() {
         </div>
       </div>
 
-      {/* Attempt summary */}
+      {/* Personalised feedback */}
       {summaryLines.length > 0 && (
         <div className="bg-white border-b border-gray-200">
-          <div className="max-w-7xl mx-auto px-6 py-4 space-y-1 text-sm text-gray-700 leading-relaxed">
+          <div className="max-w-7xl mx-auto px-6 py-4">
+            <h3 className="text-sm font-semibold text-gray-900 mb-1">Personalised feedback</h3>
             {summaryLines.map((line, i) => (
-              <p key={i}>{line}</p>
+              <p key={i} className="text-sm text-gray-700 leading-relaxed">{line}</p>
             ))}
           </div>
         </div>
