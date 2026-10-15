@@ -131,7 +131,7 @@ export default function SignupForm() {
     "w-full px-3 py-2.5 border border-gray-300 rounded-lg text-sm text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-900/20 focus:border-blue-900";
 
   return (
-    <div className="w-full bg-white rounded-2xl shadow-2xl p-8">
+    <div className="w-full bg-white rounded-2xl shadow-xl ring-1 ring-gray-200 p-8">
         <form onSubmit={handleSubmit} className="space-y-5">
           <div>
             <h1 className="text-xl font-semibold text-gray-900">Start exam prep</h1>

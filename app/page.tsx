@@ -178,7 +178,7 @@ export default function LandingPage() {
       </section>
 
       {/* Features Section */}
-      <section id="features" className="py-16 px-6 bg-white border-t border-b border-gray-200">
+      <section id="features" className="py-20 px-6 bg-slate-50">
         <div className="max-w-7xl mx-auto">
           <div className="text-center mb-12">
             <h2 className="text-4xl font-bold text-gray-900 mb-4">Designed for Your Success</h2>
@@ -226,7 +226,7 @@ export default function LandingPage() {
       </section>
 
       {/* How It Works */}
-      <section id="how-it-works" className="py-16 px-6 bg-gradient-to-b from-white to-blue-50">
+      <section id="how-it-works" className="py-20 px-6 bg-white">
         <div className="max-w-7xl mx-auto">
           <h2 className="text-4xl font-bold text-gray-900 mb-12 text-center">How It Works</h2>
 
@@ -285,18 +285,26 @@ export default function LandingPage() {
         </div>
       </section>
 
-      {/* Create account ribbon */}
-      <section id="signup" className="scroll-mt-24 bg-blue-900 px-6 py-16 border-y border-blue-800">
-        <div className="max-w-7xl mx-auto grid md:grid-cols-2 gap-12 items-center">
-          <div className="text-white">
-            <h2 className="text-3xl md:text-4xl font-bold mb-4">Ready to Pass Your CMFAS Exam?</h2>
-            <p className="text-blue-100 text-lg leading-relaxed max-w-md">
+      {/* Sign-up section: closes the page above the footer */}
+      <section id="signup" className="scroll-mt-24 bg-slate-50 px-6 py-20">
+        <div className="max-w-6xl mx-auto grid md:grid-cols-2 gap-12 md:gap-16 items-center">
+          <div>
+            <p className="text-sm font-semibold text-blue-700 uppercase tracking-wide mb-3">Get started</p>
+            <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4 leading-tight">
+              Ready to Pass Your CMFAS Exam?
+            </h2>
+            <p className="text-lg text-gray-600 leading-relaxed mb-6 max-w-md">
               Start your free practice today.
             </p>
-            <div className="mt-8">
-              <p className="text-blue-200 text-sm mb-3">Already a member?</p>
+            <ul className="space-y-3 text-gray-700 mb-10">
+              <li className="flex items-center gap-3"><span className="text-amber-500 font-bold" aria-hidden="true">✓</span> Free practice with all papers</li>
+              <li className="flex items-center gap-3"><span className="text-amber-500 font-bold" aria-hidden="true">✓</span> No credit card required</li>
+              <li className="flex items-center gap-3"><span className="text-amber-500 font-bold" aria-hidden="true">✓</span> Full access to explanations</li>
+            </ul>
+            <div className="pt-6 border-t border-gray-200">
+              <p className="text-sm text-gray-600 mb-3">Already a member?</p>
               <Link href="/login">
-                <button className="px-8 py-4 border-2 border-blue-400 text-amber-400 hover:bg-blue-400/10 rounded-lg font-semibold transition-all duration-300 transform hover:scale-105 active:scale-95">
+                <button className="px-6 py-3 border-2 border-blue-900 text-blue-900 hover:bg-blue-900 hover:text-white rounded-lg font-semibold transition-colors duration-300">
                   Sign In
                 </button>
               </Link>
