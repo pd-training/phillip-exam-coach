@@ -329,12 +329,11 @@ export default function AttemptReviewPage() {
                   </button>
                 </Link>
               ) : (
-                <button
-                  onClick={() => setCurrentQIndex(0)}
-                  className="w-full px-4 py-3 bg-blue-900 hover:bg-blue-800 text-white text-sm font-semibold rounded-lg transition"
-                >
-                  Practice Again
-                </button>
+                <Link href={`/exam/${attempt.paperid}`}>
+                  <button className="w-full px-4 py-3 bg-blue-900 hover:bg-blue-800 text-white text-sm font-semibold rounded-lg transition">
+                    Practice Again
+                  </button>
+                </Link>
               )}
             </div>
           </div>
