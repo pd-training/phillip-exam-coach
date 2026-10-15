@@ -1,7 +1,8 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { buildOptions, displayLabel, useOptionOrder } from "@/lib/option-order";
+import { buildOptions, displayLabel } from "@/lib/option-order";
+import { useOptionOrder } from "@/lib/use-option-order";
 import { useSession } from "next-auth/react";
 import { useRouter, useParams } from "next/navigation";
 import StudentNav from "@/components/StudentNav";

@@ -4,8 +4,6 @@
 // the correct-answer check always refer to the same option. Only the letter
 // shown beside each option changes, so students see A-D in a shuffled order.
 
-import { useRef } from "react";
-
 export const LETTERS = ["A", "B", "C", "D"] as const;
 export type OptionKey = (typeof LETTERS)[number];
 
@@ -40,22 +38,6 @@ export function buildOptions(
 export function displayLabel(order: OptionKey[], key: string): string {
   const position = order.indexOf(key as OptionKey);
   return position === -1 ? key : LETTERS[position];
-}
-
-/**
- * Returns a function giving each question a stable random order for the
- * lifetime of the page, so moving back and forth does not reshuffle.
- */
-export function useOptionOrder() {
-  const orders = useRef(new Map<string, OptionKey[]>());
-  return (questionId: string): OptionKey[] => {
-    let order = orders.current.get(questionId);
-    if (!order) {
-      order = shuffledOrder();
-      orders.current.set(questionId, order);
-    }
-    return order;
-  };
 }
 
 /** Returns the order only if it is a valid permutation of A-D, otherwise null. */
