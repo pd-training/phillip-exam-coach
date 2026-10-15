@@ -39,17 +39,7 @@ export default function LandingPage() {
       {/* Sticky Header */}
       <header className="sticky top-0 z-50 bg-blue-900/95 backdrop-blur-sm border-b border-blue-800 shadow-sm">
         <div className="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between">
-          <div className="flex items-center gap-3">
-            <div className="flex items-center gap-2">
-              <div className="w-8 h-8 bg-gradient-to-br from-blue-400 to-blue-500 rounded-lg flex items-center justify-center">
-                <ChartBarIcon className="text-blue-900 w-5 h-5" />
-              </div>
-              <div className="flex flex-col">
-                <span className="font-bold text-lg text-white">Finance<span className="text-amber-400">Ready</span></span>
-                <span className="text-xs text-blue-200">by Phillip Capital</span>
-              </div>
-            </div>
-          </div>
+          <BrandLockup href="/" variant="light" />
           <nav className="hidden md:flex items-center gap-8">
             <a href="#features" className="text-blue-200 hover:text-blue-400 transition font-medium">Features</a>
             <a href="#how-it-works" className="text-blue-200 hover:text-blue-400 transition font-medium">How It Works</a>
