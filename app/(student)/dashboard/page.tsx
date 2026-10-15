@@ -79,23 +79,6 @@ export default function StudentDashboard() {
     }
   }, [status, session?.user?.email, (session?.user as any)?.role]);
 
-  if (status === "loading") {
-    return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
-        <div className="text-center">
-          <div className="inline-block">
-            <div className="w-12 h-12 border-4 border-gray-300 border-t-blue-600 rounded-full animate-spin" />
-          </div>
-          <p className="mt-4 text-gray-600">Loading...</p>
-        </div>
-      </div>
-    );
-  }
-
-  if (status === "unauthenticated" || !session?.user || (session?.user as any)?.role === "ADMIN") {
-    return null;
-  }
-
   useEffect(() => {
     const fetchData = async () => {
       try {
@@ -225,6 +208,23 @@ export default function StudentDashboard() {
     stats.completedCount > 0
       ? Math.round((stats.passCount / stats.completedCount) * 100)
       : 0;
+
+  if (status === "loading") {
+    return (
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+        <div className="text-center">
+          <div className="inline-block">
+            <div className="w-12 h-12 border-4 border-gray-300 border-t-blue-600 rounded-full animate-spin" />
+          </div>
+          <p className="mt-4 text-gray-600">Loading...</p>
+        </div>
+      </div>
+    );
+  }
+
+  if (status === "unauthenticated" || !session?.user || (session?.user as any)?.role === "ADMIN") {
+    return null;
+  }
 
   return (
     <div className="min-h-screen bg-gray-50">
