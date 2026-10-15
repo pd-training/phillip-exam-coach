@@ -284,7 +284,7 @@ export default function AttemptReviewPage() {
           {/* Right Sidebar - Navigation */}
           <div className="hidden md:flex w-56 bg-gray-50 border-l border-gray-200 overflow-y-auto flex-col flex-shrink-0">
             {/* Question Navigator - Compact Scrollable */}
-            <div className="flex-1 p-6 overflow-y-auto">
+            <div className="flex-1 min-h-0 p-6 flex flex-col">
               {/* Filter Toggle */}
               <button
                 onClick={() => setShowIncorrectOnly(!showIncorrectOnly)}
@@ -298,7 +298,7 @@ export default function AttemptReviewPage() {
               </button>
 
               <p className="text-xs font-semibold text-gray-600 mb-3">QUESTIONS</p>
-              <div className="grid grid-cols-6 gap-1">
+              <div className="grid grid-cols-6 gap-1 max-h-[55vh] overflow-y-auto pr-1 content-start">
                 {questions
                   .map((q, idx) => ({ q, idx }))
                   .filter(({ q }) => !showIncorrectOnly || !q.isCorrect)
