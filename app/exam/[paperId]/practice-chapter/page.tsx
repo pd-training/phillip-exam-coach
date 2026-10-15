@@ -254,9 +254,12 @@ export default function PracticeChapterMode() {
         <div className="bg-white rounded-2xl border border-gray-200 p-8 w-full max-w-2xl">
           {/* Header */}
           <div className="mb-8 flex justify-between items-center">
-            <h1 className="text-2xl font-bold text-gray-900">
-              Chapter {selectedChapter}
-            </h1>
+            <div>
+              <p className="text-xs font-semibold text-blue-600 uppercase tracking-wide mb-2">{paperTitle}</p>
+              <h1 className="text-2xl font-bold text-gray-900">
+                Chapter {selectedChapter}
+              </h1>
+            </div>
             <div className="text-sm font-medium text-gray-600">
               Question <span className="text-blue-600 font-bold">{progress}</span> of <span className="text-gray-900 font-bold">{questions.length}</span>
             </div>
