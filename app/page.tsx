@@ -277,29 +277,6 @@ export default function LandingPage() {
         </div>
       </section>
 
-      {/* Final CTA Section */}
-      <section className="py-16 px-6 bg-gradient-to-r from-blue-900 to-slate-900">
-        <div className="max-w-3xl mx-auto text-center">
-          <h2 className="text-4xl font-bold text-white mb-6">Ready to Pass Your CMFAS Exam?</h2>
-          <p className="text-xl text-blue-100 mb-8">Start your free practice today. No credit card required.</p>
-
-          <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <Link href="/#signup">
-              <button className="px-8 py-4 bg-blue-900 hover:bg-blue-800 text-white rounded-lg font-semibold hover:shadow-lg transition-all duration-300 transform hover:scale-105 active:scale-95">
-                Get Started Free
-              </button>
-            </Link>
-            <Link href="/login">
-              <button className="px-8 py-4 border-2 border-blue-400 text-amber-400 hover:bg-blue-400/10 rounded-lg font-semibold transition-all duration-300 transform hover:scale-105 active:scale-95">
-                Already a Member
-              </button>
-            </Link>
-          </div>
-
-          <p className="text-blue-200 text-sm mt-6">✓ Free practice with all papers &nbsp; ✓ No credit card required &nbsp; ✓ Full access to explanations</p>
-        </div>
-      </section>
-
       {/* Create account ribbon */}
       <section id="signup" className="scroll-mt-24 bg-blue-900 px-6 py-16 border-y border-blue-800">
         <div className="max-w-7xl mx-auto grid md:grid-cols-2 gap-12 items-center">
@@ -308,6 +285,14 @@ export default function LandingPage() {
             <p className="text-blue-100 text-lg leading-relaxed max-w-md">
               Start your free practice today.
             </p>
+            <div className="mt-8">
+              <p className="text-blue-200 text-sm mb-3">Already a member?</p>
+              <Link href="/login">
+                <button className="px-8 py-4 border-2 border-blue-400 text-amber-400 hover:bg-blue-400/10 rounded-lg font-semibold transition-all duration-300 transform hover:scale-105 active:scale-95">
+                  Sign In
+                </button>
+              </Link>
+            </div>
           </div>
           <div className="w-full max-w-md md:justify-self-end">
             <SignupForm />
