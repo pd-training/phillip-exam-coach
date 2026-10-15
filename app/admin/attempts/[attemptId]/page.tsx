@@ -138,8 +138,8 @@ export default function AttemptDetailsPage() {
       <div className="bg-gradient-to-r from-blue-900 to-blue-800 text-white py-8 border-b border-blue-900">
         <div className="max-w-7xl mx-auto px-6 flex justify-between items-start gap-6">
           <div>
-            <Link href="/admin/dashboard" className="text-blue-100 hover:text-white font-medium text-sm mb-4 block">
-              ← Back to Dashboard
+            <Link href="/admin/attempts" className="text-blue-100 hover:text-white font-medium text-sm mb-4 block">
+              ← Back to Exam Attempts
             </Link>
             <h1 className="text-3xl font-bold">{attempt.student_name}'s Exam Review</h1>
             <p className="text-blue-100 mt-1">{attempt.paper_name}</p>
