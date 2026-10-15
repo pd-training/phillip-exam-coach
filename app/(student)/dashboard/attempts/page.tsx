@@ -23,6 +23,15 @@ export default function AllAttemptsPage() {
   const [loading, setLoading] = useState(true);
   const [selectedPaper, setSelectedPaper] = useState("");
   const [sortBy, setSortBy] = useState<'newest' | 'oldest' | 'highest' | 'lowest'>('newest');
+  const [recs, setRecs] = useState<any>(null);
+
+  useEffect(() => {
+    if (status !== "authenticated") return;
+    fetch("/api/student/recommendations")
+      .then((res) => (res.ok ? res.json() : null))
+      .then((data) => setRecs(data))
+      .catch(() => setRecs(null));
+  }, [status]);
 
   useEffect(() => {
     if (status === "unauthenticated") {
@@ -77,6 +86,87 @@ export default function AllAttemptsPage() {
 
       {/* Main Content */}
       <div className="max-w-7xl mx-auto px-6 py-12 flex-1 w-full">
+        {/* Next Steps (rules-based recommendations) */}
+        {recs && (recs.priority.length > 0 || recs.review.length > 0 || recs.notPractised.length > 0) && (
+          <div className="mb-8 bg-white rounded-lg p-6 border border-gray-200">
+            <h2 className="text-xl font-bold text-gray-900">Your next steps</h2>
+            <p className="text-sm text-gray-600 mb-6">Based on your answers across all papers</p>
+
+            {recs.priority.length > 0 && (
+              <div className="mb-6">
+                <p className="text-xs font-semibold text-red-700 uppercase tracking-wide mb-3">Practise now</p>
+                <div className="space-y-3">
+                  {recs.priority.map((c: any) => (
+                    <div
+                      key={`${c.paperId}-${c.chapterNumber}`}
+                      className="flex items-center justify-between gap-4 border border-red-200 bg-red-50 rounded-lg p-4"
+                    >
+                      <div className="min-w-0">
+                        <p className="font-semibold text-gray-900">
+                          {c.paperTitle} · Chapter {c.chapterNumber}
+                          {c.chapterTitle ? `: ${c.chapterTitle}` : ""}
+                        </p>
+                        <p className="text-xs text-gray-600 mt-1">
+                          {c.correct} of {c.total} answers right, from {c.attemptCount} {c.attemptCount === 1 ? "attempt" : "attempts"}
+                        </p>
+                      </div>
+                      <div className="flex items-center gap-4 flex-shrink-0">
+                        <span className="text-lg font-bold text-red-700">{c.accuracy}%</span>
+                        <Link
+                          href={`/exam/${c.paperId}/practice-chapter/${c.chapterNumber}`}
+                          className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white text-sm font-semibold rounded-lg transition"
+                        >
+                          Practise chapter
+                        </Link>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {recs.review.length > 0 && (
+              <div className="mb-6">
+                <p className="text-xs font-semibold text-amber-700 uppercase tracking-wide mb-3">Review soon</p>
+                <ul className="divide-y divide-gray-200">
+                  {recs.review.map((c: any) => (
+                    <li key={`${c.paperId}-${c.chapterNumber}`} className="flex items-center justify-between gap-4 py-3">
+                      <span className="text-sm text-gray-900">
+                        {c.paperTitle} · Chapter {c.chapterNumber}
+                      </span>
+                      <span className="text-sm text-gray-600 flex-shrink-0">
+                        {c.accuracy}% correct · {c.total} answers
+                      </span>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            )}
+
+            {recs.notPractised.length > 0 && (
+              <div>
+                <p className="text-xs font-semibold text-gray-600 uppercase tracking-wide mb-3">Not yet practised</p>
+                <ul className="space-y-2">
+                  {recs.notPractised.map((p: any) => (
+                    <li key={p.paperId} className="text-sm text-gray-900">
+                      <span className="font-medium">{p.paperTitle}</span>
+                      <span className="text-gray-600">
+                        {" "}· Chapters {p.chapters.map((c: any) => c.chapterNumber).join(", ")}
+                      </span>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            )}
+
+            {recs.notRankedCount > 0 && (
+              <p className="text-xs text-gray-500 mt-6">
+                Chapters need at least 5 answers before we rank them.
+              </p>
+            )}
+          </div>
+        )}
+
         {/* Stats Card */}
         {attempts.length > 0 && (
           <div className="mb-8 bg-white rounded-lg p-6 border border-gray-200">
