@@ -470,18 +470,18 @@ export default function PaperDetailPage() {
       {ToastView}
 
       {/* Header */}
-      <div className="bg-white border-b border-gray-200">
+      <div className="bg-gradient-to-r from-blue-900 to-blue-800 text-white border-b border-blue-900">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
           <div className="flex justify-between items-start mb-4">
             <div>
               <button
                 onClick={() => router.push("/admin/papers")}
-                className="text-blue-600 hover:text-blue-800 text-sm font-medium mb-2"
+                className="text-blue-100 hover:text-white text-sm font-medium mb-2"
               >
                 ← Back to Papers
               </button>
               <h1 className="text-3xl font-bold text-white">{paper.title}</h1>
-              <p className="text-gray-600 mt-1">{totalQuestions} questions • {paper.durationMinutes} min</p>
+              <p className="text-blue-100 mt-1">{totalQuestions} questions • {paper.durationMinutes} min</p>
             </div>
             <div className="flex gap-2">
               <button
