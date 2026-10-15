@@ -10,6 +10,7 @@ interface StudentPaper {
   id: string;
   paperId: string;
   paper_name: string;
+  description?: string;
   status: string;
 }
 
@@ -148,6 +149,11 @@ export default function PracticePage() {
                           </div>
                         )}
                       </div>
+                      {paper.description && (
+                        <p className="text-sm text-gray-600 mb-4 truncate" title={paper.description}>
+                          {paper.description}
+                        </p>
+                      )}
                       {latestAttempt && (
                         <>
                           <div className="mb-3">

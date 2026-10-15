@@ -24,6 +24,7 @@ export async function GET(request: NextRequest) {
         pr.id,
         p.id as "paperId",
         p.title as "paper_name",
+        p.description,
         p."durationMinutes",
         p."totalQuestions",
         p."isAvailable",
