@@ -229,12 +229,8 @@ export default function AllAttemptsPage() {
                           {c.paperTitle} · Chapter {c.chapterNumber}
                           {c.chapterTitle ? `: ${c.chapterTitle}` : ""}
                         </p>
-                        <p className="text-xs text-gray-600 mt-1">
-                          {c.correct} of {c.total} answers right, from {c.attemptCount} {c.attemptCount === 1 ? "attempt" : "attempts"}
-                        </p>
                       </div>
                       <div className="flex items-center gap-4 flex-shrink-0">
-                        <span className="text-lg font-bold text-red-700">{c.accuracy}%</span>
                         <Link
                           href={`/exam/${c.paperId}/practice-chapter/${c.chapterNumber}`}
                           className="px-4 py-2 bg-blue-900 hover:bg-blue-800 text-white text-sm font-semibold rounded-lg transition"
@@ -256,9 +252,6 @@ export default function AllAttemptsPage() {
                     <li key={`${c.paperId}-${c.chapterNumber}`} className="flex items-center justify-between gap-4 py-3">
                       <span className="text-sm text-gray-900">
                         {c.paperTitle} · Chapter {c.chapterNumber}
-                      </span>
-                      <span className="text-sm text-gray-600 flex-shrink-0">
-                        {c.accuracy}% correct · {c.total} answers
                       </span>
                     </li>
                   ))}
@@ -284,7 +277,7 @@ export default function AllAttemptsPage() {
 
             {recs.notRankedCount > 0 && (
               <p className="text-xs text-gray-500 mt-6">
-                Chapters need at least 5 answers before we rank them.
+                Some chapters need more answers before we can suggest them.
               </p>
             )}
           </div>
