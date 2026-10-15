@@ -192,7 +192,7 @@ export default function AttemptReviewPage() {
           {/* Left Content */}
           <div className="flex-1 overflow-y-auto py-5 pr-6">
             {currentQuestion ? (
-              <div className="max-w-2xl">
+              <div className="w-full">
                 {/* Question Header with Prev / Next */}
                 <div className="mb-4 flex items-center justify-between gap-4">
                   <div className="flex items-center gap-3">
