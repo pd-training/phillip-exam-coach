@@ -275,11 +275,6 @@ export default function AllAttemptsPage() {
               </div>
             )}
 
-            {recs.notRankedCount > 0 && (
-              <p className="text-xs text-gray-500 mt-6">
-                Some chapters need more answers before we can suggest them.
-              </p>
-            )}
           </div>
         )}
 
