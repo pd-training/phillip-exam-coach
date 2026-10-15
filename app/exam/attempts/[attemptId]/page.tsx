@@ -57,10 +57,21 @@ function listChapters(nums: number[], max: number): string {
     : `${shown.slice(0, -1).map(label).join(", ")} and ${label(shown[shown.length - 1])}`;
 }
 
-// Feedback wording is rotated by a seed (derived from the attempt id) so the
-// same attempt always reads the same, but different attempts read differently.
-function pickPhrase(options: string[], seed: number, offset: number): string {
-  return options[(seed + offset) % options.length];
+// Feedback wording is rotated by a hash of the attempt id so the same attempt
+// always reads the same, but different attempts read differently. Each sentence
+// uses its own salt, so the opening, focus and comparison lines vary independently.
+function hashString(input: string): number {
+  let h = 0x811c9dc5;
+  for (let i = 0; i < input.length; i++) {
+    h ^= input.charCodeAt(i);
+    h = Math.imul(h, 0x01000193);
+  }
+  return h >>> 0;
+}
+
+function pickPhrase(options: string[], seed: number, salt: number): string {
+  const mixed = Math.imul(seed ^ Math.imul(salt + 1, 0x9e3779b1), 0x85ebca6b) >>> 0;
+  return options[mixed % options.length];
 }
 
 function summarizeAttempt(
@@ -85,6 +96,9 @@ function summarizeAttempt(
       "Well done, you're performing at a passing level across the paper.",
       "Strong result. You're clearly grasping the material.",
       "You've passed, and that's a solid foundation to build on.",
+      "A confident result. The concepts are clearly sinking in.",
+      "That's a pass you can be proud of. Keep it up!",
+      "Good work, your understanding is showing through across the paper.",
     ], seed, 0);
   } else if (score >= passingScore - 10) {
     opening = pickPhrase([
@@ -93,6 +107,8 @@ function summarizeAttempt(
       "You're just short of the pass mark, which is very encouraging.",
       "The gap to passing is small, so focused revision should close it.",
       "You're almost there. A few more targeted sessions could push you over.",
+      "So close to the pass mark. A bit more practice on the gaps should tip it.",
+      "You're knocking on the door of a pass. Keep pushing and it will open.",
     ], seed, 1);
   } else {
     opening = pickPhrase([
@@ -103,16 +119,23 @@ function summarizeAttempt(
       "It's been a tough one, but the questions you missed show exactly what to work on.",
       "Every exam taker has results like this. What matters is what you do next.",
       "Take this as a clear map of where to focus, and you'll see the improvement.",
+      "A lower score today still tells you something useful, so let's use it.",
+      "Don't let this one sting too much. It's raw material for your next attempt.",
+      "Nothing here is final. Lots of advisors turn a result like this around.",
     ], seed, 2);
   }
 
+  const focusList = listChapters(weak, 3);
   const focus = weak.length > 0
     ? pickPhrase([
-        `Give ${listChapters(weak, 3)} some extra attention next.`,
-        `${listChapters(weak, 3)} are worth a closer look next.`,
-        `Spend a little extra time on ${listChapters(weak, 3)} next.`,
-        `Start your revision with ${listChapters(weak, 3)}.`,
-        `${listChapters(weak, 3)} would be a good place to begin your revision.`,
+        `Give ${focusList} some extra attention next.`,
+        `${focusList} are worth a closer look next.`,
+        `Spend a little extra time on ${focusList} next.`,
+        `Start your revision with ${focusList}.`,
+        `${focusList} would be a good place to begin your revision.`,
+        `If you revisit one area, make it ${focusList}.`,
+        `Your quickest gains will come from ${focusList}.`,
+        `Put ${focusList} at the top of your revision list.`,
       ], seed, 3)
     : "";
   const first = [opening, focus].filter(Boolean).join(" ");
@@ -131,6 +154,8 @@ function summarizeAttempt(
       "Nice progress, your score is higher than last time. Keep it up!",
       "You've improved on your last attempt. Keep building on that!",
       "Your score has gone up since last time, and that's real progress.",
+      "Compared with your last attempt, your score has climbed. Well done.",
+      "You're scoring higher than you were last time. Keep it up!",
     ], seed, 5);
   } else if (score === previous.score) {
     second = pickPhrase([
@@ -138,6 +163,7 @@ function summarizeAttempt(
       "Your score is the same as last time, so there's room to push it higher.",
       "You've held your score from last time, which is a solid base to push from.",
       "Your score matches your last attempt, so the next step is to lift it.",
+      "No change from last time, which means your next push can make the difference.",
     ], seed, 5);
   } else {
     second = pickPhrase([
@@ -146,6 +172,7 @@ function summarizeAttempt(
       "This score is below your last attempt, but one result doesn't define your progress.",
       "It's a step back from last time, and a step back is often followed by a bigger step forward.",
       "Your score is lower than before, so use the questions you missed to get back on track.",
+      "Slightly down on your last attempt. Dips like this are common, and you can bounce back.",
     ], seed, 5);
   }
 
@@ -311,7 +338,7 @@ export default function AttemptReviewPage() {
         attempt.score,
         attempt.passingScore ?? 50,
         attempt.passed,
-        Array.from(attempt.id).reduce((n, ch) => n + ch.charCodeAt(0), 0)
+        hashString(String(attempt.id))
       )
     : [];
   const timeTaken = Math.round(
