@@ -440,7 +440,6 @@ export default function ExplorePage() {
                         </p>
                       )}
                       <div className="text-xs text-gray-500 mb-4 space-y-1">
-                        <p>⏱ {paper.totalTime} minutes</p>
                         {paper.totalQuestions && (
                           <p>❓ {paper.totalQuestions} questions</p>
                         )}
@@ -587,7 +586,6 @@ export default function ExplorePage() {
                         </p>
                       )}
                       <div className="text-xs text-gray-500 mb-4 space-y-1">
-                        <p>⏱ {paper.totalTime} minutes</p>
                         {paper.totalQuestions && (
                           <p>❓ {paper.totalQuestions} questions</p>
                         )}
