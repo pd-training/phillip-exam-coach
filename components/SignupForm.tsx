@@ -218,7 +218,7 @@ export default function SignupForm() {
             disabled={loading}
             className="w-full py-2.5 bg-blue-900 hover:bg-blue-800 text-white text-sm font-semibold rounded-lg transition disabled:bg-gray-300 disabled:cursor-not-allowed"
           >
-            {loading ? "Creating account..." : "Create account"}
+            {loading ? "Starting..." : "Start learning"}
           </button>
         </form>
     </div>

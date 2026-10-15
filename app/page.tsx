@@ -123,21 +123,6 @@ export default function LandingPage() {
         </div>
       </section>
 
-      {/* Create account ribbon */}
-      <section id="signup" className="scroll-mt-24 bg-blue-900 px-6 py-16 border-y border-blue-800">
-        <div className="max-w-7xl mx-auto grid md:grid-cols-2 gap-12 items-center">
-          <div className="text-white">
-            <h2 className="text-3xl md:text-4xl font-bold mb-4">Create your free account</h2>
-            <p className="text-blue-100 text-lg leading-relaxed max-w-md">
-              Pick your CMFAS paper and start practising straight away. You can sign in any time to pick up where you left off.
-            </p>
-          </div>
-          <div className="w-full max-w-md md:justify-self-end">
-            <SignupForm />
-          </div>
-        </div>
-      </section>
-
       {/* What is CMFAS Section */}
       <section className="py-16 px-6 bg-white">
         <div className="max-w-7xl mx-auto">
@@ -312,6 +297,21 @@ export default function LandingPage() {
           </div>
 
           <p className="text-blue-200 text-sm mt-6">✓ Free practice with all papers &nbsp; ✓ No credit card required &nbsp; ✓ Full access to explanations</p>
+        </div>
+      </section>
+
+      {/* Create account ribbon */}
+      <section id="signup" className="scroll-mt-24 bg-blue-900 px-6 py-16 border-y border-blue-800">
+        <div className="max-w-7xl mx-auto grid md:grid-cols-2 gap-12 items-center">
+          <div className="text-white">
+            <h2 className="text-3xl md:text-4xl font-bold mb-4">Start your exam preparation</h2>
+            <p className="text-blue-100 text-lg leading-relaxed max-w-md">
+              Choose your CMFAS paper and start practising straight away. Your progress is saved, so you can pick up where you left off.
+            </p>
+          </div>
+          <div className="w-full max-w-md md:justify-self-end">
+            <SignupForm />
+          </div>
         </div>
       </section>
 
