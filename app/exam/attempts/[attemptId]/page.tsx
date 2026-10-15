@@ -59,40 +59,70 @@ function listChapters(nums: number[], max: number): string {
   return more > 0 ? `${list} and ${more} more` : list;
 }
 
+// Feedback wording is rotated by a seed (derived from the attempt id) so the
+// same attempt always reads the same, but different attempts read differently.
+function pickPhrase(options: string[], seed: number, offset: number): string {
+  return options[(seed + offset) % options.length];
+}
+
 function summarizeAttempt(
   chapters: ChapterPct[],
   previous: { score: number; chapters: ChapterPct[] } | null,
-  score: number
+  score: number,
+  passingScore: number,
+  passed: boolean,
+  seed: number
 ): string[] {
-  const strong = chapters.filter((c) => c.percentage >= 80).map((c) => c.chapter).sort((x, y) => x - y);
   const weak = chapters
     .filter((c) => c.percentage < 80)
     .sort((x, y) => x.percentage - y.percentage || x.chapter - y.chapter)
     .map((c) => c.chapter);
 
-  // Line 1: encourage, and name strengths and areas to work on
-  let first: string;
-  if (weak.length === 0) {
-    first = strong.length > 0
-      ? `Great work across the board, especially in ${listChapters(strong, 3)}. Keep it up!`
-      : "Solid work across every chapter. Keep it up!";
-  } else if (strong.length === 0) {
-    first = `Don't be discouraged, every attempt builds your understanding. Focus on ${listChapters(weak, 3)} next and you'll see the gains.`;
+  // Line 1: how they are doing overall, then where to focus
+  let opening: string;
+  if (passed) {
+    opening = pickPhrase([
+      "You're on track to pass, and your results show real understanding.",
+      "You're in a good position to pass. Keep it up!",
+      "Well done, you're performing at a passing level across the paper.",
+    ], seed, 0);
+  } else if (score >= passingScore - 10) {
+    opening = pickPhrase([
+      "You're close to passing, so a little more targeted practice will get you there.",
+      "You're nearly at the passing mark. Keep going, you're getting there.",
+      "You're close to passing, so keep at it.",
+    ], seed, 1);
   } else {
-    first = `You did really well in ${listChapters(strong, 3)}, so keep that going. Give ${listChapters(weak, 3)} some extra attention next, and you'll get there.`;
+    opening = pickPhrase([
+      "Don't be discouraged, every attempt builds your understanding.",
+      "This is a useful checkpoint, and there is plenty of room to grow from here.",
+      "Keep going, every practice session makes a difference.",
+    ], seed, 2);
   }
+
+  const focus = weak.length > 0
+    ? pickPhrase([
+        `Give ${listChapters(weak, 3)} some extra attention next.`,
+        `${listChapters(weak, 3)} are worth a closer look next.`,
+        `Spend a little extra time on ${listChapters(weak, 3)} next.`,
+      ], seed, 3)
+    : "";
+  const first = [opening, focus].filter(Boolean).join(" ");
 
   // Line 2: comparison with the previous attempt on this paper
   let second: string;
   if (!previous) {
-    second = "This is your first attempt on this paper, so it's a great starting point to build from.";
+    second = pickPhrase([
+      "This is your first attempt on this paper, so it's a great starting point.",
+      "This is your first attempt on this paper, so there's a clear baseline to build from.",
+    ], seed, 4);
   } else {
     const up = score > previous.score;
     const base = up
-      ? "Your score is up on last time"
+      ? pickPhrase(["Your score is up on last time", "Nice progress, your score is higher than last time"], seed, 5)
       : score === previous.score
       ? "Your score is steady compared with last time"
-      : "Your score dipped a little from last time, but that's part of learning";
+      : pickPhrase(["Your score dipped a little from last time, but that's part of learning", "Your score is a little lower than last time, which is normal while you learn"], seed, 5);
 
     const prevMap = new Map(previous.chapters.map((c) => [c.chapter, c.percentage]));
     const changes = chapters
@@ -108,10 +138,12 @@ function summarizeAttempt(
     if (slipped.length > 0) {
       parts.push(`${listChapters(slipped, 2)} ${slipped.length === 1 ? "needs" : "need"} a little more practice`);
     }
-    const tail = up ? " Keep it up!" : " Every attempt makes you stronger.";
+    const tail = up
+      ? pickPhrase(["Keep it up!", "Keep that momentum going!"], seed, 6)
+      : pickPhrase(["Every attempt makes you stronger.", "Keep practising, you're getting there."], seed, 6);
     second = parts.length > 0
-      ? `${base}, with ${parts.join(" and ")}.${tail}`
-      : `${base}.${tail}`;
+      ? `${base}, with ${parts.join(" and ")}. ${tail}`
+      : `${base}. ${tail}`;
   }
 
   return [first, second];
@@ -270,7 +302,14 @@ export default function AttemptReviewPage() {
     .map((c) => ({ chapter: c.chapter, percentage: Math.round((c.correct / c.total) * 100) }))
     .sort((a, b) => a.chapter - b.chapter);
   const summaryLines = chapterSummary.length > 0
-    ? summarizeAttempt(chapterSummary, previous, attempt.score)
+    ? summarizeAttempt(
+        chapterSummary,
+        previous,
+        attempt.score,
+        attempt.passingScore ?? 50,
+        attempt.passed,
+        Array.from(attempt.id).reduce((n, ch) => n + ch.charCodeAt(0), 0)
+      )
     : [];
   const timeTaken = Math.round(
     (new Date(attempt.submittedat).getTime() - new Date(attempt.startedat).getTime()) / 60000
