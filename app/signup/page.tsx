@@ -3,7 +3,6 @@
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
-import { Suspense } from "react";
 
 interface Paper {
   id: string;
@@ -128,152 +127,117 @@ export default function SignupPage() {
     }
   };
 
+  const inputClass =
+    "w-full px-3 py-2.5 border border-gray-300 rounded-lg text-sm text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-900/20 focus:border-blue-900";
+
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-900 via-slate-50 to-slate-50 flex items-center justify-center p-5">
-      {/* Sticky Header */}
-      <div className="fixed top-0 left-0 right-0 z-50 bg-blue-900/95 backdrop-blur-sm border-b border-blue-800 shadow-sm">
-        <div className="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between">
-          <Link href="/" className="flex items-center gap-2 hover:opacity-80 transition">
-            <span className="font-bold text-xl text-white">Finance<span className="text-amber-400">Ready</span></span>
-          </Link>
-          <Link href="/">
-            <button className="text-blue-200 hover:text-blue-400 font-medium transition">
-              ← Back to Home
-            </button>
-          </Link>
-        </div>
-      </div>
+    <div className="min-h-screen bg-gradient-to-br from-blue-900 to-blue-800 flex flex-col items-center justify-center px-4 py-12">
+      <Link href="/" className="flex flex-col items-center mb-8 group">
+        <span className="flex items-center justify-center w-14 h-14 rounded-xl bg-amber-400 text-blue-900 text-xl font-extrabold shadow-lg group-hover:scale-105 transition">
+          FR
+        </span>
+        <span className="mt-4 text-2xl font-bold text-white tracking-tight">FinanceReady</span>
+        <span className="mt-1 text-sm text-blue-200">CMFAS exam preparation for financial advisers</span>
+      </Link>
 
-      <div className="w-full max-w-5xl mt-20">
-        <div className="grid md:grid-cols-2 gap-0 bg-white rounded-2xl shadow-xl overflow-hidden border border-gray-200">
-          {/* Left Panel - Value Proposition */}
-          <div className="hidden md:flex bg-gradient-to-br from-blue-900 to-blue-800 p-12 flex-col justify-center items-start text-white">
-            <div>
-              <h2 className="text-5xl font-bold mb-6 leading-tight">Exam Ready</h2>
-              <p className="text-blue-100 mb-12 text-lg leading-relaxed max-w-sm">
-                Master the CMFAS certification with comprehensive practice papers, detailed performance tracking, and expert-curated study materials.
-              </p>
-
-              {/* Key Benefits - Text Only */}
-              <div className="space-y-6">
-                <div>
-                  <p className="text-amber-300 font-semibold mb-2">Real Exam Experience</p>
-                  <p className="text-blue-100 text-sm leading-relaxed">Full mock papers designed with authentic difficulty and realistic timing constraints</p>
-                </div>
-                <div>
-                  <p className="text-amber-300 font-semibold mb-2">Performance Insights</p>
-                  <p className="text-blue-100 text-sm leading-relaxed">Track your progress with detailed analytics to identify and strengthen weak areas</p>
-                </div>
-                <div>
-                  <p className="text-amber-300 font-semibold mb-2">Personalized Learning</p>
-                  <p className="text-blue-100 text-sm leading-relaxed">Study recommendations tailored to your performance patterns and learning pace</p>
-                </div>
-              </div>
-            </div>
+      <div className="w-full max-w-md bg-white rounded-2xl shadow-2xl p-8">
+        <form onSubmit={handleSubmit} className="space-y-5">
+          <div>
+            <h1 className="text-xl font-semibold text-gray-900">Create your account</h1>
+            <p className="mt-1 text-sm text-gray-600">Choose the paper you want to prepare for.</p>
           </div>
 
-          {/* Right Panel - Form */}
-          <div className="p-8 md:p-12 flex flex-col justify-center">
-            {/* Error Message */}
-            {error && (
-              <div className="bg-red-50 border border-red-200 text-red-800 px-4 py-3 rounded-lg mb-6 text-sm font-medium">
-                {error}
-              </div>
-            )}
-
-            {/* Form */}
-            <form onSubmit={handleSubmit}>
-              <h3 className="text-2xl font-bold text-gray-900 mb-6">Create Account</h3>
-
-              {/* Name Input */}
-              <div className="mb-4">
-                <label className="block text-sm font-semibold text-gray-900 mb-2">Full Name</label>
-                <input
-                  type="text"
-                  name="name"
-                  value={formData.name}
-                  onChange={handleChange}
-                  placeholder="John Doe"
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg text-gray-900 placeholder-gray-500 focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500 transition"
-                />
-              </div>
-
-              {/* Email Input */}
-              <div className="mb-4">
-                <label className="block text-sm font-semibold text-gray-900 mb-2">Email Address</label>
-                <input
-                  type="email"
-                  name="email"
-                  value={formData.email}
-                  onChange={handleChange}
-                  placeholder="you@example.com"
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg text-gray-900 placeholder-gray-500 focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500 transition"
-                />
-              </div>
-
-              {/* Password Input */}
-              <div className="mb-4">
-                <label className="block text-sm font-semibold text-gray-900 mb-2">Password</label>
-                <input
-                  type="password"
-                  name="password"
-                  value={formData.password}
-                  onChange={handleChange}
-                  placeholder="••••••••"
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg text-gray-900 placeholder-gray-500 focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500 transition"
-                />
-              </div>
-
-              {/* Confirm Password Input */}
-              <div className="mb-6">
-                <label className="block text-sm font-semibold text-gray-900 mb-2">Confirm Password</label>
-                <input
-                  type="password"
-                  name="confirmPassword"
-                  value={formData.confirmPassword}
-                  onChange={handleChange}
-                  placeholder="••••••••"
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg text-gray-900 placeholder-gray-500 focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500 transition"
-                />
-              </div>
-
-              {/* Paper Selection */}
-              <div className="mb-6">
-                <label className="block text-sm font-semibold text-gray-900 mb-2">Select Exam Paper</label>
-                <select
-                  value={selectedPaper}
-                  onChange={(e) => setSelectedPaper(e.target.value)}
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg text-gray-900 focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500 transition cursor-pointer"
-                >
-                  <option value="">-- Select a paper --</option>
-                  {papers.map((paper) => (
-                    <option key={paper.id} value={paper.id}>
-                      {paper.title}
-                    </option>
-                  ))}
-                </select>
-              </div>
-
-              {/* Submit Button */}
-              <button
-                type="submit"
-                disabled={loading}
-                className="w-full bg-blue-900 hover:bg-blue-800 text-white font-semibold py-3 rounded-lg transition-all duration-300 transform hover:scale-105 active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed"
-              >
-                {loading ? "Creating Account..." : "Create Account"}
-              </button>
-            </form>
-
-            {/* Login Link */}
-            <div className="text-center mt-6 text-sm text-gray-600">
-              Already have an account?{" "}
-              <Link href="/login" className="text-blue-600 font-semibold hover:text-blue-600 transition">
-                Login here
-              </Link>
+          {error && (
+            <div role="alert" className="text-sm text-red-800 bg-red-50 border border-red-200 rounded-lg px-3 py-2">
+              {error}
             </div>
+          )}
+
+          <div>
+            <label htmlFor="name" className="block mb-1.5 text-sm font-medium text-gray-700">Full name</label>
+            <input
+              id="name"
+              type="text"
+              name="name"
+              value={formData.name}
+              onChange={handleChange}
+              placeholder="John Doe"
+              className={inputClass}
+            />
           </div>
-        </div>
+
+          <div>
+            <label htmlFor="email" className="block mb-1.5 text-sm font-medium text-gray-700">Email</label>
+            <input
+              id="email"
+              type="email"
+              name="email"
+              value={formData.email}
+              onChange={handleChange}
+              placeholder="you@example.com"
+              className={inputClass}
+            />
+          </div>
+
+          <div>
+            <label htmlFor="password" className="block mb-1.5 text-sm font-medium text-gray-700">Password</label>
+            <input
+              id="password"
+              type="password"
+              name="password"
+              value={formData.password}
+              onChange={handleChange}
+              placeholder="At least 6 characters"
+              className={inputClass}
+            />
+          </div>
+
+          <div>
+            <label htmlFor="confirmPassword" className="block mb-1.5 text-sm font-medium text-gray-700">Confirm password</label>
+            <input
+              id="confirmPassword"
+              type="password"
+              name="confirmPassword"
+              value={formData.confirmPassword}
+              onChange={handleChange}
+              placeholder="Re-enter your password"
+              className={inputClass}
+            />
+          </div>
+
+          <div>
+            <label htmlFor="paper" className="block mb-1.5 text-sm font-medium text-gray-700">Exam paper</label>
+            <select
+              id="paper"
+              value={selectedPaper}
+              onChange={(e) => setSelectedPaper(e.target.value)}
+              className={inputClass}
+            >
+              <option value="">Select a paper</option>
+              {papers.map((paper) => (
+                <option key={paper.id} value={paper.id}>
+                  {paper.title}
+                </option>
+              ))}
+            </select>
+          </div>
+
+          <button
+            type="submit"
+            disabled={loading}
+            className="w-full py-2.5 bg-blue-900 hover:bg-blue-800 text-white text-sm font-semibold rounded-lg transition disabled:bg-gray-300 disabled:cursor-not-allowed"
+          >
+            {loading ? "Creating account..." : "Create account"}
+          </button>
+        </form>
       </div>
+
+      <p className="mt-6 text-sm text-blue-200">
+        Already have an account?{" "}
+        <Link href="/login" className="font-semibold text-white underline underline-offset-4 hover:text-amber-300">
+          Sign in
+        </Link>
+      </p>
     </div>
   );
 }
