@@ -1,6 +1,7 @@
 import { getServerSession } from "next-auth/next";
 import { authOptions } from "@/lib/auth-config";
 import prisma from "@/lib/prisma";
+import { sanitizeOrder } from "@/lib/option-order";
 
 export const dynamic = 'force-dynamic';
 
@@ -218,6 +219,18 @@ export async function GET(
       orderedQuestions = Array.from(questionsMap.values());
     }
 
+    // Option order each question was shown in (best effort; older attempts have none)
+    let savedOrders: Record<string, unknown> = {};
+    try {
+      const orderRows = await prisma.$queryRaw`
+        SELECT "optionOrders" FROM examattempt WHERE id = ${attemptId}
+      ` as any[];
+      const raw = orderRows?.[0]?.optionOrders;
+      savedOrders = (typeof raw === 'string' ? JSON.parse(raw) : raw) || {};
+    } catch (orderError) {
+      console.log('No optionOrders available for attempt:', orderError);
+    }
+
     // Calculate time taken
     const timeTaken = Math.round(
       (new Date(attempt.submittedat).getTime() - new Date(attempt.startedat).getTime()) / 1000
@@ -230,7 +243,10 @@ export async function GET(
         ...attempt,
         timeTaken, // Add time taken in seconds
       },
-      questions: orderedQuestions,
+      questions: orderedQuestions.map((q: any) => ({
+        ...q,
+        displayOrder: sanitizeOrder(savedOrders[q.id]),
+      })),
     });
   } catch (error: any) {
     console.error("Get attempt error:", error);

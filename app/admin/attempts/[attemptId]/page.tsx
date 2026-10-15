@@ -1,9 +1,10 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { useParams, useRouter } from 'next/navigation';
+import { useParams } from 'next/navigation';
 import AdminNav from '@/components/AdminNav';
 import Link from 'next/link';
+import { buildOptions, LETTERS, type OptionKey } from '@/lib/option-order';
 
 interface Question {
   id: string;
@@ -17,6 +18,7 @@ interface Question {
   chapterNumber: number;
   studentAnswer: string | null;
   isCorrect: boolean;
+  displayOrder?: OptionKey[] | null;
 }
 
 interface AttemptDetail {
@@ -37,7 +39,6 @@ interface AttemptDetail {
 
 export default function AttemptDetailsPage() {
   const params = useParams();
-  const router = useRouter();
   const attemptId = params.attemptId as string;
 
   const [attempt, setAttempt] = useState<AttemptDetail | null>(null);
@@ -108,297 +109,190 @@ export default function AttemptDetailsPage() {
   }
 
   const currentQuestion = questions[currentQIndex];
-  const timeTaken = attempt?.timeTaken 
+  const timeTaken = attempt?.timeTaken
     ? Math.round(attempt.timeTaken / 60)  // Convert seconds to minutes
     : Math.round(
         (new Date(attempt?.submittedat || 0).getTime() - new Date(attempt?.startedat || 0).getTime()) / 60000
       );
   const correctCount = questions.filter(q => q.isCorrect).length;
 
-  // Calculate performance by chapter
-  const chapterPerformance = questions.reduce((acc: any, q: any) => {
-    if (!acc[q.chapterNumber]) {
-      acc[q.chapterNumber] = { correct: 0, total: 0, percentage: 0 };
-    }
-    acc[q.chapterNumber].total += 1;
-    if (q.isCorrect) {
-      acc[q.chapterNumber].correct += 1;
-    }
-    acc[q.chapterNumber].percentage = Math.round(
-      (acc[q.chapterNumber].correct / acc[q.chapterNumber].total) * 100
-    );
-    return acc;
-  }, {});
-
-  // Sort chapters by performance
-  const chapterStats = Object.entries(chapterPerformance)
-    .map(([chapter, stats]: [string, any]) => ({
-      chapter: parseInt(chapter),
-      ...stats,
-    }))
-    .sort((a, b) => a.chapter - b.chapter);
+  // Performance by chapter
+  const chapterStats = Object.values(
+    questions.reduce((acc: Record<number, { chapter: number; correct: number; total: number; percentage: number }>, q) => {
+      const entry = acc[q.chapterNumber] ?? (acc[q.chapterNumber] = { chapter: q.chapterNumber, correct: 0, total: 0, percentage: 0 });
+      entry.total += 1;
+      if (q.isCorrect) entry.correct += 1;
+      entry.percentage = Math.round((entry.correct / entry.total) * 100);
+      return acc;
+    }, {})
+  ).sort((a, b) => a.chapter - b.chapter);
 
   const strongChapters = chapterStats.filter(c => c.percentage >= 80);
-  const weakChapters = chapterStats.filter(c => c.percentage < 60);
-  
-  // Get top 3 worst-performing chapters for feedback
-  const topWeakChapters = chapterStats
-    .filter(c => c.percentage < 60)
-    .sort((a, b) => a.percentage - b.percentage)  // Sort by percentage (worst first)
-    .slice(0, 3);  // Take only top 3
+  const weakChapters = chapterStats.filter(c => c.percentage < 60).sort((a, b) => a.percentage - b.percentage);
 
   return (
     <div className="min-h-screen bg-gray-50">
       <AdminNav />
 
       {/* Header */}
-      <div className="bg-gradient-to-r from-blue-900 to-blue-800 text-white py-8 px-0 border-b border-blue-900">
-        <div className="max-w-7xl mx-auto px-6 flex justify-between items-center">
+      <div className="bg-gradient-to-r from-blue-900 to-blue-800 text-white py-8 border-b border-blue-900">
+        <div className="max-w-7xl mx-auto px-6 flex justify-between items-start gap-6">
           <div>
-            <Link href="/admin/dashboard">
-              <button className="text-blue-100 hover:text-white font-medium text-sm mb-4 block">
-                ← Back to Dashboard
-              </button>
+            <Link href="/admin/dashboard" className="text-blue-100 hover:text-white font-medium text-sm mb-4 block">
+              ← Back to Dashboard
             </Link>
             <h1 className="text-3xl font-bold">{attempt.student_name}'s Exam Review</h1>
-            <p className="text-blue-100 mt-1">{attempt.paper_name} | Score: {attempt.score}% | {attempt.passed ? '✓ PASSED' : '✗ FAILED'}</p>
+            <p className="text-blue-100 mt-1">{attempt.paper_name}</p>
           </div>
           <div className="text-right">
-            <p className="text-blue-100 text-sm">Student Email</p>
-            <p className="text-sm font-mono">{attempt.student_email}</p>
+            <span
+              className={`inline-block px-3 py-1 rounded text-sm font-semibold ${
+                attempt.passed ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'
+              }`}
+            >
+              {attempt.passed ? 'Passed' : 'Failed'}
+            </span>
+            <p className="text-sm font-mono text-blue-100 mt-3">{attempt.student_email}</p>
           </div>
         </div>
       </div>
 
-      {/* Areas to Improve Section */}
-      <div className="bg-white border-b border-gray-200">
-        <div className="max-w-7xl mx-auto px-6 py-8">
-          <h2 className="text-2xl font-bold text-gray-900 mb-6">Areas to Improve</h2>
-          
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-            {/* Strengths */}
-            <div>
-              <div className="flex items-center gap-2 mb-4">
-                <div className="w-5 h-5 rounded-full bg-green-500" />
-                <h3 className="text-lg font-semibold text-gray-900">Chapters Performed Well</h3>
+      {/* Chapter summary */}
+      {chapterStats.length > 0 && (
+        <div className="bg-white border-b border-gray-200">
+          <div className="max-w-7xl mx-auto px-6 py-4 flex flex-wrap items-center gap-x-6 gap-y-2 text-sm">
+            {strongChapters.length > 0 && (
+              <div className="flex flex-wrap items-center gap-2">
+                <span className="text-gray-600 font-medium">Strong:</span>
+                {strongChapters.map(ch => (
+                  <span key={ch.chapter} className="px-2 py-1 rounded bg-green-100 text-green-800 font-medium">
+                    Ch {ch.chapter} · {ch.percentage}%
+                  </span>
+                ))}
               </div>
-              {strongChapters.length > 0 ? (
-                <div className="space-y-3">
-                  {strongChapters.map(ch => (
-                    <div key={ch.chapter} className="p-4 bg-green-50 rounded-lg border border-green-200">
-                      <div className="flex justify-between items-center mb-2">
-                        <p className="font-medium text-gray-900">Chapter {ch.chapter}</p>
-                        <span className="text-green-700 font-bold text-lg">{ch.percentage}%</span>
-                      </div>
-                      <div className="w-full bg-green-200 rounded-full h-2">
-                        <div 
-                          className="bg-green-600 h-2 rounded-full" 
-                          style={{ width: `${ch.percentage}%` }}
-                        />
-                      </div>
-                      <p className="text-sm text-gray-600 mt-2">{ch.correct} out of {ch.total} questions correct</p>
-                    </div>
-                  ))}
-                </div>
-              ) : (
-                <p className="text-gray-600 text-sm">No chapters with 80%+ accuracy yet.</p>
-              )}
-            </div>
-
-            {/* Weaknesses */}
-            <div>
-              <div className="flex items-center gap-2 mb-4">
-                <div className="w-5 h-5 rounded-full bg-red-500" />
-                <h3 className="text-lg font-semibold text-gray-900">Chapters Need Improvement</h3>
+            )}
+            {weakChapters.length > 0 && (
+              <div className="flex flex-wrap items-center gap-2">
+                <span className="text-gray-600 font-medium">Needs work:</span>
+                {weakChapters.map(ch => (
+                  <span key={ch.chapter} className="px-2 py-1 rounded bg-red-100 text-red-800 font-medium">
+                    Ch {ch.chapter} · {ch.percentage}%
+                  </span>
+                ))}
               </div>
-              {weakChapters.length > 0 ? (
-                <div className="space-y-3">
-                  {topWeakChapters.map(ch => (
-                    <div key={ch.chapter} className="p-4 bg-red-50 rounded-lg border border-red-200">
-                      <div className="flex justify-between items-center mb-2">
-                        <p className="font-medium text-gray-900">Chapter {ch.chapter}</p>
-                        <span className="text-red-700 font-bold text-lg">{ch.percentage}%</span>
-                      </div>
-                      <div className="w-full bg-red-200 rounded-full h-2">
-                        <div 
-                          className="bg-red-600 h-2 rounded-full" 
-                          style={{ width: `${ch.percentage}%` }}
-                        />
-                      </div>
-                      <p className="text-sm text-gray-600 mt-2">{ch.correct} out of {ch.total} questions correct</p>
-                      <p className="text-sm text-red-700 font-medium mt-3">⚠️ Needs more practice</p>
-                    </div>
-                  ))}
-                </div>
-              ) : (
-                <p className="text-gray-600 text-sm">Strong performance across all chapters!</p>
-              )}
-            </div>
-          </div>
-
-          {/* Overall Assessment */}
-          <div className="mt-8 p-6 bg-blue-50 rounded-lg border border-blue-200">
-            <h4 className="font-semibold text-gray-900 mb-2">📊 Assessment Summary</h4>
-            {weakChapters.length > 0 ? (
-              <p className="text-gray-700">
-                Student should focus on Chapter{topWeakChapters.length > 1 ? 's' : ''} <strong>{topWeakChapters.map(c => c.chapter).join(', ')}</strong> where performance was below 60%. Recommend targeted practice in these areas.
-              </p>
-            ) : (
-              <p className="text-gray-700">
-                Excellent performance! Student has demonstrated strong understanding across all chapters.
-              </p>
             )}
           </div>
         </div>
-      </div>
+      )}
 
-      {/* Main Content */}
-      <div className="bg-white px-6">
-        <div className="max-w-7xl mx-auto">
-          <div className="flex flex-1 overflow-hidden" style={{ height: 'calc(100vh - 200px)' }}>
-            {/* Left Content - Question */}
-            <div className="flex-1 overflow-y-auto p-8 bg-white">
-              {currentQuestion ? (
-              <div className="max-w-3xl">
-                {/* Question Header */}
-                <div className="mb-8">
-                  <div className="flex items-center gap-3 mb-4">
-                    <div className={`w-10 h-10 rounded-full flex items-center justify-center font-bold text-lg ${
-                      currentQuestion.isCorrect
-                        ? 'bg-green-100 text-green-700'
-                        : 'bg-red-100 text-red-700'
-                    }`}>
-                      {currentQuestion.isCorrect ? '✓' : '✗'}
-                    </div>
-                    <div>
-                      <h2 className="text-xl font-bold text-gray-900">
-                        Question {currentQIndex + 1} of {questions.length}
-                      </h2>
-                      <p className="text-sm text-gray-600">Chapter {currentQuestion.chapterNumber}</p>
-                    </div>
-                  </div>
-                </div>
-
-                {/* Question Text */}
-                <div className="bg-gray-50 rounded-lg p-6 mb-8 border border-gray-200">
-                  <p className="text-lg text-gray-900 leading-relaxed">{currentQuestion.questionText}</p>
-                </div>
-
-                {/* Answer Options */}
-                <div className="mb-8">
-                  <h3 className="font-semibold text-gray-900 mb-4">Student Response vs Correct Answer</h3>
-                  <div className="space-y-3">
-                    {[
-                      { key: 'A', text: currentQuestion.optionA },
-                      { key: 'B', text: currentQuestion.optionB },
-                      { key: 'C', text: currentQuestion.optionC },
-                      { key: 'D', text: currentQuestion.optionD },
-                    ].map((option) => {
-                      const isStudentAnswer = currentQuestion.studentAnswer === option.key;
-                      const isCorrectAnswer = currentQuestion.correctAnswer === option.key;
-
-                      return (
-                        <div
-                          key={option.key}
-                          className={`p-4 rounded-lg border-2 transition ${
-                            isCorrectAnswer
-                              ? 'border-green-500 bg-green-50'
-                              : isStudentAnswer
-                              ? 'border-red-500 bg-red-50'
-                              : 'border-gray-200 bg-white'
-                          }`}
-                        >
-                          <div className="flex items-start gap-3">
-                            <div className={`w-8 h-8 rounded-full border-2 flex items-center justify-center font-bold text-sm flex-shrink-0 ${
-                              isCorrectAnswer
-                                ? 'border-green-500 bg-green-100 text-green-700'
-                                : isStudentAnswer
-                                ? 'border-red-500 bg-red-100 text-red-700'
-                                : 'border-gray-300 bg-gray-100 text-gray-600'
-                            }`}>
-                              {option.key}
-                            </div>
-                            <div className="flex-1">
-                              <p className="text-gray-800 font-medium">{option.text}</p>
-                              <div className="flex gap-2 mt-2">
-                                {isCorrectAnswer && <span className="text-xs bg-green-200 text-green-800 px-2 py-1 rounded font-medium">✓ Correct Answer</span>}
-                                {isStudentAnswer && !isCorrectAnswer && <span className="text-xs bg-red-200 text-red-800 px-2 py-1 rounded font-medium">✗ Student's Answer</span>}
-                                {isStudentAnswer && isCorrectAnswer && <span className="text-xs bg-green-200 text-green-800 px-2 py-1 rounded font-medium">✓ Student's Answer</span>}
-                              </div>
-                            </div>
-                          </div>
-                        </div>
-                      );
-                    })}
-                  </div>
-                </div>
-
-                {/* Explanation */}
-                {currentQuestion.explanation && (
-                  <div className="bg-blue-50 border border-blue-200 rounded-lg p-6">
-                    <h3 className="font-bold text-blue-900 mb-2">📝 Explanation</h3>
-                    <p className="text-sm text-blue-800 leading-relaxed">{currentQuestion.explanation}</p>
-                  </div>
-                )}
-              </div>
-            ) : (
-              <div className="text-center text-gray-600">No questions to display</div>
-            )}
-          </div>
-
-            {/* Right Sidebar - Navigation */}
-            <div className="w-56 bg-white border-l border-gray-200 overflow-y-auto flex flex-col">
-              {/* Student & Performance Summary */}
-              <div className="p-6 border-b border-gray-200">
-                <p className="text-sm font-semibold text-gray-600 mb-3">STUDENT INFO</p>
-                <div className="space-y-2 text-sm mb-4 pb-4 border-b border-gray-200">
-                  <p className="text-gray-700"><span className="font-semibold">Name:</span> {attempt.student_name}</p>
-                  <p className="text-gray-700"><span className="font-semibold">Email:</span> {attempt.student_email}</p>
-                </div>
-                <p className="text-sm font-semibold text-gray-600 mb-2">PERFORMANCE</p>
-                <div className="space-y-2 text-sm">
-                  <div className="flex justify-between">
-                    <span className="text-gray-700">Correct:</span>
-                    <span className="font-bold text-green-600">{correctCount}/{attempt.totalQuestions}</span>
-                  </div>
-                  <div className="flex justify-between">
-                    <span className="text-gray-700">Score:</span>
-                    <span className={`font-bold ${attempt.score >= attempt.passingScore ? 'text-green-600' : 'text-red-600'}`}>{attempt.score}%</span>
-                  </div>
-                  <div className="flex justify-between">
-                    <span className="text-gray-700">Time Taken:</span>
-                    <span className="font-bold">{timeTaken} min</span>
-                  </div>
-                </div>
+      {/* Main content */}
+      <div className="max-w-7xl mx-auto px-6 py-8 grid grid-cols-1 lg:grid-cols-[1fr_14rem] gap-8">
+        {/* Question */}
+        <div className="bg-white rounded-lg border border-gray-200 p-8">
+          {currentQuestion ? (
+            <>
+              <div className="mb-6">
+                <h2 className="text-xl font-bold text-gray-900">
+                  Question {currentQIndex + 1} of {questions.length}
+                </h2>
+                <p className="text-sm text-gray-600">Chapter {currentQuestion.chapterNumber}</p>
               </div>
 
-              {/* Question Navigator - Compact Scrollable */}
-              <div className="flex-1 p-3 overflow-y-auto" style={{ maxHeight: '400px' }}>
-                <p className="text-xs font-semibold text-gray-600 mb-3">QUESTIONS</p>
-                <div className="grid grid-cols-6 gap-1">
-                  {questions.map((q, idx) => (
-                    <button
-                      key={q.id}
-                      onClick={() => setCurrentQIndex(idx)}
-                      className={`w-full aspect-square rounded font-semibold text-xs transition ${
-                        currentQIndex === idx
-                          ? 'bg-blue-600 text-white border-2 border-blue-700'
-                          : q.isCorrect
-                          ? 'bg-green-100 text-green-700 border border-green-300 hover:bg-green-200'
-                          : 'bg-red-100 text-red-700 border border-red-300 hover:bg-red-200'
+              <div className="bg-gray-50 rounded-lg p-6 mb-8 border border-gray-200">
+                <p className="text-lg text-gray-900 leading-relaxed">{currentQuestion.questionText}</p>
+              </div>
+
+              <div className="space-y-3 mb-8">
+                {buildOptions(currentQuestion, currentQuestion.displayOrder ?? [...LETTERS]).map((option) => {
+                  const isStudentAnswer = currentQuestion.studentAnswer === option.key;
+                  const isCorrectAnswer = currentQuestion.correctAnswer === option.key;
+
+                  return (
+                    <div
+                      key={option.key}
+                      className={`p-4 rounded-lg border-2 ${
+                        isCorrectAnswer
+                          ? 'border-green-500 bg-green-50'
+                          : isStudentAnswer
+                          ? 'border-red-500 bg-red-50'
+                          : 'border-gray-200 bg-white'
                       }`}
-                      title={`Q${idx + 1}: ${q.isCorrect ? 'Correct' : 'Incorrect'}`}
                     >
-                      {idx + 1}
-                    </button>
-                  ))}
-                </div>
+                      <p className="text-gray-800 font-medium">
+                        <span className="font-bold text-gray-900 mr-2">{option.label}.</span>
+                        {option.text}
+                      </p>
+                      {(isCorrectAnswer || isStudentAnswer) && (
+                        <div className="flex gap-2 mt-2">
+                          {isCorrectAnswer && (
+                            <span className="text-xs bg-green-200 text-green-800 px-2 py-1 rounded font-medium">
+                              ✓ Correct Answer
+                            </span>
+                          )}
+                          {isStudentAnswer && (
+                            <span className={`text-xs px-2 py-1 rounded font-medium ${
+                              isCorrectAnswer ? 'bg-green-200 text-green-800' : 'bg-red-200 text-red-800'
+                            }`}>
+                              {isCorrectAnswer ? "✓" : "✗"} Student's Answer
+                            </span>
+                          )}
+                        </div>
+                      )}
+                    </div>
+                  );
+                })}
               </div>
 
-              {/* Question Details section removed - info already displayed on the left */}
+              {currentQuestion.explanation && (
+                <div className="bg-blue-50 border border-blue-200 rounded-lg p-6">
+                  <h3 className="font-bold text-blue-900 mb-2">Explanation</h3>
+                  <p className="text-sm text-blue-800 leading-relaxed">{currentQuestion.explanation}</p>
+                </div>
+              )}
+            </>
+          ) : (
+            <div className="text-center text-gray-600">No questions to display</div>
+          )}
+        </div>
+
+        {/* Sidebar */}
+        <aside className="bg-white rounded-lg border border-gray-200 p-5 h-fit lg:sticky lg:top-6">
+          <p className="text-xs font-semibold text-gray-600 mb-3">PERFORMANCE</p>
+          <div className="space-y-2 text-sm mb-6 pb-6 border-b border-gray-200">
+            <div className="flex justify-between">
+              <span className="text-gray-700">Correct</span>
+              <span className="font-bold text-green-600">{correctCount}/{attempt.totalQuestions}</span>
+            </div>
+            <div className="flex justify-between">
+              <span className="text-gray-700">Score</span>
+              <span className={`font-bold ${attempt.score >= attempt.passingScore ? 'text-green-600' : 'text-red-600'}`}>{attempt.score}%</span>
+            </div>
+            <div className="flex justify-between">
+              <span className="text-gray-700">Time taken</span>
+              <span className="font-bold">{timeTaken} min</span>
             </div>
           </div>
-        </div>
+
+          <p className="text-xs font-semibold text-gray-600 mb-3">QUESTIONS</p>
+          <div className="grid grid-cols-5 gap-1.5">
+            {questions.map((q, idx) => (
+              <button
+                key={q.id}
+                onClick={() => setCurrentQIndex(idx)}
+                className={`aspect-square rounded font-semibold text-xs transition ${
+                  currentQIndex === idx
+                    ? 'bg-blue-900 text-white'
+                    : q.isCorrect
+                    ? 'bg-green-100 text-green-700 hover:bg-green-200'
+                    : 'bg-red-100 text-red-700 hover:bg-red-200'
+                }`}
+                title={`Q${idx + 1}: ${q.isCorrect ? 'Correct' : 'Incorrect'}`}
+              >
+                {idx + 1}
+              </button>
+            ))}
+          </div>
+        </aside>
       </div>
     </div>
   );
