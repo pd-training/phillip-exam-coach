@@ -158,7 +158,7 @@ export default function PracticePage() {
       <div className="bg-gradient-to-r from-blue-600 to-blue-700 text-white py-12 px-0 border-b border-blue-800">
         <div className="max-w-7xl mx-auto px-6">
           <button
-            onClick={() => (window.history.length > 1 ? router.back() : router.push('/explore'))}
+            onClick={() => router.push('/explore')}
             className="text-white hover:text-blue-100 font-medium text-sm mb-6 transition duration-200"
           >
             ← Back
