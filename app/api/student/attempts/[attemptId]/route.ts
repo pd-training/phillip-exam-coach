@@ -1,6 +1,7 @@
 import { getServerSession } from "next-auth/next";
 import { authOptions } from "@/lib/auth-config";
 import prisma from "@/lib/prisma";
+import { sanitizeOrder } from "@/lib/option-order";
 
 export const dynamic = 'force-dynamic';
 
@@ -91,6 +92,18 @@ export async function GET(
 
     const attempt = attemptRes[0];
     console.log("Attempt found:", attempt.id, "Paper:", attempt.paper_name);
+
+    // Option order each question was shown in (best effort; older attempts have none)
+    let savedOrders: Record<string, unknown> = {};
+    try {
+      const orderRows = await prisma.$queryRaw`
+        SELECT "optionOrders" FROM examattempt WHERE id = ${attemptId}
+      ` as any[];
+      const raw = orderRows?.[0]?.optionOrders;
+      savedOrders = (typeof raw === 'string' ? JSON.parse(raw) : raw) || {};
+    } catch (orderError) {
+      console.log('No optionOrders available for attempt:', orderError);
+    }
 
     // Fetch exam parts if they exist
     let examParts: any[] = [];
@@ -228,6 +241,11 @@ export async function GET(
       console.log(`⚠️ No questionIds available - using ID order (may not match presentation)`);
       questionsWithAnswers = Array.from(questionsWithAnswersMap.values());
     }
+
+    questionsWithAnswers = questionsWithAnswers.map((q: any) => ({
+      ...q,
+      displayOrder: sanitizeOrder(savedOrders[q.id]),
+    }));
 
     const questionsAnswered = questionsWithAnswers.filter(q => q.studentAnswer).length;
     const questionsNotAnswered = questionsWithAnswers.filter(q => !q.studentAnswer).length;

@@ -5,6 +5,7 @@ import { useParams, useRouter } from 'next/navigation';
 import { useSession } from 'next-auth/react';
 import StudentNav from '@/components/StudentNav';
 import Link from 'next/link';
+import { buildOptions, LETTERS, type OptionKey } from '@/lib/option-order';
 
 interface Question {
   id: string;
@@ -18,6 +19,7 @@ interface Question {
   chapterNumber: number;
   studentAnswer: string | null;
   isCorrect: boolean;
+  displayOrder?: OptionKey[] | null;
 }
 
 interface AttemptDetail {
@@ -210,12 +212,7 @@ export default function AttemptReviewPage() {
                 {/* Answer Options */}
                 <div className="mb-8">
                   <div className="space-y-3">
-                    {[
-                      { key: 'A', text: currentQuestion.optionA },
-                      { key: 'B', text: currentQuestion.optionB },
-                      { key: 'C', text: currentQuestion.optionC },
-                      { key: 'D', text: currentQuestion.optionD },
-                    ].map((option) => {
+                    {buildOptions(currentQuestion, currentQuestion.displayOrder ?? [...LETTERS]).map((option) => {
                       const isStudentAnswer = currentQuestion.studentAnswer === option.key;
                       const isCorrectAnswer = currentQuestion.correctAnswer === option.key;
 
@@ -231,7 +228,10 @@ export default function AttemptReviewPage() {
                           }`}
                         >
                           <div>
-                            <p className="text-gray-800 font-medium">{option.text}</p>
+                            <p className="text-gray-800 font-medium">
+                              <span className="font-bold text-gray-900 mr-2">{option.label}.</span>
+                              {option.text}
+                            </p>
                             <div className="flex gap-2 mt-2">
                               {isCorrectAnswer && <span className="text-xs bg-green-200 text-green-800 px-2 py-1 rounded font-medium">✓ Correct Answer</span>}
                               {isStudentAnswer && !isCorrectAnswer && <span className="text-xs bg-red-200 text-red-800 px-2 py-1 rounded font-medium">✗ Your Answer</span>}

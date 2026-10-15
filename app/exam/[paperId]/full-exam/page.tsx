@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { buildOptions, displayLabel, useOptionOrder } from "@/lib/option-order";
+import { buildOptions, displayLabel, labelFor, useOptionOrder } from "@/lib/option-order";
 import { useSession } from "next-auth/react";
 import { useRouter, useParams } from "next/navigation";
 import StudentNav from "@/components/StudentNav";
@@ -173,6 +173,7 @@ export default function FullExamMode() {
           userId: (session?.user as any)?.id,
           answers,
           questionIds: questions.map(q => q.id),  // Send all question IDs from this attempt
+          optionOrders: Object.fromEntries(questions.map(q => [q.id, orderFor(q.id)])),  // A-D order each question was shown in
           timeTaken,
         }),
       });
@@ -287,20 +288,20 @@ export default function FullExamMode() {
                   <>
                     <div style={{ margin: "0 0 12px 0", fontSize: "14px" }}>
                       <p style={{ margin: "0 0 6px 0" }}>
-                        Your answer: <strong>{
+                        Your answer: <strong>{labelFor(answerData.displayOrder, answerData.studentAnswer)}.</strong> {
                           answerData.studentAnswer === "A" ? answerData.optionA :
                           answerData.studentAnswer === "B" ? answerData.optionB :
                           answerData.studentAnswer === "C" ? answerData.optionC :
                           answerData.optionD
-                        }</strong>
+                        }
                       </p>
                       <p style={{ margin: "0", fontSize: "14px", color: "#059669" }}>
-                        Correct answer: <strong>{
+                        Correct answer: <strong>{labelFor(answerData.displayOrder, answerData.correctAnswer)}.</strong> {
                           answerData.correctAnswer === "A" ? answerData.optionA :
                           answerData.correctAnswer === "B" ? answerData.optionB :
                           answerData.correctAnswer === "C" ? answerData.optionC :
                           answerData.optionD
-                        }</strong>
+                        }
                       </p>
                     </div>
                     {answerData.explanation && (

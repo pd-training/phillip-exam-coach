@@ -57,3 +57,16 @@ export function useOptionOrder() {
     return order;
   };
 }
+
+/** Returns the order only if it is a valid permutation of A-D, otherwise null. */
+export function sanitizeOrder(value: unknown): OptionKey[] | null {
+  if (!Array.isArray(value) || value.length !== LETTERS.length) return null;
+  const valid = value.every((v) => (LETTERS as readonly string[]).includes(v));
+  const unique = new Set(value).size === LETTERS.length;
+  return valid && unique ? (value as OptionKey[]) : null;
+}
+
+/** The letter an original option was shown under, or the key itself when no order was saved. */
+export function labelFor(order: OptionKey[] | null | undefined, key: string): string {
+  return order ? displayLabel(order, key) : key;
+}

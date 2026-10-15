@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import prisma from '@/lib/prisma';
+import { sanitizeOrder } from '@/lib/option-order';
 
 export const dynamic = 'force-dynamic';
 
@@ -198,7 +199,7 @@ export async function POST(
       return NextResponse.json({ error: 'Invalid JSON' }, { status: 400 });
     }
 
-    const { userId, answers, questionIds, timeTaken } = body; // questionIds = all question IDs presented in the exam
+    const { userId, answers, questionIds, timeTaken, optionOrders } = body; // questionIds = all question IDs presented in the exam
     const paperId = params.id;
 
     console.log('Submitting exam - userId:', userId, 'paperId:', paperId, 'answers:', Object.keys(answers || {}).length, 'questions presented:', questionIds?.length, 'timeTaken:', timeTaken);
@@ -282,6 +283,7 @@ export async function POST(
         studentAnswer,
         correctAnswer: q.correctAnswer,
         isCorrect,
+        displayOrder: sanitizeOrder(optionOrders?.[q.id]),
         explanation: q.explanation,
         optionA: q.optionA,
         optionB: q.optionB,
@@ -480,6 +482,22 @@ export async function POST(
       }
     } catch (insertError: any) {
       console.error('Error saving exam attempt:', insertError.message, insertError.code);
+    }
+
+    // Best effort: store the A-D order each question was shown in, so the review matches.
+    if (optionOrders && typeof optionOrders === 'object') {
+      try {
+        const cleaned: Record<string, string[]> = {};
+        for (const [qid, ord] of Object.entries(optionOrders)) {
+          const valid = sanitizeOrder(ord);
+          if (valid) cleaned[qid] = valid;
+        }
+        await prisma.$queryRaw`
+          UPDATE examattempt SET "optionOrders" = ${JSON.stringify(cleaned)}::jsonb WHERE id = ${attemptId}
+        `;
+      } catch (orderError: any) {
+        console.log('Could not save option orders (run /api/admin/add-optionorders-column):', orderError.message);
+      }
     }
 
     return NextResponse.json({
