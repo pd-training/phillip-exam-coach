@@ -1,6 +1,7 @@
 'use client';
 
 import Link from 'next/link';
+import BrandLockup from '../components/BrandLockup';
 import { useSession } from 'next-auth/react';
 import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
@@ -85,15 +86,8 @@ export default function LandingPage() {
         <div className="max-w-7xl mx-auto relative z-10">
           <div className="flex flex-col items-start text-left max-w-3xl">
             {/* Brand lockup */}
-            <div className="mb-10 flex items-end gap-4">
-              <div className="flex flex-col leading-none">
-                <span className="font-bold text-xl tracking-tight text-white">PhillipCapital</span>
-                <span className="text-[11px] text-blue-200 mt-1">Your Partner in Finance</span>
-              </div>
-              <span className="h-8 w-px bg-blue-400/50" aria-hidden="true" />
-              <span className="text-sm font-semibold text-blue-100">
-                Phillip<span className="text-amber-400">WealthAdvisory</span>
-              </span>
+            <div className="mb-10">
+              <BrandLockup href="/" variant="light" />
             </div>
 
             {/* Heading */}
