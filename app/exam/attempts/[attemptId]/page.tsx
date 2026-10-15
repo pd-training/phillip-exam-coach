@@ -209,7 +209,6 @@ export default function AttemptReviewPage() {
 
                 {/* Answer Options */}
                 <div className="mb-8">
-                  <h3 className="font-semibold text-gray-900 mb-4">Your Response vs Correct Answer</h3>
                   <div className="space-y-3">
                     {[
                       { key: 'A', text: currentQuestion.optionA },
@@ -267,7 +266,7 @@ export default function AttemptReviewPage() {
                         onClick={() => setCurrentQIndex(0)}
                         className="w-full px-6 py-3 bg-blue-900 hover:bg-blue-800 text-white font-semibold rounded-lg transition"
                       >
-                        🔄 Practice Again
+                        Practice Again
                       </button>
                     )}
                     <Link href="/dashboard">
