@@ -46,6 +46,65 @@ interface AttemptDetail {
   }> | null;
 }
 
+type ChapterPct = { chapter: number; percentage: number };
+
+function listChapters(nums: number[], max: number): string {
+  if (nums.length === 0) return "";
+  const shown = nums.slice(0, max);
+  const more = nums.length - shown.length;
+  const label = (n: number) => `Chapter ${n}`;
+  const list = shown.length === 1
+    ? label(shown[0])
+    : `${shown.slice(0, -1).map(label).join(", ")} and ${label(shown[shown.length - 1])}`;
+  return more > 0 ? `${list} and ${more} more` : list;
+}
+
+function summarizeAttempt(
+  chapters: ChapterPct[],
+  previous: { score: number; chapters: ChapterPct[] } | null,
+  score: number
+): string[] {
+  const lines: string[] = [];
+  const strong = chapters.filter((c) => c.percentage >= 80).sort((a, b) => a.chapter - b.chapter);
+  const weak = chapters
+    .filter((c) => c.percentage < 80)
+    .sort((a, b) => a.percentage - b.percentage || a.chapter - b.chapter);
+
+  if (strong.length > 0) {
+    lines.push(`You did really well in ${listChapters(strong.map((c) => c.chapter), 3)}.`);
+  }
+
+  if (weak.length === 0) {
+    lines.push("You were solid across every chapter, so there is no clear weak spot this time.");
+  } else {
+    lines.push(`Focus on ${listChapters(weak.slice(0, 3).map((c) => c.chapter), 3)} next, as these were your weakest areas.`);
+  }
+
+  if (!previous) {
+    lines.push("This is your first attempt on this paper, so it sets your starting point.");
+  } else {
+    if (score > previous.score) lines.push("Your overall score is higher than your last attempt.");
+    else if (score === previous.score) lines.push("Your overall score is the same as your last attempt.");
+    else lines.push("Your overall score is lower than your last attempt.");
+
+    const prevMap = new Map(previous.chapters.map((c) => [c.chapter, c.percentage]));
+    const changes = chapters
+      .filter((c) => prevMap.has(c.chapter))
+      .map((c) => ({ chapter: c.chapter, diff: c.percentage - (prevMap.get(c.chapter) as number) }))
+      .sort((a, b) => a.chapter - b.chapter);
+    const improved = changes.filter((c) => c.diff >= 10).map((c) => c.chapter);
+    const slipped = changes.filter((c) => c.diff <= -10).map((c) => c.chapter);
+    if (improved.length > 0) {
+      lines.push(`${listChapters(improved, 2)} improved since your last attempt.`);
+    }
+    if (slipped.length > 0) {
+      lines.push(`${listChapters(slipped, 2)} slipped since your last attempt.`);
+    }
+  }
+
+  return lines;
+}
+
 export default function AttemptReviewPage() {
   const params = useParams();
   const router = useRouter();
@@ -60,6 +119,49 @@ export default function AttemptReviewPage() {
   const [showIncorrectOnly, setShowIncorrectOnly] = useState(false);
 
   // Check authentication
+  const [previous, setPrevious] = useState<{ score: number; chapters: ChapterPct[] } | null>(null);
+
+  // Load the previous attempt on the same paper for comparison
+  useEffect(() => {
+    if (!attempt) return;
+    const loadPrevious = async () => {
+      try {
+        const listRes = await fetch('/api/student/attempts');
+        if (!listRes.ok) return;
+        const listData = await listRes.json();
+        const currentTime = new Date(attempt.submittedat).getTime();
+        const prevMeta = (listData.attempts || [])
+          .filter((a: any) =>
+            a.paperid === attempt.paperid &&
+            a.id !== attempt.id &&
+            a.score !== null &&
+            new Date(a.submittedat).getTime() < currentTime
+          )
+          .sort((a: any, b: any) => new Date(b.submittedat).getTime() - new Date(a.submittedat).getTime())[0];
+        if (!prevMeta) return;
+
+        const detailRes = await fetch(`/api/student/attempts/${prevMeta.id}`);
+        if (!detailRes.ok) return;
+        const detail = await detailRes.json();
+
+        const totals: Record<number, { correct: number; total: number }> = {};
+        for (const q of detail.questions || []) {
+          const entry = totals[q.chapterNumber] ?? (totals[q.chapterNumber] = { correct: 0, total: 0 });
+          entry.total += 1;
+          if (q.isCorrect) entry.correct += 1;
+        }
+        const chapters = Object.entries(totals).map(([ch, t]) => ({
+          chapter: Number(ch),
+          percentage: Math.round((t.correct / t.total) * 100),
+        }));
+        setPrevious({ score: prevMeta.score, chapters });
+      } catch (err) {
+        console.error('Could not load previous attempt:', err);
+      }
+    };
+    loadPrevious();
+  }, [attempt]);
+
   useEffect(() => {
     if (status === 'loading') return;
 
@@ -155,8 +257,9 @@ export default function AttemptReviewPage() {
   )
     .map((c) => ({ chapter: c.chapter, percentage: Math.round((c.correct / c.total) * 100) }))
     .sort((a, b) => a.chapter - b.chapter);
-  const didWellChapters = chapterSummary.filter((c) => c.percentage >= 80);
-  const focusChapters = chapterSummary.filter((c) => c.percentage < 80);
+  const summaryLines = chapterSummary.length > 0
+    ? summarizeAttempt(chapterSummary, previous, attempt.score)
+    : [];
   const timeTaken = Math.round(
     (new Date(attempt.submittedat).getTime() - new Date(attempt.startedat).getTime()) / 60000
   );
@@ -200,34 +303,13 @@ export default function AttemptReviewPage() {
         </div>
       </div>
 
-      {/* Attempt summary by chapter */}
-      {chapterSummary.length > 0 && (
+      {/* Attempt summary */}
+      {summaryLines.length > 0 && (
         <div className="bg-white border-b border-gray-200">
-          <div className="max-w-7xl mx-auto px-6 py-3 flex flex-wrap items-center gap-x-8 gap-y-2 text-sm">
-            <div className="flex flex-wrap items-center gap-2">
-              <span className="text-gray-600 font-medium">Did well:</span>
-              {didWellChapters.length > 0 ? (
-                didWellChapters.map((c) => (
-                  <span key={c.chapter} className="px-2 py-1 rounded bg-green-100 text-green-800 font-medium">
-                    Chapter {c.chapter}
-                  </span>
-                ))
-              ) : (
-                <span className="text-gray-500">None yet</span>
-              )}
-            </div>
-            <div className="flex flex-wrap items-center gap-2">
-              <span className="text-gray-600 font-medium">Focus on:</span>
-              {focusChapters.length > 0 ? (
-                focusChapters.map((c) => (
-                  <span key={c.chapter} className="px-2 py-1 rounded bg-red-100 text-red-800 font-medium">
-                    Chapter {c.chapter}
-                  </span>
-                ))
-              ) : (
-                <span className="text-gray-500">None, well covered</span>
-              )}
-            </div>
+          <div className="max-w-7xl mx-auto px-6 py-4 space-y-1 text-sm text-gray-700 leading-relaxed">
+            {summaryLines.map((line, i) => (
+              <p key={i}>{line}</p>
+            ))}
           </div>
         </div>
       )}
