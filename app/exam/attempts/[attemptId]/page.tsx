@@ -143,6 +143,20 @@ export default function AttemptReviewPage() {
     .map(({ idx }) => idx);
   const prevIndex = [...visibleIndexes].reverse().find((idx) => idx < currentQIndex);
   const nextIndex = visibleIndexes.find((idx) => idx > currentQIndex);
+
+  // Chapter summary for this attempt: 80%+ = did well, below 80% = focus on
+  const chapterSummary = Object.values(
+    questions.reduce((acc: Record<number, { chapter: number; correct: number; total: number }>, q) => {
+      const entry = acc[q.chapterNumber] ?? (acc[q.chapterNumber] = { chapter: q.chapterNumber, correct: 0, total: 0 });
+      entry.total += 1;
+      if (q.isCorrect) entry.correct += 1;
+      return acc;
+    }, {})
+  )
+    .map((c) => ({ chapter: c.chapter, percentage: Math.round((c.correct / c.total) * 100) }))
+    .sort((a, b) => a.chapter - b.chapter);
+  const didWellChapters = chapterSummary.filter((c) => c.percentage >= 80);
+  const focusChapters = chapterSummary.filter((c) => c.percentage < 80);
   const timeTaken = Math.round(
     (new Date(attempt.submittedat).getTime() - new Date(attempt.startedat).getTime()) / 60000
   );
@@ -185,6 +199,38 @@ export default function AttemptReviewPage() {
           </div>
         </div>
       </div>
+
+      {/* Attempt summary by chapter */}
+      {chapterSummary.length > 0 && (
+        <div className="bg-white border-b border-gray-200">
+          <div className="max-w-7xl mx-auto px-6 py-3 flex flex-wrap items-center gap-x-8 gap-y-2 text-sm">
+            <div className="flex flex-wrap items-center gap-2">
+              <span className="text-gray-600 font-medium">Did well:</span>
+              {didWellChapters.length > 0 ? (
+                didWellChapters.map((c) => (
+                  <span key={c.chapter} className="px-2 py-1 rounded bg-green-100 text-green-800 font-medium">
+                    Chapter {c.chapter}
+                  </span>
+                ))
+              ) : (
+                <span className="text-gray-500">None yet</span>
+              )}
+            </div>
+            <div className="flex flex-wrap items-center gap-2">
+              <span className="text-gray-600 font-medium">Focus on:</span>
+              {focusChapters.length > 0 ? (
+                focusChapters.map((c) => (
+                  <span key={c.chapter} className="px-2 py-1 rounded bg-red-100 text-red-800 font-medium">
+                    Chapter {c.chapter}
+                  </span>
+                ))
+              ) : (
+                <span className="text-gray-500">None, well covered</span>
+              )}
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Main Content - Questions Review */}
       <div className="flex-1 overflow-hidden bg-white">
