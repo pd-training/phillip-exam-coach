@@ -27,7 +27,7 @@ export default function HelpPage() {
     <div className="min-h-screen bg-gray-50">
       <StudentNav />
 
-      <div className="bg-gradient-to-r from-blue-600 to-blue-700 text-white py-12 px-0">
+      <div className="bg-gradient-to-r from-blue-900 to-blue-800 text-white py-12 px-0">
         <div className="max-w-7xl mx-auto px-6">
           <h1 className="text-3xl font-bold">Help & Support</h1>
           <p className="text-blue-100 mt-2">Learn how to use Finance Ready</p>

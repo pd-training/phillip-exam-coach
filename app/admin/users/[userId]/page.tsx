@@ -142,7 +142,7 @@ export default function UserDetailPage() {
     <div style={{ minHeight: "100vh", backgroundColor: "#f9fafb" }}>
       {/* Hero Section */}
       <div style={{
-        background: "linear-gradient(to right, #0f172a, #1e3a8a)",
+        background: "linear-gradient(to right, #1e3a8a, #1e40af)",
         color: "white",
         padding: "24px 0",
         borderBottom: "1px solid #e5e7eb",

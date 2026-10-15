@@ -86,7 +86,7 @@ export default function AttemptsPage() {
     <div className="min-h-screen bg-gray-50">
       <AdminNav />
       {ToastView}
-      <div style={{ background: "linear-gradient(to right, #0f172a, #1e3a8a)", color: "white", padding: "48px 0" }}>
+      <div style={{ background: "linear-gradient(to right, #1e3a8a, #1e40af)", color: "white", padding: "48px 0" }}>
         <div className="max-w-7xl mx-auto px-6">
           <h1 className="text-4xl font-bold mb-2">Exam Attempts</h1>
           <p style={{ color: "#e0e7ff", margin: "0" }}>All student exam submissions</p>

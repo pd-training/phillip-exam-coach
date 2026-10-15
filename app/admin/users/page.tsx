@@ -166,7 +166,7 @@ export default function UserManagement() {
       <AdminNav />
 
       {/* Hero Section */}
-      <div style={{ background: "linear-gradient(to right, #0f172a, #1e3a8a)", color: "white", padding: "48px 0" }}>
+      <div style={{ background: "linear-gradient(to right, #1e3a8a, #1e40af)", color: "white", padding: "48px 0" }}>
         <div className="max-w-7xl mx-auto px-6">
           <h1 className="text-4xl font-bold mb-2">Users</h1>
           <p style={{ color: "#e0e7ff", margin: "0" }}>Manage advisors and students</p>
@@ -212,9 +212,6 @@ export default function UserManagement() {
                   <th style={{ padding: "16px", textAlign: "left", fontSize: "12px", fontWeight: "600", color: "#6b7280", textTransform: "uppercase" }}>
                     STATUS
                   </th>
-                  <th style={{ padding: "16px", textAlign: "left", fontSize: "12px", fontWeight: "600", color: "#6b7280", textTransform: "uppercase" }}>
-                    CREATED VIA
-                  </th>
                   <th style={{ padding: "16px", textAlign: "center", fontSize: "12px", fontWeight: "600", color: "#6b7280", textTransform: "uppercase" }}>
                     ACTION
                   </th>
@@ -223,13 +220,13 @@ export default function UserManagement() {
               <tbody>
                 {loading ? (
                   <tr>
-                    <td colSpan={6} style={{ padding: "40px", textAlign: "center", color: "#666" }}>
+                    <td colSpan={5} style={{ padding: "40px", textAlign: "center", color: "#666" }}>
                       Loading...
                     </td>
                   </tr>
                 ) : filteredUsers.length === 0 ? (
                   <tr>
-                    <td colSpan={6} style={{ padding: "40px", textAlign: "center", color: "#666" }}>
+                    <td colSpan={5} style={{ padding: "40px", textAlign: "center", color: "#666" }}>
                       No users found
                     </td>
                   </tr>
@@ -290,9 +287,6 @@ export default function UserManagement() {
                         >
                           {user.active ? "Active" : "Inactive"}
                         </span>
-                      </td>
-                      <td style={{ padding: "16px", fontSize: "14px", color: "#6b7280" }}>
-                        Admin created
                       </td>
                       <td style={{ padding: "16px", textAlign: "center" }}>
                         <button

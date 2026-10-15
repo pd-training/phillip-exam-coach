@@ -231,7 +231,7 @@ export default function StudentDashboard() {
       <StudentNav />
 
       {/* Hero Section */}
-      <div className="bg-gradient-to-r from-blue-600 to-blue-700 text-white py-12 px-0 border-b border-blue-800">
+      <div className="bg-gradient-to-r from-blue-900 to-blue-800 text-white py-12 px-0 border-b border-blue-900">
         <div className="max-w-7xl mx-auto px-6">
           <h1 className="text-4xl font-bold mb-2">Your Practice Dashboard</h1>
           <p className="text-blue-100">Track your progress and prepare for certification exams</p>

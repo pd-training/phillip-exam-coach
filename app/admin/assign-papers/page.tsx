@@ -163,7 +163,7 @@ export default function AssignPapersPage() {
     return (
       <div className="min-h-screen bg-gray-50">
         <AdminNav />
-        <div style={{ background: "linear-gradient(to right, #0f172a, #1e3a8a)", color: "white", padding: "48px 0" }}>
+        <div style={{ background: "linear-gradient(to right, #1e3a8a, #1e40af)", color: "white", padding: "48px 0" }}>
           <div className="max-w-7xl mx-auto px-6">
             <h1 className="text-3xl font-bold">Assign Papers to Students</h1>
           </div>
@@ -182,7 +182,7 @@ export default function AssignPapersPage() {
   return (
     <div className="min-h-screen bg-gray-50">
       <AdminNav />
-      <div style={{ background: "linear-gradient(to right, #0f172a, #1e3a8a)", color: "white", padding: "48px 0" }}>
+      <div style={{ background: "linear-gradient(to right, #1e3a8a, #1e40af)", color: "white", padding: "48px 0" }}>
         <div className="max-w-7xl mx-auto px-6">
           <h1 className="text-3xl font-bold">Assign Papers to Students</h1>
           <p style={{ color: "#e0e7ff", margin: "8px 0 0 0" }}>Manage paper access for individual students</p>

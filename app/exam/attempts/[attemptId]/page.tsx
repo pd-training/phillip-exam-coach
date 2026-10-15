@@ -143,7 +143,7 @@ export default function AttemptReviewPage() {
       <StudentNav />
 
       {/* Header */}
-      <div className="bg-gradient-to-r from-blue-600 to-blue-700 text-white py-8 px-0 border-b border-blue-800">
+      <div className="bg-gradient-to-r from-blue-900 to-blue-800 text-white py-8 px-0 border-b border-blue-900">
         <div className="max-w-7xl mx-auto px-6 flex justify-between items-start gap-6">
           <div className="flex-1">
             <h1 className="text-3xl font-bold mb-4">{attempt.paper_name} - Exam Review</h1>
