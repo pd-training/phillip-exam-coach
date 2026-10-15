@@ -135,6 +135,14 @@ export default function AttemptReviewPage() {
   }
 
   const currentQuestion = questions[currentQIndex];
+
+  // Prev/Next step through the same questions the navigator shows (respects "Incorrect only")
+  const visibleIndexes = questions
+    .map((q, idx) => ({ q, idx }))
+    .filter(({ q }) => !showIncorrectOnly || !q.isCorrect)
+    .map(({ idx }) => idx);
+  const prevIndex = [...visibleIndexes].reverse().find((idx) => idx < currentQIndex);
+  const nextIndex = visibleIndexes.find((idx) => idx > currentQIndex);
   const timeTaken = Math.round(
     (new Date(attempt.submittedat).getTime() - new Date(attempt.startedat).getTime()) / 60000
   );
@@ -251,6 +259,24 @@ export default function AttemptReviewPage() {
                     <p className="text-sm text-blue-800 leading-relaxed">{currentQuestion.explanation}</p>
                   </div>
                 )}
+
+                {/* Prev / Next */}
+                <div className="mt-10 grid grid-cols-2 gap-3">
+                  <button
+                    onClick={() => prevIndex !== undefined && setCurrentQIndex(prevIndex)}
+                    disabled={prevIndex === undefined}
+                    className="w-full px-6 py-3 bg-gray-100 hover:bg-gray-200 text-gray-700 font-medium rounded-lg transition disabled:opacity-40 disabled:cursor-not-allowed disabled:hover:bg-gray-100"
+                  >
+                    ← Previous
+                  </button>
+                  <button
+                    onClick={() => nextIndex !== undefined && setCurrentQIndex(nextIndex)}
+                    disabled={nextIndex === undefined}
+                    className="w-full px-6 py-3 bg-blue-900 hover:bg-blue-800 text-white font-semibold rounded-lg transition disabled:opacity-40 disabled:cursor-not-allowed disabled:hover:bg-blue-900"
+                  >
+                    Next →
+                  </button>
+                </div>
 
                 {/* CTAs */}
                 <div className="mt-12 pt-8 border-t border-gray-200">
