@@ -5,38 +5,46 @@ import BrandLockup from "../../../components/BrandLockup";
 
 export default function LoginPage() {
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-900 to-blue-800 flex flex-col">
-      <header className="w-full border-b border-blue-800/70">
+    <div className="min-h-screen relative overflow-hidden bg-gradient-to-br from-blue-950 via-blue-900 to-blue-800 flex flex-col">
+      {/* Soft light falling on the right side, matching the landing hero */}
+      <div
+        className="absolute -right-40 top-0 w-[32rem] h-[32rem] rounded-full bg-blue-400/20 blur-3xl pointer-events-none"
+        aria-hidden="true"
+      />
+
+      <header className="relative z-10 w-full bg-blue-900/95 backdrop-blur-sm border-b border-blue-800 shadow-sm">
         <div className="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between">
           <BrandLockup href="/" variant="light" />
-          <Link href="/" className="text-sm font-medium text-blue-100 hover:text-white transition">
+          <Link href="/" className="text-sm font-medium text-blue-200 hover:text-white transition">
             Back to home
           </Link>
         </div>
       </header>
 
-      <div className="flex-1 flex flex-col items-center justify-center px-4 py-12">
-      <Link href="/" className="flex flex-col items-center mb-8 group">
-        <span className="flex items-center justify-center w-14 h-14 rounded-xl bg-amber-400 text-blue-900 text-xl font-extrabold shadow-lg group-hover:scale-105 transition">
-          FR
-        </span>
-        <span className="mt-4 text-2xl font-bold text-white tracking-tight">FinanceReady</span>
-        <span className="mt-1 text-sm text-blue-200">CMFAS exam preparation for financial advisers</span>
-      </Link>
+      <main className="relative z-10 flex-1 flex items-center px-6 py-16">
+        <div className="max-w-6xl mx-auto w-full grid md:grid-cols-2 gap-12 md:gap-16 items-center">
+          <div className="text-white">
+            <h1 className="text-4xl md:text-5xl font-bold leading-tight mb-4">Welcome back</h1>
+            <p className="text-lg text-blue-100 leading-relaxed max-w-md mb-10">
+              Sign in to continue your CMFAS exam preparation. Your papers, answers and progress are waiting for you.
+            </p>
+            <div className="pt-6 border-t border-blue-800">
+              <p className="text-sm text-blue-200 mb-3">New to FinanceReady?</p>
+              <Link href="/#signup">
+                <button className="px-6 py-3 border-2 border-blue-400 text-amber-400 hover:bg-blue-400/10 rounded-lg font-semibold transition-colors duration-300">
+                  Start your exam preparation
+                </button>
+              </Link>
+            </div>
+          </div>
 
-      <div className="w-full max-w-sm bg-white rounded-2xl shadow-2xl p-8">
-        <Suspense fallback={<p className="text-center text-sm text-gray-600">Loading...</p>}>
-          <LoginForm />
-        </Suspense>
-      </div>
-
-      <p className="mt-6 text-sm text-blue-200">
-        New here?{" "}
-        <Link href="/#signup" className="font-semibold text-white underline underline-offset-4 hover:text-amber-300">
-          Create an account
-        </Link>
-      </p>
-      </div>
+          <div className="w-full max-w-md md:justify-self-end bg-white rounded-2xl shadow-xl ring-1 ring-gray-200 p-8">
+            <Suspense fallback={<p className="text-center text-sm text-gray-600">Loading...</p>}>
+              <LoginForm />
+            </Suspense>
+          </div>
+        </div>
+      </main>
     </div>
   );
 }
