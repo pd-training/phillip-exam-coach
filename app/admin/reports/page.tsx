@@ -2,6 +2,7 @@
 
 import { useSession } from "next-auth/react";
 import { redirect } from "next/navigation";
+import AdminNav from "@/components/AdminNav";
 
 export default function Reports() {
   const { data: session, status } = useSession();
@@ -20,6 +21,7 @@ export default function Reports() {
 
   return (
     <div className="min-h-screen bg-gray-50">
+      <AdminNav />
       <div className="max-w-7xl mx-auto px-6 py-12">
         <h1 className="text-4xl font-bold text-gray-900 mb-2">📊 Reports & Analytics</h1>
         <p className="text-gray-600 mb-8 text-sm">View exam statistics and performance data</p>
