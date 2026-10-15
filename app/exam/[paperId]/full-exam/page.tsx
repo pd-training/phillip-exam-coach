@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import { buildOptions, displayLabel, useOptionOrder } from "@/lib/option-order";
 import { useSession } from "next-auth/react";
 import { useRouter, useParams } from "next/navigation";
 import StudentNav from "@/components/StudentNav";
@@ -30,6 +31,7 @@ interface ExamPart {
 }
 
 export default function FullExamMode() {
+  const orderFor = useOptionOrder();
   const router = useRouter();
   const params = useParams();
   const { data: session, status } = useSession();
@@ -450,12 +452,7 @@ export default function FullExamMode() {
 
             {/* Answer Options */}
             <div style={{ marginTop: "25px" }}>
-              {[
-                { key: "A", text: currentQuestion.optionA },
-                { key: "B", text: currentQuestion.optionB },
-                { key: "C", text: currentQuestion.optionC },
-                { key: "D", text: currentQuestion.optionD },
-              ].map((option) => (
+              {buildOptions(currentQuestion, orderFor(currentQuestion.id)).map((option) => (
                 <label
                   key={option.key}
                   style={{
@@ -483,7 +480,7 @@ export default function FullExamMode() {
                     style={{ marginRight: "16px", marginTop: "2px", cursor: "pointer", flexShrink: 0 }}
                   />
                   <div style={{ flex: 1 }}>
-                    <span style={{ fontWeight: "700", fontSize: "17px", marginRight: "12px", color: "#1f2937" }}>{option.key}.</span>
+                    <span style={{ fontWeight: "700", fontSize: "17px", marginRight: "12px", color: "#1f2937" }}>{option.label}.</span>
                     <span style={{ fontSize: "16px", lineHeight: "1.6", color: "#374151" }}>{option.text}</span>
                   </div>
                 </label>

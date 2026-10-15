@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import { buildOptions, displayLabel, useOptionOrder } from "@/lib/option-order";
 import { useSession } from "next-auth/react";
 import { useRouter, useParams } from "next/navigation";
 import StudentNav from "@/components/StudentNav";
@@ -45,6 +46,7 @@ interface Feedback {
 }
 
 export default function PracticeChapterMode() {
+  const orderFor = useOptionOrder();
   const router = useRouter();
   const params = useParams();
   const { data: session, status } = useSession();
@@ -277,12 +279,7 @@ export default function PracticeChapterMode() {
 
           {/* Answer options */}
           <div className="space-y-3 mb-8">
-            {[
-              { key: "A", text: currentQuestion.optionA },
-              { key: "B", text: currentQuestion.optionB },
-              { key: "C", text: currentQuestion.optionC },
-              { key: "D", text: currentQuestion.optionD },
-            ].map((option) => (
+            {buildOptions(currentQuestion, orderFor(currentQuestion.id)).map((option) => (
               <label
                 key={option.key}
                 className={`flex items-center p-4 rounded-lg border-2 cursor-pointer transition duration-200 ${
@@ -301,7 +298,7 @@ export default function PracticeChapterMode() {
                   className="mr-4 w-4 h-4"
                 />
                 <div className="flex-1">
-                  <span className="font-medium text-gray-900 mr-3">{option.key}.</span>
+                  <span className="font-medium text-gray-900 mr-3">{option.label}.</span>
                   <span className="text-gray-700">{option.text}</span>
                 </div>
               </label>
@@ -371,7 +368,7 @@ export default function PracticeChapterMode() {
                     Correct answer
                   </p>
                   <p style={{ margin: "0", fontSize: "15px", color: "#1f2937" }}>
-                    <strong>{feedback.correctAnswer}.</strong> {
+                    <strong>{displayLabel(orderFor(currentQuestion.id), feedback.correctAnswer)}.</strong> {
                       feedback.correctAnswer === "A" ? feedback.optionA :
                       feedback.correctAnswer === "B" ? feedback.optionB :
                       feedback.correctAnswer === "C" ? feedback.optionC :
