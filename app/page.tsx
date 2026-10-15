@@ -33,6 +33,14 @@ export default function LandingPage() {
     }
   }, [session, router]);
 
+  // The page renders nothing until mounted, so the browser's own #hash scroll
+  // happens too early. Scroll to the requested section once it exists.
+  useEffect(() => {
+    if (!mounted || !window.location.hash) return;
+    const target = document.getElementById(window.location.hash.slice(1));
+    if (target) target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  }, [mounted]);
+
   if (!mounted) return null;
 
   return (
