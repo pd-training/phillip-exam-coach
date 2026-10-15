@@ -3,7 +3,9 @@
 import { signIn } from "next-auth/react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useState } from "react";
-import Link from "next/link";
+
+const inputClass =
+  "w-full px-3 py-2.5 border border-gray-300 rounded-lg text-sm text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-900/20 focus:border-blue-900";
 
 export function LoginForm() {
   const router = useRouter();
@@ -42,201 +44,63 @@ export function LoginForm() {
   };
 
   return (
-    <div>
-        {/* Success Message */}
-        {successMessage && (
-          <div style={{
-            backgroundColor: "#d1fae5",
-            border: "1px solid #6ee7b7",
-            color: "#065f46",
-            padding: "12px 16px",
-            borderRadius: "8px",
-            marginBottom: "20px",
-            fontSize: "14px",
-            fontWeight: "500",
-          }}>
-            {successMessage}
-          </div>
-        )}
+    <form onSubmit={handleSubmit} className="space-y-5">
+      <div>
+        <h1 className="text-xl font-semibold text-gray-900">Sign in</h1>
+        <p className="mt-1 text-sm text-gray-600">Use the email you registered with.</p>
+      </div>
 
-        {/* Error Message */}
-        {error && (
-          <div style={{
-            backgroundColor: "#fee2e2",
-            border: "1px solid #fecaca",
-            color: "#991b1b",
-            padding: "12px 16px",
-            borderRadius: "8px",
-            marginBottom: "20px",
-            fontSize: "14px",
-            fontWeight: "500",
-          }}>
-            {error}
-          </div>
-        )}
-
-        {/* Login Form */}
-        <form onSubmit={handleSubmit} style={{
-          backgroundColor: "white",
-          padding: "32px",
-          borderRadius: "12px",
-          border: "1px solid #e5e7eb",
-          boxShadow: "0 1px 3px rgba(0, 0, 0, 0.1)",
-        }}>
-          <h3 style={{
-            fontSize: "20px",
-            fontWeight: "600",
-            color: "#1f2937",
-            margin: "0 0 24px 0",
-          }}>
-            Sign In
-          </h3>
-
-          {/* Email Input */}
-          <div style={{ marginBottom: "20px" }}>
-            <label style={{
-              display: "block",
-              marginBottom: "8px",
-              fontSize: "14px",
-              fontWeight: "600",
-              color: "#1f2937",
-            }}>
-              Email Address
-            </label>
-            <input
-              type="email"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              placeholder="you@example.com"
-              style={{
-                width: "100%",
-                padding: "11px 13px",
-                border: "1px solid #d1d5db",
-                borderRadius: "8px",
-                fontSize: "14px",
-                fontFamily: "inherit",
-                boxSizing: "border-box",
-                transition: "border-color 0.2s",
-              }}
-              onFocus={(e) => {
-                e.currentTarget.style.borderColor = "#f59e0b";
-                e.currentTarget.style.outline = "2px solid rgba(245, 158, 11, 0.1)";
-              }}
-              onBlur={(e) => {
-                e.currentTarget.style.borderColor = "#d1d5db";
-                e.currentTarget.style.outline = "none";
-              }}
-            />
-          </div>
-
-          {/* Password Input */}
-          <div style={{ marginBottom: "24px" }}>
-            <label style={{
-              display: "block",
-              marginBottom: "8px",
-              fontSize: "14px",
-              fontWeight: "600",
-              color: "#1f2937",
-            }}>
-              Password
-            </label>
-            <input
-              type="password"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              placeholder="••••••••"
-              style={{
-                width: "100%",
-                padding: "11px 13px",
-                border: "1px solid #d1d5db",
-                borderRadius: "8px",
-                fontSize: "14px",
-                fontFamily: "inherit",
-                boxSizing: "border-box",
-                transition: "border-color 0.2s",
-              }}
-              onFocus={(e) => {
-                e.currentTarget.style.borderColor = "#f59e0b";
-                e.currentTarget.style.outline = "2px solid rgba(245, 158, 11, 0.1)";
-              }}
-              onBlur={(e) => {
-                e.currentTarget.style.borderColor = "#d1d5db";
-                e.currentTarget.style.outline = "none";
-              }}
-            />
-          </div>
-
-          {/* Sign In Button */}
-          <button
-            type="submit"
-            disabled={loading}
-            style={{
-              width: "100%",
-              padding: "12px 16px",
-              backgroundColor: loading ? "#9ca3af" : "#f59e0b",
-              color: loading ? "white" : "#1f2937",
-              border: "none",
-              borderRadius: "8px",
-              fontSize: "16px",
-              fontWeight: "600",
-              cursor: loading ? "not-allowed" : "pointer",
-              transition: "background-color 0.2s",
-            }}
-            onMouseEnter={(e) => {
-              if (!loading) (e.currentTarget as HTMLButtonElement).style.backgroundColor = "#d97706";
-            }}
-            onMouseLeave={(e) => {
-              if (!loading) (e.currentTarget as HTMLButtonElement).style.backgroundColor = "#f59e0b";
-            }}
-          >
-            {loading ? "Signing in..." : "Sign In"}
-          </button>
-        </form>
-
-        {/* Signup Link */}
-        <div style={{
-          textAlign: "center",
-          marginTop: "24px",
-          color: "#6b7280",
-          fontSize: "14px",
-        }}>
-          Don't have an account?{" "}
-          <Link href="/signup" style={{
-            color: "#f59e0b",
-            textDecoration: "none",
-            fontWeight: "600",
-            cursor: "pointer",
-          }}>
-            Create one here
-          </Link>
+      {successMessage && (
+        <div className="text-sm text-green-800 bg-green-50 border border-green-200 rounded-lg px-3 py-2">
+          {successMessage}
         </div>
+      )}
 
-        {/* Back to Home */}
-        <div style={{
-          textAlign: "center",
-          marginTop: "20px",
-        }}>
-          <div style={{
-            color: "#6b7280",
-            fontSize: "14px",
-            transition: "color 0.2s",
-            cursor: "pointer",
-          }}
-            onMouseEnter={(e) => {
-              e.currentTarget.style.color = "#f59e0b";
-            }}
-            onMouseLeave={(e) => {
-              e.currentTarget.style.color = "#6b7280";
-            }}
-          >
-            <Link href="/" style={{
-              color: "inherit",
-              textDecoration: "none",
-            }}>
-              ← Back to Home
-            </Link>
-          </div>
+      {error && (
+        <div role="alert" className="text-sm text-red-800 bg-red-50 border border-red-200 rounded-lg px-3 py-2">
+          {error}
         </div>
-    </div>
+      )}
+
+      <div>
+        <label htmlFor="email" className="block mb-1.5 text-sm font-medium text-gray-700">
+          Email
+        </label>
+        <input
+          id="email"
+          type="email"
+          required
+          autoComplete="email"
+          value={email}
+          onChange={(e) => setEmail(e.target.value)}
+          placeholder="you@example.com"
+          className={inputClass}
+        />
+      </div>
+
+      <div>
+        <label htmlFor="password" className="block mb-1.5 text-sm font-medium text-gray-700">
+          Password
+        </label>
+        <input
+          id="password"
+          type="password"
+          required
+          autoComplete="current-password"
+          value={password}
+          onChange={(e) => setPassword(e.target.value)}
+          placeholder="Password"
+          className={inputClass}
+        />
+      </div>
+
+      <button
+        type="submit"
+        disabled={loading}
+        className="w-full py-2.5 bg-blue-900 hover:bg-blue-800 text-white text-sm font-semibold rounded-lg transition disabled:bg-gray-300 disabled:cursor-not-allowed"
+      >
+        {loading ? "Signing in..." : "Sign in"}
+      </button>
+    </form>
   );
 }
