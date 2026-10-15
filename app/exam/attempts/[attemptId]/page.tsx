@@ -276,7 +276,7 @@ export default function AttemptReviewPage() {
                     ) : (
                       <button
                         onClick={() => setCurrentQIndex(0)}
-                        className="w-full px-6 py-3 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-lg transition"
+                        className="w-full px-6 py-3 bg-blue-900 hover:bg-blue-800 text-white font-semibold rounded-lg transition"
                       >
                         🔄 Practice Again
                       </button>

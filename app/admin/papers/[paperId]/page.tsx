@@ -622,7 +622,7 @@ export default function PaperDetailPage() {
               </div>
               <button
                 onClick={() => setShowAddPartModal(true)}
-                className="mb-6 px-6 py-2 bg-blue-600 text-white font-semibold rounded-lg hover:bg-blue-700 transition"
+                className="mb-6 px-6 py-2 bg-blue-900 text-white font-semibold rounded-lg hover:bg-blue-800 transition"
               >
                 + Add Exam Part
               </button>
@@ -647,7 +647,7 @@ export default function PaperDetailPage() {
                 <button
                   onClick={handleSaveSettings}
                   disabled={submitting}
-                  className="px-6 py-2 bg-blue-600 text-white font-semibold rounded-lg hover:bg-blue-700 disabled:opacity-50 transition"
+                  className="px-6 py-2 bg-blue-900 text-white font-semibold rounded-lg hover:bg-blue-800 disabled:opacity-50 transition"
                 >
                   Save Changes
                 </button>
@@ -749,7 +749,7 @@ export default function PaperDetailPage() {
               <button
                 onClick={handleSaveChapters}
                 disabled={submitting || Object.keys(editedChapters).length === 0}
-                className="px-6 py-2 bg-blue-600 text-white font-semibold rounded-lg hover:bg-blue-700 disabled:opacity-50 transition"
+                className="px-6 py-2 bg-blue-900 text-white font-semibold rounded-lg hover:bg-blue-800 disabled:opacity-50 transition"
               >
                 {submitting ? "Saving..." : "Save Changes"}
               </button>
@@ -867,7 +867,7 @@ export default function PaperDetailPage() {
               <button
                 onClick={handleUploadQuestions}
                 disabled={!uploadFile || submitting}
-                className="px-4 py-2 bg-blue-600 text-white font-medium rounded-lg hover:bg-blue-700 disabled:opacity-50"
+                className="px-4 py-2 bg-blue-900 text-white font-medium rounded-lg hover:bg-blue-800 disabled:opacity-50"
               >
                 {submitting ? "Uploading..." : "Upload"}
               </button>
@@ -979,7 +979,7 @@ export default function PaperDetailPage() {
               <button
                 onClick={handleUpdateQuestion}
                 disabled={submitting}
-                className="px-4 py-2 bg-blue-600 text-white font-medium rounded-lg hover:bg-blue-700 disabled:opacity-50"
+                className="px-4 py-2 bg-blue-900 text-white font-medium rounded-lg hover:bg-blue-800 disabled:opacity-50"
               >
                 {submitting ? "Saving..." : "Save Changes"}
               </button>
@@ -1071,7 +1071,7 @@ export default function PaperDetailPage() {
               <button
                 onClick={handleAddPart}
                 disabled={submitting || !partName || !partQuestionCount}
-                className="px-4 py-2 bg-blue-600 text-white font-medium rounded-lg hover:bg-blue-700 disabled:opacity-50"
+                className="px-4 py-2 bg-blue-900 text-white font-medium rounded-lg hover:bg-blue-800 disabled:opacity-50"
               >
                 {submitting ? "Adding..." : "Add Part"}
               </button>
@@ -1163,7 +1163,7 @@ export default function PaperDetailPage() {
               <button
                 onClick={handleUpdatePart}
                 disabled={submitting || !editPartName || !editPartQuestionCount}
-                className="px-4 py-2 bg-blue-600 text-white font-medium rounded-lg hover:bg-blue-700 disabled:opacity-50"
+                className="px-4 py-2 bg-blue-900 text-white font-medium rounded-lg hover:bg-blue-800 disabled:opacity-50"
               >
                 {submitting ? "Saving..." : "Save Changes"}
               </button>

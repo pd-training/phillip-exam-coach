@@ -176,7 +176,7 @@ export default function QuickQuizMode() {
               </button>
               <button
                 onClick={handleRetryQuiz}
-                className="flex-1 px-6 py-3 bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-semibold transition duration-200"
+                className="flex-1 px-6 py-3 bg-blue-900 hover:bg-blue-800 text-white rounded-lg font-semibold transition duration-200"
               >
                 Attempt Another Quiz
               </button>
@@ -376,7 +376,7 @@ export default function QuickQuizMode() {
                   style={{
                     width: "100%",
                     padding: "12px",
-                    backgroundColor: "#2563eb",
+                    backgroundColor: "#1e3a8a",
                     color: "white",
                     border: "none",
                     borderRadius: "6px",
@@ -386,10 +386,10 @@ export default function QuickQuizMode() {
                     transition: "background-color 0.2s",
                   }}
                   onMouseEnter={(e) => {
-                    (e.target as HTMLButtonElement).style.backgroundColor = "#1d4ed8";
+                    (e.target as HTMLButtonElement).style.backgroundColor = "#1e40af";
                   }}
                   onMouseLeave={(e) => {
-                    (e.target as HTMLButtonElement).style.backgroundColor = "#2563eb";
+                    (e.target as HTMLButtonElement).style.backgroundColor = "#1e3a8a";
                   }}
                 >
                   {currentQIndex < questions.length - 1 ? "Next Question" : "See Results"}
@@ -425,7 +425,7 @@ export default function QuickQuizMode() {
                   flex: 1,
                   padding: "12px",
                   backgroundColor:
-                    selectedAnswer ? "#2563eb" : "#9ca3af",
+                    selectedAnswer ? "#1e3a8a" : "#9ca3af",
                   color: "white",
                   border: "none",
                   borderRadius: "6px",

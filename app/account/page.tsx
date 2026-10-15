@@ -284,7 +284,7 @@ export default function AccountPage() {
               style={{
                 width: "100%",
                 padding: "12px 16px",
-                backgroundColor: profileLoading ? "#9ca3af" : "#2563eb",
+                backgroundColor: profileLoading ? "#9ca3af" : "#1e3a8a",
                 color: "white",
                 border: "none",
                 borderRadius: "6px",
@@ -294,10 +294,10 @@ export default function AccountPage() {
                 transition: "background-color 0.2s",
               }}
               onMouseEnter={(e) => {
-                if (!profileLoading) (e.currentTarget as HTMLButtonElement).style.backgroundColor = "#1d4ed8";
+                if (!profileLoading) (e.currentTarget as HTMLButtonElement).style.backgroundColor = "#1e40af";
               }}
               onMouseLeave={(e) => {
-                if (!profileLoading) (e.currentTarget as HTMLButtonElement).style.backgroundColor = "#2563eb";
+                if (!profileLoading) (e.currentTarget as HTMLButtonElement).style.backgroundColor = "#1e3a8a";
               }}
             >
               {profileLoading ? "Saving..." : "Save profile"}
@@ -418,7 +418,7 @@ export default function AccountPage() {
               style={{
                 width: "100%",
                 padding: "12px 16px",
-                backgroundColor: passwordLoading ? "#9ca3af" : "#2563eb",
+                backgroundColor: passwordLoading ? "#9ca3af" : "#1e3a8a",
                 color: "white",
                 border: "none",
                 borderRadius: "6px",
@@ -428,10 +428,10 @@ export default function AccountPage() {
                 transition: "background-color 0.2s",
               }}
               onMouseEnter={(e) => {
-                if (!passwordLoading) (e.currentTarget as HTMLButtonElement).style.backgroundColor = "#1d4ed8";
+                if (!passwordLoading) (e.currentTarget as HTMLButtonElement).style.backgroundColor = "#1e40af";
               }}
               onMouseLeave={(e) => {
-                if (!passwordLoading) (e.currentTarget as HTMLButtonElement).style.backgroundColor = "#2563eb";
+                if (!passwordLoading) (e.currentTarget as HTMLButtonElement).style.backgroundColor = "#1e3a8a";
               }}
             >
               {passwordLoading ? "Updating..." : "Update password"}

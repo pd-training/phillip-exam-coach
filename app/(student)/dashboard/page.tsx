@@ -256,7 +256,7 @@ export default function StudentDashboard() {
                   <p><span className="font-semibold">📊 Step 4:</span> Track your progress and focus on weak areas</p>
                 </div>
                 <Link href="/explore">
-                  <button className="px-6 py-3 bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-semibold transition">
+                  <button className="px-6 py-3 bg-blue-900 hover:bg-blue-800 text-white rounded-lg font-semibold transition">
                     Browse Papers & Request Access →
                   </button>
                 </Link>
@@ -308,14 +308,14 @@ export default function StudentDashboard() {
                           </div>
                         </div>
                         <Link href={`/exam/${paper.paperId}`}>
-                          <button className="w-full px-3 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-medium text-sm transition">
+                          <button className="w-full px-3 py-2 bg-blue-900 hover:bg-blue-800 text-white rounded-lg font-medium text-sm transition">
                             Practice Again →
                           </button>
                         </Link>
                       </>
                     ) : (
                       <Link href={`/exam/${paper.paperId}`}>
-                        <button className="w-full px-3 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-medium text-sm transition">
+                        <button className="w-full px-3 py-2 bg-blue-900 hover:bg-blue-800 text-white rounded-lg font-medium text-sm transition">
                           Start →
                         </button>
                       </Link>
@@ -439,7 +439,7 @@ export default function StudentDashboard() {
                           </div>
                         </button>
                         <Link href={`/exam/${paperId}`}>
-                          <button className="w-full mt-3 px-2 py-1.5 bg-blue-600 hover:bg-blue-700 text-white rounded text-xs font-semibold transition">
+                          <button className="w-full mt-3 px-2 py-1.5 bg-blue-900 hover:bg-blue-800 text-white rounded text-xs font-semibold transition">
                             Practice Again
                           </button>
                         </Link>
@@ -574,7 +574,7 @@ export default function StudentDashboard() {
                               handleRequestPaper(paper.id, paper.title)
                             }
                             disabled={submitting === paper.id}
-                            className="w-full px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 font-medium text-sm disabled:bg-gray-300"
+                            className="w-full px-4 py-2 bg-blue-900 text-white rounded-lg hover:bg-blue-800 font-medium text-sm disabled:bg-gray-300"
                           >
                             {submitting === paper.id ? 'Requesting...' : 'Request Access'}
                           </button>
@@ -703,7 +703,7 @@ export default function StudentDashboard() {
                           </button>
                         </Link>
                         <Link href={`/exam/${attempt.paperid}`}>
-                          <button className="px-3 py-1.5 text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 rounded-lg transition">
+                          <button className="px-3 py-1.5 text-sm font-medium text-white bg-blue-900 hover:bg-blue-800 rounded-lg transition">
                             Again
                           </button>
                         </Link>

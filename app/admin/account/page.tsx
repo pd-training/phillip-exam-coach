@@ -191,7 +191,7 @@ export default function AdminAccountPage() {
               <button
                 type="submit"
                 disabled={updateLoading}
-                className="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 font-medium disabled:bg-gray-300"
+                className="px-6 py-2 bg-blue-900 text-white rounded-lg hover:bg-blue-800 font-medium disabled:bg-gray-300"
               >
                 {updateLoading ? 'Saving...' : 'Save Changes'}
               </button>
@@ -258,7 +258,7 @@ export default function AdminAccountPage() {
               <button
                 type="submit"
                 disabled={passwordLoading}
-                className="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 font-medium disabled:bg-gray-300"
+                className="px-6 py-2 bg-blue-900 text-white rounded-lg hover:bg-blue-800 font-medium disabled:bg-gray-300"
               >
                 {passwordLoading ? 'Updating...' : 'Update Password'}
               </button>

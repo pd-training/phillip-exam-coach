@@ -262,7 +262,7 @@ export default function BrowsePapersPage() {
                             handleRequestPaper(paper.id, paper.title)
                           }
                           disabled={submitting === paper.id}
-                          className="px-4 py-2 bg-blue-600 text-blue-900 rounded-lg hover:bg-blue-700 font-medium whitespace-nowrap disabled:bg-gray-300"
+                          className="px-4 py-2 bg-blue-900 text-blue-900 rounded-lg hover:bg-blue-800 font-medium whitespace-nowrap disabled:bg-gray-300"
                         >
                           {submitting === paper.id ? 'Requesting...' : 'Request'}
                         </button>

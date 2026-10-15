@@ -192,7 +192,7 @@ export default function PracticeChapterMode() {
                   className="w-full bg-gray-50 rounded-lg px-6 py-6 border border-gray-200 hover:border-blue-400 hover:bg-blue-50 transition duration-200 text-left flex items-center justify-between group"
                 >
                   <div className="flex items-center gap-4 flex-1">
-                    <div className="w-12 h-12 bg-blue-600 text-white rounded-lg flex items-center justify-center group-hover:bg-blue-700 transition duration-200 font-semibold text-lg">
+                    <div className="w-12 h-12 bg-blue-900 text-white rounded-lg flex items-center justify-center group-hover:bg-blue-800 transition duration-200 font-semibold text-lg">
                       {ch.number}
                     </div>
                     <div className="flex-1">
@@ -389,7 +389,7 @@ export default function PracticeChapterMode() {
                   style={{
                     width: "100%",
                     padding: "12px",
-                    backgroundColor: "#2563eb",
+                    backgroundColor: "#1e3a8a",
                     color: "white",
                     border: "none",
                     borderRadius: "6px",
@@ -399,10 +399,10 @@ export default function PracticeChapterMode() {
                     transition: "background-color 0.2s",
                   }}
                   onMouseEnter={(e) => {
-                    (e.target as HTMLButtonElement).style.backgroundColor = "#1d4ed8";
+                    (e.target as HTMLButtonElement).style.backgroundColor = "#1e40af";
                   }}
                   onMouseLeave={(e) => {
-                    (e.target as HTMLButtonElement).style.backgroundColor = "#2563eb";
+                    (e.target as HTMLButtonElement).style.backgroundColor = "#1e3a8a";
                   }}
                 >
                   {currentQIndex < questions.length - 1 ? "Next Question" : "Back to Chapters"}
@@ -438,7 +438,7 @@ export default function PracticeChapterMode() {
                   flex: 1,
                   padding: "12px",
                   backgroundColor:
-                    selectedAnswer ? "#2563eb" : "#9ca3af",
+                    selectedAnswer ? "#1e3a8a" : "#9ca3af",
                   color: "white",
                   border: "none",
                   borderRadius: "6px",

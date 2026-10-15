@@ -336,7 +336,7 @@ export default function FullExamMode() {
           style={{
             marginTop: "20px",
             padding: "10px 20px",
-            backgroundColor: "#2563eb",
+            backgroundColor: "#1e3a8a",
             color: "white",
             border: "none",
             borderRadius: "6px",
@@ -672,7 +672,7 @@ export default function FullExamMode() {
               disabled={submitting}
               style={{
                 padding: "12px",
-                backgroundColor: submitting ? "#9ca3af" : "#2563eb",
+                backgroundColor: submitting ? "#9ca3af" : "#1e3a8a",
                 color: "white",
                 border: "none",
                 borderRadius: "6px",
@@ -768,7 +768,7 @@ export default function FullExamMode() {
                 style={{
                   flex: 1,
                   padding: "12px",
-                  backgroundColor: submitting ? "#9ca3af" : "#2563eb",
+                  backgroundColor: submitting ? "#9ca3af" : "#1e3a8a",
                   color: "white",
                   border: "none",
                   borderRadius: "6px",
@@ -777,8 +777,8 @@ export default function FullExamMode() {
                   fontSize: "14px",
                   transition: "background-color 0.2s",
                 }}
-                onMouseEnter={(e) => !submitting && (e.currentTarget.style.backgroundColor = "#1d4ed8")}
-                onMouseLeave={(e) => !submitting && (e.currentTarget.style.backgroundColor = "#2563eb")}
+                onMouseEnter={(e) => !submitting && (e.currentTarget.style.backgroundColor = "#1e40af")}
+                onMouseLeave={(e) => !submitting && (e.currentTarget.style.backgroundColor = "#1e3a8a")}
               >
                 {submitting ? "Submitting..." : "Submit Anyway"}
               </button>

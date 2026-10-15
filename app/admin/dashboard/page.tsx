@@ -258,7 +258,7 @@ export default function AdminDashboard() {
                           </td>
                           <td className="px-6 py-4 text-sm">
                             <Link href={`/admin/attempts/${attempt.id}`}>
-                              <button className="px-3 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg text-xs font-medium transition">
+                              <button className="px-3 py-2 bg-blue-900 hover:bg-blue-800 text-white rounded-lg text-xs font-medium transition">
                                 View Answers
                               </button>
                             </Link>

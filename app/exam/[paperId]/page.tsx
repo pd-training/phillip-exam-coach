@@ -140,7 +140,7 @@ export default function PracticePage() {
               <p className="text-gray-600">Paper not found</p>
             )}
             <Link href="/dashboard">
-              <button className="mt-4 px-6 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-medium transition duration-200">
+              <button className="mt-4 px-6 py-2 bg-blue-900 hover:bg-blue-800 text-white rounded-lg font-medium transition duration-200">
                 Back to Dashboard
               </button>
             </Link>

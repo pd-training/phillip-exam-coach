@@ -285,7 +285,7 @@ export default function AssignPapersPage() {
                               disabled={submitting}
                               className="px-3 py-1 bg-blue-600 text-white text-xs rounded disabled:opacity-50 transition"
                               style={{
-                                backgroundColor: submitting ? "#d1d5db" : "#2563eb",
+                                backgroundColor: submitting ? "#d1d5db" : "#1e3a8a",
                                 color: submitting ? "#6b7280" : "#1e3a8a",
                               }}
                               onMouseEnter={(e) => {

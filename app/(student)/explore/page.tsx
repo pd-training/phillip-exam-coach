@@ -278,7 +278,7 @@ export default function ExplorePage() {
               onClick={() => setFilterStatus('all')}
               className={`px-4 py-2 rounded-lg font-medium transition ${
                 filterStatus === 'all'
-                  ? 'bg-blue-600 text-white'
+                  ? 'bg-blue-900 text-white'
                   : 'bg-white border border-gray-300 text-gray-700 hover:border-gray-400'
               }`}
             >
@@ -288,7 +288,7 @@ export default function ExplorePage() {
               onClick={() => setFilterStatus('owned')}
               className={`px-4 py-2 rounded-lg font-medium transition ${
                 filterStatus === 'owned'
-                  ? 'bg-blue-600 text-white'
+                  ? 'bg-blue-900 text-white'
                   : 'bg-white border border-gray-300 text-gray-700 hover:border-gray-400'
               }`}
             >
@@ -298,7 +298,7 @@ export default function ExplorePage() {
               onClick={() => setFilterStatus('available')}
               className={`px-4 py-2 rounded-lg font-medium transition ${
                 filterStatus === 'available'
-                  ? 'bg-blue-600 text-white'
+                  ? 'bg-blue-900 text-white'
                   : 'bg-white border border-gray-300 text-gray-700 hover:border-gray-400'
               }`}
             >
@@ -308,7 +308,7 @@ export default function ExplorePage() {
               onClick={() => setFilterStatus('pending')}
               className={`px-4 py-2 rounded-lg font-medium transition ${
                 filterStatus === 'pending'
-                  ? 'bg-blue-600 text-white'
+                  ? 'bg-blue-900 text-white'
                   : 'bg-white border border-gray-300 text-gray-700 hover:border-gray-400'
               }`}
             >
@@ -376,7 +376,7 @@ export default function ExplorePage() {
                         )}
                       </div>
                       <Link href={`/exam/${paper.id}`}>
-                        <button className="w-full px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-medium transition">
+                        <button className="w-full px-4 py-2 bg-blue-900 hover:bg-blue-800 text-white rounded-lg font-medium transition">
                           Practice →
                         </button>
                       </Link>
@@ -523,7 +523,7 @@ export default function ExplorePage() {
                         Ready to use! 🎉
                       </p>
                       <Link href={`/exam/${paper.id}`}>
-                        <button className="w-full px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-medium transition">
+                        <button className="w-full px-4 py-2 bg-blue-900 hover:bg-blue-800 text-white rounded-lg font-medium transition">
                           Start Practicing →
                         </button>
                       </Link>
@@ -600,7 +600,7 @@ export default function ExplorePage() {
                           handleRequestPaper(paper.id, paper.title)
                         }
                         disabled={submitting === paper.id}
-                        className="w-full px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-medium transition disabled:bg-gray-300"
+                        className="w-full px-4 py-2 bg-blue-900 hover:bg-blue-800 text-white rounded-lg font-medium transition disabled:bg-gray-300"
                       >
                         {submitting === paper.id
                           ? 'Requesting...'

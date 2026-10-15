@@ -237,7 +237,7 @@ export default function AllAttemptsPage() {
                         <span className="text-lg font-bold text-red-700">{c.accuracy}%</span>
                         <Link
                           href={`/exam/${c.paperId}/practice-chapter/${c.chapterNumber}`}
-                          className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white text-sm font-semibold rounded-lg transition"
+                          className="px-4 py-2 bg-blue-900 hover:bg-blue-800 text-white text-sm font-semibold rounded-lg transition"
                         >
                           Practise chapter
                         </Link>
