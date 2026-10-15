@@ -484,7 +484,6 @@ export default function UserDetailPage() {
                 <thead>
                   <tr style={{ borderBottom: "2px solid #e5e7eb" }}>
                     <th style={{ textAlign: "left", padding: "8px 0", color: "#6b7280", fontWeight: "600" }}>PAPER</th>
-                    <th style={{ textAlign: "left", padding: "8px 0", color: "#6b7280", fontWeight: "600" }}>STATUS</th>
                     <th style={{ textAlign: "left", padding: "8px 0", color: "#6b7280", fontWeight: "600" }}>SCORE</th>
                     <th style={{ textAlign: "left", padding: "8px 0", color: "#6b7280", fontWeight: "600" }}>RESULT</th>
                     <th style={{ textAlign: "left", padding: "8px 0", color: "#6b7280", fontWeight: "600" }}>TIME TAKEN</th>
@@ -496,7 +495,6 @@ export default function UserDetailPage() {
                   {attempts.map((att) => (
                     <tr key={att.id} style={{ borderBottom: "1px solid #e5e7eb" }}>
                       <td style={{ padding: "8px 0", color: "#1f2937", fontWeight: "500" }}>{att.paperTitle}</td>
-                      <td style={{ padding: "8px 0", color: "#6b7280", fontSize: "12px" }}>{att.status}</td>
                       <td style={{ padding: "8px 0", color: "#1f2937" }}>{att.score ? `${att.score}%` : "—"}</td>
                       <td style={{ padding: "8px 0" }}>
                         {att.result ? (
