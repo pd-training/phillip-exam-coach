@@ -30,11 +30,20 @@ export async function GET() {
 
 export async function POST(req: Request) {
   try {
-    const { name, email, password, role, paperId } = await req.json();
+    const { name, email, password, role, paperId, phone } = await req.json();
 
     if (!name || !email || !password) {
       return Response.json(
         { success: false, error: "Name, email, and password are required" },
+        { status: 400 }
+      );
+    }
+
+    // Singapore mobile numbers: 8 digits starting with 8 or 9, optionally prefixed with +65
+    const cleanPhone = typeof phone === "string" ? phone.replace(/[\s-]/g, "") : "";
+    if (!/^(\+65)?[89]\d{7}$/.test(cleanPhone)) {
+      return Response.json(
+        { success: false, error: "Please enter a valid Singapore mobile number" },
         { status: 400 }
       );
     }
@@ -66,6 +75,18 @@ export async function POST(req: Request) {
     `;
 
     const userId = result?.[0]?.id;
+
+    // Store the mobile number. Best effort: if the phone column has not been added yet
+    // (run /api/admin/add-user-phone-column once), account creation still succeeds.
+    if (userId) {
+      try {
+        await prisma.$queryRaw`
+          UPDATE "User" SET phone = ${cleanPhone} WHERE id = ${userId}
+        `;
+      } catch (phoneError: any) {
+        console.error("Error saving phone number:", phoneError?.message || phoneError);
+      }
+    }
 
     // If paperId provided, auto-approve paper assignment for student
     let paperAssignmentSuccess = false;

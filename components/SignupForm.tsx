@@ -14,6 +14,7 @@ export default function SignupForm() {
   const [formData, setFormData] = useState({
     name: "",
     email: "",
+    phone: "",
     password: "",
     confirmPassword: "",
   });
@@ -65,6 +66,13 @@ export default function SignupForm() {
       return;
     }
 
+    const phoneDigits = formData.phone.replace(/[\s-]/g, "");
+    if (!/^(\+65)?[89]\d{7}$/.test(phoneDigits)) {
+      setError("Please enter a valid Singapore mobile number, for example 9123 4567");
+      setLoading(false);
+      return;
+    }
+
     if (!formData.password.trim()) {
       setError("Password is required");
       setLoading(false);
@@ -93,6 +101,7 @@ export default function SignupForm() {
       const payloadData = {
         name: formData.name,
         email: formData.email,
+        phone: phoneDigits,
         password: formData.password,
         role: "STUDENT",
         paperId: selectedPaper,
@@ -166,6 +175,21 @@ export default function SignupForm() {
               value={formData.email}
               onChange={handleChange}
               placeholder="you@example.com"
+              className={inputClass}
+            />
+          </div>
+
+          <div>
+            <label htmlFor="phone" className="block mb-1.5 text-sm font-medium text-gray-700">Mobile number</label>
+            <input
+              id="phone"
+              type="tel"
+              name="phone"
+              inputMode="tel"
+              autoComplete="tel"
+              value={formData.phone}
+              onChange={handleChange}
+              placeholder="9123 4567"
               className={inputClass}
             />
           </div>
