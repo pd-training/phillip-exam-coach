@@ -47,6 +47,9 @@ export default function UserDetailPage() {
   const [papers, setPapers] = useState<AssignedPaper[]>([]);
   const [attempts, setAttempts] = useState<Attempt[]>([]);
   const [message, setMessage] = useState("");
+  const [allPapers, setAllPapers] = useState<{ id: string; title: string }[]>([]);
+  const [paperMessage, setPaperMessage] = useState<{ type: "success" | "error"; text: string } | null>(null);
+  const [paperBusy, setPaperBusy] = useState(false);
 
   // Auth & redirect
   useEffect(() => {
@@ -71,12 +74,8 @@ export default function UserDetailPage() {
           setIsAdmin(userData.user.role === "ADMIN" || userData.user.role === "BOTH");
         }
 
-        // Fetch papers
-        const papersRes = await fetch(`/api/users/${userId}/papers`);
-        if (papersRes.ok) {
-          const papersData = await papersRes.json();
-          setPapers(papersData.papers || []);
-        }
+        // Fetch assigned and available papers
+        await loadAssignments();
 
         // Fetch attempts
         const attemptsRes = await fetch(`/api/users/${userId}/attempts`);
@@ -94,6 +93,44 @@ export default function UserDetailPage() {
     fetchData();
   }, [userId]);
 
+
+  const loadAssignments = async () => {
+    const [assignedRes, allRes] = await Promise.all([
+      fetch(`/api/admin/user/${userId}/papers`),
+      fetch("/api/papers"),
+    ]);
+    if (assignedRes.ok) {
+      const data = await assignedRes.json();
+      setPapers((data.papers || []).map((p: any) => ({ id: p.paperId, title: p.title, status: "approved" })));
+    }
+    if (allRes.ok) {
+      const data = await allRes.json();
+      setAllPapers((data.papers || []).map((p: any) => ({ id: p.id, title: p.title })));
+    }
+  };
+
+  const changePaperAccess = async (paperId: string, action: "assign-paper" | "remove-paper") => {
+    setPaperBusy(true);
+    setPaperMessage(null);
+    try {
+      const res = await fetch(`/api/admin/${action}`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ userId, paperId }),
+      });
+      const data = await res.json().catch(() => ({}));
+      if (res.ok) {
+        setPaperMessage({ type: "success", text: action === "assign-paper" ? "Paper assigned" : "Paper removed" });
+        await loadAssignments();
+      } else {
+        setPaperMessage({ type: "error", text: data.error || "Something went wrong. Please try again." });
+      }
+    } catch {
+      setPaperMessage({ type: "error", text: "Something went wrong. Please try again." });
+    } finally {
+      setPaperBusy(false);
+    }
+  };
 
   const formatTime = (minutes: number | null) => {
     if (!minutes) return "—";
@@ -447,18 +484,76 @@ export default function UserDetailPage() {
           marginBottom: "20px",
         }}>
           <h2 style={{ fontSize: "16px", fontWeight: "600", color: "#1f2937", margin: "0 0 16px 0" }}>
-            Assigned papers ({paperCount})
+            Papers ({paperCount} assigned)
           </h2>
+
+          {paperMessage && (
+            <div style={{
+              padding: "10px 14px",
+              marginBottom: "16px",
+              borderRadius: "6px",
+              fontSize: "14px",
+              backgroundColor: paperMessage.type === "success" ? "#d1fae5" : "#fee2e2",
+              color: paperMessage.type === "success" ? "#065f46" : "#991b1b",
+            }}>
+              {paperMessage.text}
+            </div>
+          )}
+
+          <p style={{ fontSize: "13px", fontWeight: "600", color: "#6b7280", margin: "0 0 8px 0" }}>ASSIGNED</p>
           {papers.length === 0 ? (
-            <p style={{ color: "#6b7280", fontSize: "14px", margin: "0" }}>No papers assigned yet</p>
+            <p style={{ color: "#6b7280", fontSize: "14px", margin: "0 0 20px 0" }}>No papers assigned yet</p>
           ) : (
-            <ul style={{ margin: "0", paddingLeft: "20px", lineHeight: "1.8" }}>
+            <div style={{ display: "flex", flexDirection: "column", gap: "8px", marginBottom: "20px" }}>
               {papers.map((paper) => (
-                <li key={paper.id} style={{ color: "#374151", fontSize: "14px" }}>
-                  {paper.title}
-                </li>
+                <div key={paper.id} style={{
+                  display: "flex", justifyContent: "space-between", alignItems: "center",
+                  padding: "10px 12px", backgroundColor: "#f0fdf4", border: "1px solid #bbf7d0", borderRadius: "6px",
+                }}>
+                  <span style={{ fontSize: "14px", color: "#14532d", fontWeight: "500" }}>{paper.title}</span>
+                  <button
+                    onClick={() => changePaperAccess(paper.id, "remove-paper")}
+                    disabled={paperBusy}
+                    style={{
+                      padding: "6px 12px", backgroundColor: "#dc2626", color: "white", border: "none",
+                      borderRadius: "4px", fontSize: "12px", cursor: paperBusy ? "not-allowed" : "pointer",
+                      opacity: paperBusy ? 0.5 : 1,
+                    }}
+                  >
+                    Remove
+                  </button>
+                </div>
               ))}
-            </ul>
+            </div>
+          )}
+
+          <p style={{ fontSize: "13px", fontWeight: "600", color: "#6b7280", margin: "0 0 8px 0" }}>AVAILABLE TO ASSIGN</p>
+          {allPapers.filter((p) => !papers.some((a) => a.id === p.id)).length === 0 ? (
+            <p style={{ color: "#6b7280", fontSize: "14px", margin: "0" }}>All papers are assigned</p>
+          ) : (
+            <div style={{ display: "flex", flexDirection: "column", gap: "8px" }}>
+              {allPapers
+                .filter((p) => !papers.some((a) => a.id === p.id))
+                .map((paper) => (
+                  <div key={paper.id} style={{
+                    display: "flex", justifyContent: "space-between", alignItems: "center",
+                    padding: "10px 12px", backgroundColor: "#f9fafb", border: "1px solid #e5e7eb", borderRadius: "6px",
+                  }}>
+                    <span style={{ fontSize: "14px", color: "#1f2937", fontWeight: "500" }}>{paper.title}</span>
+                    <button
+                      onClick={() => changePaperAccess(paper.id, "assign-paper")}
+                      disabled={paperBusy}
+                      style={{
+                        padding: "6px 12px", backgroundColor: "#1e3a8a", color: "white", border: "none",
+                        borderRadius: "4px", fontSize: "12px", cursor: paperBusy ? "not-allowed" : "pointer",
+                        opacity: paperBusy ? 0.5 : 1,
+                      }}
+                    >
+                      Assign
+                    </button>
+                  </div>
+                ))}
+            </div>
           )}
         </div>
 
