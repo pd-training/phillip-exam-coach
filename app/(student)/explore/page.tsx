@@ -363,14 +363,11 @@ export default function ExplorePage() {
                         </span>
                       </div>
                       {paper.description && (
-                        <p className="text-sm text-gray-600 mb-4">
+                        <p className="text-sm text-gray-600 mb-4 truncate" title={paper.description}>
                           {paper.description}
                         </p>
                       )}
                       <div className="text-xs text-gray-500 mb-4 space-y-1">
-                        {paper.description && (
-                          <p className="font-medium text-gray-700">{paper.description}</p>
-                        )}
                         {paper.totalQuestions && (
                           <p>❓ {paper.totalQuestions} questions</p>
                         )}
@@ -438,7 +435,7 @@ export default function ExplorePage() {
                         </span>
                       </div>
                       {paper.description && (
-                        <p className="text-sm text-gray-600 mb-4">
+                        <p className="text-sm text-gray-600 mb-4 truncate" title={paper.description}>
                           {paper.description}
                         </p>
                       )}
@@ -509,7 +506,7 @@ export default function ExplorePage() {
                         </span>
                       </div>
                       {paper.description && (
-                        <p className="text-sm text-gray-600 mb-4">
+                        <p className="text-sm text-gray-600 mb-4 truncate" title={paper.description}>
                           {paper.description}
                         </p>
                       )}
@@ -585,7 +582,7 @@ export default function ExplorePage() {
                         </span>
                       </div>
                       {paper.description && (
-                        <p className="text-sm text-gray-600 mb-4">
+                        <p className="text-sm text-gray-600 mb-4 truncate" title={paper.description}>
                           {paper.description}
                         </p>
                       )}
@@ -665,7 +662,7 @@ export default function ExplorePage() {
                         </span>
                       </div>
                       {paper.description && (
-                        <p className="text-sm text-gray-600 mb-4">
+                        <p className="text-sm text-gray-600 mb-4 truncate" title={paper.description}>
                           {paper.description}
                         </p>
                       )}
