@@ -131,7 +131,11 @@ export default function SignupPage() {
     "w-full px-3 py-2.5 border border-gray-300 rounded-lg text-sm text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-900/20 focus:border-blue-900";
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-900 to-blue-800 flex flex-col items-center justify-center px-4 py-12">
+    <div className="min-h-screen relative bg-gradient-to-br from-blue-900 to-blue-800 flex flex-col items-center justify-center px-4 py-12">
+      <Link href="/" className="absolute top-6 left-6 text-sm font-medium text-blue-200 hover:text-white transition">
+        ← Back to home
+      </Link>
+
       <Link href="/" className="flex flex-col items-center mb-8 group">
         <span className="flex items-center justify-center w-14 h-14 rounded-xl bg-amber-400 text-blue-900 text-xl font-extrabold shadow-lg group-hover:scale-105 transition">
           FR
