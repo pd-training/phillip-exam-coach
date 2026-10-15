@@ -83,18 +83,26 @@ function summarizeAttempt(
       "You're on track to pass, and your results show real understanding.",
       "You're in a good position to pass. Keep it up!",
       "Well done, you're performing at a passing level across the paper.",
+      "Strong result. You're clearly grasping the material.",
+      "You've passed, and that's a solid foundation to build on.",
     ], seed, 0);
   } else if (score >= passingScore - 10) {
     opening = pickPhrase([
       "You're close to passing, so a little more targeted practice will get you there.",
       "You're nearly at the passing mark. Keep going, you're getting there.",
-      "You're close to passing, so keep at it.",
+      "You're just short of the pass mark, which is very encouraging.",
+      "The gap to passing is small, so focused revision should close it.",
+      "You're almost there. A few more targeted sessions could push you over.",
     ], seed, 1);
   } else {
     opening = pickPhrase([
       "Don't be discouraged, every attempt builds your understanding.",
       "This is a useful checkpoint, and there is plenty of room to grow from here.",
       "Keep going, every practice session makes a difference.",
+      "This result is a starting point, not a verdict. Your next attempt can be stronger.",
+      "It's been a tough one, but the questions you missed show exactly what to work on.",
+      "Every exam taker has results like this. What matters is what you do next.",
+      "Take this as a clear map of where to focus, and you'll see the improvement.",
     ], seed, 2);
   }
 
@@ -103,6 +111,8 @@ function summarizeAttempt(
         `Give ${listChapters(weak, 3)} some extra attention next.`,
         `${listChapters(weak, 3)} are worth a closer look next.`,
         `Spend a little extra time on ${listChapters(weak, 3)} next.`,
+        `Start your revision with ${listChapters(weak, 3)}.`,
+        `${listChapters(weak, 3)} would be a good place to begin your revision.`,
       ], seed, 3)
     : "";
   const first = [opening, focus].filter(Boolean).join(" ");
@@ -113,13 +123,30 @@ function summarizeAttempt(
     second = pickPhrase([
       "This is your first attempt on this paper, so it's a great starting point.",
       "This is your first attempt on this paper, so there's a clear baseline to build from.",
+      "Since this is your first attempt on this paper, it gives you a benchmark for next time.",
     ], seed, 4);
   } else if (score > previous.score) {
-    second = pickPhrase(["Your score is up on last time. Keep that momentum going!", "Nice progress, your score is higher than last time. Keep it up!"], seed, 5);
+    second = pickPhrase([
+      "Your score is up on last time. Keep that momentum going!",
+      "Nice progress, your score is higher than last time. Keep it up!",
+      "You've improved on your last attempt. Keep building on that!",
+      "Your score has gone up since last time, and that's real progress.",
+    ], seed, 5);
   } else if (score === previous.score) {
-    second = pickPhrase(["Your score is steady compared with last time.", "Your score is the same as last time, so there's room to push it higher."], seed, 5);
+    second = pickPhrase([
+      "Your score is steady compared with last time.",
+      "Your score is the same as last time, so there's room to push it higher.",
+      "You've held your score from last time, which is a solid base to push from.",
+      "Your score matches your last attempt, so the next step is to lift it.",
+    ], seed, 5);
   } else {
-    second = pickPhrase(["Your score dipped a little from last time, but that's part of learning.", "Your score is a little lower than last time, which is normal while you learn."], seed, 5);
+    second = pickPhrase([
+      "Your score dipped a little from last time, but that's part of learning.",
+      "Your score is a little lower than last time, which is normal while you learn.",
+      "This score is below your last attempt, but one result doesn't define your progress.",
+      "It's a step back from last time, and a step back is often followed by a bigger step forward.",
+      "Your score is lower than before, so use the questions you missed to get back on track.",
+    ], seed, 5);
   }
 
   return [first, second];
