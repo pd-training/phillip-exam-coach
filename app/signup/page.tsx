@@ -143,7 +143,7 @@ export default function SignupPage() {
       <div className="w-full max-w-md bg-white rounded-2xl shadow-2xl p-8">
         <form onSubmit={handleSubmit} className="space-y-5">
           <div>
-            <h1 className="text-xl font-semibold text-gray-900">Create your account</h1>
+            <h1 className="text-xl font-semibold text-gray-900">Start exam prep</h1>
             <p className="mt-1 text-sm text-gray-600">Choose the paper you want to prepare for.</p>
           </div>
 
