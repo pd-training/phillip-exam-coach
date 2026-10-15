@@ -109,7 +109,7 @@ export default function PracticePage() {
                 </p>
                 <Link
                   href="/practice/browse"
-                  className="inline-block px-6 py-2 bg-blue-900 text-blue-900 rounded-lg hover:bg-blue-800 font-medium"
+                  className="inline-block px-6 py-2 bg-blue-900 text-white rounded-lg hover:bg-blue-800 font-medium"
                 >
                   Browse papers
                 </Link>

@@ -486,7 +486,7 @@ export default function PaperDetailPage() {
             <div className="flex gap-2">
               <button
                 onClick={() => setShowUploadModal(true)}
-                className="px-4 py-2 bg-white text-white border border-gray-300 rounded-lg hover:bg-gray-50 text-sm font-medium"
+                className="px-4 py-2 bg-white text-gray-900 border border-gray-300 rounded-lg hover:bg-gray-50 text-sm font-medium"
               >
                 Upload Questions
               </button>
@@ -589,7 +589,7 @@ export default function PaperDetailPage() {
                 </div>
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-2">No. of Questions</label>
-                  <div className="px-3 py-2 border border-gray-300 rounded-lg bg-gray-50 text-sm font-semibold text-white">
+                  <div className="px-3 py-2 border border-gray-300 rounded-lg bg-gray-50 text-sm font-semibold text-gray-900">
                     {parts.reduce((sum, part) => sum + part.questionCount, 0)}
                   </div>
                 </div>
@@ -605,14 +605,14 @@ export default function PaperDetailPage() {
                   parts.map((part) => (
                     <div key={part.id} className="bg-gray-100 p-4 rounded-lg flex justify-between items-center">
                       <div>
-                        <p className="font-semibold text-white">{part.partName}</p>
+                        <p className="font-semibold text-gray-900">{part.partName}</p>
                         <p className="text-sm text-gray-600">
                           Chapters {part.chapterStart}–{part.chapterEnd} • {part.questionCount} questions • {part.passingScore}% pass score
                         </p>
                       </div>
                       <button
                         onClick={() => handleEditPart(part)}
-                        className="px-3 py-1 bg-white text-white border border-gray-300 rounded text-sm hover:bg-gray-50"
+                        className="px-3 py-1 bg-white text-gray-900 border border-gray-300 rounded text-sm hover:bg-gray-50"
                       >
                         Edit
                       </button>
@@ -653,7 +653,7 @@ export default function PaperDetailPage() {
                 </button>
                 <button
                   onClick={() => fetchPaperData()}
-                  className="px-6 py-2 bg-gray-200 text-white font-semibold rounded-lg hover:bg-gray-300 transition"
+                  className="px-6 py-2 bg-gray-200 text-gray-800 font-semibold rounded-lg hover:bg-gray-300 transition"
                 >
                   Cancel
                 </button>
@@ -687,9 +687,9 @@ export default function PaperDetailPage() {
                   <tbody>
                     {questions.map((q) => (
                       <tr key={q.id} className="border-b border-gray-200 hover:bg-gray-50">
-                        <td className="px-4 py-3 font-semibold text-white">{q.chapterNumber}</td>
+                        <td className="px-4 py-3 font-semibold text-gray-900">{q.chapterNumber}</td>
                         <td className="px-4 py-3 text-gray-700 truncate max-w-xs">{q.questionText?.substring(0, 50)}...</td>
-                        <td className="px-4 py-3 font-semibold text-white">{q.correctAnswer}</td>
+                        <td className="px-4 py-3 font-semibold text-gray-900">{q.correctAnswer}</td>
                         <td className="px-4 py-3 flex gap-2">
                           <button
                             onClick={() => handleEditQuestion(q)}
@@ -756,7 +756,7 @@ export default function PaperDetailPage() {
               <button
                 onClick={() => setEditedChapters({})}
                 disabled={submitting}
-                className="px-6 py-2 bg-gray-200 text-white font-semibold rounded-lg hover:bg-gray-300 disabled:opacity-50 transition"
+                className="px-6 py-2 bg-gray-200 text-gray-800 font-semibold rounded-lg hover:bg-gray-300 disabled:opacity-50 transition"
               >
                 Cancel
               </button>
@@ -769,7 +769,7 @@ export default function PaperDetailPage() {
       {showDeleteConfirm && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
           <div className="bg-white rounded-lg shadow-lg p-6 max-w-sm">
-            <h3 className="text-lg font-bold text-white mb-2">Delete Paper</h3>
+            <h3 className="text-lg font-bold text-gray-900 mb-2">Delete Paper</h3>
             <p className="text-gray-600 mb-4">
               Are you sure you want to delete "<strong>{paper.title}</strong>"? This action cannot be undone.
             </p>
@@ -782,7 +782,7 @@ export default function PaperDetailPage() {
               <button
                 onClick={() => setShowDeleteConfirm(false)}
                 disabled={submitting}
-                className="px-4 py-2 bg-gray-200 text-white font-medium rounded-lg hover:bg-gray-300 disabled:opacity-50"
+                className="px-4 py-2 bg-gray-200 text-gray-800 font-medium rounded-lg hover:bg-gray-300 disabled:opacity-50"
               >
                 Cancel
               </button>
@@ -802,7 +802,7 @@ export default function PaperDetailPage() {
       {showUploadModal && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
           <div className="bg-white rounded-lg shadow-lg p-6 max-w-md w-full mx-4">
-            <h3 className="text-lg font-bold text-white mb-4">Upload Questions</h3>
+            <h3 className="text-lg font-bold text-gray-900 mb-4">Upload Questions</h3>
 
             <p className="text-sm text-gray-600 mb-4">
               <strong>CSV Formats Supported:</strong><br/>
@@ -860,7 +860,7 @@ export default function PaperDetailPage() {
                   setUploadProgress("");
                 }}
                 disabled={submitting}
-                className="px-4 py-2 bg-gray-200 text-white font-medium rounded-lg hover:bg-gray-300 disabled:opacity-50"
+                className="px-4 py-2 bg-gray-200 text-gray-800 font-medium rounded-lg hover:bg-gray-300 disabled:opacity-50"
               >
                 Cancel
               </button>
@@ -880,7 +880,7 @@ export default function PaperDetailPage() {
       {showEditModal && selectedQuestion && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 overflow-y-auto">
           <div className="bg-white rounded-lg shadow-lg p-6 max-w-2xl w-full mx-4 my-8">
-            <h3 className="text-lg font-bold text-white mb-4">Edit Question</h3>
+            <h3 className="text-lg font-bold text-gray-900 mb-4">Edit Question</h3>
 
             <div className="space-y-4 max-h-96 overflow-y-auto">
               <div>
@@ -972,7 +972,7 @@ export default function PaperDetailPage() {
               <button
                 onClick={() => setShowEditModal(false)}
                 disabled={submitting}
-                className="px-4 py-2 bg-gray-200 text-white font-medium rounded-lg hover:bg-gray-300 disabled:opacity-50"
+                className="px-4 py-2 bg-gray-200 text-gray-800 font-medium rounded-lg hover:bg-gray-300 disabled:opacity-50"
               >
                 Cancel
               </button>
@@ -992,7 +992,7 @@ export default function PaperDetailPage() {
       {showAddPartModal && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
           <div className="bg-white rounded-lg shadow-lg p-6 max-w-md w-full mx-4">
-            <h3 className="text-lg font-bold text-white mb-6">Add Exam Part</h3>
+            <h3 className="text-lg font-bold text-gray-900 mb-6">Add Exam Part</h3>
 
             <div className="space-y-4 mb-6">
               <div>
@@ -1064,7 +1064,7 @@ export default function PaperDetailPage() {
                   setPartPassingScore("70");
                 }}
                 disabled={submitting}
-                className="px-4 py-2 bg-gray-200 text-white font-medium rounded-lg hover:bg-gray-300 disabled:opacity-50"
+                className="px-4 py-2 bg-gray-200 text-gray-800 font-medium rounded-lg hover:bg-gray-300 disabled:opacity-50"
               >
                 Cancel
               </button>
@@ -1084,7 +1084,7 @@ export default function PaperDetailPage() {
       {showEditPartModal && selectedPart && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
           <div className="bg-white rounded-lg shadow-lg p-6 max-w-md w-full mx-4">
-            <h3 className="text-lg font-bold text-white mb-6">Edit Exam Part</h3>
+            <h3 className="text-lg font-bold text-gray-900 mb-6">Edit Exam Part</h3>
 
             <div className="space-y-4 mb-6">
               <div>
@@ -1156,7 +1156,7 @@ export default function PaperDetailPage() {
                   setEditPartPassingScore("70");
                 }}
                 disabled={submitting}
-                className="px-4 py-2 bg-gray-200 text-white font-medium rounded-lg hover:bg-gray-300 disabled:opacity-50"
+                className="px-4 py-2 bg-gray-200 text-gray-800 font-medium rounded-lg hover:bg-gray-300 disabled:opacity-50"
               >
                 Cancel
               </button>

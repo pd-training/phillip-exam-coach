@@ -100,7 +100,7 @@ export default function LandingPage() {
             {/* CTA Buttons */}
             <div className="flex flex-col sm:flex-row gap-4 mb-12">
               <Link href="/signup">
-                <button className="px-8 py-4 bg-blue-900 hover:bg-blue-800 text-blue-900 rounded-lg font-semibold transition-all duration-300 transform hover:scale-105 active:scale-95 shadow-lg">
+                <button className="px-8 py-4 bg-blue-900 hover:bg-blue-800 text-white rounded-lg font-semibold transition-all duration-300 transform hover:scale-105 active:scale-95 shadow-lg">
                   Start Practicing Free
                 </button>
               </Link>
@@ -286,7 +286,7 @@ export default function LandingPage() {
 
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Link href="/signup">
-              <button className="px-8 py-4 bg-blue-900 hover:bg-blue-800 text-blue-900 rounded-lg font-semibold hover:shadow-lg transition-all duration-300 transform hover:scale-105 active:scale-95">
+              <button className="px-8 py-4 bg-blue-900 hover:bg-blue-800 text-white rounded-lg font-semibold hover:shadow-lg transition-all duration-300 transform hover:scale-105 active:scale-95">
                 Get Started Free
               </button>
             </Link>

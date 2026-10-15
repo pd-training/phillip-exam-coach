@@ -146,7 +146,7 @@ export default function NewPaperPage() {
               <button
                 onClick={() => router.push("/admin/papers")}
                 disabled={submitting}
-                className="px-6 py-2 bg-gray-200 text-white font-semibold rounded-lg hover:bg-gray-300 disabled:opacity-50 transition"
+                className="px-6 py-2 bg-gray-200 text-gray-800 font-semibold rounded-lg hover:bg-gray-300 disabled:opacity-50 transition"
               >
                 Cancel
               </button>
