@@ -13,6 +13,8 @@ export default function AttemptsPage() {
   const [attempts, setAttempts] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [selectedPaperId, setSelectedPaperId] = useState("");
+  const [studentSearch, setStudentSearch] = useState("");
+  const [studentSort, setStudentSort] = useState<"asc" | "desc" | null>(null);
   const [papers, setPapers] = useState<any[]>([]);
 
   useEffect(() => {
@@ -51,11 +53,33 @@ export default function AttemptsPage() {
     return <div style={{ padding: "20px" }}>Loading...</div>;
   }
 
-  const filteredAttempts = Array.isArray(attempts)
+  const studentLabel = (a: any) => a.username || a.email || a.userid || "";
+
+  let filteredAttempts: any[] = Array.isArray(attempts)
     ? selectedPaperId
       ? attempts.filter((a) => a.paperid === selectedPaperId)
       : attempts
     : [];
+
+  const term = studentSearch.trim().toLowerCase();
+  if (term) {
+    filteredAttempts = filteredAttempts.filter(
+      (a) =>
+        (a.username || "").toLowerCase().includes(term) ||
+        (a.email || "").toLowerCase().includes(term)
+    );
+  }
+
+  if (studentSort) {
+    filteredAttempts = [...filteredAttempts].sort((a, b) => {
+      const cmp = studentLabel(a).localeCompare(studentLabel(b), undefined, { sensitivity: "base" });
+      return studentSort === "asc" ? cmp : -cmp;
+    });
+  }
+
+  const toggleStudentSort = () => {
+    setStudentSort((prev) => (prev === null ? "asc" : prev === "asc" ? "desc" : null));
+  };
 
   const handleDeleteAttempt = async (attemptId: string) => {
     try {
@@ -94,24 +118,37 @@ export default function AttemptsPage() {
       </div>
 
       <div className="max-w-7xl mx-auto px-6 py-12">
-        {/* Filter by Paper */}
-        <div className="mb-8 bg-white p-6 rounded-lg border border-gray-200">
-          <label className="block text-sm font-semibold text-gray-900 mb-3">
-            Filter by Paper
-          </label>
-          <select
-            value={selectedPaperId}
-            onChange={(e) => setSelectedPaperId(e.target.value)}
-            className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-            style={{ transition: "ring 0.2s" }}
-          >
-            <option value="">All Papers</option>
-            {Array.isArray(papers) && papers.map((paper) => (
-              <option key={paper.id} value={paper.id}>
-                {paper.title}
-              </option>
-            ))}
-          </select>
+        {/* Filters */}
+        <div className="mb-8 bg-white p-6 rounded-lg border border-gray-200 grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div>
+            <label className="block text-sm font-semibold text-gray-900 mb-3">
+              Filter by Paper
+            </label>
+            <select
+              value={selectedPaperId}
+              onChange={(e) => setSelectedPaperId(e.target.value)}
+              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+            >
+              <option value="">All Papers</option>
+              {Array.isArray(papers) && papers.map((paper) => (
+                <option key={paper.id} value={paper.id}>
+                  {paper.title}
+                </option>
+              ))}
+            </select>
+          </div>
+          <div>
+            <label className="block text-sm font-semibold text-gray-900 mb-3">
+              Filter by Student
+            </label>
+            <input
+              type="text"
+              value={studentSearch}
+              onChange={(e) => setStudentSearch(e.target.value)}
+              placeholder="Search by name or email..."
+              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+            />
+          </div>
         </div>
 
         {/* Attempts Table */}
@@ -126,7 +163,16 @@ export default function AttemptsPage() {
                 <thead className="bg-gray-100 border-b border-gray-200">
                   <tr>
                     <th className="px-6 py-3 text-left text-sm font-semibold text-gray-900">
-                      Student
+                      <button
+                        onClick={toggleStudentSort}
+                        className="inline-flex items-center gap-1 hover:text-blue-900"
+                        title="Sort by student"
+                      >
+                        Student
+                        <span className="text-xs text-gray-500">
+                          {studentSort === "asc" ? "▲" : studentSort === "desc" ? "▼" : "↕"}
+                        </span>
+                      </button>
                     </th>
                     <th className="px-6 py-3 text-left text-sm font-semibold text-gray-900">
                       Paper
