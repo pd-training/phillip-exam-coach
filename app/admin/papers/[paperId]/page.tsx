@@ -1,6 +1,7 @@
 "use client";
 
 import AdminNav from "@/components/AdminNav";
+import { useToast } from "@/components/Toast";
 import { useState, useEffect } from "react";
 import { useSession } from "next-auth/react";
 import { useRouter, useParams } from "next/navigation";
@@ -30,6 +31,7 @@ interface ExamPart {
 type TabType = "settings" | "questions" | "chapters";
 
 export default function PaperDetailPage() {
+  const { showToast, ToastView } = useToast();
   const router = useRouter();
   const params = useParams();
   const { data: session, status } = useSession();
@@ -178,9 +180,9 @@ export default function PaperDetailPage() {
 
       const data = await res.json();
       setPaper(data.paper);
-      alert("Settings saved successfully");
+      showToast("Settings saved successfully");
     } catch (error) {
-      alert("Error saving settings: " + (error as Error).message);
+      showToast("Error saving settings: " + (error as Error).message);
     } finally {
       setSubmitting(false);
     }
@@ -196,10 +198,11 @@ export default function PaperDetailPage() {
 
       if (!res.ok) throw new Error("Failed to delete");
 
-      alert("Paper deleted successfully");
-      router.push("/admin/papers");
+      showToast("Paper deleted successfully");
+      // Give the confirmation a moment to show before leaving the page
+      setTimeout(() => router.push("/admin/papers"), 1200);
     } catch (error) {
-      alert("Error deleting paper: " + (error as Error).message);
+      showToast("Error deleting paper: " + (error as Error).message);
       setShowDeleteConfirm(false);
     } finally {
       setSubmitting(false);
@@ -208,7 +211,7 @@ export default function PaperDetailPage() {
 
   const handleUploadQuestions = async () => {
     if (!uploadFile || !paperId) {
-      alert("Please select a file");
+      showToast("Please select a file");
       return;
     }
 
@@ -262,7 +265,7 @@ export default function PaperDetailPage() {
 
   const handleUpdateQuestion = async () => {
     if (!selectedQuestion || !editQuestionText.trim()) {
-      alert("Question text is required");
+      showToast("Question text is required");
       return;
     }
 
@@ -289,11 +292,11 @@ export default function PaperDetailPage() {
 
       if (!res.ok) throw new Error("Failed to update");
 
-      alert("Question updated successfully");
+      showToast("Question updated successfully");
       await fetchPaperData();
       setShowEditModal(false);
     } catch (error) {
-      alert("Error updating question: " + (error as Error).message);
+      showToast("Error updating question: " + (error as Error).message);
     } finally {
       setSubmitting(false);
     }
@@ -312,10 +315,10 @@ export default function PaperDetailPage() {
 
       if (!res.ok) throw new Error("Failed to delete");
 
-      alert("Question deleted successfully");
+      showToast("Question deleted successfully");
       await fetchPaperData();
     } catch (error) {
-      alert("Error deleting question: " + (error as Error).message);
+      showToast("Error deleting question: " + (error as Error).message);
     } finally {
       setSubmitting(false);
     }
@@ -323,7 +326,7 @@ export default function PaperDetailPage() {
 
   const handleAddPart = async () => {
     if (!partName.trim() || !partChapterStart || !partChapterEnd || !partQuestionCount) {
-      alert("Please fill in all part details");
+      showToast("Please fill in all part details");
       return;
     }
 
@@ -344,7 +347,7 @@ export default function PaperDetailPage() {
 
       if (!res.ok) throw new Error("Failed to add part");
 
-      alert("Exam part added successfully");
+      showToast("Exam part added successfully");
       setShowAddPartModal(false);
       setPartName("");
       setPartChapterStart("");
@@ -353,7 +356,7 @@ export default function PaperDetailPage() {
       setPartPassingScore("70");
       await fetchPaperData();
     } catch (error) {
-      alert("Error adding part: " + (error as Error).message);
+      showToast("Error adding part: " + (error as Error).message);
     } finally {
       setSubmitting(false);
     }
@@ -371,7 +374,7 @@ export default function PaperDetailPage() {
 
   const handleUpdatePart = async () => {
     if (!editPartName.trim() || !editPartChapterStart || !editPartChapterEnd || !editPartQuestionCount) {
-      alert("Please fill in all part details");
+      showToast("Please fill in all part details");
       return;
     }
 
@@ -394,12 +397,12 @@ export default function PaperDetailPage() {
 
       if (!res.ok) throw new Error("Failed to update part");
 
-      alert("Exam part updated successfully");
+      showToast("Exam part updated successfully");
       setShowEditPartModal(false);
       setSelectedPart(null);
       await fetchPaperData();
     } catch (error) {
-      alert("Error updating part: " + (error as Error).message);
+      showToast("Error updating part: " + (error as Error).message);
     } finally {
       setSubmitting(false);
     }
@@ -407,7 +410,7 @@ export default function PaperDetailPage() {
 
   const handleSaveChapters = async () => {
     if (Object.keys(editedChapters).length === 0) {
-      alert("No changes to save");
+      showToast("No changes to save");
       return;
     }
 
@@ -427,11 +430,11 @@ export default function PaperDetailPage() {
 
       if (!res.ok) throw new Error("Failed to save chapters");
 
-      alert("Chapters updated successfully");
+      showToast("Chapters updated successfully");
       setEditedChapters({});
       await fetchPaperData();
     } catch (error) {
-      alert("Error saving chapters: " + (error as Error).message);
+      showToast("Error saving chapters: " + (error as Error).message);
     } finally {
       setSubmitting(false);
     }
@@ -464,6 +467,7 @@ export default function PaperDetailPage() {
   return (
     <div className="min-h-screen bg-gray-50">
       <AdminNav />
+      {ToastView}
 
       {/* Header */}
       <div className="bg-white border-b border-gray-200">

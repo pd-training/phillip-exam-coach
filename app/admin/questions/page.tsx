@@ -1,8 +1,9 @@
 "use client";
 
-import { useSession, signOut } from "next-auth/react";
+import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import { useEffect } from "react";
+import AdminNav from "@/components/AdminNav";
 
 export default function QuestionBank() {
   const router = useRouter();
@@ -24,61 +25,9 @@ export default function QuestionBank() {
     return null;
   }
 
-  const handleLogout = async () => {
-    try {
-      await signOut({ redirect: false });
-      window.location.href = '/login';
-    } catch (error) {
-      console.error("Logout error:", error);
-      window.location.href = '/login';
-    }
-  };
-
   return (
-    <div style={{ backgroundColor: "#f8f9fa", minHeight: "100vh" }}>
-      {/* Navigation Bar */}
-      <nav style={{
-        backgroundColor: "white",
-        borderBottom: "1px solid #e5e7eb",
-        padding: "16px 24px",
-        display: "flex",
-        justifyContent: "space-between",
-        alignItems: "center",
-      }}>
-        <div style={{ display: "flex", gap: "32px" }}>
-          <a href="/admin/dashboard" style={{ textDecoration: "none", color: "#666", fontWeight: "500", fontSize: "14px" }}>
-            Dashboard
-          </a>
-          <a href="/admin/papers" style={{ textDecoration: "none", color: "#666", fontWeight: "500", fontSize: "14px" }}>
-            Papers
-          </a>
-          <a href="/admin/users" style={{ textDecoration: "none", color: "#666", fontWeight: "500", fontSize: "14px" }}>
-            Users
-          </a>
-          <a href="/admin/questions" style={{ textDecoration: "none", color: "#3b82f6", fontWeight: "600", fontSize: "14px" }}>
-            Questions
-          </a>
-        </div>
-        <div style={{ display: "flex", gap: "24px", alignItems: "center" }}>
-          <a href="/account" style={{ color: "#666", fontSize: "14px", textDecoration: "none", cursor: "pointer" }}>
-            Account
-          </a>
-          <span style={{ fontWeight: "600", fontSize: "14px" }}>{session?.user?.name || "Admin"}</span>
-          <button
-            onClick={handleLogout}
-            style={{
-              backgroundColor: "transparent",
-              color: "#3b82f6",
-              border: "none",
-              cursor: "pointer",
-              fontSize: "14px",
-              fontWeight: "500",
-            }}
-          >
-            Log out
-          </button>
-        </div>
-      </nav>
+    <div className="min-h-screen bg-gray-50">
+      <AdminNav />
 
       <div className="max-w-7xl mx-auto px-6 py-12">
         <h1 className="text-4xl font-bold text-gray-900 mb-2">❓ Question Bank</h1>
@@ -96,4 +45,3 @@ export default function QuestionBank() {
     </div>
   );
 }
-

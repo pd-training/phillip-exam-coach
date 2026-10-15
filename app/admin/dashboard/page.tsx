@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
+import { useToast } from "@/components/Toast";
 import AdminNav from '@/components/AdminNav';
 import Link from 'next/link';
 
@@ -36,6 +37,7 @@ interface PaperRequest {
 }
 
 export default function AdminDashboard() {
+  const { showToast, ToastView } = useToast();
   const [stats, setStats] = useState<DashboardStats | null>(null);
   const [attempts, setAttempts] = useState<Attempt[]>([]);
   const [requests, setRequests] = useState<PaperRequest[]>([]);
@@ -91,7 +93,7 @@ export default function AdminDashboard() {
         r.id === requestId ? { ...r, status: 'approved' } : r
       ));
     } catch (err) {
-      alert('Error approving request: ' + (err as Error).message);
+      showToast('Error approving request: ' + (err as Error).message);
     } finally {
       setActionLoading(null);
     }
@@ -112,7 +114,7 @@ export default function AdminDashboard() {
         r.id === requestId ? { ...r, status: 'rejected' } : r
       ));
     } catch (err) {
-      alert('Error rejecting request: ' + (err as Error).message);
+      showToast('Error rejecting request: ' + (err as Error).message);
     } finally {
       setActionLoading(null);
     }
@@ -137,6 +139,7 @@ export default function AdminDashboard() {
   return (
     <div className="min-h-screen bg-gray-50">
       <AdminNav />
+      {ToastView}
 
       {/* Hero Section */}
       <div className="bg-gradient-to-r from-blue-900 to-blue-800 text-white py-12 px-0 border-b border-blue-900">

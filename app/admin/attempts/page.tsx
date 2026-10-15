@@ -1,12 +1,14 @@
 "use client";
 
 import { useSession } from "next-auth/react";
+import { useToast } from "@/components/Toast";
 import { redirect } from "next/navigation";
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import AdminNav from "@/components/AdminNav";
 
 export default function AttemptsPage() {
+  const { showToast, ToastView } = useToast();
   const { data: session, status } = useSession();
   const [attempts, setAttempts] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
@@ -66,23 +68,24 @@ export default function AttemptsPage() {
       const data = await res.json();
 
       if (res.ok) {
-        alert("Exam attempt deleted successfully");
+        showToast("Exam attempt deleted successfully");
         // Refresh the list
         const attemptsRes = await fetch("/api/admin/exam-attempts");
         const attemptsData = await attemptsRes.json();
         setAttempts(Array.isArray(attemptsData) ? attemptsData : []);
       } else {
-        alert(data.error || "Failed to delete attempt");
+        showToast(data.error || "Failed to delete attempt");
       }
     } catch (error) {
       console.error("Delete error:", error);
-      alert("Error deleting attempt");
+      showToast("Error deleting attempt");
     }
   };
 
   return (
     <div className="min-h-screen bg-gray-50">
       <AdminNav />
+      {ToastView}
       <div style={{ background: "linear-gradient(to right, #0f172a, #1e3a8a)", color: "white", padding: "48px 0" }}>
         <div className="max-w-7xl mx-auto px-6">
           <h1 className="text-4xl font-bold mb-2">Exam Attempts</h1>

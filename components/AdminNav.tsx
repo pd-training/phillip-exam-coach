@@ -32,7 +32,7 @@ export default function AdminNav() {
               key={item.href}
               href={item.href}
               className={`text-sm font-medium transition ${
-                pathname === item.href
+                pathname === item.href || pathname.startsWith(`${item.href}/`)
                   ? 'text-blue-600'
                   : 'text-gray-600 hover:text-gray-900'
               }`}

@@ -1,11 +1,13 @@
 "use client";
 
 import AdminNav from "@/components/AdminNav";
+import { useToast } from "@/components/Toast";
 import { useState } from "react";
 import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
 
 export default function NewPaperPage() {
+  const { showToast, ToastView } = useToast();
   const router = useRouter();
   const { data: session, status } = useSession();
 
@@ -18,7 +20,7 @@ export default function NewPaperPage() {
 
   const handleCreatePaper = async () => {
     if (!title.trim()) {
-      alert("Paper title is required");
+      showToast("Paper title is required");
       return;
     }
 
@@ -42,7 +44,7 @@ export default function NewPaperPage() {
       const data = await res.json();
       router.push(`/admin/papers/${data.paper.id}`);
     } catch (error) {
-      alert("Error creating paper: " + (error as Error).message);
+      showToast("Error creating paper: " + (error as Error).message);
     } finally {
       setSubmitting(false);
     }
@@ -56,6 +58,7 @@ export default function NewPaperPage() {
   return (
     <div className="min-h-screen bg-gray-50">
       <AdminNav />
+      {ToastView}
 
       {/* Header */}
       <div className="bg-white border-b border-gray-200">
