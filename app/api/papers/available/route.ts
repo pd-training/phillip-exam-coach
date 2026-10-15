@@ -9,6 +9,7 @@ export async function GET(request: NextRequest) {
       SELECT
         p.id,
         p.title,
+        p.description,
         p."externalLink",
         p."totalTime"
       FROM "Paper" p
