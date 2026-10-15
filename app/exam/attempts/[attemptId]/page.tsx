@@ -161,20 +161,20 @@ export default function AttemptReviewPage() {
               <div className="mt-3 space-y-1">
                 {attempt.partScores.map((part, idx) => (
                   <p key={idx} className="text-blue-100">
-                    {part.partName}: <span className={part.passed ? 'text-green-200 font-bold' : 'text-red-200 font-bold'}>{part.score}%</span> ({part.correct}/{part.total}) {part.passed ? '✓ PASSED' : '✗ FAILED'}
+                    {part.partName}: {part.score}% ({part.correct}/{part.total}) <span className={part.passed ? 'text-green-300 font-bold' : 'text-red-400 font-bold'}>{part.passed ? '✓ PASSED' : '✗ FAILED'}</span>
                   </p>
                 ))}
-                <p className={`text-base font-bold mt-2 border-t border-blue-500 pt-2 ${attempt.passed ? 'text-green-300' : 'text-red-300'}`}>
-                  Overall: {attempt.passed ? '✓ PASSED' : '✗ FAILED'}
+                <p className="text-base font-bold mt-2 border-t border-blue-500 pt-2">
+                  Overall: <span className={attempt.passed ? 'text-green-300' : 'text-red-400'}>{attempt.passed ? '✓ PASSED' : '✗ FAILED'}</span>
                 </p>
               </div>
             ) : (
               <div className="mt-3 space-y-1">
                 <p className="text-blue-100">
-                  Score: <span className={attempt.passed ? 'text-green-200 font-bold' : 'text-red-200 font-bold'}>{attempt.score}%</span> ({correctCount}/{attempt.totalQuestions})
+                  Score: <span className="font-bold">{attempt.score}%</span> ({correctCount}/{attempt.totalQuestions})
                 </p>
-                <p className={`text-base font-bold border-t border-blue-500 pt-2 ${attempt.passed ? 'text-green-300' : 'text-red-300'}`}>
-                  Overall: {attempt.passed ? '✓ PASSED' : '✗ FAILED'}
+                <p className="text-base font-bold border-t border-blue-500 pt-2">
+                  Overall: <span className={attempt.passed ? 'text-green-300' : 'text-red-400'}>{attempt.passed ? '✓ PASSED' : '✗ FAILED'}</span>
                 </p>
               </div>
             )}
