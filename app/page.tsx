@@ -2,6 +2,7 @@
 
 import Link from 'next/link';
 import BrandLockup from '../components/BrandLockup';
+import SignupForm from '../components/SignupForm';
 import { useSession } from 'next-auth/react';
 import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
@@ -97,11 +98,11 @@ export default function LandingPage() {
 
             {/* CTA Buttons */}
             <div className="flex flex-col sm:flex-row gap-4 mb-12">
-              <Link href="/signup">
+              <a href="#signup">
                 <button className="px-8 py-4 bg-blue-900 hover:bg-blue-800 text-white rounded-lg font-semibold transition-all duration-300 transform hover:scale-105 active:scale-95 shadow-lg">
                   Start Practicing Free
                 </button>
-              </Link>
+              </a>
               <Link href="/login">
                 <button className="px-8 py-4 border-2 border-blue-400 text-amber-400 hover:bg-blue-400/10 rounded-lg font-semibold transition-all duration-300 transform hover:scale-105 active:scale-95">
                   Sign In to Continue
@@ -118,6 +119,21 @@ export default function LandingPage() {
               </div>
               <span className="text-blue-100 text-sm"><strong className="text-amber-400">800+</strong> financial advisors mastering their exams</span>
             </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Create account ribbon */}
+      <section id="signup" className="scroll-mt-24 bg-blue-900 px-6 py-16 border-y border-blue-800">
+        <div className="max-w-7xl mx-auto grid md:grid-cols-2 gap-12 items-center">
+          <div className="text-white">
+            <h2 className="text-3xl md:text-4xl font-bold mb-4">Create your free account</h2>
+            <p className="text-blue-100 text-lg leading-relaxed max-w-md">
+              Pick your CMFAS paper and start practising straight away. You can sign in any time to pick up where you left off.
+            </p>
+          </div>
+          <div className="w-full max-w-md md:justify-self-end">
+            <SignupForm />
           </div>
         </div>
       </section>
@@ -283,7 +299,7 @@ export default function LandingPage() {
           <p className="text-xl text-blue-100 mb-8">Start your free practice today. No credit card required.</p>
 
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <Link href="/signup">
+            <Link href="/#signup">
               <button className="px-8 py-4 bg-blue-900 hover:bg-blue-800 text-white rounded-lg font-semibold hover:shadow-lg transition-all duration-300 transform hover:scale-105 active:scale-95">
                 Get Started Free
               </button>
