@@ -63,7 +63,7 @@ export default function LandingPage() {
       </header>
 
       {/* Hero Section */}
-      <section className="relative py-20 px-6 overflow-hidden bg-gradient-to-r from-blue-900 via-blue-800 to-slate-900">
+      <section className="relative py-24 px-6 overflow-hidden bg-gradient-to-br from-blue-950 via-blue-900 to-blue-800">
         {/* Subtle background pattern */}
         <div className="absolute inset-0 opacity-5">
           <svg className="w-full h-full" xmlns="http://www.w3.org/2000/svg">
@@ -76,23 +76,38 @@ export default function LandingPage() {
           </svg>
         </div>
 
-        <div className="max-w-7xl mx-auto relative z-10">
-          {/* Main Content - Centered */}
-          <div className="flex flex-col items-center justify-center text-center">
-            {/* Tagline */}
-            <p className="text-amber-400 font-semibold tracking-wide mb-4 text-sm uppercase">Financial Excellence</p>
+        {/* Soft light falling on the right side of the hero */}
+        <div
+          className="absolute -right-40 top-0 w-[32rem] h-[32rem] rounded-full bg-blue-400/20 blur-3xl pointer-events-none"
+          aria-hidden="true"
+        />
 
-            {/* Hero banner (FinanceReady brand image, includes the heading and tagline) */}
-            <img
-              src="/finance-ready-banner.png"
-              alt="FinanceReady by PhillipCapital. Where Preparation Meets Opportunity"
-              width={441}
-              height={245}
-              className="w-full max-w-xl rounded-xl shadow-2xl mb-8"
-            />
+        <div className="max-w-7xl mx-auto relative z-10">
+          <div className="flex flex-col items-start text-left max-w-3xl">
+            {/* Brand lockup */}
+            <div className="mb-10 flex items-end gap-4">
+              <div className="flex flex-col leading-none">
+                <span className="font-bold text-xl tracking-tight text-white">PhillipCapital</span>
+                <span className="text-[11px] text-blue-200 mt-1">Your Partner in Finance</span>
+              </div>
+              <span className="h-8 w-px bg-blue-400/50" aria-hidden="true" />
+              <span className="text-sm font-semibold text-blue-100">
+                Phillip<span className="text-amber-400">WealthAdvisory</span>
+              </span>
+            </div>
+
+            {/* Heading */}
+            <h1 className="text-6xl md:text-8xl font-bold text-white leading-none tracking-tight mb-6">
+              Finance<span className="text-amber-400">Ready</span>
+            </h1>
+
+            {/* Tagline */}
+            <p className="text-2xl md:text-3xl text-white font-light mb-8">
+              Where Preparation Meets <span className="text-amber-400 font-semibold">Opportunity</span>
+            </p>
 
             {/* Description */}
-            <p className="text-lg text-blue-200 mb-6 max-w-2xl leading-relaxed">
+            <p className="text-base md:text-lg text-blue-100 mb-8 max-w-xl leading-relaxed">
               Practice with CMFAS exam papers, receive detailed feedback on every answer, and track your progress toward mastery. Designed specifically for financial advisors who demand excellence.
             </p>
 
