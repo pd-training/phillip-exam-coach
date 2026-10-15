@@ -164,6 +164,11 @@ export default function PracticePage() {
             ← Back
           </button>
           <h1 className="text-4xl font-bold mb-2">{paper.title}</h1>
+          {paper.description && (
+            <p className="text-blue-100 mb-2 truncate" title={paper.description}>
+              {paper.description}
+            </p>
+          )}
           <p className="text-gray-200">Choose your practice mode</p>
         </div>
       </div>
