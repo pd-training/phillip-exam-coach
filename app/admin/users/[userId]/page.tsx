@@ -1,6 +1,6 @@
 "use client";
 
-import { useSession, signOut } from "next-auth/react";
+import { useSession } from "next-auth/react";
 import { useRouter, useParams } from "next/navigation";
 import { useState, useEffect } from "react";
 import Link from "next/link";
@@ -94,10 +94,6 @@ export default function UserDetailPage() {
     fetchData();
   }, [userId]);
 
-  const handleLogout = async () => {
-    await signOut({ redirect: false });
-    window.location.href = '/login';
-  };
 
   const formatTime = (minutes: number | null) => {
     if (!minutes) return "—";
@@ -167,26 +163,6 @@ export default function UserDetailPage() {
           <Link href="/admin/users" style={{ color: "#f59e0b", fontSize: "14px", textDecoration: "none", fontWeight: "500" }}>
             ← Back to users
           </Link>
-          <button
-            onClick={handleLogout}
-            style={{
-              backgroundColor: "transparent",
-              color: "#f59e0b",
-              border: "none",
-              cursor: "pointer",
-              fontSize: "14px",
-              fontWeight: "500",
-              transition: "color 0.2s",
-            }}
-            onMouseEnter={(e) => {
-              e.currentTarget.style.color = "#d97706";
-            }}
-            onMouseLeave={(e) => {
-              e.currentTarget.style.color = "#f59e0b";
-            }}
-          >
-            Log out
-          </button>
         </div>
 
       {/* Content */}
