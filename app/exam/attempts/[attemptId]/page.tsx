@@ -70,28 +70,29 @@ function summarizeAttempt(
     .sort((x, y) => x.percentage - y.percentage || x.chapter - y.chapter)
     .map((c) => c.chapter);
 
-  // Line 1: strengths and focus areas
+  // Line 1: encourage, and name strengths and areas to work on
   let first: string;
   if (weak.length === 0) {
     first = strong.length > 0
-      ? `You did really well in ${listChapters(strong, 3)}, and were solid across every chapter.`
-      : "You were solid across every chapter.";
+      ? `Great work across the board, especially in ${listChapters(strong, 3)}. Keep it up!`
+      : "Solid work across every chapter. Keep it up!";
   } else if (strong.length === 0) {
-    first = `Focus on ${listChapters(weak, 3)} next, as these were your weakest areas.`;
+    first = `Don't be discouraged, every attempt builds your understanding. Focus on ${listChapters(weak, 3)} next and you'll see the gains.`;
   } else {
-    first = `You did really well in ${listChapters(strong, 3)}, but focus on ${listChapters(weak, 3)} next.`;
+    first = `You did really well in ${listChapters(strong, 3)}, so keep that going. Give ${listChapters(weak, 3)} some extra attention next, and you'll get there.`;
   }
 
   // Line 2: comparison with the previous attempt on this paper
   let second: string;
   if (!previous) {
-    second = "This is your first attempt on this paper, so it sets your starting point.";
+    second = "This is your first attempt on this paper, so it's a great starting point to build from.";
   } else {
-    const base = score > previous.score
-      ? "Your score is higher than last time"
+    const up = score > previous.score;
+    const base = up
+      ? "Your score is up on last time"
       : score === previous.score
-      ? "Your score is the same as last time"
-      : "Your score is lower than last time";
+      ? "Your score is steady compared with last time"
+      : "Your score dipped a little from last time, but that's part of learning";
 
     const prevMap = new Map(previous.chapters.map((c) => [c.chapter, c.percentage]));
     const changes = chapters
@@ -101,9 +102,16 @@ function summarizeAttempt(
     const slipped = changes.filter((c) => c.diff <= -10).map((c) => c.chapter).sort((x, y) => x - y);
 
     const parts: string[] = [];
-    if (improved.length > 0) parts.push(`${listChapters(improved, 2)} improving`);
-    if (slipped.length > 0) parts.push(`${listChapters(slipped, 2)} slipping`);
-    second = parts.length > 0 ? `${base}, with ${parts.join(" and ")}.` : `${base}.`;
+    if (improved.length > 0) {
+      parts.push(`${listChapters(improved, 2)} ${improved.length === 1 ? "is" : "are"} improving`);
+    }
+    if (slipped.length > 0) {
+      parts.push(`${listChapters(slipped, 2)} ${slipped.length === 1 ? "needs" : "need"} a little more practice`);
+    }
+    const tail = up ? " Keep it up!" : " Every attempt makes you stronger.";
+    second = parts.length > 0
+      ? `${base}, with ${parts.join(" and ")}.${tail}`
+      : `${base}.${tail}`;
   }
 
   return [first, second];
