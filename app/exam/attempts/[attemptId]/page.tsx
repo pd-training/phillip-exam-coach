@@ -231,23 +231,12 @@ export default function AttemptReviewPage() {
                               : 'border-gray-200 bg-white'
                           }`}
                         >
-                          <div className="flex items-start gap-3">
-                            <div className={`w-8 h-8 rounded-full border-2 flex items-center justify-center font-bold text-sm flex-shrink-0 ${
-                              isCorrectAnswer
-                                ? 'border-green-500 bg-green-100 text-green-700'
-                                : isStudentAnswer
-                                ? 'border-red-500 bg-red-100 text-red-700'
-                                : 'border-gray-300 bg-gray-100 text-gray-600'
-                            }`}>
-                              {option.key}
-                            </div>
-                            <div className="flex-1">
-                              <p className="text-gray-800 font-medium">{option.text}</p>
-                              <div className="flex gap-2 mt-2">
-                                {isCorrectAnswer && <span className="text-xs bg-green-200 text-green-800 px-2 py-1 rounded font-medium">✓ Correct Answer</span>}
-                                {isStudentAnswer && !isCorrectAnswer && <span className="text-xs bg-red-200 text-red-800 px-2 py-1 rounded font-medium">✗ Your Answer</span>}
-                                {isStudentAnswer && isCorrectAnswer && <span className="text-xs bg-green-200 text-green-800 px-2 py-1 rounded font-medium">✓ Your Answer</span>}
-                              </div>
+                          <div>
+                            <p className="text-gray-800 font-medium">{option.text}</p>
+                            <div className="flex gap-2 mt-2">
+                              {isCorrectAnswer && <span className="text-xs bg-green-200 text-green-800 px-2 py-1 rounded font-medium">✓ Correct Answer</span>}
+                              {isStudentAnswer && !isCorrectAnswer && <span className="text-xs bg-red-200 text-red-800 px-2 py-1 rounded font-medium">✗ Your Answer</span>}
+                              {isStudentAnswer && isCorrectAnswer && <span className="text-xs bg-green-200 text-green-800 px-2 py-1 rounded font-medium">✓ Your Answer</span>}
                             </div>
                           </div>
                         </div>

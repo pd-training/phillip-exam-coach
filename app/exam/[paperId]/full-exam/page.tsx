@@ -287,20 +287,20 @@ export default function FullExamMode() {
                   <>
                     <div style={{ margin: "0 0 12px 0", fontSize: "14px" }}>
                       <p style={{ margin: "0 0 6px 0" }}>
-                        Your answer: <strong>{answerData.studentAnswer}.</strong> {
+                        Your answer: <strong>{
                           answerData.studentAnswer === "A" ? answerData.optionA :
                           answerData.studentAnswer === "B" ? answerData.optionB :
                           answerData.studentAnswer === "C" ? answerData.optionC :
                           answerData.optionD
-                        }
+                        }</strong>
                       </p>
                       <p style={{ margin: "0", fontSize: "14px", color: "#059669" }}>
-                        Correct answer: <strong>{answerData.correctAnswer}.</strong> {
+                        Correct answer: <strong>{
                           answerData.correctAnswer === "A" ? answerData.optionA :
                           answerData.correctAnswer === "B" ? answerData.optionB :
                           answerData.correctAnswer === "C" ? answerData.optionC :
                           answerData.optionD
-                        }
+                        }</strong>
                       </p>
                     </div>
                     {answerData.explanation && (
