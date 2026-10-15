@@ -4,6 +4,7 @@ import { useSession, signOut } from "next-auth/react";
 import { useRouter, useParams } from "next/navigation";
 import { useState, useEffect } from "react";
 import Link from "next/link";
+import AdminNav from "@/components/AdminNav";
 
 interface User {
   id: string;
@@ -140,6 +141,8 @@ export default function UserDetailPage() {
 
   return (
     <div style={{ minHeight: "100vh", backgroundColor: "#f9fafb" }}>
+      <AdminNav />
+
       {/* Hero Section */}
       <div style={{
         background: "linear-gradient(to right, #1e3a8a, #1e40af)",
