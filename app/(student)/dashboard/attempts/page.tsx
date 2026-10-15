@@ -21,8 +21,7 @@ export default function AllAttemptsPage() {
   const { data: session, status } = useSession();
   const [attempts, setAttempts] = useState<Attempt[]>([]);
   const [loading, setLoading] = useState(true);
-  const [selectedPaper, setSelectedPaper] = useState("");
-  const [sortBy, setSortBy] = useState<'newest' | 'oldest' | 'highest' | 'lowest'>('newest');
+  const [openPaperId, setOpenPaperId] = useState<string | null>(null);
   const [recs, setRecs] = useState<any>(null);
   const [paperSort, setPaperSort] = useState<{ key: 'paper' | 'attempts' | 'passRate' | 'avgScore' | 'best'; dir: 'asc' | 'desc' }>({ key: 'attempts', dir: 'desc' });
 
@@ -33,6 +32,15 @@ export default function AllAttemptsPage() {
       .then((data) => setRecs(data))
       .catch(() => setRecs(null));
   }, [status]);
+
+  useEffect(() => {
+    if (!openPaperId) return;
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === "Escape") setOpenPaperId(null);
+    };
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, [openPaperId]);
 
   useEffect(() => {
     if (status === "unauthenticated") {
@@ -91,6 +99,17 @@ export default function AllAttemptsPage() {
     }));
   })();
 
+  const openPaperAttempts = openPaperId
+    ? attempts.filter((a) => a.paperid === openPaperId)
+    : [];
+  const openPaperTitle = openPaperAttempts[0]?.paperTitle ?? "";
+  const openPaperPassRate = openPaperAttempts.length
+    ? Math.round((openPaperAttempts.filter((a) => a.result === "Pass").length / openPaperAttempts.length) * 100)
+    : 0;
+  const openPaperBest = openPaperAttempts.length
+    ? Math.max(...openPaperAttempts.map((a) => a.score))
+    : 0;
+
   const sortedPaperRows = [...paperRows].sort((a, b) => {
     const dir = paperSort.dir === "asc" ? 1 : -1;
     if (paperSort.key === "paper") return a.paperTitle.localeCompare(b.paperTitle) * dir;
@@ -145,17 +164,7 @@ export default function AllAttemptsPage() {
               </div>
             </div>
 
-            <div className="flex items-center justify-between mb-3">
-              <h2 className="text-sm font-semibold text-gray-900">By paper</h2>
-              {selectedPaper && (
-                <button
-                  onClick={() => setSelectedPaper("")}
-                  className="text-xs font-medium text-blue-600 hover:text-blue-700"
-                >
-                  Show all papers
-                </button>
-              )}
-            </div>
+            <h2 className="text-sm font-semibold text-gray-900 mb-3">By paper</h2>
             <div className="overflow-x-auto">
               <table className="w-full text-sm">
                 <thead>
@@ -178,26 +187,25 @@ export default function AllAttemptsPage() {
                   </tr>
                 </thead>
                 <tbody>
-                  {sortedPaperRows.map((row) => {
-                    const isSelected = selectedPaper === row.paperId;
-                    return (
-                      <tr
-                        key={row.paperId}
-                        onClick={() => setSelectedPaper(isSelected ? "" : row.paperId)}
-                        className={`border-b border-gray-100 cursor-pointer transition ${isSelected ? "bg-blue-50" : "hover:bg-gray-50"}`}
-                      >
-                        <td className="py-3 pr-4 font-medium text-gray-900">{row.paperTitle}</td>
-                        <td className="py-3 pr-4 text-right text-gray-900">{row.attempts}</td>
-                        <td className={`py-3 pr-4 text-right font-semibold ${row.passRate >= 50 ? "text-green-600" : "text-red-600"}`}>{row.passRate}%</td>
-                        <td className="py-3 pr-4 text-right text-gray-900">{row.avgScore}%</td>
-                        <td className="py-3 text-right text-gray-900">{row.best}%</td>
-                      </tr>
-                    );
-                  })}
+                  {sortedPaperRows.map((row) => (
+                    <tr
+                      key={row.paperId}
+                      onClick={() => setOpenPaperId(row.paperId)}
+                      className="border-b border-gray-100 cursor-pointer hover:bg-blue-50 transition"
+                    >
+                      <td className="py-3 pr-4 font-medium text-gray-900">
+                        {row.paperTitle} <span className="text-blue-600 ml-1">›</span>
+                      </td>
+                      <td className="py-3 pr-4 text-right text-gray-900">{row.attempts}</td>
+                      <td className={`py-3 pr-4 text-right font-semibold ${row.passRate >= 50 ? "text-green-600" : "text-red-600"}`}>{row.passRate}%</td>
+                      <td className="py-3 pr-4 text-right text-gray-900">{row.avgScore}%</td>
+                      <td className="py-3 text-right text-gray-900">{row.best}%</td>
+                    </tr>
+                  ))}
                 </tbody>
               </table>
             </div>
-            <p className="text-xs text-gray-500 mt-3">Click a paper to show only its attempts below.</p>
+            <p className="text-xs text-gray-500 mt-3">Click a paper to see its attempts.</p>
           </div>
         )}
 
@@ -282,180 +290,65 @@ export default function AllAttemptsPage() {
           </div>
         )}
 
-        {/* Filter & Sort Section */}
-        {attempts.length > 0 && (
-          <div className="mb-8 grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div className="bg-white p-6 rounded-lg border border-gray-200">
-              <label className="block text-sm font-semibold text-gray-900 mb-3">
-                Filter by Paper
-              </label>
-              <select
-                value={selectedPaper}
-                onChange={(e) => setSelectedPaper(e.target.value)}
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-              >
-                <option value="">All Papers ({attempts.length})</option>
-                {Array.from(
-                  attempts.reduce((map, attempt) => {
-                    const count = (map.get(attempt.paperid) || 0) + 1;
-                    map.set(attempt.paperid, count);
-                    return map;
-                  }, new Map<string, number>())
-                ).map(([paperId, count]) => {
-                  const paperTitle = attempts.find((a) => a.paperid === paperId)?.paperTitle || paperId;
-                  return (
-                    <option key={paperId} value={paperId}>
-                      {paperTitle} ({count})
-                    </option>
-                  );
-                })}
-              </select>
-            </div>
-
-            <div className="bg-white p-6 rounded-lg border border-gray-200">
-              <label className="block text-sm font-semibold text-gray-900 mb-3">
-                Sort by
-              </label>
-              <select
-                value={sortBy}
-                onChange={(e) => setSortBy(e.target.value as any)}
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-              >
-                <option value="newest">Newest first</option>
-                <option value="oldest">Oldest first</option>
-                <option value="highest">Highest score</option>
-                <option value="lowest">Lowest score</option>
-              </select>
-            </div>
-          </div>
-        )}
-
-        {attempts.length === 0 ? (
-          <div className="bg-white rounded-xl p-12 border border-gray-200 text-center">
-            <div className="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
-              <svg
-                className="w-8 h-8 text-gray-400"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
-                />
-              </svg>
-            </div>
-            <p className="text-gray-600 font-medium mb-2">No exam attempts yet</p>
-            <p className="text-gray-500 text-sm mb-6">
-              Start practicing to see your attempts here
-            </p>
-            <Link href="/practice">
-              <button className="inline-block px-6 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-medium transition">
-                Go to Practice
-              </button>
-            </Link>
-          </div>
-        ) : (
-          <>
-            {(() => {
-              let filteredAttempts =
-                selectedPaper === ""
-                  ? attempts
-                  : attempts.filter((attempt) => attempt.paperid === selectedPaper);
-
-              // Apply sorting
-              if (sortBy === 'newest') {
-                filteredAttempts.sort((a, b) => new Date(b.submittedat).getTime() - new Date(a.submittedat).getTime());
-              } else if (sortBy === 'oldest') {
-                filteredAttempts.sort((a, b) => new Date(a.submittedat).getTime() - new Date(b.submittedat).getTime());
-              } else if (sortBy === 'highest') {
-                filteredAttempts.sort((a, b) => b.score - a.score);
-              } else if (sortBy === 'lowest') {
-                filteredAttempts.sort((a, b) => a.score - b.score);
-              }
-
-              return (
-                <>
-                  <div className="mb-4 text-sm text-gray-600">
-                    Showing {filteredAttempts.length} of {attempts.length} attempts
-                  </div>
-                  <div className="space-y-3">
-                    {filteredAttempts.length === 0 ? (
-                      <div className="bg-white rounded-lg p-8 border border-gray-200 text-center">
-                        <p className="text-gray-600">No attempts found for this paper</p>
-                      </div>
-                    ) : (
-                      filteredAttempts.map((attempt) => (
-              <Link key={attempt.id} href={`/exam/attempts/${attempt.id}`}>
-                <div className="bg-white rounded-lg p-4 border border-gray-200 hover:border-blue-400 hover:shadow-md transition duration-300 cursor-pointer group">
-                  <div className="flex items-center justify-between">
-                    <div className="flex-1 min-w-0">
-                      <h3 className="font-semibold text-gray-900 group-hover:text-blue-600 transition mb-1">
-                        {attempt.paperTitle}
-                      </h3>
-                      <div className="flex items-center gap-4 text-xs text-gray-600">
-                        <span>
-                          {new Date(attempt.submittedat).toLocaleDateString(
-                            "en-US",
-                            {
-                              year: "numeric",
-                              month: "short",
-                              day: "numeric",
-                              hour: "2-digit",
-                              minute: "2-digit",
-                            }
-                          )}
-                        </span>
-                        <span>{attempt.timeTaken} min</span>
-                      </div>
-                    </div>
-                    <div className="flex items-center gap-3 flex-shrink-0">
-                      <div className="text-right">
-                        <div
-                          className={`font-bold ${
-                            attempt.result === "Pass"
-                              ? "text-green-600"
-                              : "text-red-600"
-                          }`}
-                        >
-                          {attempt.score}%
-                        </div>
-                        <div
-                          className={`text-xs font-medium ${
-                            attempt.result === "Pass"
-                              ? "text-green-600"
-                              : "text-red-600"
-                          }`}
-                        >
-                          {attempt.result}
-                        </div>
-                      </div>
-                      <svg
-                        className="w-4 h-4 text-gray-400 group-hover:text-blue-600 transition"
-                        fill="none"
-                        stroke="currentColor"
-                        viewBox="0 0 24 24"
-                      >
-                        <path
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                          strokeWidth={2}
-                          d="M9 5l7 7-7 7"
-                        />
-                      </svg>
-                    </div>
-                  </div>
+        {/* Attempts for one paper */}
+        {openPaperId && openPaperAttempts.length > 0 && (
+          <div
+            className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4"
+            onClick={() => setOpenPaperId(null)}
+          >
+            <div
+              role="dialog"
+              aria-modal="true"
+              aria-labelledby="paper-attempts-title"
+              className="bg-white rounded-xl shadow-xl w-full max-w-2xl max-h-[80vh] flex flex-col"
+              onClick={(e) => e.stopPropagation()}
+            >
+              <div className="flex items-start justify-between gap-4 p-6 border-b border-gray-200">
+                <div>
+                  <h2 id="paper-attempts-title" className="text-xl font-bold text-gray-900">{openPaperTitle}</h2>
+                  <p className="text-sm text-gray-600 mt-1">
+                    {openPaperAttempts.length} {openPaperAttempts.length === 1 ? "attempt" : "attempts"} · {openPaperPassRate}% pass rate · best {openPaperBest}%
+                  </p>
                 </div>
-                      </Link>
-                      ))
-                    )}
-                  </div>
-                </>
-              );
-            })()}
-          </>
+                <button
+                  onClick={() => setOpenPaperId(null)}
+                  aria-label="Close"
+                  className="text-gray-400 hover:text-gray-700 text-2xl leading-none"
+                >
+                  ×
+                </button>
+              </div>
+              <ul className="overflow-y-auto divide-y divide-gray-100">
+                {openPaperAttempts.map((a) => (
+                  <li key={a.id}>
+                    <Link
+                      href={`/exam/attempts/${a.id}`}
+                      className="flex items-center justify-between gap-4 px-6 py-4 hover:bg-gray-50 transition"
+                    >
+                      <div>
+                        <p className="text-sm font-medium text-gray-900">
+                          {new Date(a.submittedat).toLocaleDateString("en-US", {
+                            year: "numeric",
+                            month: "short",
+                            day: "numeric",
+                            hour: "2-digit",
+                            minute: "2-digit",
+                          })}
+                        </p>
+                        <p className="text-xs text-gray-600">{a.timeTaken} min</p>
+                      </div>
+                      <div className="flex items-center gap-3">
+                        <span className={`text-xs font-semibold px-2 py-1 rounded-full ${a.result === "Pass" ? "bg-green-100 text-green-700" : "bg-red-100 text-red-700"}`}>
+                          {a.result}
+                        </span>
+                        <span className={`font-bold ${a.result === "Pass" ? "text-green-600" : "text-red-600"}`}>{a.score}%</span>
+                      </div>
+                    </Link>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          </div>
         )}
       </div>
     </div>
