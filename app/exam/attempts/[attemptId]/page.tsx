@@ -107,41 +107,19 @@ function summarizeAttempt(
     : "";
   const first = [opening, focus].filter(Boolean).join(" ");
 
-  // Line 2: comparison with the previous attempt on this paper
+  // Line 2: overall comparison with the previous attempt on this paper
   let second: string;
   if (!previous) {
     second = pickPhrase([
       "This is your first attempt on this paper, so it's a great starting point.",
       "This is your first attempt on this paper, so there's a clear baseline to build from.",
     ], seed, 4);
+  } else if (score > previous.score) {
+    second = pickPhrase(["Your score is up on last time. Keep that momentum going!", "Nice progress, your score is higher than last time. Keep it up!"], seed, 5);
+  } else if (score === previous.score) {
+    second = pickPhrase(["Your score is steady compared with last time.", "Your score is the same as last time, so there's room to push it higher."], seed, 5);
   } else {
-    const up = score > previous.score;
-    const base = up
-      ? pickPhrase(["Your score is up on last time", "Nice progress, your score is higher than last time"], seed, 5)
-      : score === previous.score
-      ? "Your score is steady compared with last time"
-      : pickPhrase(["Your score dipped a little from last time, but that's part of learning", "Your score is a little lower than last time, which is normal while you learn"], seed, 5);
-
-    const prevMap = new Map(previous.chapters.map((c) => [c.chapter, c.percentage]));
-    const changes = chapters
-      .filter((c) => prevMap.has(c.chapter))
-      .map((c) => ({ chapter: c.chapter, diff: c.percentage - (prevMap.get(c.chapter) as number) }));
-    const improved = changes.filter((c) => c.diff >= 10).map((c) => c.chapter).sort((x, y) => x - y);
-    const slipped = changes.filter((c) => c.diff <= -10).map((c) => c.chapter).sort((x, y) => x - y);
-
-    const parts: string[] = [];
-    if (improved.length > 0) {
-      parts.push(`${listChapters(improved, 2)} ${improved.length === 1 ? "is" : "are"} improving`);
-    }
-    if (slipped.length > 0) {
-      parts.push(`${listChapters(slipped, 2)} ${slipped.length === 1 ? "needs" : "need"} a little more practice`);
-    }
-    const tail = up
-      ? pickPhrase(["Keep it up!", "Keep that momentum going!"], seed, 6)
-      : pickPhrase(["Every attempt makes you stronger.", "Keep practising, you're getting there."], seed, 6);
-    second = parts.length > 0
-      ? `${base}, with ${parts.join(" and ")}. ${tail}`
-      : `${base}. ${tail}`;
+    second = pickPhrase(["Your score dipped a little from last time, but that's part of learning.", "Your score is a little lower than last time, which is normal while you learn."], seed, 5);
   }
 
   return [first, second];

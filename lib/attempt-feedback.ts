@@ -114,7 +114,8 @@ async function gatherFacts(attemptId: string, userId: string) {
       passed: !!attempt.passed,
       chapters: current.chapters,
       wrongQuestions,
-      previous,
+      // Only the previous overall score is shared: chapter changes are not discussed
+      previous: previous ? { score: previous.score } : null,
     },
     attemptRow: attempt,
   };
@@ -125,8 +126,8 @@ const SYSTEM_PROMPT = `You write short, personalised feedback for a student who 
 Rules:
 - Use only the facts provided. Do not invent topics, numbers or history.
 - Write exactly two lines.
-- Line 1: say how the student is doing overall, then name the chapter or concept to revise next. Use the wrong questions to make it specific (for example, the topic those questions cover), in one short sentence.
-- Line 2: compare with the previous attempt if one is provided (say whether the score is higher, steady or lower, and mention any chapter that clearly improved or needs more practice). If there is no previous attempt, say it is the first attempt on this paper. End with an encouraging phrase.
+- Line 1: say how the student is doing overall, then name the chapter or concept to revise next. Only line 1 may name chapters. Use the wrong questions to make it specific (for example, the topic those questions cover), in one short sentence.
+- Line 2: compare only the overall score with the previous attempt if one is provided (say whether it is higher, steady or lower). Do not name any chapter in line 2. If there is no previous attempt, say it is the first attempt on this paper. End with an encouraging phrase.
 - If the student passed or is within 10 points of the pass mark, be upbeat and say they are on track or close to passing. Otherwise be reassuring and practical.
 - Each line must be under 35 words.
 - Do not write percentages or numeric scores. Do not mention that you are an AI.
