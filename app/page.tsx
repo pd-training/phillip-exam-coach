@@ -304,9 +304,9 @@ export default function LandingPage() {
       <section id="signup" className="scroll-mt-24 bg-blue-900 px-6 py-16 border-y border-blue-800">
         <div className="max-w-7xl mx-auto grid md:grid-cols-2 gap-12 items-center">
           <div className="text-white">
-            <h2 className="text-3xl md:text-4xl font-bold mb-4">Start your exam preparation</h2>
+            <h2 className="text-3xl md:text-4xl font-bold mb-4">Ready to Pass Your CMFAS Exam?</h2>
             <p className="text-blue-100 text-lg leading-relaxed max-w-md">
-              Choose your CMFAS paper and start practising straight away. Your progress is saved, so you can pick up where you left off.
+              Start your free practice today.
             </p>
           </div>
           <div className="w-full max-w-md md:justify-self-end">
