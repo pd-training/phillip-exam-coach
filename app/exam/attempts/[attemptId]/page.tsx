@@ -51,12 +51,10 @@ type ChapterPct = { chapter: number; percentage: number };
 function listChapters(nums: number[], max: number): string {
   if (nums.length === 0) return "";
   const shown = nums.slice(0, max);
-  const more = nums.length - shown.length;
   const label = (n: number) => `Chapter ${n}`;
-  const list = shown.length === 1
+  return shown.length === 1
     ? label(shown[0])
     : `${shown.slice(0, -1).map(label).join(", ")} and ${label(shown[shown.length - 1])}`;
-  return more > 0 ? `${list} and ${more} more` : list;
 }
 
 // Feedback wording is rotated by a seed (derived from the attempt id) so the
