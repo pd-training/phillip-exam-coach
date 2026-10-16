@@ -42,7 +42,7 @@ export default function HelpPage() {
             <h2 className="text-2xl font-semibold text-gray-900 mb-4">Getting Started</h2>
             <div className="space-y-3 text-gray-700">
               <p>
-                <strong>Dashboard:</strong> Your starting point. View your exam performance, recent attempts, and AI-recommended focus areas to help you study smarter.
+                <strong>Dashboard:</strong> Your starting point. View your exam performance, recent attempts, and where to focus next to help you study smarter.
               </p>
               <p>
                 <strong>Your Papers:</strong> Practice papers that have been assigned to you. Select a paper and choose from three practice modes: Full Exam, Quick Quiz, or Practice by Chapter.
@@ -126,7 +126,7 @@ export default function HelpPage() {
               </div>
               <div>
                 <p className="font-semibold text-gray-900">📚 Practice by Chapter</p>
-                <p className="text-sm">Focus on specific topics. Answer all questions in a chapter with immediate feedback. You'll see AI-recommended chapters highlighted based on your past performance.</p>
+                <p className="text-sm">Focus on specific topics. Answer all questions in a chapter with immediate feedback. You'll see the chapters to focus on highlighted based on your past performance.</p>
               </div>
             </div>
           </section>

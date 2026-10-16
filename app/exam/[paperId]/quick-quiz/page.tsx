@@ -59,6 +59,8 @@ export default function QuickQuizMode() {
   const [answered, setAnswered] = useState(0);
   const [completed, setCompleted] = useState(false);
   const [paperTitle, setPaperTitle] = useState<string>("");
+  // Questions answered incorrectly in the current run, used for "Practise what I got wrong"
+  const [missed, setMissed] = useState<Question[]>([]);
 
   // Auth check
   useEffect(() => {
@@ -111,6 +113,8 @@ export default function QuickQuizMode() {
         setShowingFeedback(true);
         if (data.isCorrect) {
           setScore(score + 1);
+        } else {
+          setMissed((prev) => [...prev, questions[currentQIndex]]);
         }
         setAnswered(answered + 1);
       }
@@ -149,6 +153,20 @@ export default function QuickQuizMode() {
     setScore(0);
     setAnswered(0);
     setCompleted(false);
+    setMissed([]);
+  };
+
+  // Run again using only the questions answered incorrectly in the last run
+  const handlePractiseMissed = () => {
+    setQuestions(missed);
+    setCurrentQIndex(0);
+    setSelectedAnswer("");
+    setFeedback(null);
+    setShowingFeedback(false);
+    setScore(0);
+    setAnswered(0);
+    setCompleted(false);
+    setMissed([]);
   };
 
   if (loading) return <div style={{ padding: "20px" }}>Loading quiz...</div>;
@@ -169,6 +187,18 @@ export default function QuickQuizMode() {
                 {score} out of {questions.length} correct
               </p>
             </div>
+
+            {missed.length > 0 && (
+              <div className="mb-6">
+                <button
+                  onClick={handlePractiseMissed}
+                  className="w-full px-6 py-3 bg-amber-400 hover:bg-amber-300 text-blue-900 rounded-lg font-semibold transition duration-200"
+                >
+                  Practise what I got wrong ({missed.length})
+                </button>
+                <p className="mt-2 text-sm text-gray-600">Revisit only the {missed.length} question{missed.length !== 1 ? "s" : ""} you missed.</p>
+              </div>
+            )}
 
             <div className="flex gap-3">
               <button

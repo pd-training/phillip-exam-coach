@@ -250,7 +250,7 @@ export default function PracticePage() {
           </div>
         </div>
 
-        {/* AI Recommended Focus Areas for This Paper */}
+        {/* Where to focus next for this paper */}
         <div className="mb-12">
           <div className="flex items-center gap-3 mb-6">
             <div className="w-8 h-8 bg-gradient-to-br from-yellow-300 to-orange-400 rounded flex items-center justify-center">
@@ -258,7 +258,7 @@ export default function PracticePage() {
                 <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z" />
               </svg>
             </div>
-            <h2 className="text-2xl font-bold text-gray-900">AI Recommended Focus Areas</h2>
+            <h2 className="text-2xl font-bold text-gray-900">Where to focus next</h2>
           </div>
 
           {recommendedChapters.length > 0 ? (
