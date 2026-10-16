@@ -528,8 +528,8 @@ export default function StudentDashboard() {
                     </h3>
                     <div className="flex flex-col gap-3">
                       {status === 'owned' && (
-                        <Link href={`/exam/${paper.id}/full-exam`} className="block w-full px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 font-medium text-center text-sm">
-                            Practice →
+                        <Link href={`/exam/${paper.id}`} className="block w-full px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 font-medium text-center text-sm">
+                            Choose a mode →
                           </Link>
                       )}
 
