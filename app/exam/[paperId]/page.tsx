@@ -139,11 +139,9 @@ export default function PracticePage() {
             ) : (
               <p className="text-gray-600">Paper not found</p>
             )}
-            <Link href="/dashboard">
-              <button className="mt-4 px-6 py-2 bg-blue-900 hover:bg-blue-800 text-white rounded-lg font-medium transition duration-200">
+            <Link href="/dashboard" className="inline-block mt-4 px-6 py-2 bg-blue-900 hover:bg-blue-800 text-white rounded-lg font-medium transition duration-200">
                 Back to Dashboard
-              </button>
-            </Link>
+              </Link>
           </div>
         </div>
       </div>
@@ -228,8 +226,7 @@ export default function PracticePage() {
             </button>
 
             {/* Practice by Chapter */}
-            <Link href={`/exam/${paperId}/practice-chapter`}>
-              <button className="group w-full bg-white rounded-2xl p-8 border-2 border-gray-200 hover:border-blue-500 hover:shadow-lg transition duration-300 text-left">
+            <Link href={`/exam/${paperId}/practice-chapter`} className="group w-full bg-white rounded-2xl p-8 border-2 border-gray-200 hover:border-blue-500 hover:shadow-lg transition duration-300 text-left">
                 <div className="w-14 h-14 bg-blue-50 rounded-lg flex items-center justify-center mb-6 group-hover:bg-blue-500 transition duration-200">
                   <svg className="w-7 h-7 text-blue-600 group-hover:text-white transition duration-200" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 4H5a2 2 0 00-2 2v14a2 2 0 002 2h10a2 2 0 002-2V8.5L9 4z" />
@@ -245,8 +242,7 @@ export default function PracticePage() {
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
                   </svg>
                 </div>
-              </button>
-            </Link>
+              </Link>
           </div>
         </div>
 

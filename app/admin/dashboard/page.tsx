@@ -257,11 +257,9 @@ export default function AdminDashboard() {
                             {timeTaken} min
                           </td>
                           <td className="px-6 py-4 text-sm">
-                            <Link href={`/admin/attempts/${attempt.id}`}>
-                              <button className="px-3 py-2 bg-blue-900 hover:bg-blue-800 text-white rounded-lg text-xs font-medium transition">
+                            <Link href={`/admin/attempts/${attempt.id}`} className="inline-block px-3 py-2 bg-blue-900 hover:bg-blue-800 text-white rounded-lg text-xs font-medium transition">
                                 View Answers
-                              </button>
-                            </Link>
+                              </Link>
                           </td>
                         </tr>
                       );
@@ -275,11 +273,9 @@ export default function AdminDashboard() {
               <p className="text-sm text-gray-600">{Math.min(5, attempts.length)} of {attempts.length} attempts</p>
               <div className="flex gap-3">
                 {attempts.length > 5 && (
-                  <Link href="/admin/attempts">
-                    <button className="text-blue-600 hover:text-blue-700 font-medium text-sm">
+                  <Link href="/admin/attempts" className="text-blue-600 hover:text-blue-700 font-medium text-sm">
                       View all attempts →
-                    </button>
-                  </Link>
+                    </Link>
                 )}
               </div>
             </div>
@@ -339,11 +335,9 @@ export default function AdminDashboard() {
 
             <div className="p-4 border-t border-gray-200 flex justify-between items-center">
               <p className="text-sm text-gray-600">{requests.length} total requests</p>
-              <Link href="/admin/assign-papers">
-                <button className="text-blue-600 hover:text-blue-700 font-medium text-sm">
+              <Link href="/admin/assign-papers" className="text-blue-600 hover:text-blue-700 font-medium text-sm">
                   View All →
-                </button>
-              </Link>
+                </Link>
             </div>
           </div>
         </div>

@@ -249,7 +249,7 @@ export default function BrowsePapersPage() {
                     {status === 'owned' && (
                       <Link
                         href={`/exam/${paper.id}`}
-                        className="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 font-medium text-center whitespace-nowrap"
+                        className="inline-block px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 font-medium text-center whitespace-nowrap"
                       >
                         Practice →
                       </Link>

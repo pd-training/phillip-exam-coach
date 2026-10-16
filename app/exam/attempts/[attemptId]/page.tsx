@@ -299,11 +299,9 @@ export default function AttemptReviewPage() {
         <div className="max-w-7xl mx-auto px-6 py-12">
           <div className="bg-red-50 border border-red-200 rounded-lg p-6 text-red-800">
             <p>{error || 'Attempt not found'}</p>
-            <Link href="/dashboard">
-              <button className="mt-4 px-4 py-2 bg-red-600 hover:bg-red-700 text-white rounded-lg">
+            <Link href="/dashboard" className="inline-block mt-4 px-4 py-2 bg-red-600 hover:bg-red-700 text-white rounded-lg">
                 Back to Dashboard
-              </button>
-            </Link>
+              </Link>
           </div>
         </div>
       </div>
@@ -533,17 +531,13 @@ export default function AttemptReviewPage() {
 
             <div className="p-6 border-t border-gray-200">
               {attempt.passed ? (
-                <Link href="/explore">
-                  <button className="w-full px-4 py-3 bg-green-600 hover:bg-green-700 text-white text-sm font-semibold rounded-lg transition">
+                <Link href="/explore" className="block w-full px-4 py-3 bg-green-600 hover:bg-green-700 text-white text-sm font-semibold rounded-lg transition">
                     ✓ Try Another Paper
-                  </button>
-                </Link>
+                  </Link>
               ) : (
-                <Link href={`/exam/${attempt.paperid}`}>
-                  <button className="w-full px-4 py-3 bg-blue-900 hover:bg-blue-800 text-white text-sm font-semibold rounded-lg transition">
+                <Link href={`/exam/${attempt.paperid}`} className="block w-full px-4 py-3 bg-blue-900 hover:bg-blue-800 text-white text-sm font-semibold rounded-lg transition">
                     Practice Again
-                  </button>
-                </Link>
+                  </Link>
               )}
             </div>
           </div>

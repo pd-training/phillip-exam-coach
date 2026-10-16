@@ -372,11 +372,9 @@ export default function ExplorePage() {
                           <p>❓ {paper.totalQuestions} questions</p>
                         )}
                       </div>
-                      <Link href={`/exam/${paper.id}`}>
-                        <button className="w-full px-4 py-2 bg-blue-900 hover:bg-blue-800 text-white rounded-lg font-medium transition">
+                      <Link href={`/exam/${paper.id}`} className="block w-full px-4 py-2 bg-blue-900 hover:bg-blue-800 text-white rounded-lg font-medium transition">
                           Practice →
-                        </button>
-                      </Link>
+                        </Link>
                       {paper.externalLink && (
                         <a
                           href={paper.externalLink}
@@ -518,11 +516,9 @@ export default function ExplorePage() {
                       <p className="text-sm text-blue-700 font-medium mb-3">
                         Ready to use! 🎉
                       </p>
-                      <Link href={`/exam/${paper.id}`}>
-                        <button className="w-full px-4 py-2 bg-blue-900 hover:bg-blue-800 text-white rounded-lg font-medium transition">
+                      <Link href={`/exam/${paper.id}`} className="block w-full px-4 py-2 bg-blue-900 hover:bg-blue-800 text-white rounded-lg font-medium transition">
                           Start Practicing →
-                        </button>
-                      </Link>
+                        </Link>
                       {paper.externalLink && (
                         <a
                           href={paper.externalLink}

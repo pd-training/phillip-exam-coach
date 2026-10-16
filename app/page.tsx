@@ -53,11 +53,9 @@ export default function LandingPage() {
             <a href="#features" className="text-blue-200 hover:text-blue-400 transition font-medium">Features</a>
             <a href="#how-it-works" className="text-blue-200 hover:text-blue-400 transition font-medium">How It Works</a>
             <a href="#stats" className="text-blue-200 hover:text-blue-400 transition font-medium">Why Choose Us</a>
-            <Link href="/login">
-              <button className="px-6 py-2 text-amber-400 hover:text-blue-300 font-medium transition">
+            <Link href="/login" className="inline-block px-6 py-2 text-amber-400 hover:text-blue-300 font-medium transition">
                 Sign In
-              </button>
-            </Link>
+              </Link>
           </nav>
         </div>
       </header>
@@ -111,11 +109,9 @@ export default function LandingPage() {
                   Start Practicing Free
                 </button>
               </a>
-              <Link href="/login">
-                <button className="px-8 py-4 border-2 border-blue-400 text-amber-400 hover:bg-blue-400/10 rounded-lg font-semibold transition-all duration-300 transform hover:scale-105 active:scale-95">
+              <Link href="/login" className="inline-block px-8 py-4 border-2 border-blue-400 text-amber-400 hover:bg-blue-400/10 rounded-lg font-semibold transition-all duration-300 transform hover:scale-105 active:scale-95">
                   Sign In to Continue
-                </button>
-              </Link>
+                </Link>
             </div>
 
             {/* Social Proof */}
@@ -303,11 +299,9 @@ export default function LandingPage() {
             </ul>
             <div className="pt-6 border-t border-gray-200">
               <p className="text-sm text-gray-600 mb-3">Already a member?</p>
-              <Link href="/login">
-                <button className="px-6 py-3 border-2 border-blue-900 text-blue-900 hover:bg-blue-900 hover:text-white rounded-lg font-semibold transition-colors duration-300">
+              <Link href="/login" className="inline-block px-6 py-3 border-2 border-blue-900 text-blue-900 hover:bg-blue-900 hover:text-white rounded-lg font-semibold transition-colors duration-300">
                   Sign In
-                </button>
-              </Link>
+                </Link>
             </div>
           </div>
           <div className="w-full max-w-md md:justify-self-end">

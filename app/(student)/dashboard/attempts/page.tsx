@@ -24,6 +24,15 @@ export default function AllAttemptsPage() {
   const [openPaperId, setOpenPaperId] = useState<string | null>(null);
   const [recs, setRecs] = useState<any>(null);
   const [paperSort, setPaperSort] = useState<{ key: 'paper' | 'attempts' | 'passRate' | 'avgScore' | 'best'; dir: 'asc' | 'desc' }>({ key: 'attempts', dir: 'desc' });
+  const [quizSessions, setQuizSessions] = useState<any[]>([]);
+
+  useEffect(() => {
+    if (status !== "authenticated") return;
+    fetch("/api/student/quick-quiz-sessions")
+      .then((res) => (res.ok ? res.json() : { sessions: [] }))
+      .then((data) => setQuizSessions(data.sessions || []))
+      .catch(() => setQuizSessions([]));
+  }, [status]);
 
   useEffect(() => {
     if (status !== "authenticated") return;
@@ -209,6 +218,39 @@ export default function AllAttemptsPage() {
           </div>
         )}
 
+        {/* Recent quick quizzes */}
+        {quizSessions.length > 0 && (
+          <div className="mb-8 bg-white rounded-lg p-6 border border-gray-200">
+            <h2 className="text-xl font-bold text-gray-900 mb-4">Recent quick quizzes</h2>
+            <div className="overflow-x-auto">
+              <table className="w-full text-sm">
+                <thead>
+                  <tr className="border-b border-gray-200 text-left text-xs text-gray-600">
+                    <th className="py-2 pr-4 font-semibold">Paper</th>
+                    <th className="py-2 pr-4 font-semibold">Date</th>
+                    <th className="py-2 pr-4 font-semibold text-right">Questions</th>
+                    <th className="py-2 font-semibold text-right">Score</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {quizSessions.map((q) => (
+                    <tr key={q.id} className="border-b border-gray-100">
+                      <td className="py-3 pr-4 font-medium text-gray-900">{q.paperTitle || "Paper"}</td>
+                      <td className="py-3 pr-4 text-gray-700">
+                        {new Date(q.createdAt).toLocaleDateString("en-SG", { day: "numeric", month: "short", year: "numeric" })}
+                      </td>
+                      <td className="py-3 pr-4 text-right text-gray-900">{q.totalQuestions}</td>
+                      <td className={`py-3 text-right font-semibold ${q.percentage >= 50 ? "text-green-600" : "text-red-600"}`}>
+                        {q.correctCount} / {q.totalQuestions} ({q.percentage}%)
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </div>
+        )}
+
         {/* Next Steps (rules-based recommendations) */}
         {recs && (recs.priority.length > 0 || recs.review.length > 0 || recs.notPractised.length > 0) && (
           <div className="mb-8 bg-white rounded-lg p-6 border border-gray-200">
@@ -233,7 +275,7 @@ export default function AllAttemptsPage() {
                       <div className="flex items-center gap-4 flex-shrink-0">
                         <Link
                           href={`/exam/${c.paperId}/practice-chapter/${c.chapterNumber}`}
-                          className="px-4 py-2 bg-blue-900 hover:bg-blue-800 text-white text-sm font-semibold rounded-lg transition"
+                          className="inline-block px-4 py-2 bg-blue-900 hover:bg-blue-800 text-white text-sm font-semibold rounded-lg transition"
                         >
                           Practise chapter
                         </Link>

@@ -61,6 +61,8 @@ export default function QuickQuizMode() {
   const [paperTitle, setPaperTitle] = useState<string>("");
   // Questions answered incorrectly in the current run, used for "Practise what I got wrong"
   const [missed, setMissed] = useState<Question[]>([]);
+  // Every answer in the current run, saved to the student's progress when the quiz finishes
+  const [sessionAnswers, setSessionAnswers] = useState<{ questionId: string; answer: string }[]>([]);
 
   // Auth check
   useEffect(() => {
@@ -116,6 +118,7 @@ export default function QuickQuizMode() {
         } else {
           setMissed((prev) => [...prev, questions[currentQIndex]]);
         }
+        setSessionAnswers((prev) => [...prev, { questionId: questions[currentQIndex].id, answer: selectedAnswer }]);
         setAnswered(answered + 1);
       }
     } catch (error) {
@@ -141,7 +144,17 @@ export default function QuickQuizMode() {
       setShowingFeedback(false);
     } else {
       setCompleted(true);
+      saveSession(sessionAnswers);
     }
+  };
+
+  const saveSession = (answers: { questionId: string; answer: string }[]) => {
+    if (answers.length === 0) return;
+    fetch("/api/student/quick-quiz-sessions", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ paperId, answers }),
+    }).catch((error) => console.error("Save quiz error:", error));
   };
 
   const handleRetryQuiz = () => {
@@ -154,6 +167,7 @@ export default function QuickQuizMode() {
     setAnswered(0);
     setCompleted(false);
     setMissed([]);
+    setSessionAnswers([]);
   };
 
   // Run again using only the questions answered incorrectly in the last run
@@ -167,6 +181,7 @@ export default function QuickQuizMode() {
     setAnswered(0);
     setCompleted(false);
     setMissed([]);
+    setSessionAnswers([]);
   };
 
   if (loading) return <div style={{ padding: "20px" }}>Loading quiz...</div>;

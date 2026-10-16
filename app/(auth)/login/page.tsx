@@ -30,11 +30,9 @@ export default function LoginPage() {
             </p>
             <div className="pt-6 border-t border-blue-800">
               <p className="text-sm text-blue-200 mb-3">New to FinanceReady?</p>
-              <Link href="/#signup">
-                <button className="px-6 py-3 border-2 border-blue-400 text-amber-400 hover:bg-blue-400/10 rounded-lg font-semibold transition-colors duration-300">
+              <Link href="/#signup" className="inline-block px-6 py-3 border-2 border-blue-400 text-amber-400 hover:bg-blue-400/10 rounded-lg font-semibold transition-colors duration-300">
                   Start your exam preparation
-                </button>
-              </Link>
+                </Link>
             </div>
           </div>
 
