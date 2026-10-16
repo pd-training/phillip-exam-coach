@@ -282,12 +282,12 @@ export default function StudentDashboard() {
                           </div>
                         </div>
                         <Link href={`/exam/${paper.paperId}`} className="block w-full px-3 py-2 bg-blue-900 hover:bg-blue-800 text-white rounded-lg font-medium text-sm transition">
-                            Practice Again →
+                            Choose a mode →
                           </Link>
                       </>
                     ) : (
                       <Link href={`/exam/${paper.paperId}`} className="block w-full px-3 py-2 bg-blue-900 hover:bg-blue-800 text-white rounded-lg font-medium text-sm transition">
-                          Start →
+                          Choose a mode →
                         </Link>
                     )}
                   </div>
@@ -409,7 +409,7 @@ export default function StudentDashboard() {
                           </div>
                         </button>
                         <Link href={`/exam/${paperId}`} className="block w-full mt-3 px-2 py-1.5 bg-blue-900 hover:bg-blue-800 text-white rounded text-xs font-semibold transition">
-                            Practice Again
+                            Choose a mode
                           </Link>
                       </div>
                     );

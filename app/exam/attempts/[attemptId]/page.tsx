@@ -536,7 +536,7 @@ export default function AttemptReviewPage() {
                   </Link>
               ) : (
                 <Link href={`/exam/${attempt.paperid}`} className="block w-full px-4 py-3 bg-blue-900 hover:bg-blue-800 text-white text-sm font-semibold rounded-lg transition">
-                    Practice Again
+                    Choose a mode
                   </Link>
               )}
             </div>

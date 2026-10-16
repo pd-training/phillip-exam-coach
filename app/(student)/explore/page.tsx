@@ -373,7 +373,7 @@ export default function ExplorePage() {
                         )}
                       </div>
                       <Link href={`/exam/${paper.id}`} className="block w-full px-4 py-2 bg-blue-900 hover:bg-blue-800 text-white rounded-lg font-medium transition">
-                          Practice →
+                          Choose a mode →
                         </Link>
                       {paper.externalLink && (
                         <a
@@ -517,7 +517,7 @@ export default function ExplorePage() {
                         Ready to use! 🎉
                       </p>
                       <Link href={`/exam/${paper.id}`} className="block w-full px-4 py-2 bg-blue-900 hover:bg-blue-800 text-white rounded-lg font-medium transition">
-                          Start Practicing →
+                          Choose a mode →
                         </Link>
                       {paper.externalLink && (
                         <a
