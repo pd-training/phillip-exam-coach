@@ -240,32 +240,6 @@ export default function StudentDashboard() {
 
       {/* Main Content */}
       <div className="max-w-7xl mx-auto px-6 py-12">
-        {/* New User Welcome Banner */}
-        {attempts.length === 0 && studentPapers.length === 0 && (
-          <div className="mb-12 bg-gradient-to-r from-blue-50 to-blue-100 border-2 border-blue-200 rounded-lg p-8">
-            <div className="flex items-start justify-between">
-              <div>
-                <h2 className="text-2xl font-bold text-gray-900 mb-2">Welcome to Finance Ready! 👋</h2>
-                <p className="text-gray-700 mb-4">
-                  Get ready for your certification exams with our comprehensive practice platform.
-                </p>
-                <div className="space-y-2 text-sm text-gray-700 mb-6">
-                  <p><span className="font-semibold">📋 Step 1:</span> Request access to papers in the Explore section</p>
-                  <p><span className="font-semibold">✅ Step 2:</span> Wait for admin approval (or get instant access if pre-assigned)</p>
-                  <p><span className="font-semibold">📚 Step 3:</span> Start practicing with Full Exam, Quick Quiz, or Chapter modes</p>
-                  <p><span className="font-semibold">📊 Step 4:</span> Track your progress and focus on weak areas</p>
-                </div>
-                <Link href="/explore">
-                  <button className="px-6 py-3 bg-blue-900 hover:bg-blue-800 text-white rounded-lg font-semibold transition">
-                    Browse Papers & Request Access →
-                  </button>
-                </Link>
-              </div>
-              <div className="hidden md:block text-6xl">🚀</div>
-            </div>
-          </div>
-        )}
-
         {/* Your Papers - Quick Access */}
         {studentPapers.length > 0 && (
           <div className="mb-12">
