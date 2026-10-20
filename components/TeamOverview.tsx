@@ -55,6 +55,18 @@ function statusClass(status: PaperProgress["status"]) {
   return "text-gray-600 bg-gray-100";
 }
 
+function cardBorder(status: PaperProgress["status"]) {
+  if (status === "Passed") return "border-green-500";
+  if (status === "Failed") return "border-red-500";
+  return "border-gray-300";
+}
+
+function scoreColour(status: PaperProgress["status"]) {
+  if (status === "Passed") return "text-green-700";
+  if (status === "Failed") return "text-red-700";
+  return "text-gray-600";
+}
+
 function bestText(score: number | null) {
   return score === null ? "No attempts" : `${score}%`;
 }
@@ -162,12 +174,8 @@ export default function TeamOverview() {
                           {st.papers.length === 0 && <span className="text-gray-500">None assigned</span>}
                           <div className="space-y-2">
                             {st.papers.map((p) => (
-                              <div key={p.paperId} className="text-xs text-gray-700">
-                                <span className="px-2 py-0.5 rounded bg-gray-100 text-gray-800 font-medium">{p.title}</span>
-                                <span className="ml-2 text-gray-500">registered {formatDate(p.registeredAt)}</span>
-                                <span className={`ml-2 px-1.5 py-0.5 rounded font-semibold ${statusClass(p.status)}`}>
-                                  {p.status}
-                                </span>
+                              <div key={p.paperId}>
+                                <span className="px-2 py-0.5 rounded bg-gray-100 text-gray-800 text-xs font-medium">{p.title}</span>
                               </div>
                             ))}
                           </div>
@@ -184,61 +192,23 @@ export default function TeamOverview() {
                       {isOpen && (
                         <tr className="bg-gray-50 border-b border-gray-200">
                           <td colSpan={5} className="px-6 py-5">
-                            {/* Best scores by paper */}
+                            {/* Best scores by paper, colour coded by status */}
                             <p className="text-xs font-semibold text-gray-600 uppercase tracking-wide mb-2">Best scores by paper</p>
                             {st.papers.length === 0 ? (
-                              <p className="text-sm text-gray-600 mb-4">No papers assigned.</p>
+                              <p className="text-sm text-gray-600">No papers assigned.</p>
                             ) : (
-                              <div className="grid md:grid-cols-2 gap-3 mb-6">
+                              <div className="grid md:grid-cols-2 gap-3">
                                 {st.papers.map((p) => (
-                                  <div key={p.paperId} className="bg-white rounded-lg border border-gray-200 p-4 text-sm">
+                                  <div key={p.paperId} className={`rounded-lg border-2 bg-white p-4 text-sm ${cardBorder(p.status)}`}>
                                     <p className="font-semibold text-gray-900 mb-2">{p.title}</p>
-                                    <p className="text-gray-700">Full exam best: {bestText(p.bestFull)} <span className="text-gray-500">(pass {p.passingScore}%)</span></p>
+                                    <p className="text-gray-700">
+                                      Full exam best:{" "}
+                                      <span className={`font-semibold ${scoreColour(p.status)}`}>{bestText(p.bestFull)}</span>
+                                      <span className="text-gray-500"> (pass {p.passingScore}%)</span>
+                                    </p>
                                     <p className="text-gray-700">Quick quiz best: {bestText(p.bestQuiz)}</p>
                                   </div>
                                 ))}
-                              </div>
-                            )}
-
-                            {/* Past attempts */}
-                            <p className="text-xs font-semibold text-gray-600 uppercase tracking-wide mb-2">Past attempts</p>
-                            {st.attempts.length === 0 ? (
-                              <p className="text-sm text-gray-600">No attempts yet.</p>
-                            ) : (
-                              <div className="bg-white rounded-lg border border-gray-200 overflow-x-auto">
-                                <table className="w-full text-sm">
-                                  <thead>
-                                    <tr className="border-b border-gray-200 text-left text-xs text-gray-600">
-                                      <th className="px-4 py-2 font-semibold">Date</th>
-                                      <th className="px-4 py-2 font-semibold">Paper</th>
-                                      <th className="px-4 py-2 font-semibold">Type</th>
-                                      <th className="px-4 py-2 font-semibold text-right">Score</th>
-                                      <th className="px-4 py-2 font-semibold">Result</th>
-                                    </tr>
-                                  </thead>
-                                  <tbody>
-                                    {st.attempts.map((t, i) => {
-                                      const result = t.kind === "Full exam"
-                                        ? t.score >= t.passingScore ? "Passed" : "Failed"
-                                        : "—";
-                                      return (
-                                        <tr key={i} className="border-b border-gray-100">
-                                          <td className="px-4 py-2 text-gray-700 whitespace-nowrap">{formatDate(t.date)}</td>
-                                          <td className="px-4 py-2 text-gray-900">{t.title}</td>
-                                          <td className="px-4 py-2 text-gray-700">{t.kind}</td>
-                                          <td className="px-4 py-2 text-right text-gray-900">{t.score}%</td>
-                                          <td className="px-4 py-2">
-                                            {result === "—" ? (
-                                              <span className="text-gray-500">—</span>
-                                            ) : (
-                                              <span className={result === "Passed" ? "text-green-700 font-semibold" : "text-red-700 font-semibold"}>{result}</span>
-                                            )}
-                                          </td>
-                                        </tr>
-                                      );
-                                    })}
-                                  </tbody>
-                                </table>
                               </div>
                             )}
                           </td>
