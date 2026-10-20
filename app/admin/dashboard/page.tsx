@@ -3,6 +3,7 @@
 import { useEffect, useState } from 'react';
 import { useToast } from "@/components/Toast";
 import AdminNav from '@/components/AdminNav';
+import TeamOverview from '@/components/TeamOverview';
 import Link from 'next/link';
 
 interface DashboardStats {
@@ -145,7 +146,7 @@ export default function AdminDashboard() {
       <div className="bg-gradient-to-r from-blue-900 to-blue-800 text-white py-12 px-0 border-b border-blue-900">
         <div className="max-w-7xl mx-auto px-6">
           <h1 className="text-4xl font-bold mb-2">Admin Dashboard</h1>
-          <p className="text-blue-100">Monitor system activity and manage exam papers</p>
+          <p className="text-blue-100">Track student progress and manage exam papers</p>
         </div>
       </div>
 
@@ -157,47 +158,9 @@ export default function AdminDashboard() {
           </div>
         )}
 
-        {/* Stats Grid */}
-        <div className="grid md:grid-cols-5 gap-6 mb-12">
-          {/* Total Users */}
-          <div className="bg-white rounded-2xl p-6 border border-gray-200 hover:border-blue-300 transition">
-            <div>
-              <p className="text-gray-600 text-sm font-medium mb-2">Total Users</p>
-              <p className="text-3xl font-bold text-gray-900">{stats?.totalUsers || 0}</p>
-            </div>
-          </div>
-
-          {/* Active Users */}
-          <div className="bg-white rounded-2xl p-6 border border-gray-200 hover:border-blue-300 transition">
-            <div>
-              <p className="text-gray-600 text-sm font-medium mb-2">Active Today</p>
-              <p className="text-3xl font-bold text-gray-900">{stats?.activeUsers || 0}</p>
-            </div>
-          </div>
-
-          {/* Attempts Today */}
-          <div className="bg-white rounded-2xl p-6 border border-gray-200 hover:border-blue-300 transition">
-            <div>
-              <p className="text-gray-600 text-sm font-medium mb-2">Attempts Today</p>
-              <p className="text-3xl font-bold text-gray-900">{stats?.attemptsToday || 0}</p>
-            </div>
-          </div>
-
-          {/* Average Score */}
-          <div className="bg-white rounded-2xl p-6 border border-gray-200 hover:border-blue-300 transition">
-            <div>
-              <p className="text-gray-600 text-sm font-medium mb-2">Avg Score</p>
-              <p className="text-3xl font-bold text-gray-900">{stats?.avgScore || '0'}%</p>
-            </div>
-          </div>
-
-          {/* Pass Rate */}
-          <div className="bg-white rounded-2xl p-6 border border-gray-200 hover:border-blue-300 transition">
-            <div>
-              <p className="text-gray-600 text-sm font-medium mb-2">Pass Rate</p>
-              <p className="text-3xl font-bold text-gray-900">{stats?.passRate || 0}%</p>
-            </div>
-          </div>
+        {/* Team overview: student progress */}
+        <div className="mb-12">
+          <TeamOverview />
         </div>
 
         <div className="grid lg:grid-cols-3 gap-8">
