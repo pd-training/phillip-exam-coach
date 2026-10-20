@@ -174,11 +174,11 @@ export default function TeamOverview({ sideCard }: { sideCard?: ReactNode }) {
                         </td>
                         <td className="px-4 py-4">
                           {st.papers.length === 0 && <span className="text-gray-500">None assigned</span>}
-                          <div className="flex flex-wrap gap-1.5">
+                          <div className="flex flex-wrap gap-2">
                             {st.papers.map((p) => (
                               <span
                                 key={p.paperId}
-                                className="px-2.5 py-1 rounded-full border border-gray-300 bg-gray-50 text-gray-800 text-xs font-medium whitespace-nowrap"
+                                className="px-3 py-1.5 rounded-full border border-gray-300 bg-gray-50 text-gray-800 text-xs font-medium leading-none whitespace-nowrap"
                               >
                                 {p.title}
                               </span>
