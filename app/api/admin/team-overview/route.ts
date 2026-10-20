@@ -40,12 +40,12 @@ export async function GET() {
     `);
 
     const examRows: any[] = await db.$queryRawUnsafe(`
-      SELECT ea."userId", ea."paperId"::text AS "paperId", p.title, p."passingScore",
-             ea.score, ea."submittedAt" AS date
+      SELECT ea.userid AS "userId", ea.paperid::text AS "paperId", p.title, p."passingScore",
+             ea.score, ea.submittedat AS date
       FROM examattempt ea
-      JOIN "Paper" p ON p.id = ea."paperId"
+      JOIN "Paper" p ON p.id = ea.paperid
       WHERE ea.score IS NOT NULL
-      ORDER BY ea."submittedAt" DESC
+      ORDER BY ea.submittedat DESC
     `);
 
     // Quick quiz sessions. The table is created on first save, so treat it as optional.
