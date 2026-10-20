@@ -1,6 +1,7 @@
 "use client";
 
-import { Fragment, useEffect, useState } from "react";
+import { Fragment, ReactNode, useEffect, useState } from "react";
+import Link from "next/link";
 
 type PaperProgress = {
   paperId: string;
@@ -71,7 +72,7 @@ function bestText(score: number | null) {
   return score === null ? "No attempts" : `${score}%`;
 }
 
-export default function TeamOverview() {
+export default function TeamOverview({ sideCard }: { sideCard?: ReactNode }) {
   const [data, setData] = useState<Overview | null>(null);
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(true);
@@ -104,14 +105,14 @@ export default function TeamOverview() {
   return (
     <div>
       {/* Summary boxes */}
-      <div className="grid md:grid-cols-3 gap-6 mb-8">
-        <div className="bg-white rounded-2xl p-6 border border-gray-200">
+      <div className={`grid md:grid-cols-2 gap-6 mb-8 ${sideCard ? "lg:grid-cols-4" : "lg:grid-cols-3"}`}>
+        <Link href="/admin/users" className="block bg-white rounded-2xl p-6 border border-gray-200 hover:border-blue-300 transition">
           <p className="text-gray-600 text-sm font-medium mb-2">All users</p>
           <p className="text-3xl font-bold text-gray-900">{summary.allUsers}</p>
           <p className="text-sm text-gray-600 mt-1">
             {summary.students} student{summary.students !== 1 ? "s" : ""}, {summary.admins} admin{summary.admins !== 1 ? "s" : ""}
           </p>
-        </div>
+        </Link>
         <div className="bg-white rounded-2xl p-6 border border-gray-200">
           <p className="text-gray-600 text-sm font-medium mb-2">Active students</p>
           <p className="text-3xl font-bold text-gray-900">{summary.activeStudents}</p>
@@ -119,11 +120,12 @@ export default function TeamOverview() {
             of {summary.students} student{summary.students !== 1 ? "s" : ""} have started practicing
           </p>
         </div>
-        <div className="bg-white rounded-2xl p-6 border border-gray-200">
+        <Link href="/admin/attempts" className="block bg-white rounded-2xl p-6 border border-gray-200 hover:border-blue-300 transition">
           <p className="text-gray-600 text-sm font-medium mb-2">Total attempts</p>
           <p className="text-3xl font-bold text-gray-900">{summary.totalAttempts}</p>
           <p className="text-sm text-gray-600 mt-1">Avg {summary.avgAttemptsPerStudent} per student</p>
-        </div>
+        </Link>
+        {sideCard}
       </div>
 
       {/* Student progress */}

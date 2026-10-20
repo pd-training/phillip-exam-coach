@@ -158,151 +158,73 @@ export default function AdminDashboard() {
           </div>
         )}
 
-        {/* Team overview: student progress */}
+        {/* Team overview, with paper requests beside the attempts total */}
         <div className="mb-12">
-          <TeamOverview />
-        </div>
+          <TeamOverview
+            sideCard={
+              <div>
+              {/* Paper Requests */}
+              <div className="bg-white rounded-2xl border border-gray-200 shadow-sm">
+                <div className="p-6 border-b border-gray-200">
+                  <h2 className="text-xl font-bold text-gray-900">Paper Requests</h2>
+                  <p className="text-gray-600 text-sm mt-1">Pending student requests</p>
+                </div>
 
-        <div className="grid lg:grid-cols-3 gap-8">
-          {/* Recent Attempts */}
-          <div className="lg:col-span-2 bg-white rounded-2xl border border-gray-200 shadow-sm">
-            <div className="p-6 border-b border-gray-200">
-              <h2 className="text-xl font-bold text-gray-900">Recent Attempts</h2>
-              <p className="text-gray-600 text-sm mt-1">Latest exam submissions from students</p>
-            </div>
-
-            <div className="overflow-x-auto">
-              <table className="w-full">
-                <thead>
-                  <tr className="border-b border-gray-200 bg-gray-50">
-                    <th className="px-6 py-3 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">Student</th>
-                    <th className="px-6 py-3 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">Paper</th>
-                    <th className="px-6 py-3 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">Score</th>
-                    <th className="px-6 py-3 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">Submitted</th>
-                    <th className="px-6 py-3 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">Time Taken</th>
-                    <th className="px-6 py-3 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">Action</th>
-                  </tr>
-                </thead>
-                <tbody className="divide-y divide-gray-200">
-                  {attempts.length === 0 ? (
-                    <tr>
-                      <td colSpan={6} className="px-6 py-8 text-center text-gray-600">
-                        No recent attempts
-                      </td>
-                    </tr>
+                <div className="divide-y divide-gray-200">
+                  {requests.length === 0 ? (
+                    <div className="p-6 text-center text-gray-600">
+                      No pending requests
+                    </div>
                   ) : (
-                    attempts.slice(0, 5).map((attempt) => {
-                      const timeTaken = Math.round(
-                        (new Date(attempt.submittedat).getTime() - new Date(attempt.startedat).getTime()) / 60000
-                      );
-                      const submittedDate = new Date(attempt.submittedat);
-                      
-                      return (
-                        <tr key={attempt.id} className="hover:bg-gray-50 transition cursor-pointer">
-                          <td className="px-6 py-4">
-                            <div className="font-medium text-gray-900">{attempt.student_name}</div>
-                          </td>
-                          <td className="px-6 py-4 text-gray-700">{attempt.paper_name}</td>
-                          <td className="px-6 py-4">
-                            <span className={`inline-flex items-center px-3 py-1 rounded-full text-sm font-medium ${
-                              parseInt(String(attempt.score)) >= (attempt.passingScore || 50)
+                    requests.slice(0, 5).map((request) => (
+                      <div key={request.id} className="p-6 hover:bg-gray-50 transition">
+                        <div className="mb-3">
+                          <p className="font-medium text-gray-900">{request.student_name}</p>
+                          <p className="text-sm text-gray-600">{request.paper_name}</p>
+                        </div>
+                        <div className="flex gap-2">
+                          {request.status === 'pending' ? (
+                            <>
+                              <button
+                                onClick={() => handleApproveRequest(request.id)}
+                                disabled={actionLoading === request.id}
+                                className="flex-1 px-3 py-2 bg-green-600 hover:bg-green-700 text-white rounded-lg text-sm font-medium transition disabled:opacity-50"
+                              >
+                                Approve
+                              </button>
+                              <button
+                                onClick={() => handleRejectRequest(request.id)}
+                                disabled={actionLoading === request.id}
+                                className="flex-1 px-3 py-2 bg-red-600 hover:bg-red-700 text-white rounded-lg text-sm font-medium transition disabled:opacity-50"
+                              >
+                                Reject
+                              </button>
+                            </>
+                          ) : (
+                            <div className={`w-full py-2 rounded-lg text-center text-sm font-medium ${
+                              request.status === 'approved'
                                 ? 'bg-green-100 text-green-800'
                                 : 'bg-red-100 text-red-800'
                             }`}>
-                              {attempt.score}%
-                            </span>
-                          </td>
-                          <td className="px-6 py-4 text-gray-600 text-sm">
-                            <div>{submittedDate.toLocaleDateString()}</div>
-                            <div className="text-gray-500">{submittedDate.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</div>
-                          </td>
-                          <td className="px-6 py-4 text-gray-600 text-sm">
-                            {timeTaken} min
-                          </td>
-                          <td className="px-6 py-4 text-sm">
-                            <Link href={`/admin/attempts/${attempt.id}`} className="inline-block px-3 py-2 bg-blue-900 hover:bg-blue-800 text-white rounded-lg text-xs font-medium transition">
-                                View Answers
-                              </Link>
-                          </td>
-                        </tr>
-                      );
-                    })
-                  )}
-                </tbody>
-              </table>
-            </div>
-
-            <div className="p-4 border-t border-gray-200 flex justify-between items-center">
-              <p className="text-sm text-gray-600">{Math.min(5, attempts.length)} of {attempts.length} attempts</p>
-              <div className="flex gap-3">
-                {attempts.length > 5 && (
-                  <Link href="/admin/attempts" className="text-blue-600 hover:text-blue-700 font-medium text-sm">
-                      View all attempts →
-                    </Link>
-                )}
-              </div>
-            </div>
-          </div>
-
-          {/* Paper Requests */}
-          <div className="bg-white rounded-2xl border border-gray-200 shadow-sm">
-            <div className="p-6 border-b border-gray-200">
-              <h2 className="text-xl font-bold text-gray-900">Paper Requests</h2>
-              <p className="text-gray-600 text-sm mt-1">Pending student requests</p>
-            </div>
-
-            <div className="divide-y divide-gray-200">
-              {requests.length === 0 ? (
-                <div className="p-6 text-center text-gray-600">
-                  No pending requests
-                </div>
-              ) : (
-                requests.slice(0, 5).map((request) => (
-                  <div key={request.id} className="p-6 hover:bg-gray-50 transition">
-                    <div className="mb-3">
-                      <p className="font-medium text-gray-900">{request.student_name}</p>
-                      <p className="text-sm text-gray-600">{request.paper_name}</p>
-                    </div>
-                    <div className="flex gap-2">
-                      {request.status === 'pending' ? (
-                        <>
-                          <button
-                            onClick={() => handleApproveRequest(request.id)}
-                            disabled={actionLoading === request.id}
-                            className="flex-1 px-3 py-2 bg-green-600 hover:bg-green-700 text-white rounded-lg text-sm font-medium transition disabled:opacity-50"
-                          >
-                            Approve
-                          </button>
-                          <button
-                            onClick={() => handleRejectRequest(request.id)}
-                            disabled={actionLoading === request.id}
-                            className="flex-1 px-3 py-2 bg-red-600 hover:bg-red-700 text-white rounded-lg text-sm font-medium transition disabled:opacity-50"
-                          >
-                            Reject
-                          </button>
-                        </>
-                      ) : (
-                        <div className={`w-full py-2 rounded-lg text-center text-sm font-medium ${
-                          request.status === 'approved'
-                            ? 'bg-green-100 text-green-800'
-                            : 'bg-red-100 text-red-800'
-                        }`}>
-                          {request.status.charAt(0).toUpperCase() + request.status.slice(1)}
+                              {request.status.charAt(0).toUpperCase() + request.status.slice(1)}
+                            </div>
+                          )}
                         </div>
-                      )}
-                    </div>
-                  </div>
-                ))
-              )}
-            </div>
+                      </div>
+                    ))
+                  )}
+                </div>
 
-            <div className="p-4 border-t border-gray-200 flex justify-between items-center">
-              <p className="text-sm text-gray-600">{requests.length} total requests</p>
-              <Link href="/admin/assign-papers" className="text-blue-600 hover:text-blue-700 font-medium text-sm">
-                  View All →
-                </Link>
-            </div>
-          </div>
+                <div className="p-4 border-t border-gray-200 flex justify-between items-center">
+                  <p className="text-sm text-gray-600">{requests.length} total requests</p>
+                  <Link href="/admin/assign-papers" className="text-blue-600 hover:text-blue-700 font-medium text-sm">
+                      View All →
+                    </Link>
+                </div>
+              </div>
+              </div>
+            }
+          />
         </div>
 
         {/* Quick Actions */}
