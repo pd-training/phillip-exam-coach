@@ -27,16 +27,20 @@ export async function GET() {
     const roleCounts: any[] = await db.$queryRawUnsafe(`
       SELECT role, COUNT(*)::int AS count FROM "User" GROUP BY role
     `);
+    // Notes are saved on the user page; make sure the column exists before reading it
+    await db.$executeRawUnsafe(`ALTER TABLE "User" ADD COLUMN IF NOT EXISTS remarks TEXT`);
+
     const students: any[] = await db.$queryRawUnsafe(`
-      SELECT id, name, email FROM "User" WHERE role = 'STUDENT' ORDER BY name NULLS LAST, email
+      SELECT id, name, email, remarks FROM "User" WHERE role = 'STUDENT' ORDER BY name NULLS LAST, email
     `);
 
+    // Papers are assigned through PaperRequest rows with status 'approved'
     const assignments: any[] = await db.$queryRawUnsafe(`
-      SELECT sp."userId", p.id::text AS "paperId", p.title, p."passingScore",
-             COALESCE(sp."approvedAt", sp."createdAt") AS "registeredAt"
-      FROM "StudentPaper" sp
-      JOIN "Paper" p ON p.id = sp."paperId"
-      WHERE sp.status = 'active'
+      SELECT pr."userId", p.id::text AS "paperId", p.title, p."passingScore",
+             COALESCE(pr."reviewedAt", pr."createdAt") AS "registeredAt"
+      FROM "PaperRequest" pr
+      JOIN "Paper" p ON p.id = pr."paperId"
+      WHERE pr.status = 'approved'
     `);
 
     const examRows: any[] = await db.$queryRawUnsafe(`
@@ -114,6 +118,7 @@ export async function GET() {
         id: st.id,
         name: st.name || st.email,
         email: st.email,
+        remarks: st.remarks || "",
         papers,
         attemptCount: attempts.length,
         lastActive: attempts.length ? attempts[0].date : null,

@@ -74,6 +74,13 @@ export default function UserDetailPage() {
           setIsAdmin(userData.user.role === "ADMIN" || userData.user.role === "BOTH");
         }
 
+        // Load saved notes
+        const remarksRes = await fetch(`/api/admin/user/${userId}/remarks`);
+        if (remarksRes.ok) {
+          const remarksData = await remarksRes.json();
+          setRemarks(remarksData.remarks || "");
+        }
+
         // Fetch assigned and available papers
         await loadAssignments();
 
@@ -383,13 +390,13 @@ export default function UserDetailPage() {
           marginBottom: "20px",
         }}>
           <h2 style={{ fontSize: "16px", fontWeight: "600", color: "#1f2937", margin: "0 0 16px 0" }}>
-            Remarks
+            Notes
           </h2>
           <div style={{ display: "flex", gap: "8px" }}>
             <textarea
               value={remarks}
               onChange={(e) => setRemarks(e.target.value)}
-              placeholder="Add tags or notes about this user..."
+              placeholder="Add notes about this user..."
               style={{
                 flex: 1,
                 padding: "8px 12px",
@@ -402,6 +409,14 @@ export default function UserDetailPage() {
               }}
             />
             <button
+              onClick={async () => {
+                const res = await fetch(`/api/admin/user/${userId}/remarks`, {
+                  method: "PUT",
+                  headers: { "Content-Type": "application/json" },
+                  body: JSON.stringify({ remarks }),
+                });
+                setMessage(res.ok ? "Notes saved" : "Could not save notes");
+              }}
               style={{
                 padding: "8px 16px",
                 backgroundColor: "#f59e0b",

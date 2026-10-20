@@ -25,6 +25,7 @@ type StudentRow = {
   id: string;
   name: string;
   email: string;
+  remarks: string;
   papers: PaperProgress[];
   attemptCount: number;
   lastActive: string | null;
@@ -63,6 +64,7 @@ export default function TeamOverview() {
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(true);
   const [openId, setOpenId] = useState<string | null>(null);
+  const [query, setQuery] = useState("");
 
   useEffect(() => {
     fetch("/api/admin/team-overview")
@@ -80,6 +82,12 @@ export default function TeamOverview() {
   if (!data) return null;
 
   const { summary } = data;
+  const term = query.trim().toLowerCase();
+  const visibleStudents = term
+    ? data.students.filter(
+        (st) => st.name.toLowerCase().includes(term) || st.email.toLowerCase().includes(term)
+      )
+    : data.students;
 
   return (
     <div>
@@ -111,10 +119,20 @@ export default function TeamOverview() {
         <div className="px-6 py-4 border-b border-gray-200">
           <h2 className="font-bold text-gray-900">Student progress</h2>
           <p className="text-sm text-gray-600">Select a student to see past attempts and best scores by paper.</p>
+          <input
+            type="search"
+            value={query}
+            onChange={(e) => setQuery(e.target.value)}
+            placeholder="Search by name or email"
+            aria-label="Search students"
+            className="mt-3 w-full md:w-80 px-3 py-2 border border-gray-300 rounded-lg text-sm text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-900/20 focus:border-blue-900"
+          />
         </div>
 
         {data.students.length === 0 ? (
           <p className="px-6 py-8 text-gray-600 text-sm">No students yet.</p>
+        ) : visibleStudents.length === 0 ? (
+          <p className="px-6 py-8 text-gray-600 text-sm">No students match &ldquo;{query}&rdquo;.</p>
         ) : (
           <div className="overflow-x-auto">
             <table className="w-full text-sm">
@@ -128,7 +146,7 @@ export default function TeamOverview() {
                 </tr>
               </thead>
               <tbody>
-                {data.students.map((st) => {
+                {visibleStudents.map((st) => {
                   const isOpen = openId === st.id;
                   return (
                     <Fragment key={st.id}>
@@ -141,27 +159,21 @@ export default function TeamOverview() {
                           <p className="text-xs text-gray-500">{st.email}</p>
                         </td>
                         <td className="px-4 py-4">
-                          <div className="flex flex-wrap gap-1">
-                            {st.papers.length === 0 && <span className="text-gray-500">None</span>}
+                          {st.papers.length === 0 && <span className="text-gray-500">None assigned</span>}
+                          <div className="space-y-2">
                             {st.papers.map((p) => (
-                              <span key={p.paperId} className="px-2 py-0.5 rounded bg-gray-100 text-gray-700 text-xs font-medium">
-                                {p.title}
-                              </span>
+                              <div key={p.paperId} className="text-xs text-gray-700">
+                                <span className="px-2 py-0.5 rounded bg-gray-100 text-gray-800 font-medium">{p.title}</span>
+                                <span className="ml-2 text-gray-500">registered {formatDate(p.registeredAt)}</span>
+                                <span className={`ml-2 px-1.5 py-0.5 rounded font-semibold ${statusClass(p.status)}`}>
+                                  {p.status}
+                                </span>
+                              </div>
                             ))}
                           </div>
                         </td>
-                        <td className="px-4 py-4">
-                          {st.papers.length === 0 && <span className="text-gray-500">—</span>}
-                          <div className="space-y-1">
-                            {st.papers.map((p) => (
-                              <p key={p.paperId} className="text-xs text-gray-700">
-                                {p.title}, registered {formatDate(p.registeredAt)}{" "}
-                                <span className={`ml-1 px-1.5 py-0.5 rounded font-semibold ${statusClass(p.status)}`}>
-                                  {p.status}
-                                </span>
-                              </p>
-                            ))}
-                          </div>
+                        <td className="px-4 py-4 text-gray-700 whitespace-pre-wrap max-w-xs">
+                          {st.remarks ? st.remarks : <span className="text-gray-400">No notes</span>}
                         </td>
                         <td className="px-4 py-4 text-right text-gray-900">{st.attemptCount}</td>
                         <td className="px-6 py-4 text-right text-gray-700 whitespace-nowrap">
