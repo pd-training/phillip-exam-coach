@@ -172,61 +172,49 @@ export default function PracticeChapterMode() {
       <div className="min-h-screen bg-gray-50 flex flex-col">
         <StudentNav />
 
-        {/* Hero Section */}
-        <div className="bg-gradient-to-r from-blue-900 to-blue-800 text-white py-12 px-0 border-b border-blue-900">
-          <div className="max-w-7xl mx-auto px-6">
+        <div className="flex-1 w-full">
+          <div className="max-w-6xl mx-auto px-6 py-10">
             <button
               onClick={() => router.back()}
-              className="text-white hover:text-blue-100 font-medium text-sm mb-6 transition duration-200"
+              className="inline-flex items-center gap-2 px-3 py-1.5 border border-gray-300 bg-white rounded-lg text-sm font-medium text-gray-700 hover:bg-gray-50 transition"
             >
               ← Back
             </button>
-            <h1 className="text-4xl font-bold mb-2">{paperTitle}</h1>
-            {paperDescription && (
-              <p className="text-blue-100 mb-2 truncate" title={paperDescription}>
-                {paperDescription}
-              </p>
-            )}
-            <p className="text-gray-200">Select a chapter to practice questions from that specific topic</p>
-          </div>
-        </div>
 
-        {/* Chapters List */}
-        <div className="bg-white flex-1 w-full">
-          <div className="max-w-7xl mx-auto px-6 py-12">
-            <div className="space-y-3">
-              {chapters.map((ch) => (
-                <button
-                  key={ch.number}
-                  onClick={() => handleSelectChapter(ch.number)}
-                  className="w-full bg-gray-50 rounded-lg px-6 py-6 border border-gray-200 hover:border-blue-400 hover:bg-blue-50 transition duration-200 text-left flex items-center justify-between group"
-                >
-                  <div className="flex items-center gap-4 flex-1">
-                    <div className="w-12 h-12 bg-blue-900 text-white rounded-lg flex items-center justify-center group-hover:bg-blue-800 transition duration-200 font-semibold text-lg">
-                      {ch.number}
-                    </div>
-                    <div className="flex-1">
-                      <h3 className="font-semibold text-gray-900 group-hover:text-blue-600 transition text-lg">
-                        {ch.title}
-                      </h3>
-                    </div>
-                  </div>
-                  <svg
-                    className="w-5 h-5 text-gray-400 group-hover:text-blue-600 transition flex-shrink-0 ml-4"
-                    fill="none"
-                    stroke="currentColor"
-                    viewBox="0 0 24 24"
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth={2}
-                      d="M9 5l7 7-7 7"
-                    />
-                  </svg>
-                </button>
-              ))}
+            <div className="mt-6">
+              <h1 className="text-2xl font-bold text-gray-900">{paperTitle} - Practice by Chapter</h1>
+              <p className="text-sm text-gray-600 mt-1">
+                Select a chapter to practice 10 random questions with instant feedback.
+              </p>
             </div>
+
+            {chapters.length === 0 ? (
+              <p className="mt-8 text-gray-600 text-sm">No chapters are available for this paper yet.</p>
+            ) : (
+              <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3 mt-8">
+                {chapters.map((ch) => (
+                  <button
+                    key={ch.number}
+                    onClick={() => handleSelectChapter(ch.number)}
+                    className="group flex items-center gap-4 bg-white rounded-xl border border-gray-200 shadow-sm px-5 py-5 text-left hover:shadow-md hover:border-blue-300 transition duration-200"
+                  >
+                    <span className="flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-lg bg-blue-50 text-blue-600 group-hover:bg-blue-600 group-hover:text-white transition duration-200">
+                      <svg className="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          strokeWidth={1.8}
+                          d="M12 6.042A8.967 8.967 0 006 3.75c-1.052 0-2.062.18-3 .512v14.25A8.987 8.987 0 016 18c2.305 0 4.408.867 6 2.292m0-14.25a8.966 8.966 0 016-2.292c1.052 0 2.062.18 3 .512v14.25A8.987 8.987 0 0018 18a8.967 8.967 0 00-6 2.292m0-14.25v14.25"
+                        />
+                      </svg>
+                    </span>
+                    <span className="text-sm font-medium text-gray-900 leading-snug">
+                      Chapter {ch.number} - {ch.title}
+                    </span>
+                  </button>
+                ))}
+              </div>
+            )}
           </div>
         </div>
       </div>
