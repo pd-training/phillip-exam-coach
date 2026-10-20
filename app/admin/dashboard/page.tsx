@@ -162,22 +162,21 @@ export default function AdminDashboard() {
         <div className="mb-12">
           <TeamOverview
             sideCard={
-              <div>
-              {/* Paper Requests */}
-              <div className="bg-white rounded-2xl border border-gray-200 shadow-sm">
-                <div className="p-6 border-b border-gray-200">
-                  <h2 className="text-xl font-bold text-gray-900">Paper Requests</h2>
-                  <p className="text-gray-600 text-sm mt-1">Pending student requests</p>
+              <div className="h-44">
+              {/* Pending student requests */}
+              <div className="bg-white rounded-2xl border border-gray-200 shadow-sm h-full flex flex-col">
+                <div className="px-6 py-4 border-b border-gray-200">
+                  <h2 className="text-lg font-bold text-gray-900">Pending student requests</h2>
                 </div>
 
-                <div className="divide-y divide-gray-200">
+                <div className="divide-y divide-gray-200 flex-1 overflow-y-auto min-h-0">
                   {requests.length === 0 ? (
                     <div className="p-6 text-center text-gray-600">
                       No pending requests
                     </div>
                   ) : (
                     requests.slice(0, 5).map((request) => (
-                      <div key={request.id} className="p-6 hover:bg-gray-50 transition">
+                      <div key={request.id} className="px-6 py-3 hover:bg-gray-50 transition">
                         <div className="mb-3">
                           <p className="font-medium text-gray-900">{request.student_name}</p>
                           <p className="text-sm text-gray-600">{request.paper_name}</p>
@@ -215,7 +214,7 @@ export default function AdminDashboard() {
                   )}
                 </div>
 
-                <div className="p-4 border-t border-gray-200 flex justify-between items-center">
+                <div className="px-6 py-3 border-t border-gray-200 flex justify-between items-center">
                   <p className="text-sm text-gray-600">{requests.length} total requests</p>
                   <Link href="/admin/assign-papers" className="text-blue-600 hover:text-blue-700 font-medium text-sm">
                       View All →
