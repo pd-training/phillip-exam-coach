@@ -237,28 +237,23 @@ export default function PracticePage() {
       <StudentNav />
 
       {/* Hero Section */}
-      <div className="bg-gradient-to-r from-blue-900 to-blue-800 text-white py-12 px-0 border-b border-blue-900">
-        <div className="max-w-7xl mx-auto px-6">
-          <button
-            onClick={() => router.push('/dashboard')}
-            className="text-white hover:text-blue-100 font-medium text-sm mb-6 transition duration-200"
-          >
-            ← Back
-          </button>
-          <h1 className="text-4xl font-bold mb-2">{paper.title}</h1>
-          {paper.description && (
-            <p className="text-blue-100 mb-2 truncate" title={paper.description}>
-              {paper.description}
-            </p>
-          )}
-          <p className="text-gray-200">Choose your practice mode</p>
-        </div>
+      <div className="max-w-7xl mx-auto px-6 pt-10">
+        <button
+          onClick={() => router.push('/dashboard')}
+          className="text-sm font-medium text-blue-700 hover:text-blue-800 transition duration-200"
+        >
+          ← Back to dashboard
+        </button>
+        <h1 className="text-3xl font-bold text-gray-900 mt-4">{paper.title}</h1>
+        {paper.description && (
+          <p className="text-gray-600 mt-1">{paper.description}</p>
+        )}
       </div>
 
       {/* Main Content */}
-      <div className="max-w-7xl mx-auto px-6 py-12">
+      <div className="max-w-7xl mx-auto px-6 py-8">
         {/* Practice Modes */}
-        <div className="mb-12">
+        <div className="mb-10">
           <h2 className="text-2xl font-bold text-gray-900 mb-8">Choose a mode</h2>
 
           <div className="grid md:grid-cols-2 gap-8">
