@@ -113,11 +113,12 @@ export default function ProgressPage() {
     );
   }
 
-  const passRate = attempts.length
-    ? Math.round((attempts.filter((a) => a.result === "Pass").length / attempts.length) * 100)
+  // Summary figures follow the paper filter
+  const passRate = visibleAttempts.length
+    ? Math.round((visibleAttempts.filter((a) => a.result === "Pass").length / visibleAttempts.length) * 100)
     : 0;
-  const avgScore = attempts.length
-    ? Math.round(attempts.reduce((sum, a) => sum + a.score, 0) / attempts.length)
+  const avgScore = visibleAttempts.length
+    ? Math.round(visibleAttempts.reduce((sum, a) => sum + a.score, 0) / visibleAttempts.length)
     : 0;
 
   const tabClass = (active: boolean) =>
@@ -177,11 +178,11 @@ export default function ProgressPage() {
 
         {tab === "exam" && (
           <div className="mt-4 bg-white rounded-xl border border-gray-200 p-6">
-            {attempts.length > 0 && (
+            {visibleAttempts.length > 0 && (
               <div className="grid grid-cols-3 gap-6 pb-6 mb-6 border-b border-gray-100">
                 <div>
                   <p className="text-sm text-gray-600 font-medium mb-1">Total attempts</p>
-                  <p className="text-2xl font-bold text-gray-900">{attempts.length}</p>
+                  <p className="text-2xl font-bold text-gray-900">{visibleAttempts.length}</p>
                 </div>
                 <div>
                   <p className="text-sm text-gray-600 font-medium mb-1">Pass rate</p>
