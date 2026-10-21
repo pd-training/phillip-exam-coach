@@ -166,14 +166,12 @@ export default function UserManagement() {
       <AdminNav />
 
       {/* Hero Section */}
-      <div style={{ background: "linear-gradient(to right, #1e3a8a, #1e40af)", color: "white", padding: "48px 0" }}>
-        <div className="max-w-7xl mx-auto px-6">
-          <h1 className="text-4xl font-bold mb-2">Users</h1>
-          <p style={{ color: "#e0e7ff", margin: "0" }}>Manage advisors and students</p>
-        </div>
-      </div>
+      <div className="max-w-7xl mx-auto px-6 pt-10">
+<h1 className="text-3xl font-bold text-gray-900">Users</h1>
+<p className="text-gray-600 mt-1">Manage advisors and students</p>
+</div>
 
-      <div className="max-w-7xl mx-auto px-6 py-12">
+      <div className="max-w-7xl mx-auto px-6 py-8">
 
         {/* Success Message */}
         {success && (
