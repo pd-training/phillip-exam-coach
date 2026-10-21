@@ -87,12 +87,7 @@ export default function StudentDashboard() {
     );
   }
 
-  const statusFor = (paperId: string) => {
-    if (accessibleIds.has(paperId)) return "available";
-    const req = requests.find((r) => r.paperId === paperId);
-    if (req?.status === "pending") return "pending";
-    return "locked";
-  };
+  const yourPapers = papers.filter((p) => accessibleIds.has(p.id));
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -139,44 +134,31 @@ export default function StudentDashboard() {
           </div>
         </div>
 
-        {/* All papers */}
-        <h2 className="text-xl font-bold text-gray-900 mb-4">Papers</h2>
-        {papers.length === 0 ? (
-          <p className="text-gray-600">No papers are available yet.</p>
+        {/* Papers the student can access */}
+        <h2 className="text-xl font-bold text-gray-900 mb-4">Your papers</h2>
+        {yourPapers.length === 0 ? (
+          <p className="text-gray-600">
+            You don&apos;t have any papers yet.{" "}
+            <Link href="/papers" className="font-semibold text-blue-700 hover:text-blue-800">View papers</Link> to request one.
+          </p>
         ) : (
           <div className="grid gap-5 md:grid-cols-2 lg:grid-cols-3">
-            {papers.map((paper) => {
-              const state = statusFor(paper.id);
-              return (
-                <Link
-                  key={paper.id}
-                  href={`/exam/${paper.id}`}
-                  className="group flex flex-col bg-white rounded-xl border border-gray-200 shadow-sm p-5 hover:shadow-md hover:border-blue-300 transition"
-                >
-                  <div className="flex items-start justify-between gap-3 mb-2">
-                    <h3 className="font-semibold text-gray-900 leading-snug">{paper.title}</h3>
-                    {state === "available" && (
-                      <span className="flex-shrink-0 text-xs font-semibold px-2 py-0.5 rounded-full bg-green-100 text-green-800">Available</span>
-                    )}
-                    {state === "pending" && (
-                      <span className="flex-shrink-0 text-xs font-semibold px-2 py-0.5 rounded-full bg-amber-100 text-amber-800">Request pending</span>
-                    )}
-                    {state === "locked" && (
-                      <span className="flex-shrink-0 text-xs font-semibold px-2 py-0.5 rounded-full bg-gray-200 text-gray-700">Locked</span>
-                    )}
-                  </div>
-                  <p className="text-sm text-gray-600 line-clamp-3 flex-1">
-                    {paper.description || "No description yet."}
-                  </p>
-                  <div className="mt-4 flex items-center justify-between text-sm">
-                    <span className="text-gray-500">{paper.totalTime ? `${paper.totalTime} min` : ""}</span>
-                    <span className="font-semibold text-blue-700 group-hover:text-blue-800">
-                      {state === "available" ? "Start practising →" : "View paper →"}
-                    </span>
-                  </div>
-                </Link>
-              );
-            })}
+            {yourPapers.map((paper) => (
+              <Link
+                key={paper.id}
+                href={`/exam/${paper.id}`}
+                className="group flex flex-col bg-white rounded-xl border border-gray-200 shadow-sm p-5 hover:shadow-md hover:border-blue-300 transition"
+              >
+                <h3 className="font-semibold text-gray-900 leading-snug mb-2">{paper.title}</h3>
+                <p className="text-sm text-gray-600 line-clamp-3 flex-1">
+                  {paper.description || "No description yet."}
+                </p>
+                <div className="mt-4 flex items-center justify-between text-sm">
+                  <span className="text-gray-500">{paper.totalTime ? `${paper.totalTime} min` : ""}</span>
+                  <span className="font-semibold text-blue-700 group-hover:text-blue-800">Start practising →</span>
+                </div>
+              </Link>
+            ))}
           </div>
         )}
       </div>
