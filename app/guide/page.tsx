@@ -108,7 +108,7 @@ export default function QuickGuidePage() {
                           <>
                             {ch.tldr && (
                               <div className="mt-4 rounded-lg bg-blue-50 border border-blue-200 p-4">
-                                <p className="text-xs font-semibold text-blue-900 mb-1">60-second TL;DR</p>
+                                <p className="text-xs font-semibold text-blue-900 mb-1">TL;DR</p>
                                 <p className="text-sm text-blue-900 leading-relaxed">{ch.tldr}</p>
                               </div>
                             )}

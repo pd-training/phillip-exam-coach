@@ -61,7 +61,7 @@ export default function GuideEditor({ paperId }: { paperId: string }) {
   return (
     <div>
       <p className="text-gray-600 text-sm">
-        Write a 60-second TL;DR and core knowledge bullets for each chapter. One bullet per line. Students see these in the Quick Guide.
+        Write a TL;DR and core knowledge bullets for each chapter. One bullet per line. Students see these in the Quick Guide.
       </p>
       {message && <p className="mt-4 text-sm text-gray-700">{message}</p>}
 
@@ -75,7 +75,7 @@ export default function GuideEditor({ paperId }: { paperId: string }) {
               <h3 className="font-semibold text-gray-900 mb-4">Chapter {ch.chapterNumber} - {ch.title}</h3>
 
               <label className="block text-sm font-medium text-gray-700 mb-1.5" htmlFor={`tldr-${ch.chapterNumber}`}>
-                60-second TL;DR
+                TL;DR
               </label>
               <textarea
                 id={`tldr-${ch.chapterNumber}`}

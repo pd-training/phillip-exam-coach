@@ -16,7 +16,7 @@ type PaperSummary = {
 type PaperRequest = { paperId: string; status: string };
 
 const STUDY_STEPS = [
-  "Open the Quick Guide for the chapter you are studying and read its 60-second summary.",
+  "Open the Quick Guide for the chapter you are studying and read its TL;DR summary.",
   "Practise by chapter to check your understanding. Each question gives instant feedback and an explanation.",
   "Take a quick quiz across the paper to revise topics you may have forgotten.",
   "When you feel ready, sit a full exam under timed conditions.",
