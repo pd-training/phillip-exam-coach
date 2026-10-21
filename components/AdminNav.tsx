@@ -15,6 +15,7 @@ export default function AdminNav() {
   const navItems = [
     { label: 'Dashboard', href: '/admin/dashboard' },
     { label: 'Papers', href: '/admin/papers' },
+    { label: 'Quick Guide', href: '/admin/guide' },
     { label: 'Users', href: '/admin/users' },
     { label: 'Exam Attempts', href: '/admin/attempts' },
     { label: 'Assign Papers', href: '/admin/assign-papers' },
