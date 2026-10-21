@@ -166,7 +166,7 @@ export default function AdminDashboard() {
               {/* Pending student requests */}
               <div className="bg-white rounded-2xl border border-gray-200 shadow-sm h-full flex flex-col">
                 <div className="px-6 py-4 border-b border-gray-200">
-                  <h2 className="text-lg font-bold text-gray-900">Pending student requests</h2>
+                  <h2 className="text-sm font-semibold text-gray-900">Pending student requests</h2>
                 </div>
 
                 <div className="divide-y divide-gray-200 flex-1 overflow-y-auto min-h-0">
