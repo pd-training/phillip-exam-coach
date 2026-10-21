@@ -459,16 +459,15 @@ export default function AttemptReviewPage() {
                               : 'border-gray-200 bg-white'
                           }`}
                         >
-                          <div>
-                            <p className="text-gray-800 font-medium">
+                          <div className="flex items-start justify-between gap-3">
+                            <p className={`font-medium ${
+                              isCorrectAnswer ? 'text-green-800' : isStudentAnswer ? 'text-red-700' : 'text-gray-800'
+                            }`}>
                               <span className="font-bold text-gray-900 mr-2">{option.label}.</span>
                               {option.text}
                             </p>
-                            <div className="flex gap-2 mt-2">
-                              {isCorrectAnswer && <span className="text-xs bg-green-200 text-green-800 px-2 py-1 rounded font-medium">✓ Correct Answer</span>}
-                              {isStudentAnswer && !isCorrectAnswer && <span className="text-xs bg-red-200 text-red-800 px-2 py-1 rounded font-medium">✗ Your Answer</span>}
-                              {isStudentAnswer && isCorrectAnswer && <span className="text-xs bg-green-200 text-green-800 px-2 py-1 rounded font-medium">✓ Your Answer</span>}
-                            </div>
+                            {isCorrectAnswer && <span className="font-bold text-green-600 flex-shrink-0" aria-label="Correct answer">✓</span>}
+                            {isStudentAnswer && !isCorrectAnswer && <span className="font-bold text-red-600 flex-shrink-0" aria-label="Your answer, incorrect">✗</span>}
                           </div>
                         </div>
                       );
@@ -478,10 +477,17 @@ export default function AttemptReviewPage() {
 
                 {/* Explanation */}
                 {currentQuestion.explanation && (
-                  <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-5">
-                    <h3 className="font-bold text-blue-900 mb-2">📝 Explanation</h3>
-                    <p className="text-sm text-blue-800 leading-relaxed">{currentQuestion.explanation}</p>
-                  </div>
+                  currentQuestion.isCorrect ? (
+                    <div className="bg-green-50 border border-green-200 rounded-lg p-4 mb-5">
+                      <h3 className="font-bold text-green-700 mb-2">✓ Correct</h3>
+                      <p className="text-sm text-green-800 leading-relaxed">{currentQuestion.explanation}</p>
+                    </div>
+                  ) : (
+                    <div className="bg-red-50 border border-red-200 rounded-lg p-4 mb-5">
+                      <h3 className="font-bold text-red-700 mb-2">✗ Incorrect</h3>
+                      <p className="text-sm text-red-700 leading-relaxed">{currentQuestion.explanation}</p>
+                    </div>
+                  )
                 )}
               </div>
             ) : (
