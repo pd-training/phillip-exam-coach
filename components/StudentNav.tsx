@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
+import { createPortal } from "react-dom";
 import { usePathname } from "next/navigation";
 import { signOut, useSession } from "next-auth/react";
 import Link from "next/link";
@@ -24,7 +25,9 @@ export default function StudentNav() {
   const [drawer, setDrawer] = useState(false);
   const [isDesktop, setIsDesktop] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
-  const menuRef = useRef<HTMLDivElement>(null);
+  const menuButtonRef = useRef<HTMLButtonElement>(null);
+  const menuPanelRef = useRef<HTMLDivElement>(null);
+  const [menuPos, setMenuPos] = useState<{ top: number; right: number } | null>(null);
 
   const fullName = session?.user?.name || "Student";
   const email = session?.user?.email || "";
@@ -65,18 +68,33 @@ export default function StudentNav() {
     setMenuOpen(false);
   }, [pathname]);
 
-  // Close the user menu on outside click or Escape
+  // Position the user menu under its button. It is drawn in a portal so page
+  // containers with overflow hidden cannot clip it.
+  const openMenu = () => {
+    const rect = menuButtonRef.current?.getBoundingClientRect();
+    if (rect) setMenuPos({ top: rect.bottom + 8, right: window.innerWidth - rect.right });
+    setMenuOpen(true);
+  };
+  const closeMenu = () => setMenuOpen(false);
+
+  // Close on outside click, Escape, or scroll/resize (keeps the menu anchored)
   useEffect(() => {
     if (!menuOpen) return;
     const onPointer = (e: MouseEvent) => {
-      if (menuRef.current && !menuRef.current.contains(e.target as Node)) setMenuOpen(false);
+      const target = e.target as Node;
+      if (menuButtonRef.current?.contains(target) || menuPanelRef.current?.contains(target)) return;
+      closeMenu();
     };
-    const onKey = (e: KeyboardEvent) => e.key === "Escape" && setMenuOpen(false);
+    const onKey = (e: KeyboardEvent) => e.key === "Escape" && closeMenu();
     document.addEventListener("mousedown", onPointer);
     document.addEventListener("keydown", onKey);
+    window.addEventListener("resize", closeMenu);
+    window.addEventListener("scroll", closeMenu, true);
     return () => {
       document.removeEventListener("mousedown", onPointer);
       document.removeEventListener("keydown", onKey);
+      window.removeEventListener("resize", closeMenu);
+      window.removeEventListener("scroll", closeMenu, true);
     };
   }, [menuOpen]);
 
@@ -182,10 +200,11 @@ export default function StudentNav() {
         </div>
 
         {/* User menu: click the name to open Settings and Log out */}
-        <div className="relative" ref={menuRef}>
+        <div className="relative">
           <button
+            ref={menuButtonRef}
             type="button"
-            onClick={() => setMenuOpen((o) => !o)}
+            onClick={() => (menuOpen ? closeMenu() : openMenu())}
             aria-expanded={menuOpen}
             aria-haspopup="menu"
             className="flex items-center gap-3 rounded-full pl-1 pr-3 py-1 hover:bg-gray-100 transition focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-600"
@@ -196,8 +215,13 @@ export default function StudentNav() {
             <span className="text-sm font-medium text-gray-900 max-w-[10rem] truncate">{fullName}</span>
           </button>
 
-          {menuOpen && (
-            <div role="menu" className="absolute right-0 top-full mt-2 w-64 rounded-xl border border-gray-200 bg-white shadow-lg z-50">
+          {menuOpen && menuPos && createPortal(
+            <div
+              ref={menuPanelRef}
+              role="menu"
+              style={{ top: menuPos.top, right: menuPos.right }}
+              className="fixed w-64 max-w-[calc(100vw-2rem)] rounded-xl border border-gray-200 bg-white shadow-lg z-[60]"
+            >
               <div className="px-4 py-3 border-b border-gray-100">
                 <p className="text-sm font-semibold text-gray-900 truncate">{fullName}</p>
                 {email && <p className="text-xs text-gray-500 truncate mt-0.5">{email}</p>}
@@ -215,7 +239,8 @@ export default function StudentNav() {
                   Log out
                 </button>
               </div>
-            </div>
+            </div>,
+            document.body
           )}
         </div>
       </header>
