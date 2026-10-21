@@ -76,10 +76,10 @@ export default function PapersListPage() {
       <AdminNav />
 
       {/* Header */}
-      <div className="bg-gradient-to-r from-blue-900 to-blue-800 text-white py-12 px-0 border-b border-blue-900">
+      <div className="bg-white text-gray-900 py-8 px-0 border-b border-gray-200">
         <div className="max-w-7xl mx-auto px-6">
-          <h1 className="text-4xl font-bold mb-2">Papers</h1>
-          <p className="text-blue-100">Manage all exam papers</p>
+          <h1 className="text-3xl font-bold text-gray-900">Papers</h1>
+          <p className="text-gray-600">Manage all exam papers</p>
         </div>
       </div>
 

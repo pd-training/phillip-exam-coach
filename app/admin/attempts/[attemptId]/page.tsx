@@ -133,14 +133,14 @@ export default function AttemptDetailsPage() {
       <AdminNav />
 
       {/* Header */}
-      <div className="bg-gradient-to-r from-blue-900 to-blue-800 text-white py-8 border-b border-blue-900">
+      <div className="bg-white text-gray-900 py-8 border-b border-gray-200">
         <div className="max-w-7xl mx-auto px-6 flex justify-between items-start gap-6">
           <div>
-            <Link href="/admin/attempts" className="text-blue-100 hover:text-white font-medium text-sm mb-4 block">
+            <Link href="/admin/attempts" className="text-blue-700 hover:text-blue-800 font-medium text-sm mb-4 block">
               ← Back to Exam Attempts
             </Link>
             <h1 className="text-3xl font-bold">{attempt.student_name}'s Exam Review</h1>
-            <p className="text-blue-100 mt-1">{attempt.paper_name}</p>
+            <p className="text-gray-600 mt-1">{attempt.paper_name}</p>
           </div>
           <div className="text-right">
             <span
@@ -150,7 +150,7 @@ export default function AttemptDetailsPage() {
             >
               {attempt.passed ? 'Passed' : 'Failed'}
             </span>
-            <p className="text-sm font-mono text-blue-100 mt-3">{attempt.student_email}</p>
+            <p className="text-sm font-mono text-gray-600 mt-3">{attempt.student_email}</p>
           </div>
         </div>
       </div>
