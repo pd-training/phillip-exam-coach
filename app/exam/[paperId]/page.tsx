@@ -259,74 +259,52 @@ export default function PracticePage() {
       <div className="max-w-7xl mx-auto px-6 py-12">
         {/* Practice Modes */}
         <div className="mb-12">
-          <h2 className="text-2xl font-bold text-gray-900 mb-8">Select Practice Mode</h2>
+          <h2 className="text-2xl font-bold text-gray-900 mb-8">Choose a mode</h2>
 
-          <div className="grid md:grid-cols-3 gap-8">
-            {/* Full Exam */}
+          <div className="grid md:grid-cols-2 gap-8">
+            {/* Exam Simulation */}
             <button
               onClick={() => router.push(`/exam/${paperId}/full-exam`)}
               className="group bg-white rounded-2xl p-8 border-2 border-gray-200 hover:border-blue-500 hover:shadow-lg transition duration-300 text-left"
             >
-              <div className="flex items-start justify-between mb-6">
-                <div className="w-14 h-14 bg-blue-50 rounded-lg flex items-center justify-center group-hover:bg-blue-500 transition duration-200">
-                  <svg className="w-7 h-7 text-blue-600 group-hover:text-white transition duration-200" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
-                  </svg>
-                </div>
-                <span className="text-sm font-bold text-blue-700 bg-blue-50 px-3 py-1 rounded-full">Recommended</span>
+              <div className="w-14 h-14 bg-blue-50 rounded-lg flex items-center justify-center mb-6 group-hover:bg-blue-500 transition duration-200">
+                <svg className="w-7 h-7 text-blue-600 group-hover:text-white transition duration-200" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
+                </svg>
               </div>
-              <h3 className="text-xl font-bold text-gray-900 mb-2">Full Exam Mode</h3>
+              <h3 className="text-xl font-bold text-gray-900 mb-2">Exam Simulation</h3>
               <p className="text-gray-600 text-sm mb-6">
-                Take the complete exam under timed conditions. Get your score and detailed review of all answers.
+                Take the complete exam under timed conditions. Get your score and a detailed review of every answer.
               </p>
               <div className="flex items-center gap-2 text-blue-600 font-semibold group-hover:gap-3 transition duration-200">
-                <span>Start Exam</span>
+                <span>Start exam</span>
                 <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
                 </svg>
               </div>
             </button>
 
-            {/* Quick Quiz */}
+            {/* Practice: quick quiz and practice by chapter */}
             <button
-              onClick={() => router.push(`/exam/${paperId}/quick-quiz`)}
+              onClick={() => router.push(`/exam/${paperId}/practice`)}
               className="group bg-white rounded-2xl p-8 border-2 border-gray-200 hover:border-blue-500 hover:shadow-lg transition duration-300 text-left"
             >
               <div className="w-14 h-14 bg-blue-50 rounded-lg flex items-center justify-center mb-6 group-hover:bg-blue-500 transition duration-200">
                 <svg className="w-7 h-7 text-blue-600 group-hover:text-white transition duration-200" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 4H5a2 2 0 00-2 2v14a2 2 0 002 2h10a2 2 0 002-2V8.5L9 4z" />
                 </svg>
               </div>
-              <h3 className="text-xl font-bold text-gray-900 mb-2">Quick Quiz</h3>
+              <h3 className="text-xl font-bold text-gray-900 mb-2">Practice</h3>
               <p className="text-gray-600 text-sm mb-6">
-                Rapid-fire questions without time limits. Perfect for quick revision and refreshing your knowledge.
+                Quick quiz across the paper, or practise chapter by chapter with instant feedback.
               </p>
               <div className="flex items-center gap-2 text-blue-600 font-semibold group-hover:gap-3 transition duration-200">
-                <span>Start Quiz</span>
+                <span>Choose practice</span>
                 <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
                 </svg>
               </div>
             </button>
-
-            {/* Practice by Chapter */}
-            <Link href={`/exam/${paperId}/practice-chapter`} className="group w-full bg-white rounded-2xl p-8 border-2 border-gray-200 hover:border-blue-500 hover:shadow-lg transition duration-300 text-left">
-                <div className="w-14 h-14 bg-blue-50 rounded-lg flex items-center justify-center mb-6 group-hover:bg-blue-500 transition duration-200">
-                  <svg className="w-7 h-7 text-blue-600 group-hover:text-white transition duration-200" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 4H5a2 2 0 00-2 2v14a2 2 0 002 2h10a2 2 0 002-2V8.5L9 4z" />
-                  </svg>
-                </div>
-                <h3 className="text-xl font-bold text-gray-900 mb-2">Practice by Chapter</h3>
-                <p className="text-gray-600 text-sm mb-6">
-                  Focus on specific chapters and master each topic one step at a time.
-                </p>
-                <div className="flex items-center gap-2 text-blue-600 font-semibold group-hover:gap-3 transition duration-200">
-                  <span>View Chapters</span>
-                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-                  </svg>
-                </div>
-              </Link>
           </div>
         </div>
 
