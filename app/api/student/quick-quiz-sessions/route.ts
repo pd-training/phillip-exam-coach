@@ -88,7 +88,7 @@ export async function GET() {
        LEFT JOIN "Paper" p ON p.id::text = s."paperId"
        WHERE s."userId" = $1
        ORDER BY s."createdAt" DESC
-       LIMIT 10`,
+       LIMIT 100`,
       userId
     );
 
