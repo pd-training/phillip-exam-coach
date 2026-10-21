@@ -216,7 +216,7 @@ export default function AdminDashboard() {
 
                 <div className="px-6 py-3 border-t border-gray-200 flex justify-between items-center">
                   <p className="text-sm text-gray-600">{requests.length} total requests</p>
-                  <Link href="/admin/assign-papers" className="text-blue-600 hover:text-blue-700 font-medium text-sm">
+                  <Link href="/admin/papers" className="text-blue-600 hover:text-blue-700 font-medium text-sm">
                       View All →
                     </Link>
                 </div>
@@ -242,10 +242,10 @@ export default function AdminDashboard() {
             </div>
           </Link>
 
-          <Link href="/admin/assign-papers">
+          <Link href="/admin/papers">
             <div className="bg-white rounded-2xl p-8 border border-gray-200 hover:border-blue-300 hover:shadow-md transition cursor-pointer text-center group">
-              <h3 className="font-bold text-lg text-gray-900 mb-2">Assign Papers</h3>
-              <p className="text-gray-600 text-sm">Assign papers to students</p>
+              <h3 className="font-bold text-lg text-gray-900 mb-2">Paper Access</h3>
+              <p className="text-gray-600 text-sm">Choose which students can use each paper</p>
             </div>
           </Link>
         </div>
