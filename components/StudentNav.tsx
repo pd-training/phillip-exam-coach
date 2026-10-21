@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { usePathname } from "next/navigation";
 import { signOut, useSession } from "next-auth/react";
 import Link from "next/link";
@@ -18,6 +18,8 @@ export default function StudentNav() {
   const pathname = usePathname();
   const { data: session } = useSession();
   const [open, setOpen] = useState(false);
+  const [menuOpen, setMenuOpen] = useState(false);
+  const menuRef = useRef<HTMLDivElement>(null);
 
   const fullName = session?.user?.name || "Student";
   const email = session?.user?.email || "";
@@ -49,10 +51,26 @@ export default function StudentNav() {
     };
   }, [open]);
 
-  // Close the sidebar on mobile when moving to another page
+  // Close the sidebar on mobile, and the user menu, when moving to another page
   useEffect(() => {
     if (!window.matchMedia("(min-width: 768px)").matches) setOpen(false);
+    setMenuOpen(false);
   }, [pathname]);
+
+  // Close the user menu on outside click or Escape
+  useEffect(() => {
+    if (!menuOpen) return;
+    const onPointer = (e: MouseEvent) => {
+      if (menuRef.current && !menuRef.current.contains(e.target as Node)) setMenuOpen(false);
+    };
+    const onKey = (e: KeyboardEvent) => e.key === "Escape" && setMenuOpen(false);
+    document.addEventListener("mousedown", onPointer);
+    document.addEventListener("keydown", onKey);
+    return () => {
+      document.removeEventListener("mousedown", onPointer);
+      document.removeEventListener("keydown", onKey);
+    };
+  }, [menuOpen]);
 
   const toggleSidebar = () => {
     setOpen((prev) => {
@@ -85,7 +103,7 @@ export default function StudentNav() {
         aria-label="Student navigation"
       >
         <div className="h-16 flex items-center px-5 border-b border-gray-100">
-          <BrandLockup href="/dashboard" variant="dark" />
+          <BrandLockup href="/dashboard" variant="dark" stacked />
         </div>
         <nav className="p-3 space-y-1">
           {NAV_ITEMS.map((item) => {
@@ -139,11 +157,13 @@ export default function StudentNav() {
         </div>
 
         {/* User menu: name shows, hover or focus reveals full name, email, Settings and Log out */}
-        <div className="relative group">
+        <div className="relative" ref={menuRef}>
           <button
             type="button"
+            onClick={() => setMenuOpen((o) => !o)}
+            aria-expanded={menuOpen}
+            aria-haspopup="menu"
             className="flex items-center gap-3 rounded-full pl-1 pr-3 py-1 hover:bg-gray-100 transition focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-600"
-            aria-label={`Account menu for ${fullName}`}
           >
             <span className="flex h-8 w-8 items-center justify-center rounded-full bg-blue-900 text-white text-xs font-semibold">
               {initials || "S"}
@@ -151,17 +171,19 @@ export default function StudentNav() {
             <span className="text-sm font-medium text-gray-900 max-w-[10rem] truncate">{fullName}</span>
           </button>
 
-          <div className="invisible opacity-0 group-hover:visible group-hover:opacity-100 group-focus-within:visible group-focus-within:opacity-100 transition duration-150 absolute right-0 top-full mt-2 w-64 rounded-xl border border-gray-200 bg-white shadow-lg z-50">
+          {menuOpen && (
+          <div role="menu" className="absolute right-0 top-full mt-2 w-64 rounded-xl border border-gray-200 bg-white shadow-lg z-50">
             <div className="px-4 py-3 border-b border-gray-100">
               <p className="text-sm font-semibold text-gray-900 truncate">{fullName}</p>
               {email && <p className="text-xs text-gray-500 truncate mt-0.5">{email}</p>}
             </div>
             <div className="py-1">
-              <Link href="/account" className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 hover:text-gray-900">
+              <Link role="menuitem" href="/account" className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 hover:text-gray-900">
                 Settings
               </Link>
               <button
                 type="button"
+                role="menuitem"
                 onClick={handleLogout}
                 className="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 hover:text-gray-900"
               >
@@ -169,6 +191,7 @@ export default function StudentNav() {
               </button>
             </div>
           </div>
+          )}
         </div>
       </header>
     </>
