@@ -14,9 +14,7 @@ export default function StudentNav() {
 
   const navItems = [
     { label: 'Dashboard', href: '/dashboard' },
-    { label: 'My Progress', href: '/dashboard/attempts' },
-    { label: 'Explore', href: '/explore' },
-    { label: 'Help', href: '/help' },
+    { label: 'Progress', href: '/dashboard/attempts' },
   ];
 
   // Close the mobile menu when the student moves to another page

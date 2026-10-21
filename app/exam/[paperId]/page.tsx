@@ -33,6 +33,11 @@ export default function PracticePage() {
 
   const [paper, setPaper] = useState<PaperInfo | null>(null);
   const [recommendedChapters, setRecommendedChapters] = useState<RecommendedChapter[]>([]);
+  // Set when the student has no access: shows the paper description with a request button
+  const [lockedPaper, setLockedPaper] = useState<PaperInfo | null>(null);
+  const [requestStatus, setRequestStatus] = useState<string | null>(null);
+  const [requesting, setRequesting] = useState(false);
+  const [requestMessage, setRequestMessage] = useState("");
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
@@ -69,7 +74,21 @@ export default function PracticePage() {
       const hasAccess = studentPapers.some((p: any) => p.paperId === paperId);
       
       if (!hasAccess) {
-        console.error("Student does not have access to this paper:", paperId);
+        // Show the paper details with a locked state and a request button
+        const [availableRes, requestsRes] = await Promise.all([
+          fetch("/api/papers/available"),
+          fetch("/api/student/paper-requests"),
+        ]);
+        if (availableRes.ok) {
+          const availableData = await availableRes.json();
+          const match = (availableData.papers || []).find((p: any) => p.id === paperId);
+          setLockedPaper(match ? { id: match.id, title: match.title, durationMinutes: match.totalTime, totalQuestions: 0, description: match.description || "" } : null);
+        }
+        if (requestsRes.ok) {
+          const requestsData = await requestsRes.json();
+          const req = (requestsData.requests || []).find((r: any) => r.paperId === paperId);
+          setRequestStatus(req?.status || null);
+        }
         setPaper(null);
         setLoading(false);
         return;
@@ -125,6 +144,71 @@ export default function PracticePage() {
     return null;
   }
 
+  if (!paper && lockedPaper) {
+    const requestPaper = async () => {
+      setRequesting(true);
+      setRequestMessage("");
+      try {
+        const res = await fetch("/api/student/paper-requests", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ paperId }),
+        });
+        const data = await res.json();
+        if (res.ok) {
+          setRequestStatus("pending");
+        } else {
+          setRequestMessage(data.error || "Could not send the request");
+        }
+      } catch {
+        setRequestMessage("Could not send the request");
+      } finally {
+        setRequesting(false);
+      }
+    };
+
+    return (
+      <div className="min-h-screen bg-gray-50">
+        <StudentNav />
+        <div className="bg-gradient-to-r from-blue-900 to-blue-800 text-white py-12 px-0">
+          <div className="max-w-7xl mx-auto px-6">
+            <Link href="/dashboard" className="text-white hover:text-blue-100 font-medium text-sm mb-6 inline-block">
+              ← Back to dashboard
+            </Link>
+            <h1 className="text-4xl font-bold mb-2">{lockedPaper.title}</h1>
+            <span className="inline-block mt-2 text-xs font-semibold px-2 py-0.5 rounded-full bg-white/20 text-white">Locked</span>
+          </div>
+        </div>
+        <div className="max-w-3xl mx-auto px-6 py-10">
+          <div className="bg-white rounded-2xl border border-gray-200 p-8">
+            <h2 className="text-lg font-bold text-gray-900 mb-2">About this paper</h2>
+            <p className="text-gray-700 leading-relaxed mb-6">
+              {lockedPaper.description || "No description yet."}
+            </p>
+            <p className="text-sm text-gray-600 mb-6">
+              You do not have access to this paper yet. Send a request and an administrator will review it.
+            </p>
+
+            {requestStatus === "pending" ? (
+              <div className="px-4 py-3 rounded-lg bg-amber-50 border border-amber-200 text-amber-800 text-sm font-medium">
+                Your request is pending review.
+              </div>
+            ) : (
+              <button
+                onClick={requestPaper}
+                disabled={requesting}
+                className="px-6 py-3 bg-blue-900 hover:bg-blue-800 text-white rounded-lg font-semibold transition disabled:opacity-50"
+              >
+                {requesting ? "Sending request..." : "Request paper"}
+              </button>
+            )}
+            {requestMessage && <p className="mt-3 text-sm text-red-700">{requestMessage}</p>}
+          </div>
+        </div>
+      </div>
+    );
+  }
+
   if (!paper) {
     return (
       <div className="min-h-screen bg-gray-50">
@@ -156,7 +240,7 @@ export default function PracticePage() {
       <div className="bg-gradient-to-r from-blue-900 to-blue-800 text-white py-12 px-0 border-b border-blue-900">
         <div className="max-w-7xl mx-auto px-6">
           <button
-            onClick={() => router.push('/explore')}
+            onClick={() => router.push('/dashboard')}
             className="text-white hover:text-blue-100 font-medium text-sm mb-6 transition duration-200"
           >
             ← Back

@@ -537,7 +537,7 @@ export default function AttemptReviewPage() {
 
             <div className="p-6 border-t border-gray-200">
               {attempt.passed ? (
-                <Link href="/explore" className="block w-full px-4 py-3 bg-green-600 hover:bg-green-700 text-white text-sm font-semibold rounded-lg transition">
+                <Link href="/dashboard" className="block w-full px-4 py-3 bg-green-600 hover:bg-green-700 text-white text-sm font-semibold rounded-lg transition">
                     ✓ Try Another Paper
                   </Link>
               ) : (
