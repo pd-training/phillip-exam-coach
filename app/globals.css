@@ -16,3 +16,10 @@ body {
   background-color: #fff;
   color: #000;
 }
+
+/* Student sidebar: shift page content right of the fixed sidebar on desktop */
+@media (min-width: 768px) {
+  body[data-sidebar="open"] {
+    padding-left: 15rem;
+  }
+}

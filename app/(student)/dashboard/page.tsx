@@ -24,6 +24,14 @@ const STUDY_STEPS = [
   "Check Progress to see which chapters need work, then go back to step 1 for those chapters.",
 ];
 
+// Time-based greeting in the student's local time
+function greeting() {
+  const hour = new Date().getHours();
+  if (hour < 12) return "Good morning";
+  if (hour < 18) return "Good afternoon";
+  return "Good evening";
+}
+
 export default function StudentDashboard() {
   const router = useRouter();
   const { data: session, status } = useSession();
@@ -92,8 +100,10 @@ export default function StudentDashboard() {
 
       <div className="max-w-7xl mx-auto px-6 py-10">
         <div className="mb-8">
-          <h1 className="text-3xl font-bold text-gray-900">Dashboard</h1>
-          <p className="text-gray-600 mt-1">Choose a paper to start studying.</p>
+          <h1 className="text-3xl font-bold text-gray-900">
+            {greeting()}, {session?.user?.name || "there"}!
+          </h1>
+          <p className="text-gray-600 mt-1">Learn how the portal works, then start learning.</p>
         </div>
 
         {/* How to use the portal */}
