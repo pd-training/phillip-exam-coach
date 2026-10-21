@@ -20,6 +20,8 @@ interface QuizSession {
   id: string;
   paperId: string;
   paperTitle: string | null;
+  mode: "quick" | "chapter";
+  chapterNumber: number | null;
   totalQuestions: number;
   correctCount: number;
   percentage: number;
@@ -34,7 +36,6 @@ export default function ProgressPage() {
   const { status } = useSession();
   const [attempts, setAttempts] = useState<Attempt[]>([]);
   const [quizSessions, setQuizSessions] = useState<QuizSession[]>([]);
-  const [recs, setRecs] = useState<any>(null);
   const [loading, setLoading] = useState(true);
   const [tab, setTab] = useState<Tab>("exam");
   const [paperFilter, setPaperFilter] = useState<string>("all");
@@ -49,12 +50,10 @@ export default function ProgressPage() {
     Promise.all([
       fetch("/api/student/attempts").then((r) => (r.ok ? r.json() : { attempts: [] })),
       fetch("/api/student/quick-quiz-sessions").then((r) => (r.ok ? r.json() : { sessions: [] })),
-      fetch("/api/student/recommendations").then((r) => (r.ok ? r.json() : null)),
     ])
-      .then(([att, quiz, rec]) => {
+      .then(([att, quiz]) => {
         setAttempts(att.attempts || []);
         setQuizSessions(quiz.sessions || []);
-        setRecs(rec);
       })
       .catch((err) => console.error("Progress load error:", err))
       .finally(() => setLoading(false));
@@ -242,45 +241,11 @@ export default function ProgressPage() {
 
         {tab === "practice" && (
           <div className="mt-4 space-y-6">
-            {recs && (recs.priority.length > 0 || recs.review.length > 0) && (
-              <div className="bg-white rounded-xl border border-gray-200 p-6">
-                <h2 className="text-lg font-bold text-gray-900">Your next steps</h2>
-                <p className="text-sm text-gray-600 mb-4">Based on your answers across all papers</p>
-                {recs.priority.length > 0 && (
-                  <div className="space-y-3">
-                    {recs.priority.map((c: any) => (
-                      <div key={`${c.paperId}-${c.chapterNumber}`} className="flex items-center justify-between gap-4 border border-red-200 bg-red-50 rounded-lg p-4">
-                        <p className="font-semibold text-gray-900 min-w-0">
-                          {c.paperTitle} · Chapter {c.chapterNumber}
-                          {c.chapterTitle ? `: ${c.chapterTitle}` : ""}
-                        </p>
-                        <Link
-                          href={`/exam/${c.paperId}/practice-chapter/${c.chapterNumber}`}
-                          className="flex-shrink-0 px-4 py-2 bg-blue-900 hover:bg-blue-800 text-white text-sm font-semibold rounded-lg transition"
-                        >
-                          Practise chapter
-                        </Link>
-                      </div>
-                    ))}
-                  </div>
-                )}
-                {recs.review.length > 0 && (
-                  <ul className="mt-4 divide-y divide-gray-200">
-                    {recs.review.map((c: any) => (
-                      <li key={`${c.paperId}-${c.chapterNumber}`} className="py-3 text-sm text-gray-900">
-                        {c.paperTitle} · Chapter {c.chapterNumber} <span className="text-amber-700 font-medium">· Review soon</span>
-                      </li>
-                    ))}
-                  </ul>
-                )}
-              </div>
-            )}
-
             <div className="bg-white rounded-xl border border-gray-200 p-6">
               {visibleQuizzes.length === 0 ? (
                 <div className="py-12 text-center">
                   <p className="font-semibold text-gray-900">No practice sessions yet</p>
-                  <p className="text-sm text-gray-600 mt-1">Quick quiz results will show here.</p>
+                  <p className="text-sm text-gray-600 mt-1">Quick quiz and practice by chapter results will show here.</p>
                   <Link href="/dashboard" className="inline-block mt-5 px-5 py-2.5 bg-blue-900 hover:bg-blue-800 text-white rounded-lg text-sm font-semibold transition">
                     Start practising
                   </Link>
@@ -291,6 +256,7 @@ export default function ProgressPage() {
                     <thead>
                       <tr className="border-b border-gray-200 text-left text-xs uppercase text-gray-600">
                         {sortableHeader("paper", "Paper")}
+                        <th className="py-2 pr-4 font-semibold">Mode</th>
                         {sortableHeader("date", "Date")}
                         <th className="py-2 pr-4 font-semibold text-right">Questions</th>
                         {sortableHeader("score", "Score", "right")}
@@ -300,6 +266,9 @@ export default function ProgressPage() {
                       {visibleQuizzes.map((q) => (
                         <tr key={q.id} className="border-b border-gray-100">
                           <td className="py-3 pr-4 font-medium text-gray-900">{q.paperTitle || "Paper"}</td>
+                          <td className="py-3 pr-4 text-gray-700">
+                            {q.mode === "chapter" ? `Chapter ${q.chapterNumber}` : "Quick quiz"}
+                          </td>
                           <td className="py-3 pr-4 text-gray-700">{fmtDate(q.createdAt)}</td>
                           <td className="py-3 pr-4 text-right text-gray-900">{q.totalQuestions}</td>
                           <td className={`py-3 text-right font-semibold ${q.percentage >= 50 ? "text-green-600" : "text-red-600"}`}>

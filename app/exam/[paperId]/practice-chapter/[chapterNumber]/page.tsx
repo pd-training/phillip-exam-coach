@@ -64,6 +64,8 @@ export default function PracticeChapterMode() {
   const [showingFeedback, setShowingFeedback] = useState(false);
   const [score, setScore] = useState(0);
   const [answered, setAnswered] = useState(0);
+  // Answers given in this chapter run, saved to the student's progress at the end
+  const [runAnswers, setRunAnswers] = useState<{ questionId: string; answer: string }[]>([]);
   const [paperTitle, setPaperTitle] = useState<string>("");
   const [paperDescription, setPaperDescription] = useState<string>("");
 
@@ -114,6 +116,7 @@ export default function PracticeChapterMode() {
     setCurrentQIndex(0);
     setScore(0);
     setAnswered(0);
+    setRunAnswers([]);
     setSelectedAnswer("");
     setFeedback(null);
     setShowingFeedback(false);
@@ -160,6 +163,7 @@ export default function PracticeChapterMode() {
           setScore(score + 1);
         }
         setAnswered(answered + 1);
+        setRunAnswers((prev) => [...prev, { questionId: String(questions[currentQIndex].id), answer: selectedAnswer }]);
       } else {
         console.error("API response not ok:", res.status);
       }
@@ -169,6 +173,22 @@ export default function PracticeChapterMode() {
     }
   };
 
+  // Saves the finished chapter run so it appears in Progress. Failures are ignored
+  // so the student is never blocked from continuing.
+  const saveChapterRun = () => {
+    if (runAnswers.length === 0 || selectedChapter === null) return;
+    fetch("/api/student/quick-quiz-sessions", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        paperId,
+        mode: "chapter",
+        chapterNumber: selectedChapter,
+        answers: runAnswers,
+      }),
+    }).catch((err) => console.error("Save chapter practice error:", err));
+  };
+
   const handleNext = () => {
     if (currentQIndex < questions.length - 1) {
       setCurrentQIndex(currentQIndex + 1);
@@ -176,6 +196,7 @@ export default function PracticeChapterMode() {
       setFeedback(null);
       setShowingFeedback(false);
     } else {
+      saveChapterRun();
       setSelectedChapter(null);
     }
   };

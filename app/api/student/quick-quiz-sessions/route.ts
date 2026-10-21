@@ -18,6 +18,9 @@ async function ensureTable() {
       "createdAt" TIMESTAMP NOT NULL DEFAULT NOW()
     )
   `);
+  // Practice by chapter results share this table. Older rows are quick quizzes.
+  await (prisma as any).$executeRawUnsafe(`ALTER TABLE "QuickQuizSession" ADD COLUMN IF NOT EXISTS mode TEXT NOT NULL DEFAULT 'quick'`);
+  await (prisma as any).$executeRawUnsafe(`ALTER TABLE "QuickQuizSession" ADD COLUMN IF NOT EXISTS "chapterNumber" INT`);
 }
 
 // Saves a finished quick quiz. Correctness is checked on the server against the
@@ -32,6 +35,8 @@ export async function POST(request: Request) {
 
     const body = await request.json();
     const paperId = typeof body?.paperId === "string" ? body.paperId : "";
+    const mode = body?.mode === "chapter" ? "chapter" : "quick";
+    const chapterNumber = mode === "chapter" && Number.isInteger(body?.chapterNumber) ? body.chapterNumber : null;
     const answers: { questionId: string; answer: string }[] = Array.isArray(body?.answers) ? body.answers : [];
     if (!paperId || answers.length === 0) {
       return Response.json({ error: "paperId and answers are required" }, { status: 400 });
@@ -55,14 +60,16 @@ export async function POST(request: Request) {
 
     await ensureTable();
     await (prisma as any).$executeRawUnsafe(
-      `INSERT INTO "QuickQuizSession" (id, "userId", "paperId", "totalQuestions", "correctCount", percentage)
-       VALUES ($1, $2, $3, $4, $5, $6)`,
+      `INSERT INTO "QuickQuizSession" (id, "userId", "paperId", "totalQuestions", "correctCount", percentage, mode, "chapterNumber")
+       VALUES ($1, $2, $3, $4, $5, $6, $7, $8)`,
       randomUUID(),
       userId,
       paperId,
       totalQuestions,
       correctCount,
-      percentage
+      percentage,
+      mode,
+      chapterNumber
     );
 
     return Response.json({ success: true, totalQuestions, correctCount, percentage });
@@ -83,7 +90,7 @@ export async function GET() {
 
     await ensureTable();
     const sessions = await (prisma as any).$queryRawUnsafe(
-      `SELECT s.id, s."paperId", p.title AS "paperTitle", s."totalQuestions", s."correctCount", s.percentage, s."createdAt"
+      `SELECT s.id, s."paperId", p.title AS "paperTitle", s.mode, s."chapterNumber", s."totalQuestions", s."correctCount", s.percentage, s."createdAt"
        FROM "QuickQuizSession" s
        LEFT JOIN "Paper" p ON p.id::text = s."paperId"
        WHERE s."userId" = $1
