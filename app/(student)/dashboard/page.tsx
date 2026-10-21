@@ -106,18 +106,37 @@ export default function StudentDashboard() {
           <p className="text-gray-600 mt-1">Learn how the portal works, then start learning.</p>
         </div>
 
-        {/* How to use the portal */}
-        <div className="mb-10 bg-white rounded-2xl border border-gray-200 p-6 flex flex-col md:flex-row md:items-center md:justify-between gap-4">
-          <div>
-            <h2 className="text-lg font-bold text-gray-900">How to use the portal effectively</h2>
-            <p className="text-sm text-gray-600 mt-1">A simple study path from first read to exam day.</p>
+        {/* Two ribbons: how to use the portal, and unlocking more papers */}
+        <div className="mb-10 grid gap-5 md:grid-cols-2">
+          <div className="bg-white rounded-2xl border border-gray-200 p-6 flex flex-col gap-4">
+            <div>
+              <h2 className="text-lg font-bold text-gray-900">How to use the portal effectively</h2>
+              <p className="text-sm text-gray-600 mt-1">A simple study path from first read to exam day.</p>
+            </div>
+            <div>
+              <button
+                onClick={() => setShowSteps(true)}
+                className="px-5 py-2.5 bg-blue-900 hover:bg-blue-800 text-white rounded-lg text-sm font-semibold transition"
+              >
+                View the steps
+              </button>
+            </div>
           </div>
-          <button
-            onClick={() => setShowSteps(true)}
-            className="px-5 py-2.5 bg-blue-900 hover:bg-blue-800 text-white rounded-lg text-sm font-semibold transition"
-          >
-            View the steps
-          </button>
+
+          <div className="bg-white rounded-2xl border border-gray-200 p-6 flex flex-col gap-4">
+            <div>
+              <h2 className="text-lg font-bold text-gray-900">Unlock papers</h2>
+              <p className="text-sm text-gray-600 mt-1">Choose more papers to practise, or request one you do not have yet.</p>
+            </div>
+            <div>
+              <Link
+                href="/papers"
+                className="inline-block px-5 py-2.5 bg-blue-900 hover:bg-blue-800 text-white rounded-lg text-sm font-semibold transition"
+              >
+                View papers
+              </Link>
+            </div>
+          </div>
         </div>
 
         {/* All papers */}
