@@ -1,6 +1,7 @@
 "use client";
 
 import AdminNav from "@/components/AdminNav";
+import GuideEditor from "@/components/admin/GuideEditor";
 import { useToast } from "@/components/Toast";
 import { useState, useEffect } from "react";
 import { useSession } from "next-auth/react";
@@ -28,7 +29,7 @@ interface ExamPart {
   orderIndex: number;
 }
 
-type TabType = "settings" | "questions" | "chapters";
+type TabType = "settings" | "questions" | "chapters" | "guide";
 
 export default function PaperDetailPage() {
   const { showToast, ToastView } = useToast();
@@ -504,7 +505,7 @@ export default function PaperDetailPage() {
         <div className="border-t border-gray-200 bg-gray-50">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div className="flex gap-8">
-              {(["settings", "questions", "chapters"] as TabType[]).map((tab) => (
+              {(["settings", "questions", "chapters", "guide"] as TabType[]).map((tab) => (
                 <button
                   key={tab}
                   onClick={() => setActiveTab(tab)}
@@ -517,6 +518,7 @@ export default function PaperDetailPage() {
                   {tab === "settings" && "Settings"}
                   {tab === "questions" && "Questions"}
                   {tab === "chapters" && "Chapters"}
+                  {tab === "guide" && "Quick Guide"}
                 </button>
               ))}
             </div>
@@ -712,6 +714,9 @@ export default function PaperDetailPage() {
             )}
           </div>
         )}
+
+        {/* Quick Guide Tab */}
+        {activeTab === "guide" && <GuideEditor paperId={paperId} />}
 
         {/* Chapters Tab */}
         {activeTab === "chapters" && (
