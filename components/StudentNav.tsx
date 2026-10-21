@@ -10,6 +10,11 @@ import BrandLockup from "./BrandLockup";
 const SIDEBAR_KEY = "student-sidebar";
 const DESKTOP_QUERY = "(min-width: 768px)";
 
+// Remembers the desktop sidebar choice across page changes. Each page renders its
+// own StudentNav, so without this the sidebar would start expanded on every click
+// and then collapse, which looked like flickering.
+let sidebarCache: boolean | null = null;
+
 const NAV_ITEMS = [
   { label: "Dashboard", href: "/dashboard", icon: "M3 10.5L12 3l9 7.5V21a1 1 0 01-1 1h-5v-6h-6v6H4a1 1 0 01-1-1v-10.5z" },
   { label: "Progress", href: "/dashboard/attempts", icon: "M4 19V10m6 9V5m6 14v-7m6 7V8" },
@@ -20,7 +25,7 @@ export default function StudentNav() {
   const pathname = usePathname();
   const { data: session } = useSession();
   // Desktop: sidebar expanded (labels) or collapsed to an icon rail
-  const [expanded, setExpanded] = useState(true);
+  const [expanded, setExpanded] = useState<boolean>(() => sidebarCache ?? true);
   // Mobile: sidebar drawer open or closed
   const [drawer, setDrawer] = useState(false);
   const [isDesktop, setIsDesktop] = useState(false);
@@ -48,7 +53,9 @@ export default function StudentNav() {
     } catch {
       stored = null;
     }
-    setExpanded(stored !== "collapsed");
+    const value = stored !== "collapsed";
+    sidebarCache = value;
+    setExpanded(value);
     sync();
     mq.addEventListener("change", sync);
     return () => mq.removeEventListener("change", sync);
@@ -102,6 +109,7 @@ export default function StudentNav() {
     if (window.matchMedia(DESKTOP_QUERY).matches) {
       setExpanded((prev) => {
         const next = !prev;
+        sidebarCache = next;
         try {
           window.localStorage.setItem(SIDEBAR_KEY, next ? "expanded" : "collapsed");
         } catch {
@@ -129,7 +137,7 @@ export default function StudentNav() {
     <>
       {/* Sidebar */}
       <aside
-        className={`fixed inset-y-0 left-0 z-50 w-60 bg-white border-r border-gray-200 flex flex-col transition-all duration-200 ${
+        className={`fixed inset-y-0 left-0 z-50 w-60 bg-white border-r border-gray-200 flex flex-col transition-transform duration-200 ${
           drawer ? "translate-x-0" : "-translate-x-full"
         } md:translate-x-0 ${expanded ? "md:w-60" : "md:w-16"}`}
         aria-label="Student navigation"
