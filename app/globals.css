@@ -22,4 +22,7 @@ body {
   body[data-sidebar="open"] {
     padding-left: 15rem;
   }
+  body[data-sidebar="collapsed"] {
+    padding-left: 4rem;
+  }
 }

@@ -7,6 +7,7 @@ import Link from "next/link";
 import BrandLockup from "./BrandLockup";
 
 const SIDEBAR_KEY = "student-sidebar";
+const DESKTOP_QUERY = "(min-width: 768px)";
 
 const NAV_ITEMS = [
   { label: "Dashboard", href: "/dashboard", icon: "M3 10.5L12 3l9 7.5V21a1 1 0 01-1 1h-5v-6h-6v6H4a1 1 0 01-1-1v-10.5z" },
@@ -17,7 +18,11 @@ const NAV_ITEMS = [
 export default function StudentNav() {
   const pathname = usePathname();
   const { data: session } = useSession();
-  const [open, setOpen] = useState(false);
+  // Desktop: sidebar expanded (labels) or collapsed to an icon rail
+  const [expanded, setExpanded] = useState(true);
+  // Mobile: sidebar drawer open or closed
+  const [drawer, setDrawer] = useState(false);
+  const [isDesktop, setIsDesktop] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
   const menuRef = useRef<HTMLDivElement>(null);
 
@@ -30,30 +35,33 @@ export default function StudentNav() {
     .map((part) => part[0].toUpperCase())
     .join("");
 
-  // Restore the desktop sidebar preference. Mobile always starts closed.
+  // Restore the desktop preference and keep track of the screen size
   useEffect(() => {
-    const desktop = window.matchMedia("(min-width: 768px)").matches;
+    const mq = window.matchMedia(DESKTOP_QUERY);
+    const sync = () => setIsDesktop(mq.matches);
     let stored: string | null = null;
     try {
       stored = window.localStorage.getItem(SIDEBAR_KEY);
     } catch {
       stored = null;
     }
-    setOpen(desktop ? stored !== "closed" : false);
+    setExpanded(stored !== "collapsed");
+    sync();
+    mq.addEventListener("change", sync);
+    return () => mq.removeEventListener("change", sync);
   }, []);
 
-  // Pushes page content right of the sidebar on desktop (see globals.css)
+  // Tells globals.css how far to push page content on desktop
   useEffect(() => {
-    if (open) document.body.dataset.sidebar = "open";
-    else delete document.body.dataset.sidebar;
+    document.body.dataset.sidebar = expanded ? "open" : "collapsed";
     return () => {
       delete document.body.dataset.sidebar;
     };
-  }, [open]);
+  }, [expanded]);
 
-  // Close the sidebar on mobile, and the user menu, when moving to another page
+  // Close the mobile drawer and the user menu when moving to another page
   useEffect(() => {
-    if (!window.matchMedia("(min-width: 768px)").matches) setOpen(false);
+    setDrawer(false);
     setMenuOpen(false);
   }, [pathname]);
 
@@ -73,17 +81,19 @@ export default function StudentNav() {
   }, [menuOpen]);
 
   const toggleSidebar = () => {
-    setOpen((prev) => {
-      const next = !prev;
-      if (window.matchMedia("(min-width: 768px)").matches) {
+    if (window.matchMedia(DESKTOP_QUERY).matches) {
+      setExpanded((prev) => {
+        const next = !prev;
         try {
-          window.localStorage.setItem(SIDEBAR_KEY, next ? "open" : "closed");
+          window.localStorage.setItem(SIDEBAR_KEY, next ? "expanded" : "collapsed");
         } catch {
           // Storage can be blocked; the toggle still works for this page
         }
-      }
-      return next;
-    });
+        return next;
+      });
+    } else {
+      setDrawer((prev) => !prev);
+    }
   };
 
   const isActive = (href: string) => pathname === href || pathname.startsWith(href + "/");
@@ -93,17 +103,23 @@ export default function StudentNav() {
     window.location.href = "/login";
   };
 
+  // On desktop the labels and logo hide when collapsed; on mobile they always show
+  const labelClass = expanded ? "" : "md:hidden";
+  const collapsedLinkClass = expanded ? "" : "md:justify-center md:px-0";
+
   return (
     <>
       {/* Sidebar */}
       <aside
-        className={`fixed inset-y-0 left-0 z-50 w-60 bg-white border-r border-gray-200 flex flex-col transition-transform duration-200 ${
-          open ? "translate-x-0" : "-translate-x-full"
-        } ${open ? "md:flex" : "md:hidden"}`}
+        className={`fixed inset-y-0 left-0 z-50 w-60 bg-white border-r border-gray-200 flex flex-col transition-all duration-200 ${
+          drawer ? "translate-x-0" : "-translate-x-full"
+        } md:translate-x-0 ${expanded ? "md:w-60" : "md:w-16"}`}
         aria-label="Student navigation"
       >
-        <div className="h-16 flex items-center px-5 border-b border-gray-100">
-          <BrandLockup href="/dashboard" variant="dark" stacked />
+        <div className={`h-16 flex items-center border-b border-gray-100 ${expanded ? "px-5" : "md:justify-center md:px-0 px-5"}`}>
+          <div className={labelClass}>
+            <BrandLockup href="/dashboard" variant="dark" stacked />
+          </div>
         </div>
         <nav className="p-3 space-y-1">
           {NAV_ITEMS.map((item) => {
@@ -112,15 +128,16 @@ export default function StudentNav() {
               <Link
                 key={item.href}
                 href={item.href}
+                title={expanded ? undefined : item.label}
                 aria-current={active ? "page" : undefined}
-                className={`flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition ${
+                className={`flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition ${collapsedLinkClass} ${
                   active ? "bg-blue-50 text-blue-700" : "text-gray-700 hover:bg-gray-100 hover:text-gray-900"
                 }`}
               >
                 <svg className="w-5 h-5 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.8} aria-hidden="true">
                   <path strokeLinecap="round" strokeLinejoin="round" d={item.icon} />
                 </svg>
-                {item.label}
+                <span className={labelClass}>{item.label}</span>
               </Link>
             );
           })}
@@ -128,11 +145,11 @@ export default function StudentNav() {
       </aside>
 
       {/* Mobile backdrop */}
-      {open && (
+      {drawer && (
         <button
           type="button"
           aria-label="Close menu"
-          onClick={() => setOpen(false)}
+          onClick={() => setDrawer(false)}
           className="md:hidden fixed inset-0 z-40 bg-slate-900/40"
         />
       )}
@@ -143,8 +160,16 @@ export default function StudentNav() {
           <button
             type="button"
             onClick={toggleSidebar}
-            aria-expanded={open}
-            aria-label={open ? "Hide sidebar" : "Show sidebar"}
+            aria-expanded={isDesktop ? expanded : drawer}
+            aria-label={
+              isDesktop
+                ? expanded
+                  ? "Collapse sidebar"
+                  : "Expand sidebar"
+                : drawer
+                ? "Close menu"
+                : "Open menu"
+            }
             className="p-2 -ml-2 rounded-lg text-gray-600 hover:bg-gray-100 hover:text-gray-900 transition"
           >
             <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.8} aria-hidden="true">
@@ -152,11 +177,11 @@ export default function StudentNav() {
               <path strokeLinecap="round" d="M9 4v16" />
             </svg>
           </button>
-          {/* Logo shows in the top bar whenever the sidebar is hidden */}
-          {!open && <BrandLockup href="/dashboard" variant="dark" />}
+          {/* On mobile the logo shows in the top bar while the drawer is closed */}
+          {!drawer && <div className="md:hidden"><BrandLockup href="/dashboard" variant="dark" /></div>}
         </div>
 
-        {/* User menu: name shows, hover or focus reveals full name, email, Settings and Log out */}
+        {/* User menu: click the name to open Settings and Log out */}
         <div className="relative" ref={menuRef}>
           <button
             type="button"
@@ -172,25 +197,25 @@ export default function StudentNav() {
           </button>
 
           {menuOpen && (
-          <div role="menu" className="absolute right-0 top-full mt-2 w-64 rounded-xl border border-gray-200 bg-white shadow-lg z-50">
-            <div className="px-4 py-3 border-b border-gray-100">
-              <p className="text-sm font-semibold text-gray-900 truncate">{fullName}</p>
-              {email && <p className="text-xs text-gray-500 truncate mt-0.5">{email}</p>}
+            <div role="menu" className="absolute right-0 top-full mt-2 w-64 rounded-xl border border-gray-200 bg-white shadow-lg z-50">
+              <div className="px-4 py-3 border-b border-gray-100">
+                <p className="text-sm font-semibold text-gray-900 truncate">{fullName}</p>
+                {email && <p className="text-xs text-gray-500 truncate mt-0.5">{email}</p>}
+              </div>
+              <div className="py-1">
+                <Link role="menuitem" href="/account" className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 hover:text-gray-900">
+                  Settings
+                </Link>
+                <button
+                  type="button"
+                  role="menuitem"
+                  onClick={handleLogout}
+                  className="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 hover:text-gray-900"
+                >
+                  Log out
+                </button>
+              </div>
             </div>
-            <div className="py-1">
-              <Link role="menuitem" href="/account" className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 hover:text-gray-900">
-                Settings
-              </Link>
-              <button
-                type="button"
-                role="menuitem"
-                onClick={handleLogout}
-                className="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 hover:text-gray-900"
-              >
-                Log out
-              </button>
-            </div>
-          </div>
           )}
         </div>
       </header>
