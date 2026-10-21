@@ -145,10 +145,23 @@ export default function SideNav({ navItems, homeHref, settingsHref, fallbackName
         } md:translate-x-0 ${expanded ? "md:w-60" : "md:w-16"}`}
         aria-label="Main navigation"
       >
-        <div className={`h-16 flex items-center border-b border-gray-100 ${expanded ? "px-5" : "md:justify-center md:px-0 px-5"}`}>
+        <div className={`h-16 flex items-center justify-between border-b border-gray-100 pl-5 pr-3 ${expanded ? "" : "md:justify-center md:px-0 px-5"}`}>
           <div className={labelClass}>
             <BrandLockup href={homeHref} variant="dark" stacked />
           </div>
+          {/* Desktop collapse toggle lives in the sidebar. Mobile uses the top bar button. */}
+          <button
+            type="button"
+            onClick={toggleSidebar}
+            aria-expanded={expanded}
+            aria-label={expanded ? "Collapse sidebar" : "Expand sidebar"}
+            className="hidden md:inline-flex p-2 rounded-lg text-gray-600 hover:bg-gray-100 hover:text-gray-900 transition"
+          >
+            <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.8} aria-hidden="true">
+              <rect x="3" y="4" width="18" height="16" rx="2" />
+              <path strokeLinecap="round" d="M9 4v16" />
+            </svg>
+          </button>
         </div>
         <nav className="p-3 space-y-1">
           {navItems.map((item) => {
@@ -199,7 +212,7 @@ export default function SideNav({ navItems, homeHref, settingsHref, fallbackName
                 ? "Close menu"
                 : "Open menu"
             }
-            className="p-2 -ml-2 rounded-lg text-gray-600 hover:bg-gray-100 hover:text-gray-900 transition"
+            className="md:hidden p-2 -ml-2 rounded-lg text-gray-600 hover:bg-gray-100 hover:text-gray-900 transition"
           >
             <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.8} aria-hidden="true">
               <rect x="3" y="4" width="18" height="16" rx="2" />
