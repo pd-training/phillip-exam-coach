@@ -133,13 +133,13 @@ export default function AttemptDetailsPage() {
       <AdminNav />
 
       {/* Header */}
-      <div className="pt-10 pb-6">
+      <div className="pt-6 pb-4">
         <div className="max-w-7xl mx-auto px-6 flex justify-between items-start gap-6">
           <div>
             <Link href="/admin/attempts" className="text-blue-700 hover:text-blue-800 font-medium text-sm mb-4 block">
               ← Back to Exam Attempts
             </Link>
-            <h1 className="text-3xl font-bold">{attempt.student_name}'s Exam Review</h1>
+            <h1 className="text-2xl font-bold">{attempt.student_name}'s Exam Review</h1>
             <p className="text-gray-600 mt-1">{attempt.paper_name}</p>
           </div>
           <div className="text-right">

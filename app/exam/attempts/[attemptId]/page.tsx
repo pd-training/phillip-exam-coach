@@ -349,10 +349,10 @@ export default function AttemptReviewPage() {
       <StudentNav />
 
       {/* Header */}
-      <div className="pt-10 pb-6">
+      <div className="pt-6 pb-4">
         <div className="max-w-7xl mx-auto px-6 flex justify-between items-start gap-6">
           <div className="flex-1">
-            <h1 className="text-3xl font-bold text-gray-900">{attempt.paper_name} - Exam Review</h1>
+            <h1 className="text-2xl font-bold text-gray-900">{attempt.paper_name} - Exam Review</h1>
             {attempt.partScores && attempt.partScores.length > 0 ? (
               <div className="mt-3 space-y-1">
                 {attempt.partScores.map((part, idx) => (
@@ -541,8 +541,8 @@ export default function AttemptReviewPage() {
                     ✓ Try Another Paper
                   </Link>
               ) : (
-                <Link href={`/exam/${attempt.paperid}`} className="block w-full px-4 py-3 bg-blue-900 hover:bg-blue-800 text-white text-sm font-semibold rounded-lg transition">
-                    Choose a mode
+                <Link href={`/exam/${attempt.paperid}/full-exam`} className="block w-full px-4 py-3 bg-blue-900 hover:bg-blue-800 text-white text-sm font-semibold rounded-lg transition">
+                    Retake exam simulation
                   </Link>
               )}
             </div>
