@@ -16,18 +16,18 @@ export default function PracticeModePage() {
 
   const options = [
     {
-      title: "Quick Quiz",
-      href: `/exam/${paperId}/quick-quiz`,
-      description: "Rapid-fire questions across the whole paper, without time limits. Good for quick revision.",
-      icon: "M13 10V3L4 14h7v7l9-11h-7z",
-      cta: "Start quiz",
-    },
-    {
       title: "Full Practice",
       href: `/exam/${paperId}/full-practice`,
       description: "50 questions with no timer and no score. Each answer is marked right or wrong, with its explanation.",
       icon: "M5 4h14a1 1 0 011 1v14a1 1 0 01-1 1H5a1 1 0 01-1-1V5a1 1 0 011-1zm3 4h8M8 12h8M8 16h5",
       cta: "Start full practice",
+    },
+    {
+      title: "Quick Quiz",
+      href: `/exam/${paperId}/quick-quiz`,
+      description: "Rapid-fire questions across the whole paper, without time limits. Good for quick revision.",
+      icon: "M13 10V3L4 14h7v7l9-11h-7z",
+      cta: "Start quiz",
     },
     {
       title: "Practice by Chapter",
