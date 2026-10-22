@@ -184,7 +184,7 @@ export default function PracticeChapterMode() {
             <div className="mt-6">
               <h1 className="text-2xl font-bold text-gray-900">{paperTitle} - Practice by Chapter</h1>
               <p className="text-sm text-gray-600 mt-1">
-                Select a chapter to practice 10 random questions with instant feedback.
+                Select a chapter to drill on
               </p>
             </div>
 

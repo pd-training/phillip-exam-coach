@@ -224,7 +224,7 @@ export default function PracticeChapterMode() {
                 {paperDescription}
               </p>
             )}
-            <p className="text-gray-200">Select a chapter to practice questions from that specific topic</p>
+            <p className="text-gray-200">Select a chapter to drill on</p>
           </div>
         </div>
 
