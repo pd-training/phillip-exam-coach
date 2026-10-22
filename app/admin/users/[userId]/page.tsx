@@ -10,6 +10,7 @@ interface User {
   id: string;
   name: string | null;
   email: string;
+  phone?: string | null;
   role: string;
   createdAt: string;
 }
@@ -186,81 +187,17 @@ export default function UserDetailPage() {
     <div style={{ minHeight: "100vh", backgroundColor: "#f9fafb" }}>
       <AdminNav />
 
-      {/* Hero Section */}
-      <div style={{
-        background: "linear-gradient(to right, #1e3a8a, #1e40af)",
-        color: "white",
-        padding: "24px 0",
-        borderBottom: "1px solid #e5e7eb",
-      }}>
-        <div style={{ maxWidth: "88rem", margin: "0 auto", paddingLeft: "24px", paddingRight: "24px" }}>
-          <h1 style={{ fontSize: "24px", fontWeight: "bold", margin: "0" }}>User Details</h1>
-        </div>
+      {/* Header, same style as the dashboard pages */}
+      <div className="max-w-7xl mx-auto px-6 pt-10">
+        <Link href="/admin/users" className="text-blue-700 hover:text-blue-800 font-medium text-sm block mb-4">
+          ← Back to users
+        </Link>
+        <h1 className="text-3xl font-bold text-gray-900">{user.name || "User"}</h1>
+        <p className="text-gray-600 mt-1">{user.email}</p>
       </div>
 
-      <div style={{ maxWidth: "88rem", margin: "0 auto", paddingLeft: "24px", paddingRight: "24px" }}>
-        {/* Top Navigation */}
-        <div style={{
-          padding: "12px 0",
-          display: "flex",
-          justifyContent: "space-between",
-          alignItems: "center",
-          borderBottom: "1px solid #e5e7eb",
-        }}>
-          <Link href="/admin/users" style={{ color: "#f59e0b", fontSize: "14px", textDecoration: "none", fontWeight: "500" }}>
-            ← Back to users
-          </Link>
-        </div>
-
       {/* Content */}
-      <div style={{ maxWidth: "900px", margin: "0 auto", padding: "40px 20px" }}>
-        {/* User Header */}
-        <div style={{ marginBottom: "30px" }}>
-          <h1 style={{ fontSize: "28px", fontWeight: "bold", color: "#1f2937", margin: "0 0 8px 0" }}>
-            {user.name || "—"}
-          </h1>
-          <p style={{ color: "#6b7280", fontSize: "14px", margin: "0 0 12px 0" }}>
-            {user.email}
-          </p>
-          <div style={{ display: "flex", gap: "8px" }}>
-            <span style={{
-              display: "inline-block",
-              padding: "4px 12px",
-              backgroundColor: "#e0e7ff",
-              color: "#3730a3",
-              borderRadius: "4px",
-              fontSize: "12px",
-              fontWeight: "600",
-            }}>
-              {isAdminCreated ? "Admin created" : "Self created"}
-            </span>
-            <span style={{
-              display: "inline-block",
-              padding: "4px 12px",
-              backgroundColor: "#d1fae5",
-              color: "#065f46",
-              borderRadius: "4px",
-              fontSize: "12px",
-              fontWeight: "600",
-            }}>
-              Active
-            </span>
-          </div>
-        </div>
-
-        {message && (
-          <div style={{
-            padding: "12px 16px",
-            backgroundColor: "#d1fae5",
-            color: "#065f46",
-            borderRadius: "6px",
-            marginBottom: "20px",
-            fontSize: "14px",
-          }}>
-            {message}
-          </div>
-        )}
-
+      <div className="max-w-7xl mx-auto px-6 py-8">
         {/* Personal Information */}
         <div style={{
           backgroundColor: "white",
@@ -324,6 +261,12 @@ export default function UserDetailPage() {
                 boxSizing: "border-box",
               }}
             />
+          </div>
+          <div style={{ marginTop: "16px" }}>
+            <label style={{ display: "block", fontSize: "12px", color: "#6b7280", marginBottom: "4px", fontWeight: "600" }}>
+              Mobile number
+            </label>
+            <p style={{ margin: "0", fontSize: "14px", color: "#1f2937" }}>{user.phone || "Not provided"}</p>
           </div>
         </div>
 
@@ -639,7 +582,6 @@ export default function UserDetailPage() {
             </div>
           )}
         </div>
-      </div>
       </div>
     </div>
   );

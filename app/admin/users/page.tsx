@@ -12,6 +12,7 @@ interface User {
   name: string;
   role: string;
   active: boolean;
+  phone?: string | null;
   createdAt: string;
 }
 
@@ -69,7 +70,8 @@ export default function UserManagement() {
   useEffect(() => {
     const filtered = users.filter((user) =>
       user.name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      user.email.toLowerCase().includes(searchTerm.toLowerCase())
+      user.email.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      (user.phone || "").includes(searchTerm.trim())
     );
     setFilteredUsers(filtered);
   }, [searchTerm, users]);
@@ -184,7 +186,7 @@ export default function UserManagement() {
         <div className="mb-8">
           <input
             type="text"
-            placeholder="Search by name or email..."
+            placeholder="Search by name, email or phone..."
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
             className="w-full max-w-md px-4 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:border-blue-500"
@@ -193,123 +195,69 @@ export default function UserManagement() {
         </div>
 
         {/* Users Table */}
-        <div className="bg-white rounded-2xl border border-gray-200 mb-12 overflow-hidden">
+        <div className="bg-white rounded-lg border border-gray-200 mb-12 overflow-hidden">
           <div className="overflow-x-auto">
             <table className="w-full">
-              <thead>
-                <tr style={{ backgroundColor: "#f9fafb", borderBottom: "1px solid #e5e7eb" }}>
-                  <th style={{ padding: "16px", textAlign: "left", fontSize: "12px", fontWeight: "600", color: "#6b7280", textTransform: "uppercase" }}>
-                    NAME
-                  </th>
-                  <th style={{ padding: "16px", textAlign: "left", fontSize: "12px", fontWeight: "600", color: "#6b7280", textTransform: "uppercase" }}>
-                    EMAIL
-                  </th>
-                  <th style={{ padding: "16px", textAlign: "left", fontSize: "12px", fontWeight: "600", color: "#6b7280", textTransform: "uppercase" }}>
-                    ROLES
-                  </th>
-                  <th style={{ padding: "16px", textAlign: "left", fontSize: "12px", fontWeight: "600", color: "#6b7280", textTransform: "uppercase" }}>
-                    STATUS
-                  </th>
-                  <th style={{ padding: "16px", textAlign: "center", fontSize: "12px", fontWeight: "600", color: "#6b7280", textTransform: "uppercase" }}>
-                    ACTION
-                  </th>
+              <thead className="bg-gray-100 border-b border-gray-200">
+                <tr>
+                  <th className="px-6 py-3 text-left text-sm font-semibold text-gray-900">Name</th>
+                  <th className="px-6 py-3 text-left text-sm font-semibold text-gray-900">Email</th>
+                  <th className="px-6 py-3 text-left text-sm font-semibold text-gray-900">Phone</th>
+                  <th className="px-6 py-3 text-left text-sm font-semibold text-gray-900">Role</th>
+                  <th className="px-6 py-3 text-left text-sm font-semibold text-gray-900">Status</th>
+                  <th className="px-6 py-3 text-center text-sm font-semibold text-gray-900">Action</th>
                 </tr>
               </thead>
-              <tbody>
+              <tbody className="divide-y divide-gray-200">
                 {loading ? (
                   <tr>
-                    <td colSpan={5} style={{ padding: "40px", textAlign: "center", color: "#666" }}>
-                      Loading...
-                    </td>
+                    <td colSpan={6} className="px-6 py-10 text-center text-sm text-gray-600">Loading...</td>
                   </tr>
                 ) : filteredUsers.length === 0 ? (
                   <tr>
-                    <td colSpan={5} style={{ padding: "40px", textAlign: "center", color: "#666" }}>
-                      No users found
-                    </td>
+                    <td colSpan={6} className="px-6 py-10 text-center text-sm text-gray-600">No users found</td>
                   </tr>
                 ) : (
                   filteredUsers.map((user) => (
                     <tr
                       key={user.id}
                       onClick={() => router.push(`/admin/users/${user.id}`)}
-                      style={{
-                        borderBottom: "1px solid #e5e7eb",
-                        cursor: "pointer",
-                        transition: "background-color 0.2s",
-                      }}
-                      onMouseEnter={(e) => {
-                        (e.currentTarget as HTMLTableRowElement).style.backgroundColor = "#f9fafb";
-                      }}
-                      onMouseLeave={(e) => {
-                        (e.currentTarget as HTMLTableRowElement).style.backgroundColor = "white";
-                      }}
+                      className="hover:bg-gray-50 cursor-pointer"
                     >
-                      <td style={{ padding: "16px", fontSize: "14px", fontWeight: "500", color: "#1f2937" }}>
-                        {user.name || "—"}
-                      </td>
-                      <td style={{ padding: "16px", fontSize: "14px", color: "#f59e0b" }}>
-                        {user.email}
-                      </td>
-                      <td style={{ padding: "16px", fontSize: "14px" }}>
-                        <div style={{ display: "flex", gap: "8px", flexWrap: "wrap" }}>
+                      <td className="px-6 py-4 text-sm font-medium text-gray-900">{user.name || "—"}</td>
+                      <td className="px-6 py-4 text-sm text-gray-700">{user.email}</td>
+                      <td className="px-6 py-4 text-sm text-gray-700 tabular-nums">{user.phone || "—"}</td>
+                      <td className="px-6 py-4 text-sm">
+                        <div className="flex flex-wrap gap-2">
                           {user.role.split(",").map((role) => (
                             <span
                               key={role}
-                              style={{
-                                display: "inline-block",
-                                padding: "4px 12px",
-                                backgroundColor: role === "ADMIN" ? "#fee2e2" : "#fef3c7",
-                                color: role === "ADMIN" ? "#991b1b" : "#92400e",
-                                borderRadius: "4px",
-                                fontSize: "12px",
-                                fontWeight: "600",
-                              }}
+                              className={`inline-block px-2.5 py-0.5 rounded text-xs font-semibold ${
+                                role === "ADMIN" ? "bg-red-100 text-red-800" : "bg-amber-100 text-amber-800"
+                              }`}
                             >
                               {role}
                             </span>
                           ))}
                         </div>
                       </td>
-                      <td style={{ padding: "16px", fontSize: "14px" }}>
+                      <td className="px-6 py-4 text-sm">
                         <span
-                          style={{
-                            display: "inline-block",
-                            padding: "4px 12px",
-                            backgroundColor: user.active ? "#d1fae5" : "#fecaca",
-                            color: user.active ? "#065f46" : "#991b1b",
-                            borderRadius: "4px",
-                            fontSize: "12px",
-                            fontWeight: "600",
-                          }}
+                          className={`inline-block px-2.5 py-0.5 rounded text-xs font-semibold ${
+                            user.active ? "bg-green-100 text-green-800" : "bg-red-100 text-red-800"
+                          }`}
                         >
                           {user.active ? "Active" : "Inactive"}
                         </span>
                       </td>
-                      <td style={{ padding: "16px", textAlign: "center" }}>
+                      <td className="px-6 py-4 text-center">
                         <button
                           onClick={(e) => {
                             e.stopPropagation();
                             setDeleteUserId(user.id);
                             setError(null);
                           }}
-                          style={{
-                            padding: "6px 12px",
-                            backgroundColor: "#ef4444",
-                            color: "white",
-                            border: "none",
-                            borderRadius: "4px",
-                            fontSize: "12px",
-                            fontWeight: "600",
-                            cursor: "pointer",
-                            transition: "background-color 0.2s",
-                          }}
-                          onMouseEnter={(e) => {
-                            e.currentTarget.style.backgroundColor = "#dc2626";
-                          }}
-                          onMouseLeave={(e) => {
-                            e.currentTarget.style.backgroundColor = "#ef4444";
-                          }}
+                          className="px-3 py-1.5 bg-red-600 hover:bg-red-700 text-white rounded text-xs font-semibold transition"
                         >
                           Delete
                         </button>

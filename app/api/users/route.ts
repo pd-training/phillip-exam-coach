@@ -7,8 +7,11 @@ export async function GET() {
     const { PrismaClient } = require("@prisma/client");
     const prisma = new PrismaClient({ datasources: { db: { url: dbUrl } } });
 
+    // Make sure the phone column exists (added when sign-up started collecting mobile numbers)
+    await prisma.$executeRaw`ALTER TABLE "User" ADD COLUMN IF NOT EXISTS phone TEXT`;
+
     const users = await prisma.$queryRaw`
-      SELECT id, email, name, role, active, "createdAt"
+      SELECT id, email, name, role, active, "createdAt", phone
       FROM "User"
       ORDER BY "createdAt" DESC
     `;

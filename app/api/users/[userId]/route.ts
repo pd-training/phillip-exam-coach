@@ -12,8 +12,10 @@ export async function GET(request: Request, { params }: { params: { userId: stri
       return Response.json({ error: "Unauthorized" }, { status: 401 });
     }
 
+    await prisma.$executeRaw`ALTER TABLE "User" ADD COLUMN IF NOT EXISTS phone TEXT`;
+
     const users = await prisma.$queryRaw`
-      SELECT id, name, email, role, "createdAt", "updatedAt"
+      SELECT id, name, email, role, phone, "createdAt", "updatedAt"
       FROM "User"
       WHERE id = ${params.userId}
     ` as any[];
