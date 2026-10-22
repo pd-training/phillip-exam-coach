@@ -1079,8 +1079,8 @@ export default function PaperDetailPage() {
 
       {/* Add Exam Part Modal */}
       {showAddPartModal && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-          <div className="bg-white rounded-lg shadow-lg p-6 max-w-md w-full mx-4">
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 overflow-y-auto p-4">
+          <div className="bg-white rounded-lg shadow-lg p-6 max-w-md w-full max-h-[calc(100vh-2rem)] overflow-y-auto">
             <h3 className="text-lg font-bold text-gray-900 mb-6">Add Exam Part</h3>
 
             <div className="space-y-4 mb-6">
@@ -1184,8 +1184,8 @@ export default function PaperDetailPage() {
 
       {/* Edit Exam Part Modal */}
       {showEditPartModal && selectedPart && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-          <div className="bg-white rounded-lg shadow-lg p-6 max-w-md w-full mx-4">
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 overflow-y-auto p-4">
+          <div className="bg-white rounded-lg shadow-lg p-6 max-w-md w-full max-h-[calc(100vh-2rem)] overflow-y-auto">
             <h3 className="text-lg font-bold text-gray-900 mb-6">Edit Exam Part</h3>
 
             <div className="space-y-4 mb-6">
