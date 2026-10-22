@@ -43,9 +43,11 @@ export async function GET(
       );
     }
 
-    // Shuffle and take 15
+    // Shuffle and take `count` questions (default 15, at most 50)
+    const requested = parseInt(request.nextUrl.searchParams.get('count') || '15', 10);
+    const count = Number.isFinite(requested) ? Math.min(Math.max(requested, 1), 50) : 15;
     const shuffled = allQuestions.sort(() => Math.random() - 0.5);
-    const questions = shuffled.slice(0, Math.min(15, shuffled.length));
+    const questions = shuffled.slice(0, Math.min(count, shuffled.length));
 
     return NextResponse.json({
       paperTitle: paper?.title || 'Quick Quiz',

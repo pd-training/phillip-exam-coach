@@ -23,6 +23,13 @@ export default function PracticeModePage() {
       cta: "Start quiz",
     },
     {
+      title: "Full Practice",
+      href: `/exam/${paperId}/full-practice`,
+      description: "50 questions with no timer and no score. Each answer is marked right or wrong, with its explanation.",
+      icon: "M5 4h14a1 1 0 011 1v14a1 1 0 01-1 1H5a1 1 0 01-1-1V5a1 1 0 011-1zm3 4h8M8 12h8M8 16h5",
+      cta: "Start full practice",
+    },
+    {
       title: "Practice by Chapter",
       href: `/exam/${paperId}/practice-chapter`,
       description: "Pick a chapter and practise its questions with instant feedback, one topic at a time.",
@@ -42,7 +49,7 @@ export default function PracticeModePage() {
         <h1 className="text-3xl font-bold text-gray-900 mt-4">Practice</h1>
         <p className="text-gray-600 mt-1">Choose how you want to practise.</p>
 
-        <div className="mt-8 grid gap-6 md:grid-cols-2">
+        <div className="mt-8 grid gap-6 md:grid-cols-3">
           {options.map((opt) => (
             <Link
               key={opt.href}
