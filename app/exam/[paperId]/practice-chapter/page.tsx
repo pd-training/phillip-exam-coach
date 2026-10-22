@@ -195,7 +195,7 @@ export default function PracticeChapterMode() {
                 {chapters.map((ch) => (
                   <button
                     key={ch.number}
-                    onClick={() => handleSelectChapter(ch.number)}
+                    onClick={() => router.push(`/exam/${paperId}/practice-chapter/${ch.number}`)}
                     className="group flex items-center gap-4 bg-white rounded-xl border border-gray-200 shadow-sm px-5 py-5 text-left hover:shadow-md hover:border-blue-300 transition duration-200"
                   >
                     <span className="flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-lg bg-blue-50 text-blue-600 group-hover:bg-blue-600 group-hover:text-white transition duration-200">
