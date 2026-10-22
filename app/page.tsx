@@ -7,7 +7,6 @@ import { useSession } from 'next-auth/react';
 import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import {
-  ChartBarIcon,
   ArrowTrendingUpIcon,
   DocumentCheckIcon,
   BoltIcon,
@@ -372,48 +371,17 @@ export default function LandingPage() {
       </section>
 
       {/* Footer */}
-      <footer className="bg-slate-900 text-gray-300 px-6 py-12">
-        <div className="max-w-7xl mx-auto grid md:grid-cols-4 gap-8 mb-8">
-          <div>
-            <div className="flex items-center gap-2 mb-4">
-              <div className="w-8 h-8 bg-gradient-to-br from-blue-400 to-blue-500 rounded-lg flex items-center justify-center">
-                <ChartBarIcon className="text-blue-900 w-5 h-5" />
-              </div>
-              <div className="flex flex-col">
-                <span className="font-bold text-white text-sm">Finance<span className="text-amber-400">Ready</span></span>
-                <span className="text-xs text-gray-400">by Phillip Capital</span>
-              </div>
-            </div>
-            <p className="text-sm text-gray-400">Master your CMFAS exam with confidence.</p>
-          </div>
-          <div>
-            <h4 className="font-bold text-white mb-4">Product</h4>
-            <ul className="space-y-2 text-sm">
-              <li><a href="#features" className="hover:text-blue-400 transition">Features</a></li>
-              <li><a href="#" className="hover:text-blue-400 transition">Pricing</a></li>
-              <li><a href="#" className="hover:text-blue-400 transition">About</a></li>
-            </ul>
-          </div>
-          <div>
-            <h4 className="font-bold text-white mb-4">Legal</h4>
-            <ul className="space-y-2 text-sm">
-              <li><a href="#" className="hover:text-blue-400 transition">Privacy</a></li>
-              <li><a href="#" className="hover:text-blue-400 transition">Terms</a></li>
-              <li><a href="#" className="hover:text-blue-400 transition">Contact</a></li>
-            </ul>
-          </div>
-          <div>
-            <h4 className="font-bold text-white mb-4">Follow Us</h4>
-            <ul className="space-y-2 text-sm">
-              <li><a href="#" className="hover:text-blue-400 transition">Twitter</a></li>
-              <li><a href="#" className="hover:text-blue-400 transition">LinkedIn</a></li>
-              <li><a href="#" className="hover:text-blue-400 transition">Facebook</a></li>
-            </ul>
-          </div>
-        </div>
-
-        <div className="border-t border-gray-800 pt-8">
-          <p className="text-center text-sm text-gray-400">© 2026 Finance Ready. All rights reserved.</p>
+      <footer className="bg-slate-900 text-gray-300 px-6 py-10">
+        <div className="max-w-7xl mx-auto text-center space-y-4">
+          <p className="text-sm font-semibold text-white">
+            Finance<span className="text-amber-400">Ready</span> <span className="font-normal text-gray-400">by Phillip Capital</span>
+          </p>
+          <p className="text-sm text-gray-400 max-w-3xl mx-auto leading-relaxed">
+            Disclaimer: Finance Ready is not related to SCI or IBF and is not the official CMFAS exam papers.
+            All questions and explanations are practice materials prepared for study. For official registration and
+            exam information, use the "Official exam info" link on each paper.
+          </p>
+          <p className="text-xs text-gray-500">© 2026 Finance Ready. All rights reserved.</p>
         </div>
       </footer>
     </div>
