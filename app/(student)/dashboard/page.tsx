@@ -149,10 +149,7 @@ export default function StudentDashboard() {
                 href={`/exam/${paper.id}`}
                 className="group flex flex-col bg-white rounded-xl border border-gray-200 shadow-sm p-5 hover:shadow-md hover:border-blue-300 transition"
               >
-                <h3 className="font-semibold text-gray-900 leading-snug mb-2">{paper.title}</h3>
-                <p className="text-sm text-gray-600 line-clamp-3 flex-1">
-                  {paper.description || "No description yet."}
-                </p>
+                <h3 className="font-semibold text-gray-900 leading-snug flex-1">{paper.title}</h3>
                 <div className="mt-4 flex items-center justify-end text-sm">
                   <span className="font-semibold text-blue-700 group-hover:text-blue-800">Start practising →</span>
                 </div>
