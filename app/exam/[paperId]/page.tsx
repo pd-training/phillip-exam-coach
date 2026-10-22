@@ -116,7 +116,7 @@ export default function PracticePage() {
 
       if (focusAreasRes.ok) {
         const data = await focusAreasRes.json();
-        // Only show focus areas if student has attempted full exam on this paper
+        // Only show focus areas if student has a full practice run on this paper
         const focusAreas = data.hasAttempt ? (data.focusAreas || []) : [];
         setRecommendedChapters(focusAreas);
         console.log("Focus areas loaded:", focusAreas.length, "hasAttempt:", data.hasAttempt);
@@ -343,7 +343,7 @@ export default function PracticePage() {
                 <div>
                   <p className="font-semibold text-blue-900 mb-1">Focus Areas Locked</p>
                   <p className="text-sm text-blue-800">
-                    Complete your first full exam mode attempt on this paper to unlock personalized focus areas based on your performance.
+                    Complete a full practice run on this paper to unlock personalised focus areas based on your answers.
                   </p>
                 </div>
               </div>
@@ -357,7 +357,7 @@ export default function PracticePage() {
           <ul className="space-y-3 text-blue-800 text-sm">
             <li className="flex gap-3">
               <span className="text-blue-600 font-bold">→</span>
-              <span>Start with Full Exam Mode to assess your current level</span>
+              <span>Start with Full Practice to see where you stand</span>
             </li>
             <li className="flex gap-3">
               <span className="text-blue-600 font-bold">→</span>
