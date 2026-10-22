@@ -133,7 +133,7 @@ export default function AttemptDetailsPage() {
       <AdminNav />
 
       {/* Header */}
-      <div className="bg-white text-gray-900 py-8 border-b border-gray-200">
+      <div className="pt-10 pb-6">
         <div className="max-w-7xl mx-auto px-6 flex justify-between items-start gap-6">
           <div>
             <Link href="/admin/attempts" className="text-blue-700 hover:text-blue-800 font-medium text-sm mb-4 block">
@@ -157,8 +157,8 @@ export default function AttemptDetailsPage() {
 
       {/* Chapter summary */}
       {chapterStats.length > 0 && (
-        <div className="bg-white border-b border-gray-200">
-          <div className="max-w-7xl mx-auto px-6 py-4 flex flex-wrap items-center gap-x-6 gap-y-2 text-sm">
+        <div className="max-w-7xl mx-auto px-6">
+          <div className="bg-white rounded-xl border border-gray-200 px-6 py-4 flex flex-wrap items-center gap-x-6 gap-y-2 text-sm">
             {strongChapters.length > 0 && (
               <div className="flex flex-wrap items-center gap-2">
                 <span className="text-gray-600 font-medium">Strong:</span>
@@ -184,7 +184,7 @@ export default function AttemptDetailsPage() {
       )}
 
       {/* Main content */}
-      <div className="max-w-7xl mx-auto px-6 py-8 grid grid-cols-1 lg:grid-cols-[1fr_14rem] gap-8">
+      <div className="max-w-7xl mx-auto px-6 pb-8 grid grid-cols-1 lg:grid-cols-[1fr_14rem] gap-8">
         {/* Question */}
         <div className="bg-white rounded-lg border border-gray-200 p-8">
           {currentQuestion ? (

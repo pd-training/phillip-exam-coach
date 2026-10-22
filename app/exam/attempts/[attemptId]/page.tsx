@@ -349,43 +349,43 @@ export default function AttemptReviewPage() {
       <StudentNav />
 
       {/* Header */}
-      <div className="bg-gradient-to-r from-blue-900 to-blue-800 text-white py-5 px-0 border-b border-blue-900">
+      <div className="pt-10 pb-6">
         <div className="max-w-7xl mx-auto px-6 flex justify-between items-start gap-6">
           <div className="flex-1">
-            <h1 className="text-2xl font-bold mb-2">{attempt.paper_name} - Exam Review</h1>
+            <h1 className="text-3xl font-bold text-gray-900">{attempt.paper_name} - Exam Review</h1>
             {attempt.partScores && attempt.partScores.length > 0 ? (
               <div className="mt-3 space-y-1">
                 {attempt.partScores.map((part, idx) => (
-                  <p key={idx} className="text-blue-100">
-                    {part.partName}: {part.score}% ({part.correct}/{part.total}) <span className={part.passed ? 'text-green-300 font-bold' : 'text-red-400 font-bold'}>{part.passed ? '✓ PASSED' : '✗ FAILED'}</span>
+                  <p key={idx} className="text-gray-600">
+                    {part.partName}: {part.score}% ({part.correct}/{part.total}) <span className={part.passed ? 'text-green-700 font-bold' : 'text-red-600 font-bold'}>{part.passed ? '✓ PASSED' : '✗ FAILED'}</span>
                   </p>
                 ))}
-                <p className="text-base font-bold mt-2 border-t border-blue-500 pt-2">
-                  Overall: <span className={attempt.passed ? 'text-green-300' : 'text-red-400'}>{attempt.passed ? '✓ PASSED' : '✗ FAILED'}</span>
+                <p className="text-base font-bold mt-2 border-t border-gray-200 pt-2">
+                  Overall: <span className={attempt.passed ? 'text-green-700' : 'text-red-600'}>{attempt.passed ? '✓ PASSED' : '✗ FAILED'}</span>
                 </p>
               </div>
             ) : (
               <div className="mt-3 space-y-1">
-                <p className="text-blue-100">
+                <p className="text-gray-600">
                   Score: <span className="font-bold">{attempt.score}%</span> ({correctCount}/{attempt.totalQuestions})
                 </p>
-                <p className="text-base font-bold border-t border-blue-500 pt-2">
-                  Overall: <span className={attempt.passed ? 'text-green-300' : 'text-red-400'}>{attempt.passed ? '✓ PASSED' : '✗ FAILED'}</span>
+                <p className="text-base font-bold border-t border-gray-200 pt-2">
+                  Overall: <span className={attempt.passed ? 'text-green-700' : 'text-red-600'}>{attempt.passed ? '✓ PASSED' : '✗ FAILED'}</span>
                 </p>
               </div>
             )}
           </div>
           <div className="text-right">
-            <p className="text-blue-100 text-sm">Time Taken</p>
-            <p className="text-2xl font-bold">{timeTaken} min</p>
+            <p className="text-gray-600 text-sm">Time Taken</p>
+            <p className="text-2xl font-bold text-gray-900">{timeTaken} min</p>
           </div>
         </div>
       </div>
 
       {/* Personalised feedback */}
       {summaryLines.length > 0 && (
-        <div className="bg-white border-b border-gray-200">
-          <div className="max-w-7xl mx-auto px-6 py-4">
+        <div className="max-w-7xl mx-auto px-6 pb-6">
+          <div className="bg-white rounded-xl border border-gray-200 px-6 py-4">
             <h3 className="text-sm font-semibold text-gray-900 mb-1">Personalised feedback</h3>
             {summaryLines.map((line, i) => (
               <p key={i} className="text-sm text-gray-700 leading-relaxed">{line}</p>
