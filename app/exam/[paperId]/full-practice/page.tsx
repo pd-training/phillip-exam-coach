@@ -324,28 +324,28 @@ export default function QuickQuizMode() {
 
           {/* Feedback, shown on the page below the options */}
           {showingFeedback && feedback && (
-            <div style={{ marginTop: "20px" }}>
+            <div style={{ marginTop: "14px" }}>
               <div
                 style={{
                   backgroundColor: feedback.isCorrect ? "#f0fdf4" : "#fef2f2",
                   border: `1px solid ${feedback.isCorrect ? "#bbf7d0" : "#fecaca"}`,
-                  borderRadius: "12px",
-                  padding: "24px",
+                  borderRadius: "10px",
+                  padding: "14px 16px",
                 }}
               >
                 {/* Header with Icon */}
-                <div style={{ marginBottom: "24px" }}>
+                <div style={{ display: "flex", alignItems: "center", gap: "10px", marginBottom: "10px" }}>
                   <div
                     style={{
-                      width: "56px",
-                      height: "56px",
+                      width: "32px",
+                      height: "32px",
+                      flexShrink: 0,
                       borderRadius: "50%",
                       backgroundColor: feedback.isCorrect ? "#dcfce7" : "#fee2e2",
                       display: "flex",
                       alignItems: "center",
                       justifyContent: "center",
-                      marginBottom: "16px",
-                      fontSize: "28px",
+                      fontSize: "16px",
                     }}
                   >
                     {feedback.isCorrect ? "✓" : "✕"}
@@ -353,7 +353,7 @@ export default function QuickQuizMode() {
                   <h2
                     style={{
                       margin: "0",
-                      fontSize: "24px",
+                      fontSize: "18px",
                       fontWeight: "700",
                       color: feedback.isCorrect ? "#166534" : "#991b1b",
                     }}
@@ -363,11 +363,11 @@ export default function QuickQuizMode() {
                 </div>
 
                 {/* Correct answer */}
-                <div style={{ marginBottom: "20px", paddingBottom: "20px", borderBottom: "1px solid #e5e7eb" }}>
-                  <p style={{ margin: "0 0 8px 0", fontSize: "12px", fontWeight: "700", color: "#6b7280", textTransform: "uppercase", letterSpacing: "0.5px" }}>
+                <div style={{ marginBottom: "10px", paddingBottom: "10px", borderBottom: "1px solid #e5e7eb" }}>
+                  <p style={{ margin: "0 0 4px 0", fontSize: "11px", fontWeight: "700", color: "#6b7280", textTransform: "uppercase", letterSpacing: "0.5px" }}>
                     Correct answer
                   </p>
-                  <p style={{ margin: "0", fontSize: "15px", color: "#1f2937" }}>
+                  <p style={{ margin: "0", fontSize: "14px", color: "#1f2937" }}>
                     <strong>{displayLabel(orderFor(currentQuestion.id), feedback.correctAnswer)}.</strong> {
                       feedback.correctAnswer === "A" ? feedback.optionA :
                       feedback.correctAnswer === "B" ? feedback.optionB :
@@ -378,11 +378,11 @@ export default function QuickQuizMode() {
                 </div>
 
                 {/* Explanation */}
-                <div style={{ marginBottom: "24px" }}>
-                  <p style={{ margin: "0 0 8px 0", fontSize: "12px", fontWeight: "700", color: "#6b7280", textTransform: "uppercase", letterSpacing: "0.5px" }}>
+                <div style={{ marginBottom: "12px" }}>
+                  <p style={{ margin: "0 0 4px 0", fontSize: "11px", fontWeight: "700", color: "#6b7280", textTransform: "uppercase", letterSpacing: "0.5px" }}>
                     Explanation
                   </p>
-                  <p style={{ margin: "0", fontSize: "14px", lineHeight: "1.6", color: "#374151" }}>
+                  <p style={{ margin: "0", fontSize: "13px", lineHeight: "1.5", color: "#374151" }}>
                     {feedback.explanation}
                   </p>
                 </div>
@@ -392,14 +392,14 @@ export default function QuickQuizMode() {
                   onClick={handleNext}
                   style={{
                     width: "100%",
-                    padding: "12px",
+                    padding: "9px",
                     backgroundColor: "#1e3a8a",
                     color: "white",
                     border: "none",
                     borderRadius: "6px",
                     cursor: "pointer",
                     fontWeight: "600",
-                    fontSize: "15px",
+                    fontSize: "14px",
                     transition: "background-color 0.2s",
                   }}
                   onMouseEnter={(e) => {
