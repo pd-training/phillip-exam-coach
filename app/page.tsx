@@ -199,10 +199,7 @@ export default function LandingPage() {
             <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
               {landingPapers.map((paper) => (
                 <div key={paper.id} className="flex flex-col bg-white rounded-xl border border-gray-200 shadow-sm p-6">
-                  {paper.shortName && (
-                    <p className="text-sm font-semibold text-blue-700">{paper.shortName}</p>
-                  )}
-                  <h3 className="font-semibold text-gray-900 leading-snug mt-1">{paper.title}</h3>
+                  <h3 className="font-semibold text-gray-900 leading-snug">{paper.title}</h3>
                   {paper.partLabel && (
                     <span className="inline-block self-start mt-2 px-2.5 py-1 rounded bg-blue-50 border border-blue-200 text-blue-800 text-xs font-semibold">
                       {paper.partLabel}
