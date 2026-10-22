@@ -31,7 +31,7 @@ interface RecommendedChapter {
 const MODE_CARDS: { title: string; description: string; cta: string; icon: string; href: (paperId: string) => string }[] = [
   {
     title: "Full Practice",
-    description: "50 questions with no timer and no score. Each answer is marked right or wrong, with its explanation.",
+    description: "50 questions with immediate feedback.",
     cta: "Start full practice",
     icon: "M5 4h14a1 1 0 011 1v14a1 1 0 01-1 1H5a1 1 0 01-1-1V5a1 1 0 011-1zm3 4h8M8 12h8M8 16h5",
     href: (id) => `/exam/${id}/full-practice`,

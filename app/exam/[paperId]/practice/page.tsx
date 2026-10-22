@@ -18,7 +18,7 @@ export default function PracticeModePage() {
     {
       title: "Full Practice",
       href: `/exam/${paperId}/full-practice`,
-      description: "50 questions with no timer and no score. Each answer is marked right or wrong, with its explanation.",
+      description: "50 questions with immediate feedback.",
       icon: "M5 4h14a1 1 0 011 1v14a1 1 0 01-1 1H5a1 1 0 01-1-1V5a1 1 0 011-1zm3 4h8M8 12h8M8 16h5",
       cta: "Start full practice",
     },
