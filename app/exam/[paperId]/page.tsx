@@ -28,6 +28,37 @@ interface RecommendedChapter {
   total: number;
 }
 
+const MODE_CARDS: { title: string; description: string; cta: string; icon: string; href: (paperId: string) => string }[] = [
+  {
+    title: "Full Practice",
+    description: "50 questions with no timer and no score. Each answer is marked right or wrong, with its explanation.",
+    cta: "Start full practice",
+    icon: "M5 4h14a1 1 0 011 1v14a1 1 0 01-1 1H5a1 1 0 01-1-1V5a1 1 0 011-1zm3 4h8M8 12h8M8 16h5",
+    href: (id) => `/exam/${id}/full-practice`,
+  },
+  {
+    title: "Quick Quiz",
+    description: "Rapid-fire questions across the whole paper, without time limits. Good for quick revision.",
+    cta: "Start quiz",
+    icon: "M13 10V3L4 14h7v7l9-11h-7z",
+    href: (id) => `/exam/${id}/quick-quiz`,
+  },
+  {
+    title: "Practice by Chapter",
+    description: "Pick a chapter and practise its questions with instant feedback, one topic at a time.",
+    cta: "Choose a chapter",
+    icon: "M9 4H5a2 2 0 00-2 2v14a2 2 0 002 2h10a2 2 0 002-2V8.5L9 4z",
+    href: (id) => `/exam/${id}/practice-chapter`,
+  },
+  {
+    title: "Exam Simulation",
+    description: "Take the complete exam under timed conditions. Get your score and a detailed review of every answer.",
+    cta: "Start exam",
+    icon: "M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2",
+    href: (id) => `/exam/${id}/full-exam`,
+  },
+];
+
 export default function PracticePage() {
   const router = useRouter();
   const { data: session, status } = useSession();
@@ -281,50 +312,28 @@ export default function PracticePage() {
         <div className="mb-10">
           <h2 className="text-2xl font-bold text-gray-900 mb-8">Choose a mode</h2>
 
-          <div className="grid md:grid-cols-2 gap-8">
-            {/* Exam Simulation */}
-            <button
-              onClick={() => router.push(`/exam/${paperId}/full-exam`)}
-              className="group bg-white rounded-2xl p-8 border-2 border-gray-200 hover:border-blue-500 hover:shadow-lg transition duration-300 text-left"
-            >
-              <div className="w-14 h-14 bg-blue-50 rounded-lg flex items-center justify-center mb-6 group-hover:bg-blue-500 transition duration-200">
-                <svg className="w-7 h-7 text-blue-600 group-hover:text-white transition duration-200" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
-                </svg>
-              </div>
-              <h3 className="text-xl font-bold text-gray-900 mb-2">Exam Simulation</h3>
-              <p className="text-gray-600 text-sm mb-6">
-                Take the complete exam under timed conditions. Get your score and a detailed review of every answer.
-              </p>
-              <div className="flex items-center gap-2 text-blue-600 font-semibold group-hover:gap-3 transition duration-200">
-                <span>Start exam</span>
-                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-                </svg>
-              </div>
-            </button>
-
-            {/* Practice: quick quiz and practice by chapter */}
-            <button
-              onClick={() => router.push(`/exam/${paperId}/practice`)}
-              className="group bg-white rounded-2xl p-8 border-2 border-gray-200 hover:border-blue-500 hover:shadow-lg transition duration-300 text-left"
-            >
-              <div className="w-14 h-14 bg-blue-50 rounded-lg flex items-center justify-center mb-6 group-hover:bg-blue-500 transition duration-200">
-                <svg className="w-7 h-7 text-blue-600 group-hover:text-white transition duration-200" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 4H5a2 2 0 00-2 2v14a2 2 0 002 2h10a2 2 0 002-2V8.5L9 4z" />
-                </svg>
-              </div>
-              <h3 className="text-xl font-bold text-gray-900 mb-2">Practice</h3>
-              <p className="text-gray-600 text-sm mb-6">
-                Quick quiz across the paper, or practise chapter by chapter with instant feedback.
-              </p>
-              <div className="flex items-center gap-2 text-blue-600 font-semibold group-hover:gap-3 transition duration-200">
-                <span>Choose practice</span>
-                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-                </svg>
-              </div>
-            </button>
+          <div className="grid sm:grid-cols-2 xl:grid-cols-4 gap-6">
+            {MODE_CARDS.map((mode) => (
+              <button
+                key={mode.title}
+                onClick={() => router.push(mode.href(paperId))}
+                className="group flex flex-col bg-white rounded-2xl p-6 border-2 border-gray-200 hover:border-blue-500 hover:shadow-lg transition duration-300 text-left"
+              >
+                <div className="w-12 h-12 bg-blue-50 rounded-lg flex items-center justify-center mb-5 group-hover:bg-blue-500 transition duration-200">
+                  <svg className="w-6 h-6 text-blue-600 group-hover:text-white transition duration-200" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d={mode.icon} />
+                  </svg>
+                </div>
+                <h3 className="text-lg font-bold text-gray-900 mb-2">{mode.title}</h3>
+                <p className="text-gray-600 text-sm mb-5 flex-1">{mode.description}</p>
+                <div className="flex items-center gap-2 text-blue-600 font-semibold text-sm group-hover:gap-3 transition duration-200">
+                  <span>{mode.cta}</span>
+                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                  </svg>
+                </div>
+              </button>
+            ))}
           </div>
         </div>
 
