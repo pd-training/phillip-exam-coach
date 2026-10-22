@@ -114,8 +114,7 @@ export default function AllPapersPage() {
                   )}
                 </div>
                 <p className="text-sm text-gray-600 line-clamp-3 flex-1">{paper.description || "No description yet."}</p>
-                <div className="mt-4 flex items-center justify-between gap-3">
-                  <span className="text-sm text-gray-500">{paper.totalTime ? `${paper.totalTime} min` : ""}</span>
+                <div className="mt-4 flex items-center justify-end gap-3">
                   {state === "available" && (
                     <Link
                       href={`/exam/${paper.id}`}

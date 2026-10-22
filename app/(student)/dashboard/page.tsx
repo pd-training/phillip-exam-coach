@@ -153,8 +153,7 @@ export default function StudentDashboard() {
                 <p className="text-sm text-gray-600 line-clamp-3 flex-1">
                   {paper.description || "No description yet."}
                 </p>
-                <div className="mt-4 flex items-center justify-between text-sm">
-                  <span className="text-gray-500">{paper.totalTime ? `${paper.totalTime} min` : ""}</span>
+                <div className="mt-4 flex items-center justify-end text-sm">
                   <span className="font-semibold text-blue-700 group-hover:text-blue-800">Start practising →</span>
                 </div>
               </Link>
