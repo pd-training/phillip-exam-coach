@@ -16,6 +16,8 @@ export default function AttemptsPage() {
   const [studentSearch, setStudentSearch] = useState("");
   const [studentSort, setStudentSort] = useState<"asc" | "desc" | null>(null);
   const [papers, setPapers] = useState<any[]>([]);
+  const [view, setView] = useState<"exam" | "practice">("exam");
+  const [practiceRuns, setPracticeRuns] = useState<any[]>([]);
 
   useEffect(() => {
     if (status === "unauthenticated") {
@@ -37,6 +39,11 @@ export default function AttemptsPage() {
         const attemptsRes = await fetch("/api/admin/exam-attempts");
         const attemptsData = await attemptsRes.json();
         setAttempts(Array.isArray(attemptsData) ? attemptsData : []);
+
+        // Practice runs (quick quiz, chapter and full practice)
+        const runsRes = await fetch("/api/admin/practice-runs");
+        const runsData = await runsRes.json();
+        setPracticeRuns(Array.isArray(runsData?.runs) ? runsData.runs : []);
       } catch (error) {
         console.error("Error fetching data:", error);
         setPapers([]);
@@ -77,6 +84,18 @@ export default function AttemptsPage() {
     });
   }
 
+  // Practice runs follow the same paper and student filters
+  const practiceFiltered = practiceRuns
+    .filter((r) => !selectedPaperId || r.paperId === selectedPaperId)
+    .filter((r) => {
+      const t = studentSearch.trim().toLowerCase();
+      if (!t) return true;
+      return (r.studentName || "").toLowerCase().includes(t) || (r.studentEmail || "").toLowerCase().includes(t);
+    });
+
+  const practiceLabel = (r: any) =>
+    r.mode === "chapter" ? `Chapter ${r.chapterNumber}` : r.mode === "full" ? "Full practice" : "Quick quiz";
+
   const toggleStudentSort = () => {
     setStudentSort((prev) => (prev === null ? "asc" : prev === "asc" ? "desc" : null));
   };
@@ -112,10 +131,27 @@ export default function AttemptsPage() {
       {ToastView}
       <div className="max-w-7xl mx-auto px-6 pt-10">
 <h1 className="text-3xl font-bold text-gray-900">Exam Attempts</h1>
-<p className="text-gray-600 mt-1">All student exam submissions</p>
+<p className="text-gray-600 mt-1">All student exam submissions and practice runs</p>
 </div>
 
       <div className="max-w-7xl mx-auto px-6 py-8">
+        {/* View switch */}
+        <div className="mb-6 inline-flex gap-1 p-1 bg-gray-100 rounded-lg">
+          {(["exam", "practice"] as const).map((v) => (
+            <button
+              key={v}
+              type="button"
+              onClick={() => setView(v)}
+              aria-pressed={view === v}
+              className={`px-4 py-2 text-sm font-semibold rounded-md transition ${
+                view === v ? "bg-white text-blue-900 shadow-sm" : "text-gray-600 hover:text-gray-900"
+              }`}
+            >
+              {v === "exam" ? "Exam simulations" : "Practice runs"}
+            </button>
+          ))}
+        </div>
+
         {/* Filters */}
         <div className="mb-8 bg-white p-6 rounded-lg border border-gray-200 grid grid-cols-1 md:grid-cols-2 gap-6">
           <div>
@@ -150,7 +186,47 @@ export default function AttemptsPage() {
         </div>
 
         {/* Attempts Table */}
-        {filteredAttempts.length === 0 ? (
+        {view === "practice" ? (
+          practiceFiltered.length === 0 ? (
+            <div className="bg-white rounded-lg border border-gray-200 p-12 text-center">
+              <p className="text-gray-600">No practice runs found</p>
+            </div>
+          ) : (
+            <div className="bg-white rounded-lg border border-gray-200 overflow-hidden">
+              <div className="overflow-x-auto">
+                <table className="w-full">
+                  <thead className="bg-gray-100 border-b border-gray-200">
+                    <tr>
+                      <th className="px-6 py-3 text-left text-sm font-semibold text-gray-900">Student</th>
+                      <th className="px-6 py-3 text-left text-sm font-semibold text-gray-900">Paper</th>
+                      <th className="px-6 py-3 text-left text-sm font-semibold text-gray-900">Mode</th>
+                      <th className="px-6 py-3 text-left text-sm font-semibold text-gray-900">Score</th>
+                      <th className="px-6 py-3 text-left text-sm font-semibold text-gray-900">Date</th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-gray-200">
+                    {practiceFiltered.map((r) => (
+                      <tr key={r.id} className="hover:bg-gray-50">
+                        <td className="px-6 py-4 text-sm">
+                          <p className="font-medium text-gray-900">{r.studentName || "No name"}</p>
+                          <p className="text-gray-500 text-xs">{r.studentEmail}</p>
+                        </td>
+                        <td className="px-6 py-4 text-sm text-gray-900">{r.paperTitle || "Paper"}</td>
+                        <td className="px-6 py-4 text-sm text-gray-700">{practiceLabel(r)}</td>
+                        <td className={`px-6 py-4 text-sm font-semibold ${r.percentage >= 50 ? "text-green-700" : "text-red-600"}`}>
+                          {r.correctCount} / {r.totalQuestions} ({r.percentage}%)
+                        </td>
+                        <td className="px-6 py-4 text-sm text-gray-700">
+                          {new Date(r.createdAt).toLocaleDateString("en-SG", { day: "numeric", month: "short", year: "numeric" })}
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          )
+        ) : filteredAttempts.length === 0 ? (
           <div className="bg-white rounded-lg border border-gray-200 p-12 text-center">
             <p className="text-gray-600">No exam attempts found</p>
           </div>

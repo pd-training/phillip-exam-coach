@@ -257,7 +257,6 @@ export default function ProgressPage() {
                     <thead>
                       <tr className="border-b border-gray-200 text-left text-xs uppercase text-gray-600">
                         {sortableHeader("paper", "Paper")}
-                        <th className="py-2 pr-4 font-semibold">Mode</th>
                         {sortableHeader("date", "Date")}
                         <th className="py-2 pr-4 font-semibold text-right">Questions</th>
                         {sortableHeader("score", "Score", "right")}
@@ -271,9 +270,6 @@ export default function ProgressPage() {
                           className="border-b border-gray-100 cursor-pointer hover:bg-blue-50 transition"
                         >
                           <td className="py-3 pr-4 font-medium text-gray-900">{q.paperTitle || "Paper"}</td>
-                          <td className="py-3 pr-4 text-gray-700">
-                            {q.mode === "chapter" ? `Chapter ${q.chapterNumber}` : q.mode === "full" ? "Full practice" : "Quick quiz"}
-                          </td>
                           <td className="py-3 pr-4 text-gray-700">{fmtDate(q.createdAt)}</td>
                           <td className="py-3 pr-4 text-right text-gray-900">{q.totalQuestions}</td>
                           <td className={`py-3 text-right font-semibold ${q.percentage >= 50 ? "text-green-600" : "text-red-600"}`}>
