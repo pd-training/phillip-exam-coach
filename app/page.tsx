@@ -59,20 +59,6 @@ export default function LandingPage() {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-900 via-slate-50 to-slate-50">
-      {/* Sticky Header */}
-      <header className="sticky top-0 z-50 bg-blue-900/95 backdrop-blur-sm border-b border-blue-800 shadow-sm">
-        <div className="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between">
-          <BrandLockup href="/" variant="light" />
-          <nav className="hidden md:flex items-center gap-8">
-            <a href="#features" className="text-blue-200 hover:text-blue-400 transition font-medium">Features</a>
-            <a href="#how-it-works" className="text-blue-200 hover:text-blue-400 transition font-medium">How It Works</a>
-            <a href="#stats" className="text-blue-200 hover:text-blue-400 transition font-medium">Why Choose Us</a>
-            <Link href="/login" className="inline-block px-6 py-2 text-amber-400 hover:text-blue-300 font-medium transition">
-                Sign In
-              </Link>
-          </nav>
-        </div>
-      </header>
 
       {/* Hero Section */}
       <section className="relative py-24 px-6 overflow-hidden bg-gradient-to-br from-blue-950 via-blue-900 to-blue-800">
