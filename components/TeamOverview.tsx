@@ -14,7 +14,7 @@ type PaperProgress = {
 };
 
 type Attempt = {
-  kind: "Full exam" | "Quick quiz";
+  kind: "Full exam" | "Quick quiz" | "Full practice";
   paperId: string;
   title: string;
   score: number;
@@ -29,6 +29,8 @@ type StudentRow = {
   remarks: string;
   papers: PaperProgress[];
   attemptCount: number;
+  examAttemptCount: number;
+  practiceAttemptCount: number;
   lastActive: string | null;
   attempts: Attempt[];
 };
@@ -155,7 +157,8 @@ export default function TeamOverview({ sideCard }: { sideCard?: ReactNode }) {
                   <th className="px-6 py-3 font-semibold">Student</th>
                   <th className="px-4 py-3 font-semibold">Papers assigned</th>
                   <th className="px-4 py-3 font-semibold">Notes</th>
-                  <th className="px-4 py-3 font-semibold text-right">Attempts</th>
+                  <th className="px-4 py-3 font-semibold text-right">Exam attempts</th>
+                  <th className="px-4 py-3 font-semibold text-right">Practice attempts</th>
                   <th className="px-6 py-3 font-semibold text-right">Last active</th>
                 </tr>
               </thead>
@@ -188,7 +191,8 @@ export default function TeamOverview({ sideCard }: { sideCard?: ReactNode }) {
                         <td className="px-4 py-4 text-gray-700 whitespace-pre-wrap max-w-xs">
                           {st.remarks ? st.remarks : <span className="text-gray-400">No notes</span>}
                         </td>
-                        <td className="px-4 py-4 text-right text-gray-900">{st.attemptCount}</td>
+                        <td className="px-4 py-4 text-right text-gray-900">{st.examAttemptCount}</td>
+                        <td className="px-4 py-4 text-right text-gray-900">{st.practiceAttemptCount}</td>
                         <td className="px-6 py-4 text-right text-gray-700 whitespace-nowrap">
                           {formatDate(st.lastActive)} <span className="text-blue-600 ml-1">{isOpen ? "▴" : "▾"}</span>
                         </td>
@@ -196,7 +200,7 @@ export default function TeamOverview({ sideCard }: { sideCard?: ReactNode }) {
 
                       {isOpen && (
                         <tr className="bg-gray-50 border-b border-gray-200">
-                          <td colSpan={5} className="px-6 py-5">
+                          <td colSpan={6} className="px-6 py-5">
                             {/* Best scores by paper, colour coded by status */}
                             <p className="text-xs font-semibold text-gray-600 uppercase tracking-wide mb-2">Best scores by paper</p>
                             {st.papers.length === 0 ? (

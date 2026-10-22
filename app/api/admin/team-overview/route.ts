@@ -6,7 +6,7 @@ import prisma from "@/lib/prisma";
 export const dynamic = "force-dynamic";
 
 type Attempt = {
-  kind: "Full exam" | "Quick quiz";
+  kind: "Full exam" | "Quick quiz" | "Full practice";
   paperId: string;
   title: string;
   score: number;
@@ -55,9 +55,11 @@ export async function GET() {
     // Quick quiz sessions. The table is created on first save, so treat it as optional.
     let quizRows: any[] = [];
     try {
+      // Runs record their mode; older rows are quick quizzes
+      await db.$executeRawUnsafe(`ALTER TABLE "QuickQuizSession" ADD COLUMN IF NOT EXISTS mode TEXT NOT NULL DEFAULT 'quick'`);
       quizRows = await db.$queryRawUnsafe(`
         SELECT q."userId", q."paperId", p.title, p."passingScore",
-               q.percentage AS score, q."createdAt" AS date
+               q.percentage AS score, q."createdAt" AS date, q.mode
         FROM "QuickQuizSession" q
         LEFT JOIN "Paper" p ON p.id::text = q."paperId"
         ORDER BY q."createdAt" DESC
@@ -80,7 +82,7 @@ export async function GET() {
       attemptsByUser.set(row.userId, list);
     };
     examRows.forEach((r) => addAttempt(r, "Full exam"));
-    quizRows.forEach((r) => addAttempt(r, "Quick quiz"));
+    quizRows.forEach((r) => addAttempt(r, r.mode === "full" ? "Full practice" : "Quick quiz"));
 
     const rows = students.map((st) => {
       const attempts = (attemptsByUser.get(st.id) || []).sort(
@@ -121,6 +123,8 @@ export async function GET() {
         remarks: st.remarks || "",
         papers,
         attemptCount: attempts.length,
+        examAttemptCount: attempts.filter((t) => t.kind === "Full exam").length,
+        practiceAttemptCount: attempts.filter((t) => t.kind === "Full practice").length,
         lastActive: attempts.length ? attempts[0].date : null,
         attempts: attempts.slice(0, 50),
       };
