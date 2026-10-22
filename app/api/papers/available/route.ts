@@ -1,14 +1,18 @@
 import { NextRequest, NextResponse } from 'next/server';
 import prisma from "@/lib/prisma";
+import { ensureLabelColumns } from "@/lib/paper-labels";
 
 export const dynamic = 'force-dynamic';
 
 export async function GET(request: NextRequest) {
   try {
+    await ensureLabelColumns();
     const papers = await prisma.$queryRaw`
       SELECT
         p.id,
         p.title,
+        p."shortName",
+        p."partLabel",
         p.description,
         p."externalLink",
         p."totalTime"

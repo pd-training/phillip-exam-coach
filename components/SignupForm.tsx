@@ -9,7 +9,7 @@ interface Paper {
 }
 
 // Account creation form, used as the "Create your account" ribbon on the landing page.
-export default function SignupForm() {
+export default function SignupForm({ preselectPaperId }: { preselectPaperId?: string | null }) {
   const router = useRouter();
   const [formData, setFormData] = useState({
     name: "",
@@ -30,10 +30,10 @@ export default function SignupForm() {
         const res = await fetch("/api/papers/available");
         if (res.ok) {
           const data = await res.json();
-          setPapers(data.papers || []);
-          // Auto-select first paper
-          if (data.papers?.length > 0) {
-            setSelectedPaper(data.papers[0].id);
+          const list: Paper[] = data.papers || [];
+          setPapers(list);
+          if (list.length > 0) {
+            setSelectedPaper((current) => current || list[0].id);
           }
         }
       } catch (error) {
@@ -42,6 +42,13 @@ export default function SignupForm() {
     };
     fetchPapers();
   }, []);
+
+  // Paper chosen on the landing page wins over the default
+  useEffect(() => {
+    if (preselectPaperId && papers.some((p) => p.id === preselectPaperId)) {
+      setSelectedPaper(preselectPaperId);
+    }
+  }, [preselectPaperId, papers]);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;

@@ -18,6 +18,21 @@ import {
 
 export default function LandingPage() {
   const router = useRouter();
+  const [landingPapers, setLandingPapers] = useState<{ id: string; title: string; shortName?: string | null; partLabel?: string | null; description?: string | null }[]>([]);
+
+  const [pickedPaperId, setPickedPaperId] = useState<string | null>(null);
+
+  useEffect(() => {
+    const fromUrl = new URLSearchParams(window.location.search).get('paper');
+    if (fromUrl) setPickedPaperId(fromUrl);
+  }, []);
+
+  useEffect(() => {
+    fetch('/api/papers/available')
+      .then((res) => (res.ok ? res.json() : { papers: [] }))
+      .then((data) => setLandingPapers(data.papers || []))
+      .catch(() => setLandingPapers([]));
+  }, []);
   const { data: session } = useSession();
   const [mounted, setMounted] = useState(false);
 
@@ -173,6 +188,45 @@ export default function LandingPage() {
         </div>
       </section>
 
+      {/* Papers Section */}
+      {landingPapers.length > 0 && (
+        <section id="papers" className="scroll-mt-24 py-20 px-6 bg-white">
+          <div className="max-w-7xl mx-auto">
+            <div className="text-center mb-12">
+              <h2 className="text-4xl font-bold text-gray-900 mb-4">Available Papers</h2>
+              <p className="text-xl text-gray-600">Choose the paper you are preparing for. Create a free account to start practising.</p>
+            </div>
+            <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+              {landingPapers.map((paper) => (
+                <div key={paper.id} className="flex flex-col bg-white rounded-xl border border-gray-200 shadow-sm p-6">
+                  {paper.shortName && (
+                    <p className="text-sm font-semibold text-blue-700">{paper.shortName}</p>
+                  )}
+                  <h3 className="font-semibold text-gray-900 leading-snug mt-1">{paper.title}</h3>
+                  {paper.partLabel && (
+                    <span className="inline-block self-start mt-2 px-2.5 py-1 rounded bg-blue-50 border border-blue-200 text-blue-800 text-xs font-semibold">
+                      {paper.partLabel}
+                    </span>
+                  )}
+                  <p className="text-sm text-gray-600 line-clamp-3 flex-1 mt-3">
+                    {paper.description || "No description yet."}
+                  </p>
+                  <div className="mt-5">
+                    <Link
+                      href={`/?paper=${paper.id}#signup`}
+                      onClick={() => setPickedPaperId(paper.id)}
+                      className="inline-block w-full text-center px-4 py-2.5 bg-blue-900 hover:bg-blue-800 text-white rounded-lg text-sm font-semibold transition"
+                    >
+                      Start practising
+                    </Link>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        </section>
+      )}
+
       {/* Features Section */}
       <section id="features" className="py-20 px-6 bg-slate-50">
         <div className="max-w-7xl mx-auto">
@@ -305,7 +359,7 @@ export default function LandingPage() {
             </div>
           </div>
           <div className="w-full max-w-md md:justify-self-end">
-            <SignupForm />
+            <SignupForm preselectPaperId={pickedPaperId} />
           </div>
         </div>
       </section>
