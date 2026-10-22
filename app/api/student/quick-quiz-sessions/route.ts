@@ -5,8 +5,8 @@ import { randomUUID } from "crypto";
 
 export const dynamic = "force-dynamic";
 
-// Creates the table on first use so no separate admin migration is needed.
-async function ensureTable() {
+// Creates the tables on first use so no separate admin migration is needed.
+async function ensureTables() {
   await (prisma as any).$executeRawUnsafe(`
     CREATE TABLE IF NOT EXISTS "QuickQuizSession" (
       id TEXT PRIMARY KEY,
@@ -18,13 +18,25 @@ async function ensureTable() {
       "createdAt" TIMESTAMP NOT NULL DEFAULT NOW()
     )
   `);
-  // Practice by chapter results share this table. Older rows are quick quizzes.
+  // Quick quiz, chapter practice and full practice results share this table.
+  // Older rows are quick quizzes.
   await (prisma as any).$executeRawUnsafe(`ALTER TABLE "QuickQuizSession" ADD COLUMN IF NOT EXISTS mode TEXT NOT NULL DEFAULT 'quick'`);
   await (prisma as any).$executeRawUnsafe(`ALTER TABLE "QuickQuizSession" ADD COLUMN IF NOT EXISTS "chapterNumber" INT`);
+  // One row per question answered in a run, so each run can be reviewed.
+  await (prisma as any).$executeRawUnsafe(`
+    CREATE TABLE IF NOT EXISTS "QuickQuizAnswer" (
+      id TEXT PRIMARY KEY,
+      "sessionId" TEXT NOT NULL,
+      "questionId" TEXT NOT NULL,
+      answer TEXT NOT NULL,
+      "isCorrect" BOOLEAN NOT NULL,
+      position INT NOT NULL
+    )
+  `);
 }
 
-// Saves a finished quick quiz. Correctness is checked on the server against the
-// stored answers, so the score cannot be set by the browser.
+// Saves a finished run. Correctness is checked on the server against the stored
+// answers, so the score cannot be set by the browser. Each question counts once.
 export async function POST(request: Request) {
   try {
     const session = await getServerSession(authOptions);
@@ -37,7 +49,17 @@ export async function POST(request: Request) {
     const paperId = typeof body?.paperId === "string" ? body.paperId : "";
     const mode = body?.mode === "chapter" ? "chapter" : body?.mode === "full" ? "full" : "quick";
     const chapterNumber = mode === "chapter" && Number.isInteger(body?.chapterNumber) ? body.chapterNumber : null;
-    const answers: { questionId: string; answer: string }[] = Array.isArray(body?.answers) ? body.answers : [];
+    const rawAnswers: { questionId: string; answer: string }[] = Array.isArray(body?.answers) ? body.answers : [];
+
+    // First answer for each question wins, so repeats are ignored
+    const seen = new Set<string>();
+    const answers = rawAnswers.filter((a) => {
+      const id = String(a?.questionId ?? "");
+      if (!id || seen.has(id)) return false;
+      seen.add(id);
+      return true;
+    });
+
     if (!paperId || answers.length === 0) {
       return Response.json({ error: "paperId and answers are required" }, { status: 400 });
     }
@@ -49,20 +71,20 @@ export async function POST(request: Request) {
     });
     const byId = new Map(questions.map((q) => [String(q.id), q.correctAnswer]));
 
-    const totalQuestions = answers.filter((a) => byId.has(String(a.questionId))).length;
+    const valid = answers.filter((a) => byId.has(String(a.questionId)));
+    const totalQuestions = valid.length;
     if (totalQuestions === 0) {
       return Response.json({ error: "No valid questions" }, { status: 400 });
     }
-    const correctCount = answers.filter(
-      (a) => byId.has(String(a.questionId)) && byId.get(String(a.questionId)) === a.answer
-    ).length;
+    const correctCount = valid.filter((a) => byId.get(String(a.questionId)) === a.answer).length;
     const percentage = Math.round((correctCount / totalQuestions) * 100);
 
-    await ensureTable();
+    await ensureTables();
+    const sessionId = randomUUID();
     await (prisma as any).$executeRawUnsafe(
       `INSERT INTO "QuickQuizSession" (id, "userId", "paperId", "totalQuestions", "correctCount", percentage, mode, "chapterNumber")
        VALUES ($1, $2, $3, $4, $5, $6, $7, $8)`,
-      randomUUID(),
+      sessionId,
       userId,
       paperId,
       totalQuestions,
@@ -72,14 +94,28 @@ export async function POST(request: Request) {
       chapterNumber
     );
 
+    for (let i = 0; i < valid.length; i++) {
+      const a = valid[i];
+      await (prisma as any).$executeRawUnsafe(
+        `INSERT INTO "QuickQuizAnswer" (id, "sessionId", "questionId", answer, "isCorrect", position)
+         VALUES ($1, $2, $3, $4, $5, $6)`,
+        randomUUID(),
+        sessionId,
+        String(a.questionId),
+        String(a.answer),
+        byId.get(String(a.questionId)) === a.answer,
+        i + 1
+      );
+    }
+
     return Response.json({ success: true, totalQuestions, correctCount, percentage });
   } catch (error: any) {
-    console.error("Save quick quiz error:", error?.message || error);
-    return Response.json({ error: "Could not save quiz" }, { status: 500 });
+    console.error("Save practice run error:", error?.message || error);
+    return Response.json({ error: "Could not save run" }, { status: 500 });
   }
 }
 
-// Recent quick quizzes for the signed-in student
+// Recent runs for the signed-in student
 export async function GET() {
   try {
     const session = await getServerSession(authOptions);
@@ -88,7 +124,7 @@ export async function GET() {
     }
     const userId = (session.user as any).id;
 
-    await ensureTable();
+    await ensureTables();
     const sessions = await (prisma as any).$queryRawUnsafe(
       `SELECT s.id, s."paperId", p.title AS "paperTitle", s.mode, s."chapterNumber", s."totalQuestions", s."correctCount", s.percentage, s."createdAt"
        FROM "QuickQuizSession" s
@@ -101,7 +137,7 @@ export async function GET() {
 
     return Response.json({ sessions: sessions || [] });
   } catch (error: any) {
-    console.error("Load quick quiz sessions error:", error?.message || error);
+    console.error("Load practice runs error:", error?.message || error);
     return Response.json({ sessions: [] });
   }
 }
