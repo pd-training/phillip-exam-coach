@@ -43,6 +43,7 @@ export default function PaperDetailPage() {
   const [loading, setLoading] = useState(true);
   const [submitting, setSubmitting] = useState(false);
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
+  const [deleteConfirmText, setDeleteConfirmText] = useState("");
   const [showUploadModal, setShowUploadModal] = useState(false);
   const [showEditModal, setShowEditModal] = useState(false);
   const [selectedQuestion, setSelectedQuestion] = useState<any>(null);
@@ -485,20 +486,6 @@ export default function PaperDetailPage() {
               <h1 className="text-3xl font-bold text-gray-900">{paper.title}</h1>
               <p className="text-gray-600 mt-1">{totalQuestions} questions • {paper.durationMinutes} min</p>
             </div>
-            <div className="flex gap-2">
-              <button
-                onClick={() => setShowUploadModal(true)}
-                className="px-4 py-2 bg-white text-gray-900 border border-gray-300 rounded-lg hover:bg-gray-50 text-sm font-medium"
-              >
-                Upload Questions
-              </button>
-              <button
-                onClick={() => setShowDeleteConfirm(true)}
-                className="px-4 py-2 bg-red-100 text-red-700 rounded-lg hover:bg-red-200 text-sm font-medium"
-              >
-                Delete Paper
-              </button>
-            </div>
           </div>
         </div>
 
@@ -666,12 +653,39 @@ export default function PaperDetailPage() {
           </div>
         )}
 
+        {/* Danger zone: delete is only available on the Settings tab */}
+        {activeTab === "settings" && (
+          <div className="bg-white rounded-lg shadow p-6 mt-8 border border-red-200">
+            <h2 className="text-sm font-semibold text-red-700 uppercase tracking-wider mb-2">Danger zone</h2>
+            <p className="text-sm text-gray-600 mb-4">
+              Deleting a paper also removes its exam parts and questions. This cannot be undone.
+            </p>
+            <button
+              onClick={() => {
+                setDeleteConfirmText("");
+                setShowDeleteConfirm(true);
+              }}
+              className="px-4 py-2 bg-red-100 text-red-700 rounded-lg hover:bg-red-200 text-sm font-medium"
+            >
+              Delete Paper
+            </button>
+          </div>
+        )}
+
         {/* Questions Tab */}
         {activeTab === "questions" && (
           <div className="bg-white rounded-lg shadow p-6">
-            <h2 className="text-lg font-semibold mb-6 uppercase text-gray-600 text-xs tracking-wider">
-              Question Bank ({questions.length})
-            </h2>
+            <div className="flex items-center justify-between gap-4 mb-6">
+              <h2 className="text-lg font-semibold uppercase text-gray-600 text-xs tracking-wider">
+                Question Bank ({questions.length})
+              </h2>
+              <button
+                onClick={() => setShowUploadModal(true)}
+                className="px-4 py-2 bg-white text-gray-900 border border-gray-300 rounded-lg hover:bg-gray-50 text-sm font-medium"
+              >
+                Upload Questions
+              </button>
+            </div>
 
             {questions.length === 0 ? (
               <div className="text-center py-12">
@@ -788,6 +802,16 @@ export default function PaperDetailPage() {
                 This will also delete all associated exam parts and questions.
               </p>
             </div>
+            <label className="block text-sm font-medium text-gray-700 mb-2">
+              Type <strong>{paper.title}</strong> to confirm
+            </label>
+            <input
+              type="text"
+              value={deleteConfirmText}
+              onChange={(e) => setDeleteConfirmText(e.target.value)}
+              autoFocus
+              className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm mb-6 focus:outline-none focus:ring-2 focus:ring-red-500"
+            />
             <div className="flex gap-3 justify-end">
               <button
                 onClick={() => setShowDeleteConfirm(false)}
@@ -798,7 +822,7 @@ export default function PaperDetailPage() {
               </button>
               <button
                 onClick={handleDeletePaper}
-                disabled={submitting}
+                disabled={submitting || deleteConfirmText.trim() !== paper.title.trim()}
                 className="px-4 py-2 bg-red-600 text-white font-medium rounded-lg hover:bg-red-700 disabled:opacity-50"
               >
                 {submitting ? "Deleting..." : "Delete Paper"}
