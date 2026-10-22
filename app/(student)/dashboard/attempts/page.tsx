@@ -20,7 +20,7 @@ interface QuizSession {
   id: string;
   paperId: string;
   paperTitle: string | null;
-  mode: "quick" | "chapter";
+  mode: "quick" | "chapter" | "full";
   chapterNumber: number | null;
   totalQuestions: number;
   correctCount: number;
@@ -246,7 +246,7 @@ export default function ProgressPage() {
               {visibleQuizzes.length === 0 ? (
                 <div className="py-12 text-center">
                   <p className="font-semibold text-gray-900">No practice sessions yet</p>
-                  <p className="text-sm text-gray-600 mt-1">Quick quiz and practice by chapter results will show here.</p>
+                  <p className="text-sm text-gray-600 mt-1">Quick quiz, practice by chapter and full practice results will show here.</p>
                   <Link href="/dashboard" className="inline-block mt-5 px-5 py-2.5 bg-blue-900 hover:bg-blue-800 text-white rounded-lg text-sm font-semibold transition">
                     Start practising
                   </Link>
@@ -268,7 +268,7 @@ export default function ProgressPage() {
                         <tr key={q.id} className="border-b border-gray-100">
                           <td className="py-3 pr-4 font-medium text-gray-900">{q.paperTitle || "Paper"}</td>
                           <td className="py-3 pr-4 text-gray-700">
-                            {q.mode === "chapter" ? `Chapter ${q.chapterNumber}` : "Quick quiz"}
+                            {q.mode === "chapter" ? `Chapter ${q.chapterNumber}` : q.mode === "full" ? "Full practice" : "Quick quiz"}
                           </td>
                           <td className="py-3 pr-4 text-gray-700">{fmtDate(q.createdAt)}</td>
                           <td className="py-3 pr-4 text-right text-gray-900">{q.totalQuestions}</td>

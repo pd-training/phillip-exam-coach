@@ -144,6 +144,7 @@ export default function QuickQuizMode() {
       setShowingFeedback(false);
     } else {
       setCompleted(true);
+      saveRun(sessionAnswers);
     }
   };
 
@@ -154,6 +155,16 @@ export default function QuickQuizMode() {
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ paperId, answers }),
     }).catch((error) => console.error("Save quiz error:", error));
+  };
+
+  // Saves the finished run so it appears in Progress under Practice Sessions
+  const saveRun = (answers: { questionId: string; answer: string }[]) => {
+    if (answers.length === 0) return;
+    fetch("/api/student/quick-quiz-sessions", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ paperId, mode: "full", answers }),
+    }).catch((error) => console.error("Save full practice error:", error));
   };
 
   const handleRetryQuiz = () => {

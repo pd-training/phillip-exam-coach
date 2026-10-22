@@ -35,7 +35,7 @@ export async function POST(request: Request) {
 
     const body = await request.json();
     const paperId = typeof body?.paperId === "string" ? body.paperId : "";
-    const mode = body?.mode === "chapter" ? "chapter" : "quick";
+    const mode = body?.mode === "chapter" ? "chapter" : body?.mode === "full" ? "full" : "quick";
     const chapterNumber = mode === "chapter" && Number.isInteger(body?.chapterNumber) ? body.chapterNumber : null;
     const answers: { questionId: string; answer: string }[] = Array.isArray(body?.answers) ? body.answers : [];
     if (!paperId || answers.length === 0) {
