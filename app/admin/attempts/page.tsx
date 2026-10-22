@@ -202,6 +202,7 @@ export default function AttemptsPage() {
                       <th className="px-6 py-3 text-left text-sm font-semibold text-gray-900">Mode</th>
                       <th className="px-6 py-3 text-left text-sm font-semibold text-gray-900">Score</th>
                       <th className="px-6 py-3 text-left text-sm font-semibold text-gray-900">Date</th>
+                      <th className="px-6 py-3 text-left text-sm font-semibold text-gray-900">Action</th>
                     </tr>
                   </thead>
                   <tbody className="divide-y divide-gray-200">
@@ -218,6 +219,11 @@ export default function AttemptsPage() {
                         </td>
                         <td className="px-6 py-4 text-sm text-gray-700">
                           {new Date(r.createdAt).toLocaleDateString("en-SG", { day: "numeric", month: "short", year: "numeric" })}
+                        </td>
+                        <td className="px-6 py-4 text-sm">
+                          <Link href={`/admin/practice-runs/${r.id}`} className="font-medium text-blue-700 hover:text-blue-800">
+                            Review →
+                          </Link>
                         </td>
                       </tr>
                     ))}
