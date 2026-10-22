@@ -33,7 +33,8 @@ export async function GET(
     `;
 
     const weights = await getWeightsForPaper(paperId);
-    const partsWithWeights = (parts || []).map((part: any) => ({
+    const partRows = ((parts as any[]) || []);
+    const partsWithWeights = partRows.map((part: any) => ({
       ...part,
       chapterWeights: weights.get(part.id) ?? null,
     }));
