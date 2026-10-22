@@ -10,7 +10,7 @@ export interface PaperLabels {
 
 let columnsReady: Promise<void> | null = null;
 
-function ensureLabelColumns(): Promise<void> {
+export function ensureLabelColumns(): Promise<void> {
   if (!columnsReady) {
     columnsReady = (async () => {
       await (prisma as any).$executeRawUnsafe(`ALTER TABLE "Paper" ADD COLUMN IF NOT EXISTS "shortName" TEXT`);

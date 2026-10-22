@@ -10,6 +10,7 @@ interface Attempt {
   id: string;
   paperid: string;
   paperTitle: string;
+  paperShortName?: string | null;
   score: number;
   result: string;
   timeTaken: number;
@@ -20,6 +21,7 @@ interface QuizSession {
   id: string;
   paperId: string;
   paperTitle: string | null;
+  paperShortName?: string | null;
   mode: "quick" | "chapter" | "full";
   chapterNumber: number | null;
   totalQuestions: number;
@@ -62,8 +64,8 @@ export default function ProgressPage() {
   // Papers that appear in either tab, for the filter dropdown
   const paperOptions = useMemo(() => {
     const map = new Map<string, string>();
-    attempts.forEach((a) => map.set(a.paperid, a.paperTitle));
-    quizSessions.forEach((q) => map.set(q.paperId, q.paperTitle || "Paper"));
+    attempts.forEach((a) => map.set(a.paperid, a.paperShortName || a.paperTitle));
+    quizSessions.forEach((q) => map.set(q.paperId, q.paperShortName || q.paperTitle || "Paper"));
     return Array.from(map.entries())
       .map(([id, title]) => ({ id, title }))
       .sort((a, b) => a.title.localeCompare(b.title));
@@ -222,7 +224,7 @@ export default function ProgressPage() {
                         onClick={() => router.push(`/exam/attempts/${a.id}`)}
                         className="border-b border-gray-100 cursor-pointer hover:bg-blue-50 transition"
                       >
-                        <td className="py-3 pr-4 font-medium text-gray-900">{a.paperTitle}</td>
+                        <td className="py-3 pr-4 font-medium text-gray-900">{a.paperShortName || a.paperTitle}</td>
                         <td className="py-3 pr-4 text-gray-700">{fmtDate(a.submittedat)}</td>
                         <td className={`py-3 pr-4 text-right font-semibold ${a.result === "Pass" ? "text-green-600" : "text-red-600"}`}>{a.score}%</td>
                         <td className="py-3 pr-4">
@@ -269,7 +271,7 @@ export default function ProgressPage() {
                           onClick={() => router.push(`/exam/practice-runs/${q.id}`)}
                           className="border-b border-gray-100 cursor-pointer hover:bg-blue-50 transition"
                         >
-                          <td className="py-3 pr-4 font-medium text-gray-900">{q.paperTitle || "Paper"}</td>
+                          <td className="py-3 pr-4 font-medium text-gray-900">{q.paperShortName || q.paperTitle || "Paper"}</td>
                           <td className="py-3 pr-4 text-gray-700">{fmtDate(q.createdAt)}</td>
                           <td className="py-3 pr-4 text-right text-gray-900">{q.totalQuestions}</td>
                           <td className={`py-3 text-right font-semibold ${q.percentage >= 50 ? "text-green-600" : "text-red-600"}`}>

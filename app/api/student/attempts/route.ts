@@ -1,6 +1,7 @@
 import { getServerSession } from "next-auth/next";
 import { authOptions } from "@/lib/auth-config";
 import prisma from "@/lib/prisma";
+import { ensureLabelColumns } from "@/lib/paper-labels";
 
 export const dynamic = 'force-dynamic';
 
@@ -14,11 +15,13 @@ export async function GET(request: Request) {
 
     const userId = (session.user as any).id;
 
+    await ensureLabelColumns();
     const attempts = await prisma.$queryRaw`
       SELECT 
         ea.id,
         ea.paperid,
         p.title as "paperTitle",
+        p."shortName" as "paperShortName",
         ea.score,
         CASE 
           WHEN ea.score >= COALESCE(p."passingScore", 50) THEN 'Pass'

@@ -1,11 +1,13 @@
 export const dynamic = "force-dynamic";
 
 import prisma from "@/lib/prisma";
+import { ensureLabelColumns } from "@/lib/paper-labels";
 
 export async function GET() {
   try {
+    await ensureLabelColumns();
     const papers = await prisma.$queryRaw`
-      SELECT id, title, description, "externalLink", "durationMinutes", "totalQuestions", "isAvailable", "createdAt"
+      SELECT id, title, "shortName", "partLabel", description, "externalLink", "durationMinutes", "totalQuestions", "isAvailable", "createdAt"
       FROM "Paper"
       ORDER BY "createdAt" DESC
     `;

@@ -126,7 +126,7 @@ export async function GET() {
 
     await ensureTables();
     const sessions = await (prisma as any).$queryRawUnsafe(
-      `SELECT s.id, s."paperId", p.title AS "paperTitle", s.mode, s."chapterNumber", s."totalQuestions", s."correctCount", s.percentage, s."createdAt"
+      `SELECT s.id, s."paperId", p.title AS "paperTitle", p."shortName" AS "paperShortName", s.mode, s."chapterNumber", s."totalQuestions", s."correctCount", s.percentage, s."createdAt"
        FROM "QuickQuizSession" s
        LEFT JOIN "Paper" p ON p.id::text = s."paperId"
        WHERE s."userId" = $1

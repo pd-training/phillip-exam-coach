@@ -10,6 +10,8 @@ interface Paper {
   title: string;
   description?: string;
   externalLink?: string;
+  shortName?: string | null;
+  partLabel?: string | null;
   durationMinutes: number;
   totalQuestions: number;
   isAvailable: boolean;
@@ -127,7 +129,10 @@ export default function PapersListPage() {
                   >
                     <td className="px-6 py-4">
                       <div>
-                        <p className="font-semibold text-gray-900">{paper.title}</p>
+                        <p className="font-semibold text-gray-900">{paper.shortName || paper.title}</p>
+                        {paper.shortName && (
+                          <p className="text-sm text-gray-700">{paper.title}</p>
+                        )}
                         {paper.description && (
                           <p className="text-sm text-gray-600">{paper.description}</p>
                         )}
