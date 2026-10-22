@@ -321,32 +321,15 @@ export default function QuickQuizMode() {
             ))}
           </div>
 
-          {/* Feedback Modal */}
+          {/* Feedback, shown on the page below the options */}
           {showingFeedback && feedback && (
-            <div
-              style={{
-                position: "fixed",
-                top: 0,
-                left: 0,
-                right: 0,
-                bottom: 0,
-                backgroundColor: "rgba(0, 0, 0, 0.5)",
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "center",
-                zIndex: 1000,
-                padding: "20px",
-              }}
-            >
+            <div style={{ marginTop: "20px" }}>
               <div
                 style={{
-                  backgroundColor: "white",
+                  backgroundColor: feedback.isCorrect ? "#f0fdf4" : "#fef2f2",
+                  border: `1px solid ${feedback.isCorrect ? "#bbf7d0" : "#fecaca"}`,
                   borderRadius: "12px",
-                  padding: "32px",
-                  maxWidth: "500px",
-                  width: "100%",
-                  boxShadow: "0 20px 25px -5px rgba(0, 0, 0, 0.1)",
-                  animation: "slideUp 0.3s ease-out",
+                  padding: "24px",
                 }}
               >
                 {/* Header with Icon */}
