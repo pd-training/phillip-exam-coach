@@ -125,7 +125,12 @@ export default function SideNav({ navItems, homeHref, settingsHref, fallbackName
     }
   };
 
-  const isActive = (href: string) => pathname === href || pathname.startsWith(href + "/");
+  // Only the most specific nav item is highlighted, so /dashboard/attempts lights up Progress, not Dashboard
+  const matches = (href: string) => pathname === href || pathname.startsWith(href + "/");
+  const activeHref = navItems
+    .filter((item) => matches(item.href))
+    .sort((a, b) => b.href.length - a.href.length)[0]?.href;
+  const isActive = (href: string) => href === activeHref;
 
   const handleLogout = async () => {
     await signOut({ redirect: false });
