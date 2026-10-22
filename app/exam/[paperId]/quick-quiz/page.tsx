@@ -243,8 +243,8 @@ export default function QuickQuizMode() {
       <style>{styles}</style>
       <StudentNav />
 
-      <div className="flex-1 flex items-center justify-center px-6 py-12">
-        <div className="bg-white rounded-2xl border border-gray-200 p-8 w-full max-w-2xl">
+      <div className="flex-1 flex items-center justify-center px-6 py-6">
+        <div className="bg-white rounded-2xl border border-gray-200 p-6 w-full max-w-4xl">
           {/* Back to Practice Link */}
           <button
             onClick={() => router.replace(`/exam/${paperId}`)}
@@ -254,10 +254,10 @@ export default function QuickQuizMode() {
           </button>
 
           {/* Header */}
-          <div className="mb-8 flex justify-between items-center">
+          <div className="mb-5 flex justify-between items-center">
             <div>
-              <p className="text-sm text-gray-600 mb-1">{paperTitle}</p>
-              <h1 className="text-3xl font-bold text-gray-900">Quick Quiz</h1>
+              <p className="text-xs text-gray-600 mb-1">{paperTitle}</p>
+              <h1 className="text-2xl font-bold text-gray-900">Quick Quiz</h1>
             </div>
             <div className="text-sm font-medium text-gray-600">
               Question <span className="text-blue-600 font-bold">{progress}</span> of <span className="text-gray-900 font-bold">{questions.length}</span>
@@ -265,7 +265,7 @@ export default function QuickQuizMode() {
           </div>
 
           {/* Progress bar */}
-          <div className="w-full h-2 bg-gray-200 rounded-full mb-8 overflow-hidden">
+          <div className="w-full h-2 bg-gray-200 rounded-full mb-5 overflow-hidden">
             <div
               className="h-full bg-blue-600 transition-all duration-300"
               style={{
@@ -277,31 +277,32 @@ export default function QuickQuizMode() {
           {/* Question */}
           <div
             style={{
-              padding: "20px",
+              padding: "14px 16px",
               backgroundColor: "#f9fafb",
               borderRadius: "8px",
-              marginBottom: "20px",
+              marginBottom: "14px",
               border: "1px solid #e5e7eb",
             }}
           >
-            <p style={{ margin: "0", fontWeight: "500", fontSize: "16px", lineHeight: "1.5" }}>
+            <p style={{ margin: "0", fontWeight: "500", fontSize: "15px", lineHeight: "1.5" }}>
               {currentQuestion.text}
             </p>
-            <p style={{ margin: "10px 0 0 0", fontSize: "12px", color: "#999" }}>
+            <p style={{ margin: "6px 0 0 0", fontSize: "11px", color: "#999" }}>
               Chapter {currentQuestion.chapter}
             </p>
           </div>
 
           {/* Answer options */}
-          <div style={{ marginBottom: "20px" }}>
+          <div style={{ marginBottom: "14px" }}>
             {buildOptions(currentQuestion, orderFor(currentQuestion.id)).map((option) => (
               <label
                 key={option.key}
                 style={{
                   display: "flex",
                   alignItems: "center",
-                  padding: "12px",
-                  marginBottom: "10px",
+                  padding: "8px 10px",
+                  marginBottom: "6px",
+                  fontSize: "14px",
                   backgroundColor:
                     selectedAnswer === option.key ? "#eff6ff" : "white",
                   border:
