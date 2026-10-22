@@ -1,6 +1,7 @@
 import prisma from '@/lib/prisma';
 import { getServerSession } from 'next-auth/next';
 import { authOptions } from '@/lib/auth-config';
+import { getPaperLabels } from '@/lib/paper-labels';
 
 export const dynamic = 'force-dynamic';
 
@@ -38,6 +39,9 @@ export async function GET(
         { status: 404 }
       );
     }
+
+    const labels = await getPaperLabels(paperId);
+    Object.assign(paper, labels);
 
     // Check availability: students cannot access unavailable papers
     const userRole = (session?.user as any)?.role;

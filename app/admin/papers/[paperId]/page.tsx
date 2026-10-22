@@ -12,6 +12,8 @@ interface Paper {
   title: string;
   description?: string;
   externalLink?: string;
+  shortName?: string | null;
+  partLabel?: string | null;
   durationMinutes: number;
   totalQuestions: number;
   isAvailable: boolean;
@@ -63,6 +65,8 @@ export default function PaperDetailPage() {
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
   const [externalLink, setExternalLink] = useState("");
+  const [shortName, setShortName] = useState("");
+  const [partLabel, setPartLabel] = useState("");
   const [duration, setDuration] = useState("");
   const [passingScore, setPassingScore] = useState("");
   const [isAvailable, setIsAvailable] = useState(false);
@@ -121,6 +125,8 @@ export default function PaperDetailPage() {
       setTitle(paperInfo.title || "");
       setDescription(paperInfo.description || "");
       setExternalLink(paperInfo.externalLink || "");
+      setShortName(paperInfo.shortName || "");
+      setPartLabel(paperInfo.partLabel || "");
       setDuration(paperInfo.durationMinutes?.toString() || "120");
       setPassingScore(paperInfo.passingScore?.toString() || "70");
       setIsAvailable(paperInfo.isAvailable || false);
@@ -172,6 +178,8 @@ export default function PaperDetailPage() {
           title,
           description,
           externalLink,
+          shortName,
+          partLabel,
           durationMinutes: parseInt(duration),
           passingScore: parseInt(passingScore),
           isAvailable,
@@ -523,12 +531,35 @@ export default function PaperDetailPage() {
                 Basic Information
               </h2>
               <div className="space-y-4 mb-6">
+                <div className="grid grid-cols-2 gap-4">
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">Short name</label>
+                    <input
+                      type="text"
+                      value={shortName}
+                      onChange={(e) => setShortName(e.target.value)}
+                      placeholder="e.g. M9A"
+                      className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">Part label (optional)</label>
+                    <input
+                      type="text"
+                      value={partLabel}
+                      onChange={(e) => setPartLabel(e.target.value)}
+                      placeholder="e.g. Part II of CM-LIP"
+                      className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    />
+                  </div>
+                </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">Paper Title</label>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">Full paper name</label>
                   <input
                     type="text"
                     value={title}
                     onChange={(e) => setTitle(e.target.value)}
+                    placeholder="e.g. Life Insurance And Investment-Linked Policies II"
                     className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
                   />
                 </div>

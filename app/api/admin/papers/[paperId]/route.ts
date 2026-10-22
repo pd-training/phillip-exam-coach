@@ -2,6 +2,7 @@ import { getServerSession } from "next-auth/next";
 import { authOptions } from "@/lib/auth-config";
 import { NextRequest, NextResponse } from "next/server";
 import prisma from "@/lib/prisma";
+import { getPaperLabels, setPaperLabels, cleanLabel } from "@/lib/paper-labels";
 
 export const dynamic = 'force-dynamic';
 
@@ -26,7 +27,8 @@ async function updatePaper(paperId: string, body: any) {
     return { error: "Paper not found", status: 404, paper: null };
   }
 
-  const { title, description, externalLink, totalQuestions, durationMinutes, passingScore, isAvailable } = body;
+  const { title, description, externalLink, totalQuestions, durationMinutes, passingScore, isAvailable, shortName, partLabel } = body;
+  const labelUpdate = shortName !== undefined || partLabel !== undefined;
 
   // For PUT requests, title is required. For PATCH, it's optional.
   if (title !== undefined && (!title || !title.trim())) {
@@ -58,25 +60,36 @@ async function updatePaper(paperId: string, body: any) {
   }
 
   // If no fields to update, return existing paper
-  if (Object.keys(updateData).length === 0) {
+  if (Object.keys(updateData).length === 0 && !labelUpdate) {
     return { error: null, status: 200, paper: existingPaper };
   }
 
   try {
-    const paper = await (prisma as any).paper.update({
-      where: { id: paperId },
-      data: updateData,
-      select: {
-        id: true,
-        title: true,
-        description: true,
-        externalLink: true,
-        durationMinutes: true,
-        totalQuestions: true,
-        passingScore: true,
-        isAvailable: true,
-      }
-    });
+    let paper: any = existingPaper;
+    if (Object.keys(updateData).length > 0) {
+      paper = await (prisma as any).paper.update({
+        where: { id: paperId },
+        data: updateData,
+        select: {
+          id: true,
+          title: true,
+          description: true,
+          externalLink: true,
+          durationMinutes: true,
+          totalQuestions: true,
+          passingScore: true,
+          isAvailable: true,
+        }
+      });
+    }
+    if (labelUpdate) {
+      const current = await getPaperLabels(paperId);
+      await setPaperLabels(paperId, {
+        shortName: shortName !== undefined ? cleanLabel(shortName) : current.shortName,
+        partLabel: partLabel !== undefined ? cleanLabel(partLabel) : current.partLabel,
+      });
+    }
+    paper = { ...paper, ...(await getPaperLabels(paperId)) };
     return { error: null, status: 200, paper };
   } catch (updateError: any) {
     console.error('Paper update error:', updateError.message);

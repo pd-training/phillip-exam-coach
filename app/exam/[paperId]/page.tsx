@@ -7,6 +7,8 @@ import { useState, useEffect } from "react";
 import Link from "next/link";
 
 interface PaperInfo {
+  shortName?: string | null;
+  partLabel?: string | null;
   id: string;
   title: string;
   durationMinutes: number;
@@ -244,7 +246,15 @@ export default function PracticePage() {
         >
           ← Back to dashboard
         </button>
-        <h1 className="text-3xl font-bold text-gray-900 mt-4">{paper.title}</h1>
+        {paper.shortName && (
+          <p className="text-sm font-semibold text-blue-700 mt-4">{paper.shortName}</p>
+        )}
+        <h1 className={`text-3xl font-bold text-gray-900 ${paper.shortName ? "mt-1" : "mt-4"}`}>{paper.title}</h1>
+        {paper.partLabel && (
+          <span className="inline-block mt-3 px-2.5 py-1 rounded bg-blue-50 border border-blue-200 text-blue-800 text-xs font-semibold">
+            {paper.partLabel}
+          </span>
+        )}
         {paper.description && (
           <p className="text-gray-600 mt-1">{paper.description}</p>
         )}
