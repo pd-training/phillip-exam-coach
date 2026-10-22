@@ -14,7 +14,7 @@ type PaperProgress = {
 };
 
 type Attempt = {
-  kind: "Full exam" | "Quick quiz" | "Full practice";
+  kind: "Exam simulation" | "Quick quiz" | "Full practice";
   paperId: string;
   title: string;
   score: number;
@@ -211,7 +211,7 @@ export default function TeamOverview({ sideCard }: { sideCard?: ReactNode }) {
                                   <div key={p.paperId} className={`rounded-lg border-2 bg-white p-4 text-sm ${cardBorder(p.status)}`}>
                                     <p className="font-semibold text-gray-900 mb-2">{p.title}</p>
                                     <p className="text-gray-700">
-                                      Full exam best:{" "}
+                                      Exam simulation best:{" "}
                                       <span className={`font-semibold ${scoreColour(p.status)}`}>{bestText(p.bestFull)}</span>
                                       <span className="text-gray-500"> (pass {p.passingScore}%)</span>
                                     </p>

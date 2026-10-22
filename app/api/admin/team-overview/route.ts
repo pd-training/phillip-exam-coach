@@ -6,7 +6,7 @@ import prisma from "@/lib/prisma";
 export const dynamic = "force-dynamic";
 
 type Attempt = {
-  kind: "Full exam" | "Quick quiz" | "Full practice";
+  kind: "Exam simulation" | "Quick quiz" | "Full practice";
   paperId: string;
   title: string;
   score: number;
@@ -81,7 +81,7 @@ export async function GET() {
       });
       attemptsByUser.set(row.userId, list);
     };
-    examRows.forEach((r) => addAttempt(r, "Full exam"));
+    examRows.forEach((r) => addAttempt(r, "Exam simulation"));
     quizRows.forEach((r) => addAttempt(r, r.mode === "full" ? "Full practice" : "Quick quiz"));
 
     const rows = students.map((st) => {
@@ -93,7 +93,7 @@ export async function GET() {
         .filter((a) => a.userId === st.id)
         .map((a) => {
           const mine = attempts.filter((t) => t.paperId === a.paperId);
-          const fullExamAttempts = mine.filter((t) => t.kind === "Full exam");
+          const fullExamAttempts = mine.filter((t) => t.kind === "Exam simulation");
           const passed = fullExamAttempts.some((t) => t.score >= Number(a.passingScore));
           const status = passed
             ? "Passed"
@@ -123,7 +123,7 @@ export async function GET() {
         remarks: st.remarks || "",
         papers,
         attemptCount: attempts.length,
-        examAttemptCount: attempts.filter((t) => t.kind === "Full exam").length,
+        examAttemptCount: attempts.filter((t) => t.kind === "Exam simulation").length,
         practiceAttemptCount: attempts.filter((t) => t.kind === "Full practice").length,
         lastActive: attempts.length ? attempts[0].date : null,
         attempts: attempts.slice(0, 50),

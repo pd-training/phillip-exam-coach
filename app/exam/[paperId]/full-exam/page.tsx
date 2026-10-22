@@ -400,11 +400,11 @@ export default function FullExamMode() {
           </button>
           <div className="flex justify-between items-center">
             <div>
-              <h1 className="text-xl font-bold text-gray-900">{examConfig?.title || "Full Exam Mode"}</h1>
+              <h1 className="text-xl font-bold text-gray-900">{examConfig?.title || "Exam Simulation"}</h1>
               <p className="text-sm text-gray-500 mt-1">
                 {currentPart
                   ? `${currentPart.partName} (Q${currentPart.questionInPart}/${currentPart.totalInPart})`
-                  : "Full Exam Mode"
+                  : "Exam Simulation"
                 }
               </p>
             </div>
