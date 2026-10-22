@@ -1,5 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import prisma from "@/lib/prisma";
+import { setPartWeights } from "@/lib/exam-part-weights";
+import { parseChapterWeights } from "@/lib/chapter-weights";
 
 export async function PATCH(
   request: NextRequest,
@@ -11,6 +13,7 @@ export async function PATCH(
 
     const { partName, chapterStart, chapterEnd, questionCount, passingScore } =
       body;
+    const weightsSent = Object.prototype.hasOwnProperty.call(body, "chapterWeights");
 
     // Validate required fields
     if (!partName || chapterStart === undefined || chapterEnd === undefined || questionCount === undefined) {
@@ -41,9 +44,13 @@ export async function PATCH(
       );
     }
 
+    if (weightsSent) {
+      await setPartWeights(partId, parseChapterWeights(body.chapterWeights));
+    }
+
     return NextResponse.json({
       success: true,
-      examPart: result[0],
+      examPart: { ...result[0], chapterWeights: parseChapterWeights(body.chapterWeights) },
     });
   } catch (error: any) {
     console.error("Error updating exam part:", error);

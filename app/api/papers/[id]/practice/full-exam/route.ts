@@ -1,6 +1,29 @@
 import { NextRequest, NextResponse } from 'next/server';
 import prisma from '@/lib/prisma';
 import { sanitizeOrder } from '@/lib/option-order';
+import { allocateByWeight, ChapterWeights } from '@/lib/chapter-weights';
+import { getWeightsForPaper } from '@/lib/exam-part-weights';
+
+// Draw questions for a part by chapter weight: each chapter gets its weighted share, capped by its bank
+function drawByChapterWeights(total: number, weights: ChapterWeights, pool: any[]): any[] {
+  const byChapter: Record<string, any[]> = {};
+  pool.forEach((q) => {
+    const key = String(q.chapterNumber);
+    if (!byChapter[key]) byChapter[key] = [];
+    byChapter[key].push(q);
+  });
+  const usable: ChapterWeights = {};
+  for (const [ch, w] of Object.entries(weights)) {
+    if (w > 0 && byChapter[ch]?.length) usable[ch] = w;
+  }
+  const counts = allocateByWeight(total, usable);
+  const drawn: any[] = [];
+  for (const [ch, n] of Object.entries(counts)) {
+    const shuffled = [...byChapter[ch]].sort(() => Math.random() - 0.5);
+    drawn.push(...shuffled.slice(0, Math.min(n, shuffled.length)));
+  }
+  return drawn;
+}
 
 export const dynamic = 'force-dynamic';
 
@@ -78,6 +101,7 @@ export async function GET(
     // If exam parts are defined, use them to structure the exam
     if (examParts && examParts.length > 0) {
       console.log('Using exam parts structure');
+      const weightMap = await getWeightsForPaper(paperId);
       
       for (const part of examParts) {
         // Filter questions in the chapter range for this part
@@ -89,10 +113,13 @@ export async function GET(
         const chaptersInPart = [...new Set(questionsInPartRange.map(q => q.chapterNumber))].sort((a, b) => Number(a) - Number(b));
 
         // Randomly select the configured number of questions for this part
-        const numToSelect = Math.min(part.questionCount, questionsInPartRange.length);
-        const partQuestions = questionsInPartRange
-          .sort(() => Math.random() - 0.5)
-          .slice(0, numToSelect);
+        const chapterWeights = weightMap.get(part.id);
+        const partQuestions = chapterWeights
+          ? drawByChapterWeights(part.questionCount, chapterWeights, questionsInPartRange)
+          : questionsInPartRange
+              .sort(() => Math.random() - 0.5)
+              .slice(0, Math.min(part.questionCount, questionsInPartRange.length));
+        const numToSelect = partQuestions.length;
 
         console.log(`Part "${part.partName}": Expected chapters ${part.chapterStart}-${part.chapterEnd}, found chapters [${chaptersInPart.join(', ')}], selecting ${numToSelect} from ${questionsInPartRange.length} available`);
 

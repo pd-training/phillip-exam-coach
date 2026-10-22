@@ -2,6 +2,7 @@
 
 import AdminNav from "@/components/AdminNav";
 import PaperAccess from "@/components/admin/PaperAccess";
+import ChapterWeightsEditor from "@/components/admin/ChapterWeightsEditor";
 import { useToast } from "@/components/Toast";
 import { useState, useEffect } from "react";
 import { useSession } from "next-auth/react";
@@ -29,6 +30,7 @@ interface ExamPart {
   questionCount: number;
   passingScore: number;
   orderIndex: number;
+  chapterWeights?: Record<string, number> | null;
 }
 
 type TabType = "settings" | "questions" | "chapters" | "access";
@@ -97,6 +99,18 @@ export default function PaperDetailPage() {
   const [editPartChapterEnd, setEditPartChapterEnd] = useState("");
   const [editPartQuestionCount, setEditPartQuestionCount] = useState("");
   const [editPartPassingScore, setEditPartPassingScore] = useState("70");
+
+  // Chapter weights for exam parts
+  const [addWeightsOn, setAddWeightsOn] = useState(false);
+  const [addWeights, setAddWeights] = useState<Record<string, number>>({});
+  const [editWeightsOn, setEditWeightsOn] = useState(false);
+  const [editWeights, setEditWeights] = useState<Record<string, number>>({});
+  // Questions in the bank per chapter, used to check the weighted counts
+  const bankCounts: Record<string, number> = {};
+  questions.forEach((q: any) => {
+    const key = String(q.chapterNumber);
+    bankCounts[key] = (bankCounts[key] || 0) + 1;
+  });
 
   // Edit chapters
   const [editedChapters, setEditedChapters] = useState<{ [key: number]: string }>({});
@@ -361,6 +375,7 @@ export default function PaperDetailPage() {
           chapterEnd: parseInt(partChapterEnd),
           questionCount: parseInt(partQuestionCount),
           passingScore: parseInt(partPassingScore),
+          chapterWeights: addWeightsOn ? addWeights : null,
         }),
       });
 
@@ -373,6 +388,8 @@ export default function PaperDetailPage() {
       setPartChapterEnd("");
       setPartQuestionCount("");
       setPartPassingScore("70");
+      setAddWeightsOn(false);
+      setAddWeights({});
       await fetchPaperData();
     } catch (error) {
       showToast("Error adding part: " + (error as Error).message);
@@ -388,6 +405,8 @@ export default function PaperDetailPage() {
     setEditPartChapterEnd(part.chapterEnd.toString());
     setEditPartQuestionCount(part.questionCount.toString());
     setEditPartPassingScore(part.passingScore.toString());
+    setEditWeightsOn(!!part.chapterWeights);
+    setEditWeights(part.chapterWeights || {});
     setShowEditPartModal(true);
   };
 
@@ -411,6 +430,7 @@ export default function PaperDetailPage() {
           chapterEnd: parseInt(editPartChapterEnd),
           questionCount: parseInt(editPartQuestionCount),
           passingScore: parseInt(editPartPassingScore),
+          chapterWeights: editWeightsOn ? editWeights : null,
         }),
       });
 
@@ -1122,6 +1142,19 @@ export default function PaperDetailPage() {
               </div>
             </div>
 
+            <div className="mb-6">
+              <ChapterWeightsEditor
+                start={parseInt(partChapterStart)}
+                end={parseInt(partChapterEnd)}
+                questionCount={parseInt(partQuestionCount) || 0}
+                enabled={addWeightsOn}
+                onEnabledChange={setAddWeightsOn}
+                weights={addWeights}
+                onWeightsChange={setAddWeights}
+                bank={bankCounts}
+              />
+            </div>
+
             <div className="flex gap-3 justify-end">
               <button
                 onClick={() => {
@@ -1211,6 +1244,19 @@ export default function PaperDetailPage() {
                   className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
                 />
               </div>
+            </div>
+
+            <div className="mb-6">
+              <ChapterWeightsEditor
+                start={parseInt(editPartChapterStart)}
+                end={parseInt(editPartChapterEnd)}
+                questionCount={parseInt(editPartQuestionCount) || 0}
+                enabled={editWeightsOn}
+                onEnabledChange={setEditWeightsOn}
+                weights={editWeights}
+                onWeightsChange={setEditWeights}
+                bank={bankCounts}
+              />
             </div>
 
             <div className="flex gap-3 justify-end">

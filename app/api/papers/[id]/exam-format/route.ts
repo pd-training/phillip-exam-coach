@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import prisma from '@/lib/prisma';
+import { getWeightsForPaper } from '@/lib/exam-part-weights';
 
 export const dynamic = 'force-dynamic';
 
@@ -31,10 +32,16 @@ export async function GET(
       ORDER BY "orderIndex" ASC
     `;
 
+    const weights = await getWeightsForPaper(paperId);
+    const partsWithWeights = (parts || []).map((part: any) => ({
+      ...part,
+      chapterWeights: weights.get(part.id) ?? null,
+    }));
+
     return NextResponse.json({
       examFormat: {
         totalTime: paper.totalTime || 120,
-        parts: parts || [],
+        parts: partsWithWeights,
       },
     });
   } catch (error: any) {

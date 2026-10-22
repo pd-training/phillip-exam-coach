@@ -1,5 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import prisma from '@/lib/prisma';
+import { setPartWeights } from '@/lib/exam-part-weights';
+import { parseChapterWeights } from '@/lib/chapter-weights';
 
 export const dynamic = 'force-dynamic';
 
@@ -9,7 +11,7 @@ export async function POST(
 ) {
   try {
     const body = await request.json();
-    const { partName, chapterStart, chapterEnd, questionCount, passingScore } = body;
+    const { partName, chapterStart, chapterEnd, questionCount, passingScore, chapterWeights } = body;
     const paperId = params.id;
 
     if (!partName || !chapterStart || !chapterEnd || questionCount === undefined || passingScore === undefined) {
@@ -30,10 +32,15 @@ export async function POST(
     const newOrderIndex = maxOrder + 1;
 
     // Create new part
-    await prisma.$queryRaw`
+    const inserted = await prisma.$queryRaw`
       INSERT INTO "ExamPart" (id, "paperId", "partName", "chapterStart", "chapterEnd", "questionCount", "passingScore", "orderIndex", "createdAt", "updatedAt")
       VALUES (gen_random_uuid(), ${paperId}::uuid, ${partName}, ${chapterStart}, ${chapterEnd}, ${questionCount}, ${passingScore}, ${newOrderIndex}, NOW(), NOW())
-    `;
+      RETURNING id
+    ` as any[];
+
+    if (inserted?.[0]?.id) {
+      await setPartWeights(String(inserted[0].id), parseChapterWeights(chapterWeights));
+    }
 
     return NextResponse.json({
       success: true,
