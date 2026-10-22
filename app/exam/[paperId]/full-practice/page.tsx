@@ -207,10 +207,10 @@ export default function QuickQuizMode() {
             <p className="text-gray-600 mb-8">You have worked through all {questions.length} questions.</p>
             <div className="flex gap-3">
               <button
-                onClick={() => router.replace(`/exam/${paperId}/practice`)}
+                onClick={() => router.replace(`/exam/${paperId}`)}
                 className="flex-1 px-6 py-3 bg-gray-500 hover:bg-gray-600 text-white rounded-lg font-semibold transition duration-200"
               >
-                Back to Practice
+                Back to Paper
               </button>
               <button
                 onClick={() => window.location.reload()}
@@ -237,10 +237,10 @@ export default function QuickQuizMode() {
         <div className="bg-white rounded-2xl border border-gray-200 p-8 w-full max-w-2xl">
           {/* Back to Practice Link */}
           <button
-            onClick={() => router.replace(`/exam/${paperId}/practice`)}
+            onClick={() => router.replace(`/exam/${paperId}`)}
             className="text-blue-600 hover:text-blue-700 font-medium text-sm mb-6 transition duration-200 flex items-center gap-2"
           >
-            ← Back to Practice
+            ← Back to Paper
           </button>
 
           {/* Header */}

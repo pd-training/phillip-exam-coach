@@ -175,7 +175,7 @@ export default function PracticeChapterMode() {
         <div className="flex-1 w-full">
           <div className="max-w-6xl mx-auto px-6 py-10">
             <button
-              onClick={() => router.push(`/exam/${paperId}/practice`)}
+              onClick={() => router.push(`/exam/${paperId}`)}
               className="inline-flex items-center gap-2 px-3 py-1.5 border border-gray-300 bg-white rounded-lg text-sm font-medium text-gray-700 hover:bg-gray-50 transition"
             >
               ← Back
