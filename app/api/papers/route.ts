@@ -25,7 +25,9 @@ export async function GET() {
 
 export async function POST(req: Request) {
   try {
-    const { title, durationMinutes, totalQuestions } = await req.json();
+    const { title, description, externalLink, durationMinutes, totalQuestions } = await req.json();
+    const cleanDescription = typeof description === "string" ? description.trim() : "";
+    const cleanLink = typeof externalLink === "string" && externalLink.trim() ? externalLink.trim() : null;
 
     if (!title) {
       return Response.json(
@@ -37,7 +39,7 @@ export async function POST(req: Request) {
     // Use raw SQL to bypass Prisma enum validation
     const result = await prisma.$queryRaw`
       INSERT INTO "Paper" (id, title, description, "externalLink", "durationMinutes", "totalQuestions", "createdAt", "updatedAt")
-      VALUES (gen_random_uuid(), ${title}, '', NULL, ${durationMinutes || 180}, ${totalQuestions || 150}, NOW(), NOW())
+      VALUES (gen_random_uuid(), ${title}, ${cleanDescription}, ${cleanLink}, ${durationMinutes || 180}, ${totalQuestions || 150}, NOW(), NOW())
       RETURNING id, title, description, "externalLink", "durationMinutes", "totalQuestions", "isAvailable", "createdAt"
     `;
 
