@@ -51,6 +51,9 @@ export default function UserDetailPage() {
   const [allPapers, setAllPapers] = useState<{ id: string; title: string }[]>([]);
   const [paperMessage, setPaperMessage] = useState<{ type: "success" | "error"; text: string } | null>(null);
   const [paperBusy, setPaperBusy] = useState(false);
+  const [phoneInput, setPhoneInput] = useState("");
+  const [phoneSaving, setPhoneSaving] = useState(false);
+  const [phoneMessage, setPhoneMessage] = useState("");
 
   // Auth & redirect
   useEffect(() => {
@@ -71,6 +74,7 @@ export default function UserDetailPage() {
         if (userRes.ok) {
           const userData = await userRes.json();
           setUser(userData.user);
+          setPhoneInput(userData.user.phone || "");
           setIsStudent(userData.user.role === "STUDENT" || userData.user.role === "BOTH");
           setIsAdmin(userData.user.role === "ADMIN" || userData.user.role === "BOTH");
         }
@@ -179,6 +183,30 @@ export default function UserDetailPage() {
     );
   }
 
+  const savePhone = async () => {
+    setPhoneSaving(true);
+    setPhoneMessage("");
+    try {
+      const res = await fetch(`/api/users/${userId}`, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ phone: phoneInput }),
+      });
+      const data = await res.json();
+      if (!res.ok) {
+        setPhoneMessage(data.error || "Could not save the mobile number");
+        return;
+      }
+      setUser((prev) => (prev ? { ...prev, phone: data.user?.phone ?? null } : prev));
+      setPhoneInput(data.user?.phone || "");
+      setPhoneMessage("Mobile number saved");
+    } catch {
+      setPhoneMessage("Could not save the mobile number");
+    } finally {
+      setPhoneSaving(false);
+    }
+  };
+
   const isAdminCreated = false; // Would come from user.createdBy or similar
   const paperCount = papers.length;
   const attemptCount = attempts.length;
@@ -266,7 +294,45 @@ export default function UserDetailPage() {
             <label style={{ display: "block", fontSize: "12px", color: "#6b7280", marginBottom: "4px", fontWeight: "600" }}>
               Mobile number
             </label>
-            <p style={{ margin: "0", fontSize: "14px", color: "#1f2937" }}>{user.phone || "Not provided"}</p>
+            <div style={{ display: "flex", gap: "8px", alignItems: "center", flexWrap: "wrap" }}>
+              <input
+                type="tel"
+                value={phoneInput}
+                onChange={(e) => setPhoneInput(e.target.value)}
+                placeholder="9123 4567"
+                style={{
+                  width: "220px",
+                  maxWidth: "100%",
+                  padding: "8px",
+                  border: "1px solid #d1d5db",
+                  borderRadius: "6px",
+                  fontSize: "14px",
+                  boxSizing: "border-box",
+                }}
+              />
+              <button
+                type="button"
+                onClick={savePhone}
+                disabled={phoneSaving}
+                style={{
+                  padding: "8px 14px",
+                  backgroundColor: phoneSaving ? "#9ca3af" : "#1e3a8a",
+                  color: "white",
+                  border: "none",
+                  borderRadius: "6px",
+                  fontSize: "14px",
+                  fontWeight: "600",
+                  cursor: phoneSaving ? "not-allowed" : "pointer",
+                }}
+              >
+                {phoneSaving ? "Saving..." : "Save"}
+              </button>
+            </div>
+            {phoneMessage && (
+              <p style={{ margin: "8px 0 0 0", fontSize: "13px", color: phoneMessage.startsWith("Mobile") ? "#065f46" : "#991b1b" }}>
+                {phoneMessage}
+              </p>
+            )}
           </div>
         </div>
 

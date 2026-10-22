@@ -28,6 +28,17 @@ export default function AccountPage() {
   const [passwordSuccess, setPasswordSuccess] = useState("");
 
   // Handle auth redirects
+  // Load the saved mobile number into the Phone field
+  useEffect(() => {
+    if (status !== "authenticated") return;
+    fetch("/api/account/profile")
+      .then((r) => (r.ok ? r.json() : null))
+      .then((d) => {
+        if (d?.phone) setPhone(d.phone);
+      })
+      .catch(() => {});
+  }, [status]);
+
   useEffect(() => {
     if (status === "loading") return;
 

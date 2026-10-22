@@ -1,6 +1,7 @@
 import { getServerSession } from "next-auth/next";
 import { authOptions } from "@/lib/auth-config";
 import prisma from "@/lib/prisma";
+import { normalizeSgPhone } from "@/lib/phone";
 
 export const dynamic = 'force-dynamic';
 
@@ -39,16 +40,27 @@ export async function PUT(request: Request, { params }: { params: { userId: stri
       return Response.json({ error: "Unauthorized" }, { status: 401 });
     }
 
-    const { name, email } = await request.json();
+    const { name, email, phone } = await request.json();
 
-    await prisma.$queryRaw`
-      UPDATE "User"
-      SET name = ${name}, email = ${email}, "updatedAt" = NOW()
-      WHERE id = ${params.userId}
-    `;
+    if (phone !== undefined) {
+      const normalized = normalizeSgPhone(phone);
+      if (normalized.error) {
+        return Response.json({ error: normalized.error }, { status: 400 });
+      }
+      await prisma.$executeRaw`ALTER TABLE "User" ADD COLUMN IF NOT EXISTS phone TEXT`;
+      await prisma.$executeRaw`UPDATE "User" SET phone = ${normalized.value}, "updatedAt" = NOW() WHERE id = ${params.userId}`;
+    }
+
+    if (name !== undefined && email !== undefined) {
+      await prisma.$queryRaw`
+        UPDATE "User"
+        SET name = ${name}, email = ${email}, "updatedAt" = NOW()
+        WHERE id = ${params.userId}
+      `;
+    }
 
     const updated = await prisma.$queryRaw`
-      SELECT id, name, email, role, "createdAt", "updatedAt"
+      SELECT id, name, email, role, phone, "createdAt", "updatedAt"
       FROM "User"
       WHERE id = ${params.userId}
     ` as any[];
