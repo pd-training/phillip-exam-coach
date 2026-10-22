@@ -197,7 +197,7 @@ export default function PracticeChapterMode() {
       setShowingFeedback(false);
     } else {
       saveChapterRun();
-      setSelectedChapter(null);
+      router.push(`/exam/${paperId}/practice-chapter`);
     }
   };
 
@@ -291,10 +291,10 @@ export default function PracticeChapterMode() {
       {/* Back to Practice Navigation */}
       <div className="max-w-7xl mx-auto px-6 pt-3 pb-1 w-full">
         <button
-          onClick={() => router.push(`/exam/${paperId}`)}
+          onClick={() => router.push(`/exam/${paperId}/practice-chapter`)}
           className="text-blue-600 hover:text-blue-700 font-medium text-sm transition duration-200"
         >
-          ← Back to Practice
+          ← Back to Chapters
         </button>
       </div>
 
@@ -468,23 +468,6 @@ export default function PracticeChapterMode() {
 
           {/* Buttons */}
           <div style={{ display: "flex", gap: "12px" }}>
-            <button
-              onClick={() => setSelectedChapter(null)}
-              disabled={showingFeedback}
-              style={{
-                flex: 1,
-                padding: "12px",
-                backgroundColor: showingFeedback ? "#d1d5db" : "#e5e7eb",
-                color: "#1f2937",
-                border: "none",
-                borderRadius: "6px",
-                cursor: showingFeedback ? "not-allowed" : "pointer",
-                fontWeight: "600",
-                opacity: showingFeedback ? 0.6 : 1,
-              }}
-            >
-              Back to Chapters
-            </button>
             {!showingFeedback && (
               <button
                 onClick={handleSubmitAnswer}
