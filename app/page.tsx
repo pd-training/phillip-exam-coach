@@ -340,7 +340,6 @@ export default function LandingPage() {
             </p>
             <ul className="space-y-3 text-gray-700 mb-10">
               <li className="flex items-center gap-3"><span className="text-amber-500 font-bold" aria-hidden="true">✓</span> Free practice with all papers</li>
-              <li className="flex items-center gap-3"><span className="text-amber-500 font-bold" aria-hidden="true">✓</span> No credit card required</li>
               <li className="flex items-center gap-3"><span className="text-amber-500 font-bold" aria-hidden="true">✓</span> Full access to explanations</li>
             </ul>
             <div className="pt-6 border-t border-gray-200">
