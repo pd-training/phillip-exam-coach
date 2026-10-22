@@ -97,32 +97,6 @@ export default function ProgressPage() {
     );
   };
 
-  // Question-by-question review of one practice run
-  const [reviewRun, setReviewRun] = useState<QuizSession | null>(null);
-  const [reviewItems, setReviewItems] = useState<any[]>([]);
-  const [reviewLoading, setReviewLoading] = useState(false);
-
-  const openReview = (run: QuizSession) => {
-    setReviewRun(run);
-    setReviewItems([]);
-    setReviewLoading(true);
-    fetch(`/api/student/quick-quiz-sessions/${run.id}`)
-      .then((r) => (r.ok ? r.json() : { items: [] }))
-      .then((data) => setReviewItems(data.items || []))
-      .catch(() => setReviewItems([]))
-      .finally(() => setReviewLoading(false));
-  };
-
-  useEffect(() => {
-    if (!reviewRun) return;
-    const onKey = (e: KeyboardEvent) => e.key === "Escape" && setReviewRun(null);
-    window.addEventListener("keydown", onKey);
-    return () => window.removeEventListener("keydown", onKey);
-  }, [reviewRun]);
-
-  const runLabel = (q: QuizSession) =>
-    q.mode === "chapter" ? `Chapter ${q.chapterNumber}` : q.mode === "full" ? "Full practice" : "Quick quiz";
-
   const sortLabel = (key: SortKey) => (sort.key === key ? (sort.dir === "asc" ? " ↑" : " ↓") : "");
 
   const fmtDate = (iso: string) =>
@@ -293,7 +267,7 @@ export default function ProgressPage() {
                       {visibleQuizzes.map((q) => (
                         <tr
                           key={q.id}
-                          onClick={() => openReview(q)}
+                          onClick={() => router.push(`/exam/practice-runs/${q.id}`)}
                           className="border-b border-gray-100 cursor-pointer hover:bg-blue-50 transition"
                         >
                           <td className="py-3 pr-4 font-medium text-gray-900">{q.paperTitle || "Paper"}</td>
@@ -315,89 +289,6 @@ export default function ProgressPage() {
           </div>
         )}
 
-      {/* Question-by-question review of one practice run */}
-      {reviewRun && (
-        <div
-          className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/50 p-4"
-          onClick={() => setReviewRun(null)}
-        >
-          <div
-            role="dialog"
-            aria-modal="true"
-            aria-labelledby="run-review-title"
-            className="bg-white rounded-xl shadow-xl w-full max-w-3xl max-h-[85vh] flex flex-col"
-            onClick={(e) => e.stopPropagation()}
-          >
-            <div className="flex items-start justify-between gap-4 p-6 border-b border-gray-200">
-              <div>
-                <h2 id="run-review-title" className="text-xl font-bold text-gray-900">
-                  {reviewRun.paperTitle || "Paper"} · {runLabel(reviewRun)}
-                </h2>
-                <p className="text-sm text-gray-600 mt-1">
-                  {fmtDate(reviewRun.createdAt)} · {reviewRun.correctCount} / {reviewRun.totalQuestions} correct
-                </p>
-              </div>
-              <button
-                type="button"
-                onClick={() => setReviewRun(null)}
-                aria-label="Close"
-                className="text-gray-400 hover:text-gray-700 text-2xl leading-none"
-              >
-                ×
-              </button>
-            </div>
-
-            <div className="overflow-y-auto p-6 space-y-6">
-              {reviewLoading && <p className="text-sm text-gray-600">Loading questions...</p>}
-              {!reviewLoading && reviewItems.length === 0 && (
-                <p className="text-sm text-gray-600">No question-by-question record is available for this run.</p>
-              )}
-              {!reviewLoading && reviewItems.map((item) => (
-                <div key={item.position} className="border-b border-gray-100 pb-6 last:border-0">
-                  <div className="flex items-start justify-between gap-4">
-                    <p className="text-sm font-semibold text-gray-900">
-                      {item.position}. {item.questionText}
-                    </p>
-                    <span className={`flex-shrink-0 text-xs font-semibold px-2 py-1 rounded-full ${item.isCorrect ? "bg-green-100 text-green-700" : "bg-red-100 text-red-700"}`}>
-                      {item.isCorrect ? "Correct" : "Wrong"}
-                    </span>
-                  </div>
-                  {item.options && (
-                    <ul className="mt-3 space-y-1.5 text-sm">
-                      {(["A", "B", "C", "D"] as const).map((key) => {
-                        const isCorrectOption = item.correctAnswer === key;
-                        const isYourWrongPick = item.answer === key && !item.isCorrect;
-                        return (
-                          <li
-                            key={key}
-                            className={`px-3 py-2 rounded-lg border ${
-                              isCorrectOption
-                                ? "border-green-300 bg-green-50 text-green-900"
-                                : isYourWrongPick
-                                ? "border-red-300 bg-red-50 text-red-900"
-                                : "border-gray-200 text-gray-700"
-                            }`}
-                          >
-                            <span className="font-semibold mr-2">{key}.</span>
-                            {item.options[key]}
-                            {isCorrectOption && <span className="ml-2 text-xs font-semibold">✓ Correct answer</span>}
-                            {isYourWrongPick && <span className="ml-2 text-xs font-semibold">✗ Your answer</span>}
-                          </li>
-                        );
-                      })}
-                    </ul>
-                  )}
-                  {item.explanation && (
-                    <p className="mt-3 text-sm text-gray-700 bg-gray-50 rounded-lg p-3 leading-relaxed">
-                      <span className="font-semibold">Explanation: </span>{item.explanation}
-                    </p>
-                  )}
-                </div>
-              ))}
-            </div>
-          </div>
-        </div>
-      )}
       </div>
     </div>
   );
