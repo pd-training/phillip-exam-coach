@@ -64,7 +64,7 @@ export default function ProgressPage() {
   // Papers that appear in either tab, for the filter dropdown
   const paperOptions = useMemo(() => {
     const map = new Map<string, string>();
-    attempts.forEach((a) => map.set(a.paperid, a.paperShortName || a.paperTitle));
+    attempts.forEach((a) => map.set(a.paperid, a.paperShortName || a.paperTitle || "Paper"));
     quizSessions.forEach((q) => map.set(q.paperId, q.paperShortName || q.paperTitle || "Paper"));
     return Array.from(map.entries())
       .map(([id, title]) => ({ id, title }))
