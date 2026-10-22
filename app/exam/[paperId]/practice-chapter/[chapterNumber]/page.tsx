@@ -289,7 +289,7 @@ export default function PracticeChapterMode() {
       <StudentNav />
 
       {/* Back to Practice Navigation */}
-      <div className="max-w-7xl mx-auto px-6 py-4 w-full">
+      <div className="max-w-7xl mx-auto px-6 pt-3 pb-1 w-full">
         <button
           onClick={() => router.push(`/exam/${paperId}`)}
           className="text-blue-600 hover:text-blue-700 font-medium text-sm transition duration-200"
@@ -298,13 +298,13 @@ export default function PracticeChapterMode() {
         </button>
       </div>
 
-      <div className="flex-1 flex items-center justify-center px-6 py-6">
-        <div className="bg-white rounded-2xl border border-gray-200 p-6 w-full max-w-4xl">
+      <div className="flex-1 flex items-start justify-center px-6 pb-4 pt-2">
+        <div className="bg-white rounded-2xl border border-gray-200 p-5 w-full max-w-4xl">
           {/* Header */}
-          <div className="mb-5 flex justify-between items-center">
+          <div className="mb-4 flex justify-between items-center">
             <div>
-              <p className="text-xs font-semibold text-blue-600 uppercase tracking-wide mb-2">{paperTitle}</p>
-              <h1 className="text-2xl font-bold text-gray-900">
+              <p className="text-xs font-semibold text-blue-600 uppercase tracking-wide mb-1">{paperTitle}</p>
+              <h1 className="text-xl font-bold text-gray-900">
                 Chapter {selectedChapter}
               </h1>
             </div>
@@ -314,7 +314,7 @@ export default function PracticeChapterMode() {
           </div>
 
           {/* Progress bar */}
-          <div className="w-full h-2 bg-gray-200 rounded-full mb-5 overflow-hidden">
+          <div className="w-full h-2 bg-gray-200 rounded-full mb-4 overflow-hidden">
             <div
               className="h-full bg-blue-600 transition-all duration-300"
               style={{ width: `${(progress / questions.length) * 100}%` }}
@@ -322,14 +322,14 @@ export default function PracticeChapterMode() {
           </div>
 
           {/* Question */}
-          <div className="bg-blue-50 border border-blue-200 rounded-xl p-4 mb-5">
+          <div className="bg-blue-50 border border-blue-200 rounded-xl p-4 mb-4">
             <p className="m-0 font-medium text-base leading-relaxed text-gray-900">
               {currentQuestion.text}
             </p>
           </div>
 
           {/* Answer options */}
-          <div className="space-y-2 mb-5">
+          <div className="space-y-2 mb-4">
             {buildOptions(currentQuestion, orderFor(currentQuestion.id)).map((option) => (
               <label
                 key={option.key}
