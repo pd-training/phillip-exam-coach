@@ -75,7 +75,7 @@ export default function ProgressPage() {
     const rows = attempts.filter((a) => paperFilter === "all" || a.paperid === paperFilter);
     return [...rows].sort((a, b) => {
       const dir = sort.dir === "asc" ? 1 : -1;
-      if (sort.key === "paper") return a.paperTitle.localeCompare(b.paperTitle) * dir;
+      if (sort.key === "paper") return (a.paperShortName || a.paperTitle || "").localeCompare(b.paperShortName || b.paperTitle || "") * dir;
       if (sort.key === "score") return (a.score - b.score) * dir;
       return (new Date(a.submittedat).getTime() - new Date(b.submittedat).getTime()) * dir;
     });
@@ -85,7 +85,7 @@ export default function ProgressPage() {
     const rows = quizSessions.filter((q) => paperFilter === "all" || q.paperId === paperFilter);
     return [...rows].sort((a, b) => {
       const dir = sort.dir === "asc" ? 1 : -1;
-      if (sort.key === "paper") return (a.paperTitle || "").localeCompare(b.paperTitle || "") * dir;
+      if (sort.key === "paper") return (a.paperShortName || a.paperTitle || "").localeCompare(b.paperShortName || b.paperTitle || "") * dir;
       if (sort.key === "score") return (a.percentage - b.percentage) * dir;
       return (new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime()) * dir;
     });
