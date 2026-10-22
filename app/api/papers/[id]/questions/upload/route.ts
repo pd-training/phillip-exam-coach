@@ -228,9 +228,11 @@ export async function POST(
     }
 
     // Update paper's total questions count (with select to avoid description field)
+    // Store the paper's full question count (existing + new in Append mode)
+    const totalNow = await (prisma as any).question.count({ where: { paperId: paperId } });
     await (prisma as any).paper.update({
       where: { id: paperId },
-      data: { totalQuestions: insertedCount },
+      data: { totalQuestions: totalNow },
       select: { id: true }
     });
 
