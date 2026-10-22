@@ -13,6 +13,7 @@ export async function GET(request: NextRequest) {
         p.title,
         p."shortName",
         p."partLabel",
+        p."externalLink",
         p.description,
         p."externalLink",
         p."totalTime"

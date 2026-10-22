@@ -18,7 +18,7 @@ import {
 
 export default function LandingPage() {
   const router = useRouter();
-  const [landingPapers, setLandingPapers] = useState<{ id: string; title: string; shortName?: string | null; partLabel?: string | null; description?: string | null }[]>([]);
+  const [landingPapers, setLandingPapers] = useState<{ id: string; title: string; shortName?: string | null; partLabel?: string | null; description?: string | null; externalLink?: string | null }[]>([]);
 
   const [pickedPaperId, setPickedPaperId] = useState<string | null>(null);
 
@@ -208,6 +208,16 @@ export default function LandingPage() {
                   <p className="text-sm text-gray-600 line-clamp-3 flex-1 mt-3">
                     {paper.description || "No description yet."}
                   </p>
+                  {paper.externalLink && (
+                    <a
+                      href={paper.externalLink}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="mt-3 inline-block self-start text-sm font-medium text-blue-700 hover:text-blue-800 underline-offset-2 hover:underline"
+                    >
+                      Official exam info ↗
+                    </a>
+                  )}
                   <div className="mt-5">
                     <Link
                       href={`/?paper=${paper.id}#signup`}

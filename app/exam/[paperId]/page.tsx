@@ -7,6 +7,7 @@ import { useState, useEffect } from "react";
 import Link from "next/link";
 
 interface PaperInfo {
+  externalLink?: string | null;
   shortName?: string | null;
   partLabel?: string | null;
   id: string;
@@ -250,10 +251,24 @@ export default function PracticePage() {
           <p className="text-sm font-semibold text-blue-700 mt-4">{paper.shortName}</p>
         )}
         <h1 className={`text-3xl font-bold text-gray-900 ${paper.shortName ? "mt-1" : "mt-4"}`}>{paper.title}</h1>
-        {paper.partLabel && (
-          <span className="inline-block mt-3 px-2.5 py-1 rounded bg-blue-50 border border-blue-200 text-blue-800 text-xs font-semibold">
-            {paper.partLabel}
-          </span>
+        {(paper.partLabel || paper.externalLink) && (
+          <div className="flex flex-wrap items-center gap-x-4 gap-y-2 mt-3">
+            {paper.partLabel && (
+              <span className="inline-block px-2.5 py-1 rounded bg-blue-50 border border-blue-200 text-blue-800 text-xs font-semibold">
+                {paper.partLabel}
+              </span>
+            )}
+            {paper.externalLink && (
+              <a
+                href={paper.externalLink}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-sm font-medium text-blue-700 hover:text-blue-800 underline-offset-2 hover:underline"
+              >
+                Official exam info ↗
+              </a>
+            )}
+          </div>
         )}
         {paper.description && (
           <p className="text-gray-600 mt-1">{paper.description}</p>
