@@ -304,7 +304,7 @@ export default function PracticeChapterMode() {
           <div className="mb-4 flex justify-between items-center">
             <div>
               <p className="text-xs font-semibold text-blue-600 uppercase tracking-wide mb-1">{paperTitle}</p>
-              <h1 className="text-xl font-bold text-gray-900">
+              <h1 className="text-2xl font-bold text-gray-900">
                 Chapter {selectedChapter}
               </h1>
             </div>
@@ -322,18 +322,18 @@ export default function PracticeChapterMode() {
           </div>
 
           {/* Question */}
-          <div className="bg-blue-50 border border-blue-200 rounded-xl p-4 mb-4">
-            <p className="m-0 font-medium text-base leading-relaxed text-gray-900">
+          <div className="bg-blue-50 border border-blue-200 rounded-lg px-4 py-3.5 mb-4">
+            <p className="m-0 font-medium text-[15px] leading-relaxed text-gray-900">
               {currentQuestion.text}
             </p>
           </div>
 
           {/* Answer options */}
-          <div className="space-y-2 mb-4">
+          <div className="space-y-1.5 mb-4">
             {buildOptions(currentQuestion, orderFor(currentQuestion.id)).map((option) => (
               <label
                 key={option.key}
-                className={`flex items-center p-3 text-sm rounded-lg border-2 cursor-pointer transition duration-200 ${
+                className={`flex items-center px-2.5 py-2 text-sm rounded-lg border-2 cursor-pointer transition duration-200 ${
                   selectedAnswer === option.key
                     ? "bg-blue-50 border-blue-500"
                     : "bg-white border-gray-200 hover:border-gray-300"
@@ -346,7 +346,7 @@ export default function PracticeChapterMode() {
                   checked={selectedAnswer === option.key}
                   onChange={(e) => setSelectedAnswer(e.target.value)}
                   disabled={showingFeedback}
-                  className="mr-4 w-4 h-4"
+                  className="mr-3 w-4 h-4"
                 />
                 <div className="flex-1">
                   <span className="font-medium text-gray-900 mr-3">{option.label}.</span>
