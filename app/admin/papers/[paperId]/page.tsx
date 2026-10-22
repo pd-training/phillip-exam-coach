@@ -242,14 +242,23 @@ export default function PaperDetailPage() {
 
       if (res.ok) {
         const modeText = uploadMode === "APPEND" ? "appended" : "replaced";
-        setUploadProgress(`${data.count} questions ${modeText} successfully!`);
+        const skipped: { row: number; reason: string }[] = data.skipped || [];
+        const skippedText = skipped.length
+          ? ` ${skipped.length} row(s) skipped: ` +
+            skipped.slice(0, 5).map((k) => `row ${k.row} (${k.reason})`).join("; ") +
+            (skipped.length > 5 ? "; ..." : "")
+          : "";
+        setUploadProgress(`${data.count} questions ${modeText} successfully!${skippedText}`);
         await fetchPaperData();
-        setTimeout(() => {
-          setShowUploadModal(false);
-          setUploadFile(null);
-          setUploadProgress("");
-          setUploadMode("APPEND");
-        }, 2000);
+        // Keep the dialog open when rows were skipped, so the message can be read
+        if (skipped.length === 0) {
+          setTimeout(() => {
+            setShowUploadModal(false);
+            setUploadFile(null);
+            setUploadProgress("");
+            setUploadMode("APPEND");
+          }, 2000);
+        }
       } else {
         setUploadProgress(`Error: ${data.error}`);
       }

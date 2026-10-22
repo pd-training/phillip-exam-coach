@@ -8,6 +8,46 @@ export const dynamic = 'force-dynamic';
 // Ensure UTF-8 encoding for database connection
 const dbUrl = process.env.DATABASE_URL || "postgresql://postgres:MyPassword2026!@phillip-exam-coach-db.c7cmo2c6ecz8.ap-southeast-1.rds.amazonaws.com:5432/phillip_exam_coach?client_encoding=UTF8";
 
+// Minimal CSV reader: commas and line breaks inside quotes are kept, "" is an escaped quote
+function parseCsvRows(input: string): string[][] {
+  const rows: string[][] = [];
+  let row: string[] = [];
+  let field = '';
+  let inQuotes = false;
+  for (let i = 0; i < input.length; i++) {
+    const ch = input[i];
+    if (inQuotes) {
+      if (ch === '"') {
+        if (input[i + 1] === '"') {
+          field += '"';
+          i++;
+        } else {
+          inQuotes = false;
+        }
+      } else {
+        field += ch;
+      }
+    } else if (ch === '"') {
+      inQuotes = true;
+    } else if (ch === ',') {
+      row.push(field.trim());
+      field = '';
+    } else if (ch === '\n') {
+      row.push(field.trim());
+      rows.push(row);
+      row = [];
+      field = '';
+    } else {
+      field += ch;
+    }
+  }
+  if (field !== '' || row.length > 0) {
+    row.push(field.trim());
+    rows.push(row);
+  }
+  return rows;
+}
+
 export async function POST(
   request: NextRequest,
   { params }: { params: { id: string } }
@@ -51,42 +91,19 @@ export async function POST(
     // Normalize line endings to Unix format
     text = text.replace(/\r\n/g, '\n').replace(/\r/g, '\n');
     
-    const lines = text.split('\n');
-    const questions = [];
+    // Read the whole CSV (handles commas, escaped quotes and line breaks inside quoted fields)
+    const rows = parseCsvRows(text);
+    const questions: any[] = [];
+    const skipped: { row: number; reason: string }[] = [];
 
-    // Skip header row
-    for (let i = 1; i < lines.length; i++) {
-      const line = lines[i].trim();
-      if (!line) continue;
+    // Row 1 is the header
+    for (let r = 1; r < rows.length; r++) {
+      const parts = rows[r];
+      const rowNumber = r + 1;
+      if (parts.every((c) => c === '')) continue; // blank line
 
-      // CSV parsing: handle quoted fields with commas inside
-      const parts = [];
-      let current = '';
-      let inQuotes = false;
-
-      for (let j = 0; j < line.length; j++) {
-        const char = line[j];
-        if (char === '"') {
-          // Toggle quote state, but don't add the quote to current
-          inQuotes = !inQuotes;
-        } else if (char === ',' && !inQuotes) {
-          // Unquoted comma = field separator
-          parts.push(current.trim());
-          current = '';
-        } else {
-          current += char;
-        }
-      }
-      // Don't forget the last field
-      parts.push(current.trim());
-
-      // Support two CSV formats:
-      // Format 1 (8 columns): chapter, question, optionA, optionB, optionC, optionD, answer, explanation
-      // Format 2 (4 columns): chapter, question, answer, explanation (generates placeholder options)
-      
       const chapter = parts[0] || '';
       const question = parts[1] || '';
-      
       let optionA: string;
       let optionB: string;
       let optionC: string;
@@ -95,7 +112,7 @@ export async function POST(
       let explanation: string;
 
       if (parts.length >= 8) {
-        // 8-column format with explicit options (quotes already removed during parsing)
+        // 8-column format: chapter, question, optionA, optionB, optionC, optionD, answer, explanation
         optionA = parts[2] || '';
         optionB = parts[3] || '';
         optionC = parts[4] || '';
@@ -103,26 +120,28 @@ export async function POST(
         answer = parts[6] || '';
         explanation = parts[7] || '';
       } else if (parts.length >= 4) {
-        // 4-column format without options — generate placeholders
+        // 4-column format: chapter, question, answer, explanation (placeholder options)
         answer = parts[2] || '';
         explanation = parts[3] || '';
-        
-        // Generate placeholder options based on correct answer
         optionA = answer === 'A' ? '[Correct Answer]' : 'Option A';
         optionB = answer === 'B' ? '[Correct Answer]' : 'Option B';
         optionC = answer === 'C' ? '[Correct Answer]' : 'Option C';
         optionD = answer === 'D' ? '[Correct Answer]' : 'Option D';
       } else {
-        continue; // Not enough columns
-      }
-
-      // Validate required fields
-      if (!chapter || !question || !optionA || !optionB || !optionC || !optionD || !answer) {
+        skipped.push({ row: rowNumber, reason: 'Too few columns' });
         continue;
       }
 
-      // Validate answer is A-D
+      if (!chapter || !question) {
+        skipped.push({ row: rowNumber, reason: 'Missing chapter or question' });
+        continue;
+      }
+      if (!optionA || !optionB || !optionC || !optionD) {
+        skipped.push({ row: rowNumber, reason: 'Missing option' });
+        continue;
+      }
       if (!['A', 'B', 'C', 'D'].includes(answer.toUpperCase())) {
+        skipped.push({ row: rowNumber, reason: `Answer must be A, B, C or D (found "${answer}")` });
         continue;
       }
 
@@ -138,6 +157,8 @@ export async function POST(
         explanation: explanation || '',
       });
     }
+
+    console.log('Parsed questions:', questions.length, 'skipped rows:', skipped.length);
 
     if (questions.length === 0) {
       console.error('No questions parsed from CSV');
@@ -316,6 +337,7 @@ export async function POST(
       count: insertedCount,
       mode: uploadMode,
       deleted: deletedCount,
+      skipped: skipped,
       message: `${insertedCount} questions ${modeMessage}`,
       encoding_note: 'CSV file should be saved as UTF-8 encoding (not UTF-8 with BOM). Special characters like apostrophes and dashes will be preserved correctly.',
     });
