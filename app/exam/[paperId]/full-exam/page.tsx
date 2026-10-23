@@ -280,7 +280,7 @@ export default function FullExamMode() {
                   }
                 </p>
                 {question.text && (
-                  <p style={{ margin: "0 0 12px 0", fontSize: "14px", lineHeight: "1.5", color: "#1f2937" }}>
+                  <p style={{ whiteSpace: "pre-line", margin: "0 0 12px 0", fontSize: "14px", lineHeight: "1.5", color: "#1f2937" }}>
                     {question.text}
                   </p>
                 )}
@@ -319,7 +319,7 @@ export default function FullExamMode() {
                         <p style={{ margin: "0 0 6px 0", fontWeight: "600", color: "#1f2937" }}>
                           📝 Explanation
                         </p>
-                        <p style={{ margin: "0" }}>
+                        <p style={{ whiteSpace: "pre-line", margin: "0" }}>
                           {answerData.explanation}
                         </p>
                       </div>
@@ -442,6 +442,7 @@ export default function FullExamMode() {
             >
             <p
               style={{
+                whiteSpace: "pre-line",
                 margin: "0 0 20px 0",
                 fontSize: "18px",
                 lineHeight: "1.6",

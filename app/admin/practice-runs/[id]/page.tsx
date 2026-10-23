@@ -124,7 +124,7 @@ export default function PracticeRunReviewPage() {
               </span>
             </div>
 
-            <p className="text-base font-semibold text-gray-900 leading-relaxed mb-6">{current.questionText}</p>
+            <p className="whitespace-pre-line text-base font-semibold text-gray-900 leading-relaxed mb-6">{current.questionText}</p>
 
             {current.options && (
               <div className="space-y-3">
@@ -157,7 +157,7 @@ export default function PracticeRunReviewPage() {
                 <h3 className={`font-bold mb-2 ${current.isCorrect ? "text-green-700" : "text-red-700"}`}>
                   {current.isCorrect ? "✓ Correct" : "✗ Incorrect"}
                 </h3>
-                <p className={`text-sm leading-relaxed ${current.isCorrect ? "text-green-800" : "text-red-700"}`}>{current.explanation}</p>
+                <p className={`whitespace-pre-line text-sm leading-relaxed ${current.isCorrect ? "text-green-800" : "text-red-700"}`}>{current.explanation}</p>
               </div>
             )}
 

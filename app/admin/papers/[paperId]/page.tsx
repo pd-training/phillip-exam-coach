@@ -896,7 +896,8 @@ export default function PaperDetailPage() {
             <p className="text-sm text-gray-600 mb-4">
               <strong>CSV Formats Supported:</strong><br/>
               • <strong>8-column:</strong> Chapter, Question, Option A, Option B, Option C, Option D, Answer (A-D), Explanation<br/>
-              • <strong>4-column:</strong> Chapter, Question, Answer (A-D), Explanation
+              • <strong>4-column:</strong> Chapter, Question, Answer (A-D), Explanation<br/>
+              • <strong>Line breaks:</strong> inside a cell (question or explanation), press Alt+Enter in Excel to start a new line. Save as CSV and the line breaks are kept, so calculation steps and case-study points show on separate lines.
             </p>
 
             <div className="mb-4">

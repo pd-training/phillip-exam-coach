@@ -274,7 +274,7 @@ export default function QuickQuizMode() {
               border: "1px solid #e5e7eb",
             }}
           >
-            <p style={{ margin: "0", fontWeight: "500", fontSize: "15px", lineHeight: "1.5" }}>
+            <p style={{ whiteSpace: "pre-line", margin: "0", fontWeight: "500", fontSize: "15px", lineHeight: "1.5" }}>
               {currentQuestion.text}
             </p>
             <p style={{ margin: "6px 0 0 0", fontSize: "11px", color: "#999" }}>
@@ -382,7 +382,7 @@ export default function QuickQuizMode() {
                   <p style={{ margin: "0 0 4px 0", fontSize: "11px", fontWeight: "700", color: "#6b7280", textTransform: "uppercase", letterSpacing: "0.5px" }}>
                     Explanation
                   </p>
-                  <p style={{ margin: "0", fontSize: "13px", lineHeight: "1.5", color: "#374151" }}>
+                  <p style={{ whiteSpace: "pre-line", margin: "0", fontSize: "13px", lineHeight: "1.5", color: "#374151" }}>
                     {feedback.explanation}
                   </p>
                 </div>

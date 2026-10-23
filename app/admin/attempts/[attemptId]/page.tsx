@@ -197,7 +197,7 @@ export default function AttemptDetailsPage() {
               </div>
 
               <div className="bg-gray-50 rounded-lg p-6 mb-8 border border-gray-200">
-                <p className="text-lg text-gray-900 leading-relaxed">{currentQuestion.questionText}</p>
+                <p className="whitespace-pre-line text-lg text-gray-900 leading-relaxed">{currentQuestion.questionText}</p>
               </div>
 
               <div className="space-y-3 mb-8">
@@ -244,7 +244,7 @@ export default function AttemptDetailsPage() {
               {currentQuestion.explanation && (
                 <div className="bg-blue-50 border border-blue-200 rounded-lg p-6">
                   <h3 className="font-bold text-blue-900 mb-2">Explanation</h3>
-                  <p className="text-sm text-blue-800 leading-relaxed">{currentQuestion.explanation}</p>
+                  <p className="whitespace-pre-line text-sm text-blue-800 leading-relaxed">{currentQuestion.explanation}</p>
                 </div>
               )}
             </>

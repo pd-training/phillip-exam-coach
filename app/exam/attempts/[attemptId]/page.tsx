@@ -438,7 +438,7 @@ export default function AttemptReviewPage() {
 
                 {/* Question Text */}
                 <div className="bg-gray-50 rounded-lg p-4 mb-5 border border-gray-200">
-                  <p className="text-base text-gray-900 leading-relaxed">{currentQuestion.questionText}</p>
+                  <p className="whitespace-pre-line text-base text-gray-900 leading-relaxed">{currentQuestion.questionText}</p>
                 </div>
 
                 {/* Answer Options */}
@@ -480,12 +480,12 @@ export default function AttemptReviewPage() {
                   currentQuestion.isCorrect ? (
                     <div className="bg-green-50 border border-green-200 rounded-lg p-4 mb-5">
                       <h3 className="font-bold text-green-700 mb-2">✓ Correct</h3>
-                      <p className="text-sm text-green-800 leading-relaxed">{currentQuestion.explanation}</p>
+                      <p className="whitespace-pre-line text-sm text-green-800 leading-relaxed">{currentQuestion.explanation}</p>
                     </div>
                   ) : (
                     <div className="bg-red-50 border border-red-200 rounded-lg p-4 mb-5">
                       <h3 className="font-bold text-red-700 mb-2">✗ Incorrect</h3>
-                      <p className="text-sm text-red-700 leading-relaxed">{currentQuestion.explanation}</p>
+                      <p className="whitespace-pre-line text-sm text-red-700 leading-relaxed">{currentQuestion.explanation}</p>
                     </div>
                   )
                 )}

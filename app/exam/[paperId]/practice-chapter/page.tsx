@@ -264,7 +264,7 @@ export default function PracticeChapterMode() {
 
           {/* Question */}
           <div className="bg-blue-50 border border-blue-200 rounded-xl p-6 mb-8">
-            <p className="m-0 font-medium text-lg leading-relaxed text-gray-900">
+            <p className="whitespace-pre-line m-0 font-medium text-lg leading-relaxed text-gray-900">
               {currentQuestion.text}
             </p>
           </div>
@@ -374,7 +374,7 @@ export default function PracticeChapterMode() {
                   <p style={{ margin: "0 0 8px 0", fontSize: "12px", fontWeight: "700", color: "#6b7280", textTransform: "uppercase", letterSpacing: "0.5px" }}>
                     Explanation
                   </p>
-                  <p style={{ margin: "0", fontSize: "14px", lineHeight: "1.6", color: "#374151" }}>
+                  <p style={{ whiteSpace: "pre-line", margin: "0", fontSize: "14px", lineHeight: "1.6", color: "#374151" }}>
                     {feedback.explanation}
                   </p>
                 </div>
