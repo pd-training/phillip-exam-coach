@@ -1,5 +1,6 @@
 'use client';
 
+import ChapterPerformanceChart from "@/components/ChapterPerformanceChart";
 import { useEffect, useState } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import { useSession } from 'next-auth/react';
@@ -194,29 +195,25 @@ export default function AttemptReviewPage() {
 
   // Check authentication
   const [previous, setPrevious] = useState<{ score: number; chapters: ChapterPct[] } | null>(null);
-  const [aiFeedback, setAiFeedback] = useState<{
-    overview: string;
-    strengths: string[];
-    revisit: string[];
-    nextSteps: string[];
+  const [chartData, setChartData] = useState<{
+    paperName: string;
+    score: number;
+    passingScore: number;
+    studentsCompared: number;
+    chapters: { chapterNumber: number; title: string | null; correct: number; total: number; pct: number; averagePct: number | null }[];
   } | null>(null);
-  const [aiLoading, setAiLoading] = useState(false);
-  const [aiError, setAiError] = useState<string | null>(null);
+  const [chartError, setChartError] = useState<string | null>(null);
 
-  const loadAiFeedback = async () => {
-    setAiLoading(true);
-    setAiError(null);
-    try {
-      const res = await fetch(`/api/student/attempts/${attemptId}/feedback`);
-      const body = await res.json().catch(() => ({}));
-      if (res.ok) setAiFeedback(body.feedback);
-      else setAiError(body?.details || body?.error || `Error ${res.status}`);
-    } catch (err: any) {
-      setAiError(err?.message || "Something went wrong");
-    } finally {
-      setAiLoading(false);
-    }
-  };
+  useEffect(() => {
+    if (!attemptId) return;
+    fetch(`/api/student/attempts/${attemptId}/feedback`)
+      .then(async (r) => {
+        const body = await r.json().catch(() => ({}));
+        if (r.ok) setChartData(body);
+        else setChartError(body?.details || body?.error || `Error ${r.status}`);
+      })
+      .catch((err) => setChartError(err?.message || "Something went wrong"));
+  }, [attemptId]);
 
   // Load the previous attempt on the same paper for comparison
   useEffect(() => {
@@ -405,53 +402,18 @@ export default function AttemptReviewPage() {
         </div>
       </div>
 
-      {/* Personalised feedback (AI) */}
+      {/* Chapter performance for this simulation */}
       <div className="max-w-7xl mx-auto px-6 pb-6">
-        <div className="bg-white rounded-xl border border-gray-200 px-6 py-4">
-          {!aiFeedback ? (
-            <div className="flex flex-wrap items-center justify-between gap-3">
-              <div>
-                <h3 className="text-sm font-semibold text-gray-900">Personalised feedback</h3>
-                <p className="text-sm text-gray-600 mt-1">Get an AI review of this attempt by chapter.</p>
-                {aiError && <p className="mt-2 text-sm text-red-700">Could not get feedback: {aiError}</p>}
-              </div>
-              <button
-                onClick={loadAiFeedback}
-                disabled={aiLoading}
-                className="px-4 py-2 bg-blue-900 hover:bg-blue-800 disabled:opacity-60 text-white rounded-lg text-sm font-semibold transition"
-              >
-                {aiLoading ? "Writing feedback..." : "Get AI feedback"}
-              </button>
-            </div>
-          ) : (
-            <div className="space-y-3">
-              <h3 className="text-sm font-semibold text-gray-900">Personalised feedback</h3>
-              {aiFeedback.overview && <p className="text-sm text-gray-800 leading-relaxed">{aiFeedback.overview}</p>}
-              {aiFeedback.strengths.length > 0 && (
-                <div>
-                  <p className="text-sm font-semibold text-green-800">Strengths</p>
-                  <ul className="list-disc pl-5 text-sm text-gray-700 space-y-1">
-                    {aiFeedback.strengths.map((x, i) => <li key={i}>{x}</li>)}
-                  </ul>
-                </div>
-              )}
-              {aiFeedback.revisit.length > 0 && (
-                <div>
-                  <p className="text-sm font-semibold text-red-700">Revisit</p>
-                  <ul className="list-disc pl-5 text-sm text-gray-700 space-y-1">
-                    {aiFeedback.revisit.map((x, i) => <li key={i}>{x}</li>)}
-                  </ul>
-                </div>
-              )}
-              {aiFeedback.nextSteps.length > 0 && (
-                <div>
-                  <p className="text-sm font-semibold text-gray-900">Next steps</p>
-                  <ul className="list-disc pl-5 text-sm text-gray-700 space-y-1">
-                    {aiFeedback.nextSteps.map((x, i) => <li key={i}>{x}</li>)}
-                  </ul>
-                </div>
-              )}
-            </div>
+        <div className="bg-white rounded-xl border border-gray-200 px-6 py-5">
+          {chartError && <p className="text-sm text-red-700">Could not load chapter performance: {chartError}</p>}
+          {!chartData && !chartError && <p className="text-sm text-gray-600">Loading chapter performance...</p>}
+          {chartData && chartData.chapters.length > 0 && (
+            <ChapterPerformanceChart
+              paperName={chartData.paperName}
+              passingScore={chartData.passingScore}
+              studentsCompared={chartData.studentsCompared}
+              chapters={chartData.chapters}
+            />
           )}
         </div>
       </div>
