@@ -26,6 +26,7 @@ interface RecommendedChapter {
   percentage: number;
   correct: number;
   total: number;
+  note?: string;
 }
 
 const MODE_CARDS: { title: string; description: string; cta: string; icon: string; href: (paperId: string) => string }[] = [
@@ -357,6 +358,7 @@ export default function PracticePage() {
                     <div className="bg-white rounded-lg p-4 border border-gray-200 hover:border-blue-400 hover:bg-blue-50 transition duration-200 cursor-pointer group flex items-center justify-between">
                       <div>
                         <p className="font-semibold text-gray-900">Chapter {chapter.chapterNumber}: {chapter.chapterTitle}</p>
+                        {chapter.note && <p className="text-sm text-gray-600 mt-1">{chapter.note}</p>}
                       </div>
                       <svg className="w-5 h-5 text-gray-400 group-hover:text-blue-600 transition flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />

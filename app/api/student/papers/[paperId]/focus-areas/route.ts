@@ -1,6 +1,7 @@
 import { getServerSession } from "next-auth/next";
 import { authOptions } from "@/lib/auth-config";
 import prisma from "@/lib/prisma";
+import { generateFocusPicks } from "@/lib/study-advice";
 
 export const dynamic = "force-dynamic";
 
@@ -98,8 +99,42 @@ export async function GET(
         paperId,
       }));
 
+    // Let the AI choose the focus chapters and explain them. Falls back to the rules above.
+    let focusAreas: any[] = weakChapters;
+    let aiUsed = false;
+    try {
+      const picks = await generateFocusPicks(
+        paperTitle,
+        chapterPerformance.map((c) => ({
+          chapterNumber: c.chapterNumber,
+          title: chapterTitles[c.chapterNumber] || null,
+          percentage: c.percentage,
+          correct: c.correct,
+          total: c.total,
+        }))
+      );
+      focusAreas = picks.map((pick) => {
+        const c = chapterPerformance.find((x) => x.chapterNumber === pick.chapterNumber)!;
+        return {
+          id: `${paperId}-${c.chapterNumber}`,
+          chapterNumber: c.chapterNumber,
+          chapterTitle: chapterTitles[c.chapterNumber] || `Chapter ${c.chapterNumber}`,
+          percentage: c.percentage,
+          correct: c.correct,
+          total: c.total,
+          paperTitle,
+          paperId,
+          note: pick.note,
+        };
+      });
+      aiUsed = true;
+    } catch (aiError: any) {
+      console.error("AI focus areas failed:", aiError?.message);
+    }
+
     return Response.json({
-      focusAreas: weakChapters,
+      focusAreas,
+      aiUsed,
       hasAttempt: true,
       totalAttempts: runsCounted,
       allChaptersCount: chapterPerformance.length,

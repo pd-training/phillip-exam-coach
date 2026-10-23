@@ -152,3 +152,57 @@ export async function generateAttemptFeedback(a: AttemptForFeedback): Promise<At
     nextSteps: list(p.nextSteps, 3),
   };
 }
+
+export interface FocusInput {
+  chapterNumber: number;
+  title: string | null;
+  percentage: number;
+  correct: number;
+  total: number;
+}
+
+export interface FocusPick {
+  chapterNumber: number;
+  note: string;
+}
+
+const FOCUS_SYSTEM_PROMPT = `You are a study coach for students preparing for Singapore CMFAS exams.
+You receive a student's full practice results for one paper, by chapter.
+Pick the up to 3 chapters the student should focus on next to improve their exam result, using the numbers given.
+For each, write one short sentence (under 25 words) saying why, and what to do.
+Only use chapter numbers from the data. Do not invent numbers.
+Reply with JSON only, no other text, in this shape:
+{"focus":[{"chapterNumber":1,"note":"one short sentence"}]}`;
+
+// AI picks the focus chapters for one paper. Only chapter numbers from the input are accepted.
+export async function generateFocusPicks(
+  paperName: string,
+  chapters: FocusInput[]
+): Promise<FocusPick[]> {
+  if (chapters.length === 0) return [];
+  const lines = [
+    `Paper: ${paperName}`,
+    "Chapter results from full practice:",
+    ...chapters.map(
+      (c) =>
+        `- Chapter ${c.chapterNumber}${c.title ? ` (${c.title})` : ""}: ${c.percentage}% correct from ${c.total} answers`
+    ),
+  ];
+  const text = await invokeBedrockText({
+    system: FOCUS_SYSTEM_PROMPT,
+    user: lines.join("\n"),
+    maxTokens: 500,
+  });
+  const allowed = new Set(chapters.map((c) => c.chapterNumber));
+  const items = Array.isArray(parseJsonObject(text).focus) ? parseJsonObject(text).focus : [];
+  const picks: FocusPick[] = [];
+  for (const item of items) {
+    const n = Number(item?.chapterNumber);
+    if (!allowed.has(n) || picks.some((p) => p.chapterNumber === n)) continue;
+    if (typeof item?.note !== "string") continue;
+    picks.push({ chapterNumber: n, note: item.note.slice(0, 200) });
+    if (picks.length === 3) break;
+  }
+  if (picks.length === 0) throw new Error("No valid focus chapters in model reply");
+  return picks;
+}
