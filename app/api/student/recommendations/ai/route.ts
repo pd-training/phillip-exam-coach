@@ -1,55 +1,38 @@
-import { NextRequest } from "next/server";
 import { getServerSession } from "next-auth/next";
 import { authOptions } from "@/lib/auth-config";
 import { generateStudyAdvice } from "@/lib/study-advice";
-import type { Recommendations } from "@/lib/progress-recommendations";
+import { computeRecommendations } from "@/lib/student-recommendations";
 
 export const dynamic = "force-dynamic";
 
 // AI study advice for the signed-in student. Uses the rules-based
 // recommendations as input, and falls back to them if the AI call fails.
-export async function GET(req: NextRequest) {
-  const session = await getServerSession(authOptions);
-  if (!session?.user) {
-    return Response.json({ error: "Unauthorized" }, { status: 401 });
-  }
-
-  // Reuse the rules engine by calling it with the student's own cookies
-  let rulesRes: Response;
+export async function GET() {
   try {
-    rulesRes = await fetch(`${req.nextUrl.origin}/api/student/recommendations`, {
-      headers: { cookie: req.headers.get("cookie") || "" },
-      cache: "no-store",
-    });
+    const session = await getServerSession(authOptions);
+    if (!session?.user) {
+      return Response.json({ error: "Unauthorized" }, { status: 401 });
+    }
+    const userId = (session.user as any).id;
+    const recommendations = await computeRecommendations(userId);
+
+    try {
+      const advice = await generateStudyAdvice(recommendations);
+      return Response.json({ advice, recommendations, aiUsed: true });
+    } catch (error: any) {
+      console.error("AI study advice failed:", error?.message);
+      return Response.json({
+        advice: [],
+        recommendations,
+        aiUsed: false,
+        details: error?.message,
+      });
+    }
   } catch (error: any) {
-    console.error("Could not reach recommendations:", error?.message);
+    console.error("Study advice failed:", error?.message);
     return Response.json(
       { error: "Could not load practice results", details: error?.message },
       { status: 500 }
     );
-  }
-  if (!rulesRes.ok) {
-    const body = await rulesRes.json().catch(() => ({}));
-    return Response.json(
-      {
-        error: "Could not load practice results",
-        details: body?.details || body?.error || `status ${rulesRes.status}`,
-      },
-      { status: 500 }
-    );
-  }
-  const recommendations: Recommendations = await rulesRes.json();
-
-  try {
-    const advice = await generateStudyAdvice(recommendations);
-    return Response.json({ advice, recommendations, aiUsed: true });
-  } catch (error: any) {
-    console.error("AI study advice failed:", error?.message);
-    return Response.json({
-      advice: [],
-      recommendations,
-      aiUsed: false,
-      details: error?.message,
-    });
   }
 }
