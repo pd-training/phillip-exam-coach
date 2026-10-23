@@ -437,35 +437,6 @@ export default function LandingPage() {
         </div>
       </section>
 
-      {/* How It Works */}
-      <section id="how-it-works" className="py-20 px-6 bg-white">
-        <div className="max-w-7xl mx-auto">
-          <h2 className="text-4xl font-bold text-gray-900 mb-12 text-center">How It Works</h2>
-
-          <div className="grid md:grid-cols-4 gap-8">
-            {[
-              { step: 1, title: 'Sign Up', desc: 'Create your free account in seconds' },
-              { step: 2, title: 'Choose Papers', desc: 'Select which CMFAS papers to practice' },
-              { step: 3, title: 'Take Mock Exams', desc: 'Complete full-length or chapter practice' },
-              { step: 4, title: 'Improve', desc: 'Review answers and track your progress' },
-            ].map((item, idx) => (
-              <div key={idx} className="relative">
-                <div className="flex flex-col items-center text-center">
-                  <div className="w-16 h-16 bg-gradient-to-br from-blue-900 to-blue-800 text-amber-400 rounded-full flex items-center justify-center mb-4 font-bold text-2xl hover:shadow-lg hover:scale-110 transition-all">
-                    {item.step}
-                  </div>
-                  <h3 className="font-bold text-lg text-gray-900 mb-2">{item.title}</h3>
-                  <p className="text-gray-600 text-sm">{item.desc}</p>
-                </div>
-                {idx < 3 && (
-                  <div className="hidden md:block absolute top-8 -right-4 text-amber-400 text-2xl">→</div>
-                )}
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
-
       {/* Stats Section */}
       <section id="stats" className="py-16 px-6 bg-gradient-to-r from-blue-900 via-blue-800 to-slate-900 text-white">
         <div className="max-w-7xl mx-auto">
