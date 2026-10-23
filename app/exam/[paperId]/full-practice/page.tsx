@@ -233,8 +233,8 @@ export default function QuickQuizMode() {
       <style>{styles}</style>
       <StudentNav />
 
-      <div className="flex-1 flex items-center justify-center px-6 py-6">
-        <div className="bg-white rounded-2xl border border-gray-200 p-6 w-full max-w-4xl">
+      <div className="flex-1 flex justify-center px-6 py-6">
+        <div className="w-full max-w-4xl">
           {/* Back to Practice Link */}
           <button
             onClick={() => router.replace(`/exam/${paperId}`)}
@@ -265,15 +265,7 @@ export default function QuickQuizMode() {
           </div>
 
           {/* Question */}
-          <div
-            style={{
-              padding: "14px 16px",
-              backgroundColor: "#f9fafb",
-              borderRadius: "8px",
-              marginBottom: "14px",
-              border: "1px solid #e5e7eb",
-            }}
-          >
+          <div style={{ marginBottom: "14px" }}>
             <p style={{ whiteSpace: "pre-line", margin: "0", fontWeight: "500", fontSize: "15px", lineHeight: "1.5" }}>
               {currentQuestion.text}
             </p>
