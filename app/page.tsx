@@ -242,7 +242,6 @@ export default function LandingPage() {
               <div key={p.code} className="rounded-xl border border-gray-200 bg-slate-50 p-5">
                 <p className="text-xs font-semibold text-blue-800 uppercase tracking-wide">{p.code}</p>
                 <p className="font-semibold text-gray-900 mt-1">{p.name}</p>
-                <p className="text-sm text-gray-600 mt-1">{p.note}</p>
               </div>
             ))}
           </div>
