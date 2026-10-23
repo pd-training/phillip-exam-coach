@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getServerSession } from 'next-auth/next';
 import { authOptions } from '@/lib/auth-config';
+import { logChange, diffFields } from '@/lib/change-log';
 import prisma from '@/lib/prisma';
 
 export const dynamic = 'force-dynamic';
@@ -94,6 +95,21 @@ export async function PATCH(
       }
     }
 
+    const questionChanges = diffFields(existingQuestion, updateData, [
+      'questionText', 'correctAnswer', 'chapterNumber', 'explanation', 'optionA', 'optionB', 'optionC', 'optionD',
+    ]);
+    if (questionChanges.length > 0) {
+      await logChange({
+        paperId: id,
+        entityType: 'Question',
+        action: 'Edited question',
+        summary: `Edited question in Chapter ${updateData.chapterNumber}: "${String(existingQuestion.questionText).slice(0, 60)}"`,
+        details: questionChanges,
+        actorId: (session.user as any).id,
+        actorEmail: session.user.email,
+      });
+    }
+
     // Fetch updated question (with graceful fallback)
     let question;
     try {
@@ -173,6 +189,15 @@ export async function DELETE(
     if (question.paperId !== id) {
       return NextResponse.json({ error: 'Question does not belong to this paper' }, { status: 403 });
     }
+
+    await logChange({
+      paperId: id,
+      entityType: 'Question',
+      action: 'Deleted question',
+      summary: `Deleted question in Chapter ${question.chapterNumber}: "${String(question.questionText).slice(0, 60)}"`,
+      actorId: (session.user as any).id,
+      actorEmail: session.user.email,
+    });
 
     // Delete the question
     await (prisma as any).question.delete({

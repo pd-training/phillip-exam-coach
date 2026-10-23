@@ -33,7 +33,7 @@ interface ExamPart {
   chapterWeights?: Record<string, number> | null;
 }
 
-type TabType = "settings" | "questions" | "chapters" | "access";
+type TabType = "settings" | "questions" | "chapters" | "access" | "history";
 
 export default function PaperDetailPage() {
   const { showToast, ToastView } = useToast();
@@ -43,6 +43,18 @@ export default function PaperDetailPage() {
 
   const paperId = params.paperId as string;
   const [activeTab, setActiveTab] = useState<TabType>("settings");
+  const [changes, setChanges] = useState<any[]>([]);
+  const [changesLoading, setChangesLoading] = useState(false);
+
+  useEffect(() => {
+    if (activeTab !== "history") return;
+    setChangesLoading(true);
+    fetch(`/api/papers/${paperId}/change-log`)
+      .then((r) => (r.ok ? r.json() : { changes: [] }))
+      .then((data) => setChanges(data.changes || []))
+      .catch((err) => console.error("Change history error:", err))
+      .finally(() => setChangesLoading(false));
+  }, [activeTab, paperId]);
   const [loading, setLoading] = useState(true);
   const [submitting, setSubmitting] = useState(false);
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
@@ -529,7 +541,7 @@ export default function PaperDetailPage() {
         <div className="border-t border-gray-200 bg-gray-50">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div className="flex gap-8">
-              {(["settings", "questions", "chapters", "access"] as TabType[]).map((tab) => (
+              {(["settings", "questions", "chapters", "access", "history"] as TabType[]).map((tab) => (
                 <button
                   key={tab}
                   onClick={() => setActiveTab(tab)}
@@ -543,6 +555,7 @@ export default function PaperDetailPage() {
                   {tab === "questions" && "Questions"}
                   {tab === "chapters" && "Chapters"}
                   {tab === "access" && "Access"}
+                  {tab === "history" && "History"}
                 </button>
               ))}
             </div>
@@ -791,6 +804,54 @@ export default function PaperDetailPage() {
 
         {/* Access Tab */}
         {activeTab === "access" && <PaperAccess paperId={paperId} />}
+
+        {/* History Tab: who changed questions and settings, and when */}
+        {activeTab === "history" && (
+          <div className="bg-white rounded-lg border border-gray-200 overflow-hidden">
+            <div className="px-6 py-4 border-b border-gray-200">
+              <h2 className="text-lg font-bold text-gray-900">Change history</h2>
+              <p className="text-sm text-gray-600">Edits to questions and paper settings, newest first.</p>
+            </div>
+            {changesLoading ? (
+              <p className="px-6 py-6 text-sm text-gray-600">Loading...</p>
+            ) : changes.length === 0 ? (
+              <p className="px-6 py-6 text-sm text-gray-600">No changes recorded yet.</p>
+            ) : (
+              <ul className="divide-y divide-gray-200">
+                {changes.map((c) => {
+                  const fields: { field: string; from: string; to: string }[] = (() => {
+                    try {
+                      const d = typeof c.details === "string" ? JSON.parse(c.details) : c.details;
+                      return Array.isArray(d) ? d : [];
+                    } catch {
+                      return [];
+                    }
+                  })();
+                  return (
+                    <li key={c.id} className="px-6 py-4">
+                      <div className="flex flex-wrap items-baseline justify-between gap-2">
+                        <p className="font-medium text-gray-900 text-sm">{c.summary}</p>
+                        <p className="text-xs text-gray-500">
+                          {new Date(c.createdAt).toLocaleString("en-SG")} · {c.actorEmail || "Unknown"}
+                        </p>
+                      </div>
+                      {fields.length > 0 && (
+                        <ul className="mt-2 space-y-1 text-xs text-gray-700">
+                          {fields.map((f) => (
+                            <li key={f.field}>
+                              <span className="font-semibold">{f.field}:</span>{" "}
+                              <span className="line-through text-gray-500">{f.from || "(empty)"}</span> → {f.to || "(empty)"}
+                            </li>
+                          ))}
+                        </ul>
+                      )}
+                    </li>
+                  );
+                })}
+              </ul>
+            )}
+          </div>
+        )}
 
         {/* Chapters Tab */}
         {activeTab === "chapters" && (

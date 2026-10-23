@@ -3,6 +3,7 @@ import { authOptions } from "@/lib/auth-config";
 import { NextRequest, NextResponse } from "next/server";
 import prisma from "@/lib/prisma";
 import { getPaperLabels, setPaperLabels, cleanLabel } from "@/lib/paper-labels";
+import { logChange } from "@/lib/change-log";
 
 export const dynamic = 'force-dynamic';
 
@@ -125,6 +126,15 @@ export async function PATCH(
 
     console.log('Paper updated successfully:', result.paper.id);
 
+    await logChange({
+      paperId,
+      entityType: "Paper",
+      action: "Updated paper settings",
+      summary: `Changed ${Object.keys(body).join(", ") || "settings"}`,
+      actorId: (session.user as any).id,
+      actorEmail: session.user.email,
+    });
+
     return NextResponse.json({
       paper: result.paper,
       message: "Paper details updated successfully"
@@ -171,6 +181,15 @@ export async function PUT(
     }
 
     console.log('Paper updated successfully:', result.paper.id);
+
+    await logChange({
+      paperId,
+      entityType: "Paper",
+      action: "Updated paper settings",
+      summary: `Changed ${Object.keys(body).join(", ") || "settings"}`,
+      actorId: (session.user as any).id,
+      actorEmail: session.user.email,
+    });
 
     return NextResponse.json({
       paper: result.paper,

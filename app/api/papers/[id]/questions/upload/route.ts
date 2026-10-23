@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import prisma from '@/lib/prisma';
 import { getServerSession } from 'next-auth/next';
 import { authOptions } from '@/lib/auth-config';
+import { logChange } from '@/lib/change-log';
 
 export const dynamic = 'force-dynamic';
 
@@ -325,6 +326,17 @@ export async function POST(
         { status: 500 }
       );
     }
+
+    await logChange({
+      paperId: paperId,
+      entityType: 'Question',
+      action: uploadMode === 'APPEND' ? 'Uploaded questions (append)' : 'Uploaded questions (replace all)',
+      summary: uploadMode === 'APPEND'
+        ? `Added ${insertedCount} questions from CSV`
+        : `Replaced all questions: deleted ${deletedCount}, added ${insertedCount} from CSV`,
+      actorId: (session.user as any).id,
+      actorEmail: session.user.email,
+    });
 
     console.log('✅ Upload succeeded - inserted:', insertedCount, 'questions (mode:', uploadMode + ')');
     
