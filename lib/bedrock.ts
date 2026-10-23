@@ -9,11 +9,12 @@ export async function invokeBedrockText(opts: {
   maxTokens?: number;
   timeoutMs?: number;
 }): Promise<string> {
-  const token = process.env.AWS_BEARER_TOKEN_BEDROCK;
+  // BEDROCK_API_KEY is used on Amplify (AWS_ names are reserved there)
+  const token = process.env.BEDROCK_API_KEY || process.env.AWS_BEARER_TOKEN_BEDROCK;
   const region = process.env.BEDROCK_REGION || "ap-southeast-2";
   const modelId = process.env.BEDROCK_MODEL_ID || "amazon.nova-lite-v1:0";
 
-  if (!token) throw new BedrockError("AWS_BEARER_TOKEN_BEDROCK is not set");
+  if (!token) throw new BedrockError("BEDROCK_API_KEY is not set");
 
   const url = `https://bedrock-runtime.${region}.amazonaws.com/model/${encodeURIComponent(
     modelId
