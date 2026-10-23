@@ -308,17 +308,7 @@ export default function PracticeChapterMode() {
                 Chapter {selectedChapter}
               </h1>
             </div>
-            <div className="text-sm font-medium text-gray-600">
-              Question <span className="text-blue-600 font-bold">{progress}</span> of <span className="text-gray-900 font-bold">{questions.length}</span>
-            </div>
-          </div>
 
-          {/* Progress bar */}
-          <div className="w-full h-2 bg-gray-200 rounded-full mb-4 overflow-hidden">
-            <div
-              className="h-full bg-blue-600 transition-all duration-300"
-              style={{ width: `${(progress / questions.length) * 100}%` }}
-            />
           </div>
 
           {/* Question */}
