@@ -219,6 +219,38 @@ export default function LandingPage() {
         </section>
       )}
 
+      {/* Papers financial advisors typically need */}
+      <section className="py-16 px-6 bg-white">
+        <div className="max-w-6xl mx-auto">
+          <div className="text-center mb-10">
+            <h2 className="text-3xl font-bold text-gray-900 mb-3">Papers financial advisors typically need</h2>
+            <p className="text-lg text-gray-600">Which papers you need depends on the products you advise on. Check with SCI or IBF to confirm.</p>
+          </div>
+          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
+            {[
+              { code: "RES 5", name: "Rules, Ethics and Skills for Financial Advisory Services", note: "Rules and ethics for advisers" },
+              { code: "M8", name: "Collective Investment Schemes", note: "Unit trusts and funds" },
+              { code: "M9", name: "Life Insurance and Investment-Linked Policies", note: "Life insurance and ILP basics" },
+              { code: "M9A", name: "Life Insurance and Investment-Linked Policies II", note: "Continuation of M9" },
+              { code: "CM-SIP (M6A)", name: "Structured Investment Products", note: "Structured products" },
+              { code: "CM-EIP (M6)", name: "Excluded Investment Products", note: "Excluded investment products" },
+              { code: "HI", name: "Health Insurance", note: "Health insurance products" },
+            ].map((p) => (
+              <div key={p.code} className="rounded-xl border border-gray-200 bg-slate-50 p-5">
+                <p className="text-xs font-semibold text-blue-800 uppercase tracking-wide">{p.code}</p>
+                <p className="font-semibold text-gray-900 mt-1">{p.name}</p>
+                <p className="text-sm text-gray-600 mt-1">{p.note}</p>
+              </div>
+            ))}
+          </div>
+          <div className="text-center mt-10">
+            <a href="#papers" className="inline-block px-8 py-3 bg-blue-900 hover:bg-blue-800 text-white rounded-lg font-semibold transition">
+              See the papers available
+            </a>
+          </div>
+        </div>
+      </section>
+
       {/* Features Section */}
       <section id="features" className="py-20 px-6 bg-slate-50">
         <div className="max-w-7xl mx-auto">
