@@ -156,6 +156,24 @@ export default function StudentDashboard() {
   const [loading, setLoading] = useState(true);
   const [showSteps, setShowSteps] = useState(false);
   const [stepIndex, setStepIndex] = useState(0);
+  const [adviceLoading, setAdviceLoading] = useState(false);
+  const [adviceResult, setAdviceResult] = useState<{
+    advice: { title: string; action: string }[];
+    recommendations: { priority: any[]; review: any[]; totalAnswered: number };
+    aiUsed: boolean;
+  } | null>(null);
+
+  const loadAdvice = async () => {
+    setAdviceLoading(true);
+    try {
+      const res = await fetch("/api/student/recommendations/ai");
+      if (res.ok) setAdviceResult(await res.json());
+    } catch (err) {
+      console.error("Study advice error:", err);
+    } finally {
+      setAdviceLoading(false);
+    }
+  };
 
   // Send admins to their dashboard and signed-out users to login
   useEffect(() => {
@@ -215,6 +233,71 @@ export default function StudentDashboard() {
             {greeting()}, {session?.user?.name || "there"}!
           </h1>
           <p className="text-gray-600 mt-1">Learn how the portal works, then start learning.</p>
+        </div>
+
+        {/* AI study advice based on practice results */}
+        <div className="mb-10 bg-white rounded-2xl border border-gray-200 p-6">
+          <div className="flex flex-wrap items-start justify-between gap-4">
+            <div>
+              <h2 className="text-lg font-bold text-gray-900">Your study advice</h2>
+              <p className="text-sm text-gray-600 mt-1">
+                Get suggestions on what to practise next, based on your practice results.
+              </p>
+            </div>
+            <button
+              onClick={loadAdvice}
+              disabled={adviceLoading}
+              className="px-5 py-2.5 bg-blue-900 hover:bg-blue-800 disabled:opacity-60 text-white rounded-lg text-sm font-semibold transition"
+            >
+              {adviceLoading ? "Getting advice..." : adviceResult ? "Refresh advice" : "Get study advice"}
+            </button>
+          </div>
+
+          {adviceResult && (
+            <div className="mt-5">
+              {adviceResult.recommendations.totalAnswered === 0 ? (
+                <p className="text-sm text-gray-600">
+                  Answer some practice questions first, then come back for advice.
+                </p>
+              ) : (
+                <>
+                  {!adviceResult.aiUsed && (
+                    <p className="text-sm text-amber-700 mb-3">
+                      Advice is unavailable right now. Here is what your results show.
+                    </p>
+                  )}
+                  {adviceResult.aiUsed && adviceResult.advice.length > 0 && (
+                    <ol className="grid gap-3 md:grid-cols-2">
+                      {adviceResult.advice.map((item, i) => (
+                        <li key={i} className="rounded-xl border border-gray-200 bg-gray-50 p-4">
+                          <p className="font-semibold text-gray-900">{item.title}</p>
+                          <p className="text-sm text-gray-700 mt-1">{item.action}</p>
+                        </li>
+                      ))}
+                    </ol>
+                  )}
+                  {(!adviceResult.aiUsed || adviceResult.advice.length === 0) && (
+                    <ul className="text-sm text-gray-700 list-disc pl-5 space-y-1">
+                      {adviceResult.recommendations.priority.map((s: any) => (
+                        <li key={`p-${s.paperId}-${s.chapterNumber}`}>
+                          Practise {s.paperTitle}, Chapter {s.chapterNumber} ({s.accuracy}% correct)
+                        </li>
+                      ))}
+                      {adviceResult.recommendations.review.map((s: any) => (
+                        <li key={`r-${s.paperId}-${s.chapterNumber}`}>
+                          Review {s.paperTitle}, Chapter {s.chapterNumber} ({s.accuracy}% correct)
+                        </li>
+                      ))}
+                      {adviceResult.recommendations.priority.length === 0 &&
+                        adviceResult.recommendations.review.length === 0 && (
+                          <li>No weak chapters yet. Keep practising across all chapters.</li>
+                        )}
+                    </ul>
+                  )}
+                </>
+              )}
+            </div>
+          )}
         </div>
 
         {/* Two ribbons: how to use the portal, and unlocking more papers */}
