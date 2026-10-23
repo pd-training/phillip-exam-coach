@@ -7,7 +7,7 @@ import { logChange } from '@/lib/change-log';
 export const dynamic = 'force-dynamic';
 
 // Ensure UTF-8 encoding for database connection
-const dbUrl = process.env.DATABASE_URL || "postgresql://postgres:MyPassword2026!@phillip-exam-coach-db.c7cmo2c6ecz8.ap-southeast-1.rds.amazonaws.com:5432/phillip_exam_coach?client_encoding=UTF8";
+const dbUrl = process.env.DATABASE_URL ?? "";
 
 // Minimal CSV reader: commas and line breaks inside quotes are kept, "" is an escaped quote
 function parseCsvRows(input: string): string[][] {

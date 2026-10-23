@@ -4,7 +4,7 @@ export const revalidate = 0;
 export async function GET() {
   try {
     // Use env var if available, otherwise fallback to hardcoded connection string
-    const dbUrl = process.env.DATABASE_URL || "postgresql://postgres:MyPassword2026!@phillip-exam-coach-db.c7cmo2c6ecz8.ap-southeast-1.rds.amazonaws.com:5432/phillip_exam_coach";
+    const dbUrl = process.env.DATABASE_URL ?? "";
     
     if (!dbUrl) {
       return Response.json({ 

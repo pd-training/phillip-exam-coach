@@ -1,6 +1,6 @@
 export const dynamic = "force-dynamic";
 
-const dbUrl = process.env.DATABASE_URL || "postgresql://postgres:MyPassword2026!@phillip-exam-coach-db.c7cmo2c6ecz8.ap-southeast-1.rds.amazonaws.com:5432/phillip_exam_coach";
+const dbUrl = process.env.DATABASE_URL ?? "";
 
 /**
  * TEMPORARY ENDPOINT - DELETE AFTER USE
