@@ -100,6 +100,26 @@ const STUDY_STEPS: { title: string; body: string; illustration: React.ReactNode 
     ),
   },
   {
+    title: "Check how prepared you are",
+    body: "Open How prepared are you for the exam? on your dashboard. It shows a readiness level for each paper, with actions to close the gap.",
+    illustration: (
+      <svg viewBox="0 0 320 150" className={STEP_SVG} role="img" aria-label="Readiness levels for three papers">
+        {[
+          { y: 22, label: "Ready", fill: "#dcfce7", stroke: "#16a34a", text: "#166534", w: 120 },
+          { y: 62, label: "Getting there", fill: "#fef3c7", stroke: "#d97706", text: "#92400e", w: 150 },
+          { y: 102, label: "Not yet ready", fill: "#fee2e2", stroke: "#dc2626", text: "#991b1b", w: 130 },
+        ].map((r) => (
+          <g key={r.label}>
+            <rect x="24" y={r.y} width="272" height="30" rx="8" fill="#ffffff" stroke="#e2e8f0" />
+            <rect x="34" y={r.y + 7} width="90" height="16" rx="4" fill="#cbd5e1" />
+            <rect x={300 - r.w} y={r.y + 5} width={r.w - 14} height="20" rx="10" fill={r.fill} stroke={r.stroke} strokeWidth="1.5" />
+            <text x={300 - r.w + (r.w - 14) / 2} y={r.y + 19} fontSize="11" fontWeight="600" textAnchor="middle" fill={r.text}>{r.label}</text>
+          </g>
+        ))}
+      </svg>
+    ),
+  },
+  {
     title: "Do Quick Quizzes often",
     body: "Take a Quick Quiz whenever you are free, and again just before the exam.",
     illustration: (
