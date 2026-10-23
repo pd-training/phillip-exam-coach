@@ -267,6 +267,83 @@ export default function LandingPage() {
         </div>
       </section>
 
+      {/* See inside the portal: previews with example data */}
+      <section className="py-20 px-6 bg-white">
+        <div className="max-w-6xl mx-auto">
+          <div className="text-center mb-12">
+            <h2 className="text-4xl font-bold text-gray-900 mb-4">See inside the portal</h2>
+            <p className="text-xl text-gray-600">Know where you stand before exam day</p>
+            <p className="text-xs text-gray-500 mt-2">Previews use example data.</p>
+          </div>
+
+          <div className="grid md:grid-cols-3 gap-6">
+            {/* Preview 1: exam readiness */}
+            <div className="rounded-2xl border border-gray-200 bg-slate-50 p-6 flex flex-col gap-4">
+              <div>
+                <p className="text-sm font-semibold text-gray-900">How prepared am I?</p>
+                <p className="text-xs text-gray-500">Readiness for each paper</p>
+              </div>
+              {[
+                { paper: "Example paper A", level: "Getting there", tone: "bg-amber-100 text-amber-800", detail: "Latest exam simulation: 58% (pass mark 50%)." },
+                { paper: "Example paper B", level: "Not yet ready", tone: "bg-red-100 text-red-700", detail: "Latest exam simulation: 41% (pass mark 50%)." },
+              ].map((r) => (
+                <div key={r.paper} className="rounded-xl bg-white border border-gray-200 p-4">
+                  <div className="flex items-center justify-between gap-2">
+                    <p className="font-semibold text-gray-900 text-sm">{r.paper}</p>
+                    <span className={`text-xs font-semibold px-2.5 py-1 rounded-full ${r.tone}`}>{r.level}</span>
+                  </div>
+                  <p className="text-xs text-gray-600 mt-1">{r.detail}</p>
+                </div>
+              ))}
+            </div>
+
+            {/* Preview 2: focus areas */}
+            <div className="rounded-2xl border border-gray-200 bg-slate-50 p-6 flex flex-col gap-4">
+              <div>
+                <p className="text-sm font-semibold text-gray-900">Where to focus next</p>
+                <p className="text-xs text-gray-500">Chosen from your practice results</p>
+              </div>
+              {[
+                { ch: "Chapter 4: Example topic", note: "Only 38% correct. Work through the explanations, then retry 20 questions." },
+                { ch: "Chapter 1: Example topic", note: "Good start, but mixed. Review the definitions before the next full run." },
+              ].map((f) => (
+                <div key={f.ch} className="rounded-xl bg-white border border-gray-200 p-4">
+                  <p className="font-semibold text-gray-900 text-sm">{f.ch}</p>
+                  <p className="text-xs text-gray-600 mt-1">{f.note}</p>
+                </div>
+              ))}
+            </div>
+
+            {/* Preview 3: exam review feedback */}
+            <div className="rounded-2xl border border-gray-200 bg-slate-50 p-6 flex flex-col gap-4">
+              <div>
+                <p className="text-sm font-semibold text-gray-900">After each exam simulation</p>
+                <p className="text-xs text-gray-500">Personalised feedback on your attempt</p>
+              </div>
+              <div className="rounded-xl bg-white border border-gray-200 p-4 space-y-3">
+                <p className="text-xs text-gray-700 leading-relaxed">
+                  You passed with 62%. Your chapter results were strong in the first half and weaker on the calculation topics.
+                </p>
+                <div>
+                  <p className="text-xs font-semibold text-green-800">Strengths</p>
+                  <p className="text-xs text-gray-600">Chapter 2 and Chapter 5 at 80% or higher.</p>
+                </div>
+                <div>
+                  <p className="text-xs font-semibold text-red-700">Revisit</p>
+                  <p className="text-xs text-gray-600">Chapter 6, where 4 of 10 answers were correct.</p>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div className="text-center mt-10">
+            <a href="#signup" className="inline-block px-8 py-3 bg-blue-900 hover:bg-blue-800 text-white rounded-lg font-semibold transition">
+              Create an account
+            </a>
+          </div>
+        </div>
+      </section>
+
       {/* How It Works */}
       <section id="how-it-works" className="py-20 px-6 bg-white">
         <div className="max-w-7xl mx-auto">
