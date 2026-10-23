@@ -157,6 +157,7 @@ export default function StudentDashboard() {
   const [showSteps, setShowSteps] = useState(false);
   const [stepIndex, setStepIndex] = useState(0);
   const [adviceLoading, setAdviceLoading] = useState(false);
+  const [adviceError, setAdviceError] = useState<string | null>(null);
   const [adviceResult, setAdviceResult] = useState<{
     advice: { title: string; action: string }[];
     recommendations: { priority: any[]; review: any[]; totalAnswered: number };
@@ -165,9 +166,15 @@ export default function StudentDashboard() {
 
   const loadAdvice = async () => {
     setAdviceLoading(true);
+    setAdviceError(null);
     try {
       const res = await fetch("/api/student/recommendations/ai");
-      if (res.ok) setAdviceResult(await res.json());
+      if (res.ok) {
+        setAdviceResult(await res.json());
+      } else {
+        const body = await res.json().catch(() => ({}));
+        setAdviceError(body?.details || body?.error || `Error ${res.status}`);
+      }
     } catch (err) {
       console.error("Study advice error:", err);
     } finally {
@@ -252,6 +259,10 @@ export default function StudentDashboard() {
               {adviceLoading ? "Getting advice..." : adviceResult ? "Refresh advice" : "Get study advice"}
             </button>
           </div>
+
+          {adviceError && (
+            <p className="mt-4 text-sm text-red-700">Could not get advice: {adviceError}</p>
+          )}
 
           {adviceResult && (
             <div className="mt-5">

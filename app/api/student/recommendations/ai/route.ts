@@ -20,7 +20,14 @@ export async function GET(req: NextRequest) {
     cache: "no-store",
   });
   if (!rulesRes.ok) {
-    return Response.json({ error: "Could not load practice results" }, { status: 500 });
+    const body = await rulesRes.json().catch(() => ({}));
+    return Response.json(
+      {
+        error: "Could not load practice results",
+        details: body?.details || body?.error || `status ${rulesRes.status}`,
+      },
+      { status: 500 }
+    );
   }
   const recommendations: Recommendations = await rulesRes.json();
 
@@ -33,6 +40,7 @@ export async function GET(req: NextRequest) {
       advice: [],
       recommendations,
       aiUsed: false,
+      details: error?.message,
     });
   }
 }
