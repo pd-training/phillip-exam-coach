@@ -197,24 +197,78 @@ export default function QuickQuizMode() {
   if (loading) return <div style={{ padding: "20px" }}>Loading quiz...</div>;
 
   if (completed) {
+    // Summary of this run, by chapter. Every question was answered, so the
+    // questions the student got wrong (missed) tell us the rest.
+    const wrongIds = new Set(missed.map((q) => q.id));
+    const chapterMap = new Map<number, { correct: number; total: number }>();
+    for (const q of questions) {
+      const c = chapterMap.get(q.chapter) || { correct: 0, total: 0 };
+      c.total += 1;
+      if (!wrongIds.has(q.id)) c.correct += 1;
+      chapterMap.set(q.chapter, c);
+    }
+    const chapterRows = Array.from(chapterMap.entries())
+      .map(([chapter, c]) => ({
+        chapter,
+        correct: c.correct,
+        total: c.total,
+        pct: c.total ? Math.round((c.correct / c.total) * 100) : 0,
+      }))
+      .sort((a, b) => a.chapter - b.chapter);
+    const overallPct = questions.length ? Math.round((score / questions.length) * 100) : 0;
+    const weakest = [...chapterRows].sort((a, b) => a.pct - b.pct)[0];
+    const strongest = [...chapterRows].sort((a, b) => b.pct - a.pct)[0];
+
     return (
       <div className="min-h-screen bg-gray-50 flex flex-col">
         <StudentNav />
 
-        <div className="flex-1 flex items-center justify-center px-6 py-12">
-          <div className="bg-white rounded-2xl border border-gray-200 p-8 w-full max-w-2xl text-center">
-            <h1 className="text-3xl font-bold text-gray-900 mb-3">Full Practice complete</h1>
-            <p className="text-gray-600 mb-8">You have worked through all {questions.length} questions.</p>
-            <div className="flex gap-3">
+        <div className="flex-1 flex justify-center px-6 py-10">
+          <div className="w-full max-w-4xl">
+            <p className="text-xs text-gray-600 mb-1">{paperTitle}</p>
+            <h1 className="text-3xl font-bold text-gray-900">Full Practice complete</h1>
+            <p className="text-gray-600 mt-2 mb-6">
+              You answered all {questions.length} questions and scored{" "}
+              <span className="font-bold text-gray-900">{score} of {questions.length}</span> ({overallPct}%).
+            </p>
+
+            {chapterRows.length > 0 && (
+              <div className="mb-6 space-y-3">
+                <h2 className="text-lg font-bold text-gray-900">Review by chapter</h2>
+                {strongest && weakest && strongest.chapter !== weakest.chapter && (
+                  <p className="text-sm text-gray-700">
+                    Strongest: Chapter {strongest.chapter} ({strongest.pct}%). Revisit: Chapter {weakest.chapter} ({weakest.pct}%).
+                  </p>
+                )}
+                <div className="space-y-2">
+                  {chapterRows.map((r) => (
+                    <div key={r.chapter} className="flex items-center gap-3 text-sm">
+                      <span className="w-24 text-gray-800 font-medium">Chapter {r.chapter}</span>
+                      <div className="flex-1 h-2.5 bg-gray-200 rounded-full overflow-hidden">
+                        <div
+                          className={`h-full ${r.pct >= 60 ? "bg-green-600" : "bg-red-500"}`}
+                          style={{ width: `${r.pct}%` }}
+                        />
+                      </div>
+                      <span className="w-28 text-right text-gray-700">
+                        {r.correct} / {r.total} ({r.pct}%)
+                      </span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            <div className="flex flex-wrap gap-3">
               <button
                 onClick={() => router.replace(`/exam/${paperId}`)}
-                className="flex-1 px-6 py-3 bg-gray-500 hover:bg-gray-600 text-white rounded-lg font-semibold transition duration-200"
+                className="px-6 py-3 bg-gray-500 hover:bg-gray-600 text-white rounded-lg font-semibold transition duration-200"
               >
                 Back to Paper
               </button>
               <button
                 onClick={() => window.location.reload()}
-                className="flex-1 px-6 py-3 bg-blue-900 hover:bg-blue-800 text-white rounded-lg font-semibold transition duration-200"
+                className="px-6 py-3 bg-blue-900 hover:bg-blue-800 text-white rounded-lg font-semibold transition duration-200"
               >
                 Start again
               </button>
