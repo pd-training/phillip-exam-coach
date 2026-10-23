@@ -351,7 +351,6 @@ export default function PracticePage() {
 
           {recommendedChapters.length > 0 ? (
             <>
-              <p className="text-gray-600 mb-6">Focus on these chapters based on your exam performance:</p>
               <div className="space-y-2">
                 {recommendedChapters.map((chapter) => (
                   <Link key={chapter.id} href={`/exam/${paperId}/practice-chapter/${chapter.chapterNumber}`}>
