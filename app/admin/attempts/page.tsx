@@ -212,7 +212,7 @@ export default function AttemptsPage() {
                           <p className="font-medium text-gray-900">{r.studentName || "No name"}</p>
                           <p className="text-gray-500 text-xs">{r.studentEmail}</p>
                         </td>
-                        <td className="px-6 py-4 text-sm text-gray-900">{r.paperTitle || "Paper"}</td>
+                        <td className="px-6 py-4 text-sm text-gray-900">{r.paperShortName || r.paperTitle || "Paper"}</td>
                         <td className="px-6 py-4 text-sm text-gray-700">{practiceLabel(r)}</td>
                         <td className={`px-6 py-4 text-sm font-semibold ${r.percentage >= 50 ? "text-green-700" : "text-red-600"}`}>
                           {r.correctCount} / {r.totalQuestions} ({r.percentage}%)
@@ -300,7 +300,7 @@ export default function AttemptsPage() {
                           {attempt.username || attempt.userid}
                         </td>
                         <td className="px-6 py-4 text-sm text-gray-600">
-                          {paper?.title || "Unknown"}
+                          {paper?.shortName || paper?.title || "Unknown"}
                         </td>
                         <td className="px-6 py-4 text-sm font-semibold">
                           {attempt.score !== null ? `${attempt.score}%` : "—"}

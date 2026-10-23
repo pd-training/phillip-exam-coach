@@ -1,6 +1,7 @@
 import { getServerSession } from "next-auth/next";
 import { authOptions } from "@/lib/auth-config";
 import prisma from "@/lib/prisma";
+import { ensureLabelColumns } from "@/lib/paper-labels";
 
 export const dynamic = "force-dynamic";
 
@@ -12,8 +13,9 @@ export async function GET() {
       return Response.json({ error: "Admin only" }, { status: 403 });
     }
 
+    await ensureLabelColumns();
     const runs = await (prisma as any).$queryRawUnsafe(
-      `SELECT s.id, s."paperId", p.title AS "paperTitle", s.mode, s."chapterNumber",
+      `SELECT s.id, s."paperId", p.title AS "paperTitle", p."shortName" AS "paperShortName", s.mode, s."chapterNumber",
               s."totalQuestions", s."correctCount", s.percentage, s."createdAt",
               u.id AS "userId", u.name AS "studentName", u.email AS "studentEmail"
        FROM "QuickQuizSession" s

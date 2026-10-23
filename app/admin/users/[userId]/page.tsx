@@ -25,6 +25,7 @@ interface Attempt {
   id: string;
   paperId: string;
   paperTitle: string;
+  paperShortName?: string | null;
   status: string;
   score: number | null;
   result: string | null;
@@ -613,7 +614,7 @@ export default function UserDetailPage() {
                 <tbody>
                   {attempts.map((att) => (
                     <tr key={att.id} style={{ borderBottom: "1px solid #e5e7eb" }}>
-                      <td style={{ padding: "8px 0", color: "#1f2937", fontWeight: "500" }}>{att.paperTitle}</td>
+                      <td style={{ padding: "8px 0", color: "#1f2937", fontWeight: "500" }}>{att.paperShortName || att.paperTitle}</td>
                       <td style={{ padding: "8px 0", color: "#1f2937" }}>{att.score ? `${att.score}%` : "—"}</td>
                       <td style={{ padding: "8px 0" }}>
                         {att.result ? (
