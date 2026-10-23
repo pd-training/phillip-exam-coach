@@ -162,6 +162,7 @@ export default function StudentDashboard() {
     advice: { title: string; action: string }[];
     recommendations: { priority: any[]; review: any[]; totalAnswered: number };
     aiUsed: boolean;
+    details?: string;
   } | null>(null);
 
   const loadAdvice = async () => {
@@ -276,6 +277,9 @@ export default function StudentDashboard() {
                     <p className="text-sm text-amber-700 mb-3">
                       Advice is unavailable right now. Here is what your results show.
                     </p>
+                  )}
+                  {!adviceResult.aiUsed && adviceResult.details && (
+                    <p className="text-xs text-gray-500 mb-3 break-all">Reason: {adviceResult.details}</p>
                   )}
                   {adviceResult.aiUsed && adviceResult.advice.length > 0 && (
                     <ol className="grid gap-3 md:grid-cols-2">
