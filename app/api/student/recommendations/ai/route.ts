@@ -15,10 +15,19 @@ export async function GET(req: NextRequest) {
   }
 
   // Reuse the rules engine by calling it with the student's own cookies
-  const rulesRes = await fetch(`${req.nextUrl.origin}/api/student/recommendations`, {
-    headers: { cookie: req.headers.get("cookie") || "" },
-    cache: "no-store",
-  });
+  let rulesRes: Response;
+  try {
+    rulesRes = await fetch(`${req.nextUrl.origin}/api/student/recommendations`, {
+      headers: { cookie: req.headers.get("cookie") || "" },
+      cache: "no-store",
+    });
+  } catch (error: any) {
+    console.error("Could not reach recommendations:", error?.message);
+    return Response.json(
+      { error: "Could not load practice results", details: error?.message },
+      { status: 500 }
+    );
+  }
   if (!rulesRes.ok) {
     const body = await rulesRes.json().catch(() => ({}));
     return Response.json(
