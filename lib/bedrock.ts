@@ -14,7 +14,12 @@ export async function invokeBedrockText(opts: {
   const region = process.env.BEDROCK_REGION || "ap-southeast-2";
   const modelId = process.env.BEDROCK_MODEL_ID || "amazon.nova-lite-v1:0";
 
-  if (!token) throw new BedrockError("BEDROCK_API_KEY is not set");
+  if (!token) {
+    const seen = Object.keys(process.env).filter((k) => /BEDROCK|AWS/i.test(k));
+    throw new BedrockError(
+      `BEDROCK_API_KEY is not set (server can see: ${seen.join(", ") || "none"})`
+    );
+  }
 
   const url = `https://bedrock-runtime.${region}.amazonaws.com/model/${encodeURIComponent(
     modelId
