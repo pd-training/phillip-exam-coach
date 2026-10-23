@@ -87,6 +87,12 @@ export default function LandingPage() {
               <BrandLockup href="/" variant="light" />
             </div>
 
+            {/* AI-powered badge */}
+            <span className="mb-5 inline-flex items-center gap-2 rounded-full border border-amber-400/60 bg-amber-400/10 px-4 py-1.5 text-sm font-semibold text-amber-300">
+              <span className="h-2 w-2 rounded-full bg-amber-400" aria-hidden="true" />
+              AI-powered exam preparation
+            </span>
+
             {/* Heading */}
             <h1 className="text-6xl md:text-8xl font-bold text-white leading-none tracking-tight mb-6">
               Finance<span className="text-amber-400">Ready</span>
@@ -372,6 +378,64 @@ export default function LandingPage() {
             <a href="#signup" className="inline-block px-8 py-3 bg-blue-900 hover:bg-blue-800 text-white rounded-lg font-semibold transition">
               Create an account
             </a>
+          </div>
+        </div>
+      </section>
+
+      {/* Comparison: portal vs traditional prep */}
+      <section className="py-20 px-6 bg-slate-50">
+        <div className="max-w-5xl mx-auto">
+          <div className="text-center mb-10">
+            <h2 className="text-4xl font-bold text-gray-900 mb-4">Books and PDFs only tell you what to read</h2>
+            <p className="text-xl text-gray-600">FinanceReady tells you what you still need to learn</p>
+          </div>
+          <div className="overflow-x-auto rounded-2xl border border-gray-200 bg-white">
+            <table className="w-full text-left text-sm md:text-base">
+              <thead>
+                <tr className="bg-gray-100">
+                  <th className="px-5 py-4 font-semibold text-gray-900 w-1/3">What you need</th>
+                  <th className="px-5 py-4 font-semibold text-gray-700 w-1/3">Traditional prep (books and PDFs)</th>
+                  <th className="px-5 py-4 font-semibold text-blue-900 bg-blue-100 w-1/3">
+                    <span className="inline-flex items-center gap-2">
+                      FinanceReady
+                      <span className="rounded-full bg-amber-400 px-2 py-0.5 text-xs font-bold text-blue-950">AI-powered</span>
+                    </span>
+                  </th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr className="border-t border-gray-200">
+                  <td className="px-5 py-4 font-medium text-gray-900">Feedback on each answer</td>
+                  <td className="px-5 py-4 text-gray-600">Read the answer key yourself</td>
+                  <td className="px-5 py-4 bg-blue-50 font-medium text-blue-900">Instant feedback with an explanation</td>
+                </tr>
+                <tr className="border-t border-gray-200">
+                  <td className="px-5 py-4 font-medium text-gray-900">Knowing which chapters to revisit</td>
+                  <td className="px-5 py-4 text-gray-600">Guess from memory</td>
+                  <td className="px-5 py-4 bg-blue-50 font-medium text-blue-900">AI picks focus chapters from your results</td>
+                </tr>
+                <tr className="border-t border-gray-200">
+                  <td className="px-5 py-4 font-medium text-gray-900">Readiness for the real exam</td>
+                  <td className="px-5 py-4 text-gray-600">Unclear until exam day</td>
+                  <td className="px-5 py-4 bg-blue-50 font-medium text-blue-900">Readiness level per paper, from exam simulations</td>
+                </tr>
+                <tr className="border-t border-gray-200">
+                  <td className="px-5 py-4 font-medium text-gray-900">Personalised study advice</td>
+                  <td className="px-5 py-4 text-gray-600">Same plan for everyone</td>
+                  <td className="px-5 py-4 bg-blue-50 font-medium text-blue-900">AI actions based on your own results</td>
+                </tr>
+                <tr className="border-t border-gray-200">
+                  <td className="px-5 py-4 font-medium text-gray-900">Review after an exam simulation</td>
+                  <td className="px-5 py-4 text-gray-600">Mark it by hand</td>
+                  <td className="px-5 py-4 bg-blue-50 font-medium text-blue-900">AI feedback by chapter, with strengths and gaps</td>
+                </tr>
+                <tr className="border-t border-gray-200">
+                  <td className="px-5 py-4 font-medium text-gray-900">Progress over time</td>
+                  <td className="px-5 py-4 text-gray-600">Not tracked</td>
+                  <td className="px-5 py-4 bg-blue-50 font-medium text-blue-900">Scores and trends in your Progress tab</td>
+                </tr>
+              </tbody>
+            </table>
           </div>
         </div>
       </section>
