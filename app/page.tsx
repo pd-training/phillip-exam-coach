@@ -235,11 +235,8 @@ export default function LandingPage() {
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
             {[
               { code: "RES 5", name: "Rules, Ethics and Skills for Financial Advisory Services", note: "Rules and ethics for advisers" },
-              { code: "M8", name: "Collective Investment Schemes", note: "Unit trusts and funds" },
               { code: "M9", name: "Life Insurance and Investment-Linked Policies", note: "Life insurance and ILP basics" },
               { code: "M9A", name: "Life Insurance and Investment-Linked Policies II", note: "Continuation of M9" },
-              { code: "CM-SIP (M6A)", name: "Structured Investment Products", note: "Structured products" },
-              { code: "CM-EIP (M6)", name: "Excluded Investment Products", note: "Excluded investment products" },
               { code: "HI", name: "Health Insurance", note: "Health insurance products" },
             ].map((p) => (
               <div key={p.code} className="rounded-xl border border-gray-200 bg-slate-50 p-5">
