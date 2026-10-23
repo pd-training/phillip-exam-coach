@@ -194,6 +194,29 @@ export default function AttemptReviewPage() {
 
   // Check authentication
   const [previous, setPrevious] = useState<{ score: number; chapters: ChapterPct[] } | null>(null);
+  const [aiFeedback, setAiFeedback] = useState<{
+    overview: string;
+    strengths: string[];
+    revisit: string[];
+    nextSteps: string[];
+  } | null>(null);
+  const [aiLoading, setAiLoading] = useState(false);
+  const [aiError, setAiError] = useState<string | null>(null);
+
+  const loadAiFeedback = async () => {
+    setAiLoading(true);
+    setAiError(null);
+    try {
+      const res = await fetch(`/api/student/attempts/${attemptId}/feedback`);
+      const body = await res.json().catch(() => ({}));
+      if (res.ok) setAiFeedback(body.feedback);
+      else setAiError(body?.details || body?.error || `Error ${res.status}`);
+    } catch (err: any) {
+      setAiError(err?.message || "Something went wrong");
+    } finally {
+      setAiLoading(false);
+    }
+  };
 
   // Load the previous attempt on the same paper for comparison
   useEffect(() => {
@@ -386,10 +409,49 @@ export default function AttemptReviewPage() {
       {summaryLines.length > 0 && (
         <div className="max-w-7xl mx-auto px-6 pb-6">
           <div className="bg-white rounded-xl border border-gray-200 px-6 py-4">
-            <h3 className="text-sm font-semibold text-gray-900 mb-1">Personalised feedback</h3>
+            <div className="flex flex-wrap items-center justify-between gap-3 mb-1">
+              <h3 className="text-sm font-semibold text-gray-900">Personalised feedback</h3>
+              <button
+                onClick={loadAiFeedback}
+                disabled={aiLoading}
+                className="px-4 py-2 bg-blue-900 hover:bg-blue-800 disabled:opacity-60 text-white rounded-lg text-sm font-semibold transition"
+              >
+                {aiLoading ? "Writing feedback..." : aiFeedback ? "Refresh AI feedback" : "Get AI feedback"}
+              </button>
+            </div>
             {summaryLines.map((line, i) => (
               <p key={i} className="text-sm text-gray-700 leading-relaxed">{line}</p>
             ))}
+            {aiError && <p className="mt-3 text-sm text-red-700">Could not get feedback: {aiError}</p>}
+            {aiFeedback && (
+              <div className="mt-4 border-t border-gray-200 pt-4 space-y-3">
+                {aiFeedback.overview && <p className="text-sm text-gray-800 leading-relaxed">{aiFeedback.overview}</p>}
+                {aiFeedback.strengths.length > 0 && (
+                  <div>
+                    <p className="text-sm font-semibold text-green-800">Strengths</p>
+                    <ul className="list-disc pl-5 text-sm text-gray-700 space-y-1">
+                      {aiFeedback.strengths.map((x, i) => <li key={i}>{x}</li>)}
+                    </ul>
+                  </div>
+                )}
+                {aiFeedback.revisit.length > 0 && (
+                  <div>
+                    <p className="text-sm font-semibold text-red-700">Revisit</p>
+                    <ul className="list-disc pl-5 text-sm text-gray-700 space-y-1">
+                      {aiFeedback.revisit.map((x, i) => <li key={i}>{x}</li>)}
+                    </ul>
+                  </div>
+                )}
+                {aiFeedback.nextSteps.length > 0 && (
+                  <div>
+                    <p className="text-sm font-semibold text-gray-900">Next steps</p>
+                    <ul className="list-disc pl-5 text-sm text-gray-700 space-y-1">
+                      {aiFeedback.nextSteps.map((x, i) => <li key={i}>{x}</li>)}
+                    </ul>
+                  </div>
+                )}
+              </div>
+            )}
           </div>
         </div>
       )}

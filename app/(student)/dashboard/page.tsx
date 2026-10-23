@@ -163,6 +163,7 @@ export default function StudentDashboard() {
     recommendations: { priority: any[]; review: any[]; totalAnswered: number };
     aiUsed: boolean;
     details?: string;
+    readiness?: { paperName: string; level: string; detail: string }[];
   } | null>(null);
 
   const loadAdvice = async () => {
@@ -283,9 +284,9 @@ export default function StudentDashboard() {
         <div className="mb-10 bg-white rounded-2xl border border-gray-200 p-6">
           <div className="flex flex-wrap items-start justify-between gap-4">
             <div>
-              <h2 className="text-lg font-bold text-gray-900">Your study advice</h2>
+              <h2 className="text-lg font-bold text-gray-900">How prepared are you for the exam?</h2>
               <p className="text-sm text-gray-600 mt-1">
-                Get suggestions on what to practise next, based on your practice results.
+                See how ready you are for each paper, based on your exam simulations and practice results, and what to do next.
               </p>
             </div>
             <button
@@ -293,7 +294,7 @@ export default function StudentDashboard() {
               disabled={adviceLoading}
               className="px-5 py-2.5 bg-blue-900 hover:bg-blue-800 disabled:opacity-60 text-white rounded-lg text-sm font-semibold transition"
             >
-              {adviceLoading ? "Getting advice..." : adviceResult ? "Refresh advice" : "Get study advice"}
+              {adviceLoading ? "Checking..." : adviceResult ? "Check again" : "Check my readiness"}
             </button>
           </div>
 
@@ -303,6 +304,31 @@ export default function StudentDashboard() {
 
           {adviceResult && (
             <div className="mt-5">
+              {adviceResult.readiness && adviceResult.readiness.length > 0 && (
+                <div className="grid gap-3 md:grid-cols-2 mb-5">
+                  {adviceResult.readiness.map((r) => (
+                    <div key={r.paperName} className="rounded-xl border border-gray-200 p-4 flex flex-col gap-1">
+                      <div className="flex items-center justify-between gap-3">
+                        <p className="font-semibold text-gray-900">{r.paperName}</p>
+                        <span
+                          className={`text-xs font-semibold px-2.5 py-1 rounded-full ${
+                            r.level === "Ready"
+                              ? "bg-green-100 text-green-800"
+                              : r.level === "Getting there"
+                                ? "bg-amber-100 text-amber-800"
+                                : r.level === "Not yet ready"
+                                  ? "bg-red-100 text-red-700"
+                                  : "bg-gray-200 text-gray-700"
+                          }`}
+                        >
+                          {r.level}
+                        </span>
+                      </div>
+                      <p className="text-sm text-gray-600">{r.detail}</p>
+                    </div>
+                  ))}
+                </div>
+              )}
               {adviceResult.recommendations.totalAnswered === 0 ? (
                 <p className="text-sm text-gray-600">
                   Answer some practice questions first, then come back for advice.
