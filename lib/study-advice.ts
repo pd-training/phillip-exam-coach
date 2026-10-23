@@ -32,8 +32,9 @@ const ADVICE_SYSTEM_PROMPT = `You are a study coach for students preparing for S
 You receive a student's practice results by chapter, and their exam simulation results with pass marks.
 Give 3 to 4 short, concrete actions that will best prepare the student for the real exam, in plain English.
 Only mention chapters and papers that appear in the data. Do not invent numbers.
+Every title and action must name the paper (use the paper name as given) and the chapter number, for example "HI, Chapter 11". Never write a heading that leaves out the paper.
 Reply with JSON only, no other text, in this shape:
-{"advice":[{"title":"short heading","action":"one or two sentences"}]}`;
+{"advice":[{"title":"short heading that names the paper and chapter","action":"one or two sentences that name the paper and chapter"}]}`;
 
 const FEEDBACK_SYSTEM_PROMPT = `You are a study coach for students preparing for Singapore CMFAS exams.
 You receive one exam simulation result: the score, the pass mark, and the score for each chapter.
