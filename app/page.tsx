@@ -232,7 +232,7 @@ export default function LandingPage() {
             <h2 className="text-3xl font-bold text-gray-900 mb-3">Papers financial advisors typically need</h2>
             <p className="text-lg text-gray-600">Which papers you need depends on the products you advise on. Check with SCI or IBF to confirm.</p>
           </div>
-          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
+          <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
             {[
               { code: "RES 5", name: "Rules, Ethics and Skills for Financial Advisory Services", note: "Rules and ethics for advisers" },
               { code: "M9", name: "Life Insurance and Investment-Linked Policies", note: "Life insurance and ILP basics" },
