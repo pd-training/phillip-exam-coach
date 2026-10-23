@@ -298,8 +298,8 @@ export default function PracticeChapterMode() {
         </button>
       </div>
 
-      <div className="flex-1 flex items-start justify-center px-6 pb-4 pt-2">
-        <div className="bg-white rounded-2xl border border-gray-200 p-5 w-full max-w-4xl">
+      <div className="flex-1 flex justify-center px-6 pb-4 pt-2">
+        <div className="w-full max-w-4xl">
           {/* Header */}
           <div className="mb-4 flex justify-between items-center">
             <div>
@@ -322,7 +322,7 @@ export default function PracticeChapterMode() {
           </div>
 
           {/* Question */}
-          <div className="bg-blue-50 border border-blue-200 rounded-lg px-4 py-3.5 mb-4">
+          <div className="mb-4">
             <p className="whitespace-pre-line m-0 font-medium text-[15px] leading-relaxed text-gray-900">
               {currentQuestion.text}
             </p>
