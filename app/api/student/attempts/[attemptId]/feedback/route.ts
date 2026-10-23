@@ -1,6 +1,8 @@
 import { getServerSession } from "next-auth/next";
 import { authOptions } from "@/lib/auth-config";
 import prisma from "@/lib/prisma";
+import { ensureLabelColumns } from "@/lib/paper-labels";
+import { generateAttemptFeedback } from "@/lib/study-advice";
 
 export const dynamic = "force-dynamic";
 
@@ -16,27 +18,7 @@ function parseJson<T>(value: unknown, fallback: T): T {
   return value as T;
 }
 
-type Tally = Map<number, { correct: number; total: number }>;
-
-// Per-chapter results for one exam simulation, plus the average across all
-// students' simulations on the same paper (for comparison).
-function tallyAttempt(
-  answers: Record<string, string>,
-  questionIds: string[],
-  byId: Map<string, { chapterNumber: number; correctAnswer: string }>
-): Tally {
-  const tally: Tally = new Map();
-  for (const qid of questionIds) {
-    const q = byId.get(qid);
-    if (!q) continue;
-    const t = tally.get(q.chapterNumber) || { correct: 0, total: 0 };
-    t.total += 1;
-    if (answers[qid] && answers[qid] === q.correctAnswer) t.correct += 1;
-    tally.set(q.chapterNumber, t);
-  }
-  return tally;
-}
-
+// Personalised feedback for one exam simulation attempt (summary only)
 export async function GET(_req: Request, { params }: { params: { attemptId: string } }) {
   try {
     const session = await getServerSession(authOptions);
@@ -45,8 +27,9 @@ export async function GET(_req: Request, { params }: { params: { attemptId: stri
     }
     const userId = (session.user as any).id;
 
+    await ensureLabelColumns();
     const rows = (await prisma.$queryRaw`
-      SELECT ea.id, ea.paperid::text AS "paperId", ea.score, ea.answers, ea."questionIds",
+      SELECT ea.id, ea.paperid::text AS "paperId", ea.score, ea.passed, ea.answers, ea."questionIds",
              p.title AS "paperTitle", p."shortName" AS "paperShortName",
              COALESCE(p."passingScore", 50) AS "passingScore"
       FROM examattempt ea
@@ -70,31 +53,16 @@ export async function GET(_req: Request, { params }: { params: { attemptId: stri
 
     const answers = parseJson<Record<string, string>>(attempt.answers, {});
     const questionIds = parseJson<string[]>(attempt.questionIds, Object.keys(answers));
-    const mine = tallyAttempt(answers, questionIds, byId);
 
-    // Average across other students' recent simulations on this paper
-    const others = (await prisma.$queryRaw`
-      SELECT ea.answers, ea."questionIds"
-      FROM examattempt ea
-      WHERE ea.paperid::text = ${attempt.paperId}::text
-        AND ea.score IS NOT NULL
-        AND ea.id <> ${params.attemptId}
-      ORDER BY ea.submittedat DESC
-      LIMIT 300
-    `) as any[];
-    const allTotals = new Map<number, { correct: number; total: number }>();
-    for (const o of others) {
-      const t = tallyAttempt(
-        parseJson<Record<string, string>>(o.answers, {}),
-        parseJson<string[]>(o.questionIds, []),
-        byId
-      );
-      t.forEach((v, ch) => {
-        const a = allTotals.get(ch) || { correct: 0, total: 0 };
-        a.correct += v.correct;
-        a.total += v.total;
-        allTotals.set(ch, a);
-      });
+    // Tally each chapter. Unanswered questions count as not correct, as in the score.
+    const tally = new Map<number, { correct: number; total: number }>();
+    for (const qid of questionIds) {
+      const q = byId.get(qid);
+      if (!q) continue;
+      const t = tally.get(q.chapterNumber) || { correct: 0, total: 0 };
+      t.total += 1;
+      if (answers[qid] && answers[qid] === q.correctAnswer) t.correct += 1;
+      tally.set(q.chapterNumber, t);
     }
 
     const chapterRows = (await (prisma as any).chapter.findMany({
@@ -103,31 +71,37 @@ export async function GET(_req: Request, { params }: { params: { attemptId: stri
     })) as { number: number; title: string }[];
     const titles = new Map(chapterRows.map((c) => [Number(c.number), c.title]));
 
-    const chapters = Array.from(mine.entries())
+    const chapters = Array.from(tally.entries())
       .sort((a, b) => a[0] - b[0])
-      .map(([chapterNumber, t]) => {
-        const avg = allTotals.get(chapterNumber);
-        return {
-          chapterNumber,
-          title: titles.get(chapterNumber) ?? null,
-          correct: t.correct,
-          total: t.total,
-          pct: t.total ? Math.round((t.correct / t.total) * 100) : 0,
-          averagePct: avg && avg.total > 0 ? Math.round((avg.correct / avg.total) * 100) : null,
-        };
-      });
+      .map(([chapterNumber, t]) => ({
+        chapterNumber,
+        title: titles.get(chapterNumber) ?? null,
+        correct: t.correct,
+        total: t.total,
+      }));
 
-    return Response.json({
-      paperName: attempt.paperShortName || attempt.paperTitle || "Paper",
-      score: Number(attempt.score),
-      passingScore: Number(attempt.passingScore),
-      studentsCompared: others.length,
-      chapters,
-    });
+    const score = Number(attempt.score);
+    const passingScore = Number(attempt.passingScore);
+    try {
+      const feedback = await generateAttemptFeedback({
+        paperName: attempt.paperShortName || attempt.paperTitle || "Paper",
+        score,
+        passingScore,
+        passed: score >= passingScore,
+        chapters,
+      });
+      return Response.json({ feedback, aiUsed: true });
+    } catch (error: any) {
+      console.error("Attempt feedback failed:", error?.message);
+      return Response.json(
+        { error: "Could not create feedback", details: error?.message },
+        { status: 500 }
+      );
+    }
   } catch (error: any) {
-    console.error("Chapter performance error:", error?.message);
+    console.error("Attempt feedback error:", error?.message);
     return Response.json(
-      { error: "Could not load chapter performance", details: error?.message },
+      { error: "Could not create feedback", details: error?.message },
       { status: 500 }
     );
   }

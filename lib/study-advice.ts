@@ -36,6 +36,13 @@ Every title and action must name the paper (use the paper name as given) and the
 Reply with JSON only, no other text, in this shape:
 {"advice":[{"title":"short heading that names the paper and chapter","action":"one or two sentences that name the paper and chapter"}]}`;
 
+const FEEDBACK_SYSTEM_PROMPT = `You are a study coach for students preparing for Singapore CMFAS exams.
+You receive one exam simulation result: the score, the pass mark, and the score for each chapter.
+Give a short, encouraging but honest review in plain English for a non-technical adult learner.
+Only use the numbers given. Do not invent figures.
+Reply with JSON only, no other text, in this shape:
+{"overview":"two sentences on how the attempt went","strengths":["up to 2 short points"],"revisit":["up to 3 chapters or topics to revisit, with why"],"nextSteps":["up to 3 short actions"]}`;
+
 function levelFor(exam: ExamResult, hasWeakChapters: boolean): PaperReadiness {
   if (exam.latestScore === null) {
     return { paperName: exam.paperName, level: "Not tried yet", detail: "No exam simulation taken yet." };
@@ -104,6 +111,47 @@ export async function generateStudyAdvice(
     user: summarise(recs, readiness),
   });
   return { readiness, advice: cleanAdvice(parseJsonObject(text).advice) };
+}
+
+export interface AttemptForFeedback {
+  paperName: string;
+  score: number;
+  passingScore: number;
+  passed: boolean;
+  chapters: { chapterNumber: number; title: string | null; correct: number; total: number }[];
+}
+
+export interface AttemptFeedback {
+  overview: string;
+  strengths: string[];
+  revisit: string[];
+  nextSteps: string[];
+}
+
+export async function generateAttemptFeedback(a: AttemptForFeedback): Promise<AttemptFeedback> {
+  const lines = [
+    `Paper: ${a.paperName}`,
+    `Score: ${a.score}% (pass mark ${a.passingScore}%), result: ${a.passed ? "passed" : "not passed"}`,
+    "Chapter results:",
+    ...a.chapters.map(
+      (c) =>
+        `- Chapter ${c.chapterNumber}${c.title ? ` (${c.title})` : ""}: ${c.correct} of ${c.total} correct (${c.total ? Math.round((c.correct / c.total) * 100) : 0}%)`
+    ),
+  ];
+  const text = await invokeBedrockText({
+    system: FEEDBACK_SYSTEM_PROMPT,
+    user: lines.join("\n"),
+    maxTokens: 700,
+  });
+  const p = parseJsonObject(text);
+  const list = (v: any, n: number) =>
+    (Array.isArray(v) ? v : []).filter((x) => typeof x === "string").slice(0, n).map((x: string) => x.slice(0, 300));
+  return {
+    overview: typeof p.overview === "string" ? p.overview.slice(0, 400) : "",
+    strengths: list(p.strengths, 2),
+    revisit: list(p.revisit, 3),
+    nextSteps: list(p.nextSteps, 3),
+  };
 }
 
 export interface FocusInput {
