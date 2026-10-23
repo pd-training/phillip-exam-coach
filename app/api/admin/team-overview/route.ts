@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { getServerSession } from "next-auth/next";
 import { authOptions } from "@/lib/auth-config";
 import prisma from "@/lib/prisma";
+import { ensureLabelColumns } from "@/lib/paper-labels";
 
 export const dynamic = "force-dynamic";
 
@@ -35,8 +36,9 @@ export async function GET() {
     `);
 
     // Papers are assigned through PaperRequest rows with status 'approved'
+    await ensureLabelColumns();
     const assignments: any[] = await db.$queryRawUnsafe(`
-      SELECT pr."userId", p.id::text AS "paperId", p.title, p."passingScore",
+      SELECT pr."userId", p.id::text AS "paperId", p.title, p."shortName", p."passingScore",
              COALESCE(pr."reviewedAt", pr."createdAt") AS "registeredAt"
       FROM "PaperRequest" pr
       JOIN "Paper" p ON p.id = pr."paperId"
@@ -108,6 +110,7 @@ export async function GET() {
           return {
             paperId: a.paperId,
             title: a.title,
+            shortTitle: a.shortName || null,
             passingScore: Number(a.passingScore),
             registeredAt: a.registeredAt ? new Date(a.registeredAt).toISOString() : null,
             status,

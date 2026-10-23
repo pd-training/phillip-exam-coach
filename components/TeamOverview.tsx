@@ -6,6 +6,7 @@ import Link from "next/link";
 type PaperProgress = {
   paperId: string;
   title: string;
+  shortTitle?: string | null;
   passingScore: number;
   registeredAt: string | null;
   status: "Passed" | "Failed" | "Not started";
@@ -183,7 +184,7 @@ export default function TeamOverview({ sideCard }: { sideCard?: ReactNode }) {
                                 key={p.paperId}
                                 className="px-3 py-1.5 rounded-full border border-gray-300 bg-gray-50 text-gray-800 text-xs font-medium leading-none whitespace-nowrap"
                               >
-                                {p.title}
+                                {p.shortTitle || p.title}
                               </span>
                             ))}
                           </div>
